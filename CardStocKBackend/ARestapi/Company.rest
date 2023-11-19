@@ -23,7 +23,7 @@ Content-Type: application/json
 "password": "{{password}}"
 }
 
-###
+
 ###Company Create User
 POST  {{baseUrl}}/CreateUser
 content-type: application/json;charset=UTF-8
@@ -790,9 +790,29 @@ Authorization: Bearer {{Auth_token}}
 {
 "safariId":"Mbona_tbSwL_1697829219",
 "productCode":"bido_1698592481",
-"qty":"0",
-"price":"0",
-"status":"gainProduct"
+"qty":"20",
+"price":"50",
+"status":"spendProduct"
+
+}
+
+###Display all Temp Calculator not from Database
+GET  {{baseUrl}}/GetDispTempCalculator
+content-type: application/json;charset=UTF-8
+Authorization: Bearer {{Auth_token}}
+
+{
+"safariId":"Mbona_tbSwL_1697829219"
+
+}
+###Reset all Temp Calculator not from Database
+GET  {{baseUrl}}/ResetTempCalculator
+content-type: application/json;charset=UTF-8
+Authorization: Bearer {{Auth_token}}
+
+{
+"safariId":"Mbona_tbSwL_1697829219"
+
 
 
 
@@ -806,7 +826,8 @@ content-type: application/json;charset=UTF-8
 Authorization: Bearer {{Auth_token}}
 
 {
-"name":"Mbona_tbSwL_1697829219",
+"safariId":"Mbona_tbSwL_1697829219",
+"name":"saveTemp1",
 "systemUid":"Point_Sale1",
 "commentData":"commentData"
 }
@@ -816,23 +837,36 @@ content-type: application/json;charset=UTF-8
 Authorization: Bearer {{Auth_token}}
 
 {
-"uid":"Mbona_tbSwL_1697829219"
+"safariId":"Mbona_tbSwL_1697829219",
+"uid":"saveTemp1_1700324601"
 
 
 }
-###Get All Temporally Data to Database
-POST  {{baseUrl}}/GetAllcalculateTemp
-content-type: application/json;charset=UTF-8
-Authorization: Bearer {{Auth_token}}
 
-
-###Get Temporally Data to Database
-POST  {{baseUrl}}/GetcalculateTemp
+###Delete Temporally Data From Database
+POST  {{baseUrl}}/DeleteCalculateTemp
 content-type: application/json;charset=UTF-8
 Authorization: Bearer {{Auth_token}}
 
 {
-"uid":"Mbona_tbSwL_1697829219"
+"uid":"saveTemp1_1700328261"
+
+
+}
+###Get All Temporally Data to Database
+GET  {{baseUrl}}/GetAllcalculateTemp
+content-type: application/json;charset=UTF-8
+Authorization: Bearer {{Auth_token}}
+
+
+###Use This CalculateTemp From Database to continue to calculate Interest
+GET  {{baseUrl}}/UseThisCalculateTemp
+content-type: application/json;charset=UTF-8
+Authorization: Bearer {{Auth_token}}
+
+{
+"safariId":"Mbona_tbSwL_1697829219",
+"uid":"saveTemp1_1700396580"
 
 
 }

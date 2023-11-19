@@ -645,30 +645,78 @@ class StockController extends Controller
         }
 
     }
+    public function GetDispTempCalculator($input){
+        $safariId=$input['safariId'];
+        $stockInterest=$input['safariId']."_"."int";
+        $stockTempInterest=$input['safariId']."_"."tempInt";//Tempinterest
+        return response([
+
+
+
+            "data1"=>Cache::get($stockTempInterest)
+
+
+
+            ],200);
+    }
+    public function ResetTempCalculator($input){
+        $safariId=$input['safariId'];
+        $stockInterest=$input['safariId']."_"."int";
+        $stockTempInterest=$input['safariId']."_"."tempInt";//Tempinterest
+        Cache::forget($stockTempInterest);
+        return response([
+
+
+
+            "data1"=>Cache::get($stockTempInterest)
+
+
+
+            ],200);
+    }
     public function SaveCalculateTemp($input){//temp Calculator
+        $safariId=$input['safariId'];
+        $stockInterest=$input['safariId']."_"."int";
+        $stockTempInterest=$input['safariId']."_"."tempInt";//Tempinterest
         $json_array=[
 
            "data1"=>Cache::get($stockTempInterest),
-           "data2"=>Cache::get($stockInterest)[0]->interest
+           "data2"=>Cache::get($stockInterest)[0]->interest,
         ];
+if((Cache::get($stockTempInterest))!=null)
+{
+    $uid=preg_replace('/[^A-Za-z0-9-]/','',$input['name']);
+    $uid=$uid.""."_".date(time());
+    $check=DB::table("temp_tables")
+    ->insert([
+        "uid"=>$uid,
+        "name"=>$input['name'],
+        "tempData"=>json_encode($json_array),
+        "subscriber"=>Auth::user()->subscriber,
+        "uidCreator"=>Auth::user()->uid,
+        "actionTable"=>"SaveCalculatorInterest",
+        "systemUid"=>$input['systemUid'],
+        "commentData"=>$input["commentData"]??'none',
+        "created_at"=>$this->today
+    ]);
+}
+else{
+    return response([
 
-        $uid=preg_replace('/[^A-Za-z0-9-]/','',$input['promoName']);
-        $uid=$uid.""."_".date(time());
-        $check=DB::table("temp_tables")
-        ->insert([
-            "uid"=>$uid,
-            "name"=>$input['name'],
-            "tempData"=>json_encode($json_array),
-            "subscriber"=>Auth::user()->subscriber,
-            "uidCreator"=>Auth::user()->uid,
-            "actionTable"=>"SaveCalculatorInterest",
-            "systemUid"=>$input['systemUid'],
-            "commentData"=>$input["commentData"]??'none',
-            "created_at"=>$this->today
-        ]);
+        "status"=>false,
+        "message"=>"No temp Data to insert"
+
+
+
+     ],200);
+}
+
 
     }
     public function UpdatecalculateTemp($input){//temp Calculator
+        $safariId=$input['safariId'];
+        $stockInterest=$input['safariId']."_"."int";
+        $stockTempInterest=$input['safariId']."_"."tempInt";//Tempinterest
         $json_array=[
 
             "data1"=>Cache::get($stockTempInterest),
@@ -682,33 +730,72 @@ class StockController extends Controller
 
        ));
     }
+    public function DeleteCalculateTemp($input){
+        $check = DB::delete("DELETE FROM temp_tables WHERE uid = :uid AND subscriber = :subscriber LIMIT 1", [
+            "uid" => $input['uid'],
+            "subscriber" => Auth::user()->subscriber
+        ]);
+
+        if ($check) {
+            return response([
+                "status" => true,
+            ], 200);
+        } else {
+            return response([
+                "status" => false,
+            ], 200);
+        }
+
+
+    }
     public function GetAllcalculateTemp($input){//later i will add pagination
-        $check=DB::select("select name,tempData From temp_tables where uidCreator=:uidCreator and subscriber=:subscriber limit 100",array(
+        $check=DB::select("select name,uid From temp_tables where uidCreator=:uidCreator and subscriber=:subscriber limit 100",array(
             "uidCreator"=>Auth::user()->uid,
             "subscriber"=>Auth::user()->subscriber
         ));
-        return response([
+        if($check){
+            return response([
 
 
 
-            "data1"=>$check
+                //"data1"=>$check
+                "data1"=>$check
 
 
 
-         ],200);
+             ],200);
+        }
+        else{
+
+        }
+
     }
-    public function GetCalculatorTemp($input){//temp Calculator
+
+
+    public function UseThisCalculateTemp($input){//this will continue to use
+        $safariId=$input['safariId'];
+        $stockInterest=$input['safariId']."_"."int";
+        $stockTempInterest=$input['safariId']."_"."tempInt";
         $check=DB::select("select name,tempData From temp_tables where uid=:uid and uidCreator=:uidCreator limit 1",array(
             "uid"=>$input['uid'],
             "uidCreator"=>Auth::user()->uid,
 
         ));
+        $interestData=($this->interest_check($input))?Cache::get($stockInterest)[0]->interest:'0';
+              $data=json_decode($check[0]->tempData, true);
+              $interest=$data["data1"]["Interest"]= $interestData;
+              $data2=$data["data2"]=$interestData;
+              $data["data1"]["SumInterest"]=$interest +($data["data1"]["TotTempSold"])-(($data["data1"]["TotTempBuy"]));
+
+              Cache::put($stockTempInterest,$data["data1"],now()->addMinutes(60));
         return response([
 
 
-
-            "data1"=>$check
-
+          //"data1"=>json_decode($check[0]->tempData, true),
+          //"dataTest"=>(json_decode($check[0]->tempData, true))["data1"]["Interest"]
+         // "data"=>$data
+         "data1"=>(Cache::get($stockTempInterest)),
+         "data2"=>Cache::get($stockInterest)[0]->interest
 
 
          ],200);
@@ -951,7 +1038,7 @@ public function testSubmitOrder(){
         WHERE oh.uid = 'O4Pft' AND productCode='keb'");
 
     }
-    
+
 
     public function SubmitOrder($input){
         $check_InputData=$input['all_total']-$input['inputData'];//all_total :niyo total ya orders,custom_price or inputData=niyo client yishyuye cash

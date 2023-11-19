@@ -404,6 +404,62 @@ class CompanyController extends Controller
         }
     }
 
+    public function GetDispTempCalculator(Request $request){
+        if(Auth::check())
+        {
+
+            if(Auth::user()->platform==$this->platform1)
+            {
+                $input=$request->all();
+
+                return (new StockController)->GetDispTempCalculator($input);
+            }
+            else{
+                return response([
+                    "status"=>false,
+                    "result"=>$this->Admin_Auth_result_error,
+                    "error"=>$this->Admin_Auth_error,
+
+                ],200);
+            }
+        }
+        else{
+            return response([
+                "status"=>false,
+                "result"=>$this->Admin_Auth_result_error,
+                "error"=>$this->Admin_Auth_error,
+
+            ],200);
+        }
+    }
+    public function ResetTempCalculator(Request $request){
+        if(Auth::check())
+        {
+
+            if(Auth::user()->platform==$this->platform1)
+            {
+                $input=$request->all();
+
+                return (new StockController)->ResetTempCalculator($input);
+            }
+            else{
+                return response([
+                    "status"=>false,
+                    "result"=>$this->Admin_Auth_result_error,
+                    "error"=>$this->Admin_Auth_error,
+
+                ],200);
+            }
+        }
+        else{
+            return response([
+                "status"=>false,
+                "result"=>$this->Admin_Auth_result_error,
+                "error"=>$this->Admin_Auth_error,
+
+            ],200);
+        }
+    }
     public function SaveCalculateTemp(Request $request){
         if(Auth::check())
         {
@@ -460,6 +516,34 @@ class CompanyController extends Controller
             ],200);
         }
     }
+    public function DeleteCalculateTemp(Request $request){
+        if(Auth::check())
+        {
+
+            if(Auth::user()->platform==$this->platform1)
+            {
+                $input=$request->all();
+
+                return (new StockController)->DeleteCalculateTemp($input);
+            }
+            else{
+                return response([
+                    "status"=>false,
+                    "result"=>$this->Admin_Auth_result_error,
+                    "error"=>$this->Admin_Auth_error,
+
+                ],200);
+            }
+        }
+        else{
+            return response([
+                "status"=>false,
+                "result"=>$this->Admin_Auth_result_error,
+                "error"=>$this->Admin_Auth_error,
+
+            ],200);
+        }
+    }
     public function GetAllcalculateTemp(Request $request){
         if(Auth::check())
         {
@@ -489,7 +573,7 @@ class CompanyController extends Controller
         }
     }
 
-    public function GetCalculatorTemp(Request $request){
+    public function UseThisCalculateTemp(Request $request){
         if(Auth::check())
         {
 
@@ -497,7 +581,7 @@ class CompanyController extends Controller
             {
                 $input=$request->all();
 
-                return (new StockController)->GetCalculatorTemp($input);
+                return (new StockController)->UseThisCalculateTemp($input);
             }
             else{
                 return response([

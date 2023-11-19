@@ -20,6 +20,7 @@ class CreateTempTablesTable extends Migration
             $table->String('uidCreator')->index('uidCreator');
             $table->json('tempData')->nullable();
             $table->string('status')->default('none')->index("status");
+            $table->string('subscriber')->default('none')->index("subscriber");
             $table->string('actionTable')->default('none')->index("actionTable");
             $table->string('systemUid')->default('none')->index("systemUid");
             $table->longtext('commentData')->nullable();//
