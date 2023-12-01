@@ -113,6 +113,8 @@ Route::post('/EditStockQty','CompanyController@EditStockQty')->name('EditStockQt
 Route::post('/EditStockFactPrice','CompanyController@EditStockFactPrice')->name('EditStockFactPrice');
 Route::post('/placeOrder','CompanyController@placeOrder')->name('placeOrder');
 Route::get('/EditOrder','CompanyController@EditOrder')->name('EditOrder');
+Route::get('/ViewTempOrder','CompanyController@ViewTempOrder')->name('ViewTempOrder');
+Route::get('/ViewUserTempOrder','CompanyController@ViewUserTempOrder')->name('ViewUserTempOrder');
 Route::get('/displayCalculate','CompanyController@displayCalculate')->name('displayCalculate');
 Route::post('/calculateAll','CompanyController@calculateAll')->name('calculateAll');
 Route::get('/GetDispTempCalculator','CompanyController@GetDispTempCalculator')->name('GetDispTempCalculator');

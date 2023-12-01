@@ -154,7 +154,7 @@ class StockController extends Controller
     list($queryData,$itemName) = ($productCode!='none') ? ['productCode','%' . $productCode. '%'] : ['productName','%' . $productName. '%'];
 
 
-        $check=DB::select("select *from products where subscriber=:subscriber and $queryData LIKE :itemName LIMIT 50",array(
+        $check=DB::select("select *from products where subscriber=:subscriber and $queryData LIKE :itemName LIMIT 20",array(
             "itemName"=>$itemName,
             "subscriber"=>Auth::user()->subscriber
 
@@ -819,8 +819,9 @@ else{
         $req_qty=$input['req_qty'];
         $productCode=$input['productCode'];
         $input['statusForm']??'none';
+        $currentQtyOfOrder=$input['currentQtyOfOrder']??0;
        // $req_qtyProduct=$input['req_qtyFromorderEdit']??$input['req_qty'];
-          $SignChange=($input['statusForm']=='editOrder')?'-':'+';
+          $SignChange=($input['statusForm']=='editOrder')?"-$currentQtyOfOrder+":'+';
         //list($QueryFactory,$myArray) = ($input['statusForm']=='editOrder') ? [$QueryFactoryDelete,$sqlDelete,$myArrayDelete] : [$QueryFactoryUpdate,$sqlUpdate,$myArrayUpdate];
         $check=DB::update("update products set qty_sold=qty_sold  $SignChange $req_qty where subscriber=:subscriber and productCode=:productCode and qty>=qty_sold+$req_qty limit 1",array(
             "productCode"=>$productCode,
@@ -874,7 +875,8 @@ else{
          "productCode"=>$productCode,
          "subscriber"=>Auth::user()->subscriber
         ));
-        $uid =$input['uidComeFromOrderEdit']??Str::random(5);
+        $orderId=$input['orderIdFromEdit']??'none';
+        $uid =($orderId!='none')?"OrderId"."_".Str::random(2).""."_".date(time()):$orderId;
         $data=[];
         $ids=[];
           $limitData=count($results);
@@ -883,8 +885,9 @@ else{
             $id=$results[$i]->id;
             $ids[]=$results[$i]->id;
             $data[] = [
-                'uid' =>$uid,
-                'userid'=>'test',
+                //'uid' =>$input["orderIdFromEdit"]??$uid,
+                'uid' =>$orderId,
+                'userid'=>$input['uidclient'],
                 'safariId'=>$results[$i]->safariId,
                 "order_creator"=>Auth::user()->uid,
                 "subscriber"=>Auth::user()->subscriber,
@@ -925,19 +928,20 @@ else{
 
         return response([
 
-
+            "status"=>true,
             "result"=>$results,
+            "OrderId"=>$input["orderIdFromEdit"]??$uid,
             //"data"=>$data
 
 
 
             ],200);
     }
-    public function productEditOrder($input){
+    public function productEditOrder($input){//idea behind this is first to reset cart (orderhistory),and start as new one
 
         $req_qty=$input['req_qty'];
         $productCode=$input['productCode'];
-        $current_qty=$input['current_qty'];
+       // $current_qty=$input['current_qty'];
         $uid=$input['uid'];
         $subscriber=Auth::user()->subscriber;
         $results=DB::select("select *FROM
@@ -950,14 +954,18 @@ else{
 
         $data=[];
         $ids=[];
+        $orderId="OrderId";
           $limitData=count($results);
+             $totalQty=0;
         for($i=0;$i<$limitData;$i++)
         {
+            $totalQty+=$results[$i]->qty;
             $id=$results[$i]->id;
             $ids[]=$results[$i]->id;
-            $data[] = [
+            $orderId=$results[$i]->uid;
+            /*$data[] = [
                 'uid' =>$uid,
-                'userid'=>'test',
+                'userid'=>$input['uidclient'],
                 'safariId'=>$results[$i]->SafariId,
                 'ProductCode'=>$productCode,
                 'price'=>$results[$i]->price,
@@ -966,7 +974,8 @@ else{
 
 
                 // Add more rows here if needed
-            ];
+            ];*/
+            //reset all
            DB::update("update safariProducts set qty=qty+:qty,SoldOut=SoldOut-:SoldOut,TotSoldAmount=TotSoldAmount-:TotSoldAmout where safariId=:safariId and productCode=:productCode limit 100 ",array(
                    "qty"=>$results[$i]->qty,
                    "SoldOut"=>$results[$i]->qty,
@@ -982,28 +991,23 @@ else{
 
                 ));
         }
-        $input['uidComeFromOrderEdit']=$input['uid'];
+       // $input['uidComeFromOrderEdit']=$input['uid'];
        // $current_qty=totalqty
-       $input['req_qtyFromorderEdit']=$req_qty-$input['current_qty'];
+       $input['currentQtyOfOrder']=$totalQty;
+       $input["orderIdFromEdit"]=$orderId;
        $input['statusForm']="editOrder";
 
-
-       return $this->placeOrder($input);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+if($results){
+    if($input['currentQtyOfOrder']>0){
+        return $this->placeOrder($input);
     }
+
+}
+
+}
+public function EditOGOrder($input){
+
+}
 
     public function testCancelOrder(){
 
@@ -1019,6 +1023,143 @@ public function testSubmitOrder(){
 
 }
 
+public function ViewTempOrder($input){//make sure order must not be more than 30 minutes
+
+    try {
+        $uid = $input['uid'];
+        try {
+            $check = DB::select("
+                SELECT
+                MAX(users.name) AS name,
+                MAX(orderhistories.uid) AS uid,
+                orderhistories.productCode,
+                MAX(products.productName) AS productName,
+                    MAX(products.pcs) AS pcs,
+                    SUM(orderhistories.qty) AS totalQty,
+                    SUM(orderhistories.total) AS totalAmount,
+                    SUM(orderhistories.qty_count) AS totalCount
+                FROM orderhistories
+                INNER JOIN products ON orderhistories.productCode = products.productCode
+                INNER JOIN users ON orderhistories.userid = users.uid
+                WHERE uid = :uid
+                GROUP BY orderhistories.productCode order by orderhistories.id desc
+                LIMIT 25
+            ", ['uid' => $uid]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'An error occurred',
+                'errorPrint' => $e->getMessage(),
+                'errorCode' => $e->getLine(),
+            ], 500);
+        }
+
+        if($check)
+        {
+           return response([
+               "status"=>true,
+               "result"=>$check,
+
+           ],200);
+        }
+        else{
+           return response([
+               "status"=>true,
+               "result"=>0,
+
+           ],200);
+        }
+
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'An error occurred', 'errorPrint' => $e->getMessage(), 'errorCode' => $e->getLine()], 500);
+    }
+
+
+
+
+
+
+
+}
+
+public function ViewUserTempOrder($input){//make sure order must not be more than 30 minutes
+
+    try {
+
+        try {
+            $check = DB::select("
+            SELECT
+                MAX(users.name) AS name,
+                MAX(orderhistories.uid) AS uid,
+                orderhistories.productCode,
+                MAX(products.productName) AS productName,
+                MAX(orderhistories.price) AS price,
+                MAX(products.pcs) AS pcs,
+                SUM(orderhistories.qty) AS totalQty,
+                SUM(orderhistories.total) AS totalAmount,
+                SUM(orderhistories.qty_count) AS totalCount
+            FROM orderhistories
+            INNER JOIN products ON orderhistories.productCode = products.productCode
+            INNER JOIN users ON orderhistories.userid = users.uid
+            WHERE orderhistories.order_creator = :orderCreator
+                AND orderhistories.subscriber = :subscriber
+                AND orderhistories.status='Open'
+            GROUP BY orderhistories.productCode order by orderhistories.id desc
+            LIMIT 25
+        ", [
+
+            'orderCreator' => Auth::user()->uid,
+            'subscriber' => Auth::user()->subscriber,
+        ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'An error occurred',
+                'errorPrint' => $e->getMessage(),
+                'errorCode' => $e->getLine(),
+            ], 500);
+        }
+
+        if($check)
+        {
+           return response([
+               "status"=>true,
+               "result"=>$check,
+
+           ],200);
+        }
+        else{
+           return response([
+               "status"=>true,
+               "result"=>0,
+
+           ],200);
+        }
+
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'An error occurred', 'errorPrint' => $e->getMessage(), 'errorCode' => $e->getLine()], 500);
+    }
+
+
+
+
+
+
+
+}
+
+public function viewTotalSales(){ //this will view All sales
+    DB::select("select *from admnin_records where uid=:uid and status=:status and subscriber=:subscriber order by id desc limit 25",[
+         "uid"=>Auth::user()->uid,
+        "subscriber"=>Auth::user()->subscriber,
+        "status"=>'sales'
+    ]);
+}
+public function viewSaleSyst(){ //this will view All sales based on systemId //not done
+    DB::select("select *from admnin_records where uid=:uid and status=:status and subscriber=:subscriber order by id desc limit 25",[
+         "uid"=>Auth::user()->uid,
+        "subscriber"=>Auth::user()->subscriber,
+        "status"=>'sales'
+    ]);
+}
 
     //my code of buying and calculator
 
@@ -1077,12 +1218,14 @@ public function testSubmitOrder(){
     WHEN custom_price >=all_total THEN 'paid'
     ELSE 'dettes'
     END
-    where uid=:uid limit 100",array(
+    where uid=:uid and userid=:userid limit 100",array(
         "uid"=>$input["OrderId"],
+        "userid"=>$input["uidUser"],
         "all_total"=>$input['all_total'],
         "custom_price"=>$input['inputData']
 
     ));*/
+
     $paidStatus=($input['inputData']==$input['all_total'])?'paid':($input['inputData']>$input['all_total'])?'paidReturn':'dettes';
     $json_array =  [
         [

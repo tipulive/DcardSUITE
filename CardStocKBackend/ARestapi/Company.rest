@@ -637,12 +637,14 @@ Authorization: Bearer {{Auth_token}}
 
 
 ###Search productCode or productName  done or i may search both productCode and productName together
+### either productCode equal none or productName equal none
 GET  {{baseUrl}}/SearchProduct
 content-type: application/json;charset=UTF-8
 Authorization: Bearer {{Auth_token}}
 
 {
-"productCode":"veve_169782945"
+"productCode":"b",
+"productName":"none"
 
 
 }
@@ -655,19 +657,19 @@ Authorization: Bearer {{Auth_token}}
 
 {
 "safariId":"Mbona_tbSwL_1697829219",
-"name":"Mbona",
+"name":"Phone",
 "uid":"Uid",
 "cat":"1",
 "catName":"China",
-"productName":"BIDO",
+"productName":"WebCam",
 "productCode":"0",
-"fact_price":"40",
+"fact_price":"50",
 "status":"Spendproduct",
 "CommentStatus":"Inserting Product",
-"price":"40",
+"price":"60",
 "qty":"500",
-"pcs":"20",
-"tags":"20",
+"pcs":"30",
+"tags":"Phone My Model",
 "active":"on",
 "description":"on"
 }
@@ -722,38 +724,59 @@ Authorization: Bearer {{Auth_token}}
 
 }
 
-###place order ,this oTher ref after req_qty are after sales
+###place order ,this oTher ref after req_qty are after sales not allowed negative value
+### more order i need to Add orderId value to orderIdFromEdit to track my Order
 POST  {{baseUrl}}/placeOrder/
 content-type: application/json;charset=UTF-8
 Authorization: Bearer {{Auth_token}}
 
 {
 "productCode":"bido_1698592481",
-"uidclient":"testclient",
-"req_qty":10,
+"uidclient":"kebineericMuna_1674160265",
+"req_qty":25,
 "ref":"test",
-"comment":"ok"
+"comment":"ok",
+"statusForm":"none",
+"orderIdFromEdit":"feke"
 
 
 }
 
 ###
-###Edit temporary Order edit order done but not tested
+###Edit temporary Order edit order done not allowed negative Value 100% tested and working perfect
 GET  {{baseUrl}}/EditOrder/
 content-type: application/json;charset=UTF-8
 Authorization: Bearer {{Auth_token}}
 
 {
-"productCode":"bido_1698592481",
-"req_qty":2,
-"current_qty":10,
-"uid":"KoBZ8"
+"productCode":"webcam_1700726985",
+"req_qty":0,
+"uidclient":"kebineericMuna_1674160265",
+
+"uid":"OrderId_2S_1700747346",
+"statusForm":"editOrder"
 
 
 }
 
 ###
+### double test submit Order later
+POST  {{baseUrl}}/SubmitOrder
+Content-Type: application/json
+Authorization: Bearer {{Auth_token}}
 
+{
+"uid":"Nyota_1672353378",
+"uidUser":"kebineericMuna_1674160265",
+"OrderId":"Km08c",
+"inputData":"150",
+"all_total":"200",
+"reach":"1200",
+"gain":"350",
+"systemUid":"PointSales_1"
+
+
+}
 ###Edit  OginalOrder this is very Important but done later
 GET  {{baseUrl}}/EditOGOrder/
 content-type: application/json;charset=UTF-8
@@ -768,7 +791,30 @@ Authorization: Bearer {{Auth_token}}
 
 }
 
-###
+###ViewTempOrder
+
+
+GET  {{baseUrl}}/ViewTempOrder/
+content-type: application/json;charset=UTF-8
+Authorization: Bearer {{Auth_token}}
+
+{
+"uid":"Km08c"
+
+
+}
+###ViewTempOrder
+
+
+GET  {{baseUrl}}/ViewUserTempOrder/
+content-type: application/json;charset=UTF-8
+Authorization: Bearer {{Auth_token}}
+
+{
+"uid":"Km08c"
+
+
+}
 
 
 ###this is to calculate when want to see Safari interest
@@ -870,24 +916,8 @@ Authorization: Bearer {{Auth_token}}
 
 
 }
-### double test submit Order later
-POST  {{baseUrl}}/SubmitOrder
-Content-Type: application/json
-Authorization: Bearer {{Auth_token}}
 
-{
-"uid":"Nyota_1672353378",
-"uidUser":"kebineericMuna_1674160265",
-"OrderId":"aKCrj",
-"inputData":"50",
-"all_total":"500",
-"reach":"1200",
-"gain":"350",
-"systemUid":"PointSales_1"
-
-
-}
-### Get Total Debt
+### Get Total Debt,here we must even check with PhoneNumber
 GET  {{baseUrl}}/GetDebt
 Content-Type: application/json
 Authorization: Bearer {{Auth_token}}
