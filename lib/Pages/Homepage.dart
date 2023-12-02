@@ -152,6 +152,10 @@ class _HomepageState extends State<Homepage> {
                   elevation:0,
                 ),
                 onPressed: () async{
+                  setState(() {
+                    cartData.removeWhere((item) => item['productCode'] == "webcam_1700726985");
+                  });
+
                   print(cartData);
                 },
                 child: Text('Check'),
@@ -247,14 +251,17 @@ class _HomepageState extends State<Homepage> {
                               border: InputBorder.none,
                             ),
                             onChanged: (value){
-
-
+                              if((double.tryParse(value) != null)){
                                 num deptVal=(Get.put(StockQuery()).orderSum)-num.parse(value);
-
-
                                 setState(() {
                                   (Get.put(StockQuery()).updateDeptOrder(deptVal));
                                 });
+
+                              }
+
+
+
+
                             },
                           ),
                         ),
@@ -286,11 +293,18 @@ class _HomepageState extends State<Homepage> {
                 ),
               ),
 
-              Expanded(child: CheckoutPage(chekoutResult:cartData)),
+              Expanded(child: CheckoutPage(chekoutResult:cartData,changeQtyCheckout:(index,price,valueData){
+                ChangeQtyMethod(index,price,valueData);
+
+              },deleteCheckout:(productCode){
+                setState(() {
+                  cartData.removeWhere((item) => item['productCode'] == productCode);
+                  num totalVal = cartData.fold(0, (previousValue, element) => previousValue + element['totalAmount']);
+                  (Get.put(StockQuery()).updateSumOrder(totalVal));
+                });
+              },)),
 
               // CheckoutPage(),
-
-
 
 
 
@@ -1007,6 +1021,26 @@ class _HomepageState extends State<Homepage> {
 
 
   }
+  void ChangeQtyMethod(indexData,price,valueData){
+   /* cartData.forEach((item) {
+      if (item['productCode'] == dataDynamic["productCode"]) {
+        item['totalAmount'] = valueData;
+      }
+    });*/
+
+
+    setState(() {
+      cartData[indexData]["totalAmount"]=price*valueData;
+      cartData[indexData]["totalQty"]=valueData;
+
+      num totalVal = cartData.fold(0, (previousValue, element) => previousValue + element['totalAmount']);
+      (Get.put(StockQuery()).updateSumOrder(totalVal));
+    });
+
+
+
+
+  }
   void addCartPlus(dynamic dynamicData) async{
 
     bool containsProductCode = cartData.any((item) => item['productCode'] == dynamicData["productCode"]);
@@ -1252,20 +1286,21 @@ class ProductSearchList extends StatelessWidget {
 
                                                 ),
                                                 onChanged: (text) {
-                                                  searchResult[index]['req_qty']=text;
-                                                 // print(searchResult[index]);
 
-                                                  searchResult[index]['totalQty']=text;
-                                                  searchResult[index]['totalAmount']=num.parse(searchResult[index]['price'])*num.parse(text);
-                                                  searchResult[index]['totalCount']=text;
+                                                  if((double.tryParse(text) != null)){
+                                                    searchResult[index]['req_qty']=text;
+                                                    // print(searchResult[index]);
 
-                                                  print(searchResult[index]);
-
-
+                                                    searchResult[index]['totalQty']=text;
+                                                    searchResult[index]['totalAmount']=num.parse(searchResult[index]['price'])*num.parse(text);
+                                                    searchResult[index]['totalCount']=text;
 
 
-                                                  //print(this._data[index]["total_var"]);
-                                                  // print("Text changed to: $text");
+                                                  }
+
+
+
+
                                                 },
                                               ),
                                               stepWidth: 0.5, // set minimum width to 100
@@ -1372,10 +1407,13 @@ class CheckoutPage extends StatelessWidget {
   const CheckoutPage({
     Key? key,
     required this.chekoutResult,
-
+    required this.changeQtyCheckout,
+    required this.deleteCheckout,
   }) : super(key: key);
 
   final dynamic chekoutResult;
+  final void Function(int,num,num) changeQtyCheckout;
+  final void Function(String) deleteCheckout;
 
 
   @override
@@ -1463,8 +1501,10 @@ class CheckoutPage extends StatelessWidget {
 
                                                 ),
                                                 onChanged: (text) {
+                                              if((double.tryParse(text) != null)){
+                                                changeQtyCheckout(index,(num.parse(chekoutResult[index]["price"])),(num.parse(text)));
 
-
+                                              }
 
                                                   //print(this._data[index]["total_var"]);
                                                   // print("Text changed to: $text");
@@ -1511,12 +1551,12 @@ class CheckoutPage extends StatelessWidget {
                                   child: Text("")),
                               IconButton(
                                 icon: Icon(
-                                    Icons.grid_view,
+                                    Icons.delete,
                                     size: 23.0,
-                                    color: Colors.orange
+                                    color: Colors.red
                                 ),
                                 onPressed: () {
-
+                                deleteCheckout("${chekoutResult[index]["productCode"]}");
 
                                 },
                               ),

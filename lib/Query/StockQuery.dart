@@ -302,7 +302,7 @@ dynamic dataTest=[];
     }
 
   }
-  editOrder(Topups topupData,User userData) async{//balance and Bonus Widthdraw History
+  editTOrder(Topups topupData,User userData) async{//balance and Bonus Widthdraw History
     try {
 
       var params =  {
@@ -320,7 +320,7 @@ dynamic dataTest=[];
       };
 
       String authToken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
-      var url="${ConstantClassUtil.urlLink}/EditOrder";
+      var url="${ConstantClassUtil.urlLink}/EditTOrder";
       var response = await Dio().get(url,
         options: Options(headers: {
           HttpHeaders.contentTypeHeader: "application/json",
@@ -331,12 +331,93 @@ dynamic dataTest=[];
       if (response.statusCode == 200) {
 
 
-        // return (response.data).length;
-        //updateEventState(response.data);
-        //return "hello";
 
-        //updateBalanceHistState(response.data);
-        //return response.data;
+
+        return response;
+
+
+      } else {
+        return false;
+        //print(false);
+      }
+    } catch (e) {
+      //return false;
+      print(e);
+    }
+  }
+  deleteTSingleOrder(Topups topupData,User userData) async{//balance and Bonus Widthdraw History
+    try {
+
+      var params =  {
+
+        "LimitStart":topupData.endlimit,  //page
+        "LimitEnd":topupData.startlimit,//limit
+        "uid":userData.uid,//userid
+        "optionCase":topupData.optionCase,//optionCase
+
+        "productCode":"bido_1698592481",
+        "req_qty":2,
+        "current_qty":10,
+        "uid":"KoBZ8"
+
+      };
+
+      String authToken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
+      var url="${ConstantClassUtil.urlLink}/deleteTSingleOrder";
+      var response = await Dio().get(url,
+        options: Options(headers: {
+          HttpHeaders.contentTypeHeader: "application/json",
+          HttpHeaders.authorizationHeader:"Bearer ${authToken}"
+        }),
+        queryParameters: params,
+      );
+      if (response.statusCode == 200) {
+
+
+
+
+        return response;
+
+
+      } else {
+        return false;
+        //print(false);
+      }
+    } catch (e) {
+      //return false;
+      print(e);
+    }
+  }
+  deleteTOrder(Topups topupData,User userData) async{//balance and Bonus Widthdraw History
+    try {
+
+      var params =  {
+
+        "LimitStart":topupData.endlimit,  //page
+        "LimitEnd":topupData.startlimit,//limit
+        "uid":userData.uid,//userid
+        "optionCase":topupData.optionCase,//optionCase
+
+        "productCode":"bido_1698592481",
+        "req_qty":2,
+        "current_qty":10,
+        "uid":"KoBZ8"
+
+      };
+
+      String authToken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
+      var url="${ConstantClassUtil.urlLink}/deleteTOrder";
+      var response = await Dio().get(url,
+        options: Options(headers: {
+          HttpHeaders.contentTypeHeader: "application/json",
+          HttpHeaders.authorizationHeader:"Bearer ${authToken}"
+        }),
+        queryParameters: params,
+      );
+      if (response.statusCode == 200) {
+
+
+
 
         return response;
 
