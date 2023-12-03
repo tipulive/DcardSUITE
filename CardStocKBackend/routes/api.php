@@ -112,7 +112,9 @@ Route::post('/EditProducts','CompanyController@EditProducts')->name('EditProduct
 Route::post('/EditStockQty','CompanyController@EditStockQty')->name('EditStockQty');
 Route::post('/EditStockFactPrice','CompanyController@EditStockFactPrice')->name('EditStockFactPrice');
 Route::post('/placeOrder','CompanyController@placeOrder')->name('placeOrder');
-Route::get('/EditOrder','CompanyController@EditOrder')->name('EditOrder');
+Route::get('/EditTOrder','CompanyController@EditTOrder')->name('EditTOrder');
+Route::get('/deleteTSingleOrder','CompanyController@deleteTSingleOrder')->name('deleteTSingleOrder');
+Route::get('/deleteTOrder','CompanyController@deleteTOrder')->name('deleteTOrder');
 Route::get('/ViewTempOrder','CompanyController@ViewTempOrder')->name('ViewTempOrder');
 Route::get('/ViewUserTempOrder','CompanyController@ViewUserTempOrder')->name('ViewUserTempOrder');
 Route::get('/displayCalculate','CompanyController@displayCalculate')->name('displayCalculate');
@@ -127,6 +129,7 @@ Route::get('/UseThisCalculateTemp','CompanyController@UseThisCalculateTemp')->na
 Route::post('/SubmitOrder','CompanyController@SubmitOrder')->name('SubmitOrder');
 Route::get('/GetDebt','CompanyController@GetDebt')->name('GetDebt');
 Route::post('/PaidDette','CompanyController@PaidDette')->name('PaidDette');
+Route::get('/OrderViewCount','CompanyController@OrderViewCount')->name('OrderViewCount');
 Route::get('/StockCount','CompanyController@StockCount')->name('StockCount');
 /*safari*/
 Route::get('/SafariGetAll','CompanyController@CompanySafariGetAll')->name('CompanySafariGetAll');

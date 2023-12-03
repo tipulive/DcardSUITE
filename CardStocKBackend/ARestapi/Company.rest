@@ -733,11 +733,11 @@ Authorization: Bearer {{Auth_token}}
 {
 "productCode":"bido_1698592481",
 "uidclient":"kebineericMuna_1674160265",
-"req_qty":25,
+"req_qty":6,
 "ref":"test",
 "comment":"ok",
 "statusForm":"none",
-"orderIdFromEdit":"feke"
+"orderIdFromEdit":"none"
 
 
 }
@@ -759,8 +759,31 @@ Authorization: Bearer {{Auth_token}}
 
 }
 
+###delete Single temporary Order tested Done
+GET  {{baseUrl}}/deleteTSingleOrder/
+content-type: application/json;charset=UTF-8
+Authorization: Bearer {{Auth_token}}
+
+{
+"productCode":"webcam_1700726985",
+"uid":"OrderId_8b_1701507455"
+
+}
+
+###delete temporary Full Order  half tested
+GET  {{baseUrl}}/deleteTOrder/
+content-type: application/json;charset=UTF-8
+Authorization: Bearer {{Auth_token}}
+
+{
+
+"uid":"0s"
+
+}
+
+
 ###
-### double test submit Order later
+### double test submit Order later,this uid is promotion uid
 POST  {{baseUrl}}/SubmitOrder
 Content-Type: application/json
 Authorization: Bearer {{Auth_token}}
@@ -768,7 +791,7 @@ Authorization: Bearer {{Auth_token}}
 {
 "uid":"Nyota_1672353378",
 "uidUser":"kebineericMuna_1674160265",
-"OrderId":"Km08c",
+"OrderId":"0s",
 "inputData":"150",
 "all_total":"200",
 "reach":"1200",
@@ -938,7 +961,7 @@ Authorization: Bearer {{Auth_token}}
 
 "uidUser":"kebineericMuna_1674160265",
 
-"inputData":"600",
+"inputData":"2",
 "all_total":"2000",
 "ref":"Eric",
 "reach":"1200",
@@ -949,22 +972,28 @@ Authorization: Bearer {{Auth_token}}
 
 
 }
+### View Order When Someone Submit
+GET  {{baseUrl}}/OrderViewCount
+content-type: application/json;charset=UTF-8
+Authorization: Bearer {{Auth_token}}
 
+{
+
+}
 
 
 ### take OuT Stock and Shout
-
+### uid is OrderId StockCount Done 100% reste is Order
 GET  {{baseUrl}}/StockCount
 content-type: application/json;charset=UTF-8
 Authorization: Bearer {{Auth_token}}
 
 {
-"id":1,
-"productCode":"viva_1693508831",
+"uid":"0s",
+"productCode":"bido_1698592481",
 "uidTransport":"Qito",
-"qty_Transport":6,
+"qty_Transport":4,
 "stockName":"M crispin",
-"safariId":"test",
 "ref":"NeeMaUid",
 "status":"delivered",
 "comment":"comment Test"
