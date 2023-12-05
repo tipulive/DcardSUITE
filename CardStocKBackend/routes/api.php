@@ -130,6 +130,7 @@ Route::post('/SubmitOrder','CompanyController@SubmitOrder')->name('SubmitOrder')
 Route::get('/GetDebt','CompanyController@GetDebt')->name('GetDebt');
 Route::post('/PaidDette','CompanyController@PaidDette')->name('PaidDette');
 Route::get('/OrderViewCount','CompanyController@OrderViewCount')->name('OrderViewCount');
+Route::get('/OrderViewByUid','CompanyController@OrderViewByUid')->name('OrderViewByUid');
 Route::get('/StockCount','CompanyController@StockCount')->name('StockCount');
 /*safari*/
 Route::get('/SafariGetAll','CompanyController@CompanySafariGetAll')->name('CompanySafariGetAll');

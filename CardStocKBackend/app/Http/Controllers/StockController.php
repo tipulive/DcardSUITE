@@ -1560,32 +1560,60 @@ public function viewSaleSyst(){ //this will view All sales based on systemId //n
              $commentData=$input["commentData"]??'none';
              $status=$input["status"]??'PaidDette';
          // this query will give you a list of how much you will pay every Admin in This Company by dividing according,based on every someone you have debts
+         DB::select("SET @requested_qty = ?", [$inputData]);
          $data=DB::select("SELECT
          id,
-         paid,
          uid,
+         debt AS prevDebt,
          uidCreator,
-         total,
-         systemUid,
-         ROUND(debt / (SELECT SUM(debt) FROM orders) * :inputData) AS paidAmount
-     FROM orders where uidUser=:uidUser and subscriber=:subscriber and paidStatus='dettes' limit 50 ",array(
-        "inputData"=>$inputData,
-        "uidUser"=>$uidUser,
-        "subscriber"=>$subscriber
-     ));
+         CASE
+             WHEN @requested_qty >= debt THEN debt
+             ELSE @requested_qty
+         END AS debt,
+         CASE
+             WHEN @requested_qty >= debt THEN 0
+             ELSE @requested_qty - debt
+         END AS remaining,
+         CASE
+             WHEN @requested_qty >= debt THEN 'paid'
+             ELSE 'dettes'
+         END AS new_status,
 
-     for($i=0;$i<count($data);$i++)
+
+         @requested_qty := GREATEST(@requested_qty - debt, 0) AS updated_requested_qty
+
+     FROM
+         orders
+     WHERE
+        'uidUser'=:uidUser AND
+        'subscriber'=:subscriber AND
+         debt != 0 AND
+         @requested_qty > 0
+     ORDER BY
+         id",array(
+            "uidUser"=>$uidUser,
+            "subscriber"=>$subscriber
+         ));
+
+         $dataLimit=count($data);
+     for($i=0;$i<$dataLimit;$i++)
      {
-         /*$json_array =  [
+        $debtRemain=abs($data[$i]->remaining);
+        $id=$data[$i]->id;
+        $status=$data[$i]->new_status;
+        $paidAmount=$data[$i]->dettes;
+         $json_array =  [
              [
                 "uid"=>$data[$i]->uid,//orders ID
                  "uidUser"=>$uidUser,
                  "uidReceiver"=>$data[$i]->uidCreator,//owner of dettes
                  "uidCreator"=>$uidCreator,//who received amount as admin
-                 "amount"=>$data[$i]->paidAmount,//amount
+                 "amount"=>$paidAmount,//amount Paid
                  "InputAmount"=>$inputData,//amount Submitted
                  "paidStatus"=>(($data[$i]->uidCreator==$uidCreator?'paidReceived':'PaidAdminNotReceived')),//
                  "ref"=>$input['ref']??'none',
+                 "PrevDebt"=>$data[$i]->prevDebt,//PrevDebt
+                 "remain"=>$debtRemain,//Debt Remain
                  "systemUid"=>$data[$i]->systemUid,
                  "subscriber"=>$subscriber,
                  "commentData"=>$input['commentData']??'none',
@@ -1599,27 +1627,29 @@ public function viewSaleSyst(){ //this will view All sales based on systemId //n
              "uidUser"=>$uidUser,
              "uidReceiver"=>$data[$i]->uidCreator,//owner of dettes
              "uidCreator"=>$uidCreator,//who received amount as admin
-             "amount"=>$data[$i]->paidAmount,//amount
+             "amount"=>$paidAmount,//amount
              "paidStatus"=>(($data[$i]->uidCreator==$uidCreator?'paidReceived':'PaidAdminNotReceived')),//
              "temporalData"=>json_encode($json_array),
              "systemUid"=>$data[$i]->systemUid,
              "subscriber"=>$subscriber,
              "commentData"=>$input['commentData']??'none',
              "created_at"=>$this->today
-         ]);*/
+         ]);
          DB::update("UPDATE orders
-         SET debt = (debt - ROUND(debt / (SELECT SUM(debt) FROM orders) * $inputData)),
-         paidStatus = (CASE
-                          WHEN (debt-(ROUND(debt / (SELECT SUM(debt) FROM orders) * $inputData))) <= 0 THEN 'paid'
-                          ELSE paidStatus
-                      END)
+             SET debt = :debtRemain,
+                 paidStatus = :status
+             WHERE id = :id
+                 AND subscriber = :subscriber
+             LIMIT :limitData",
+             [
+                 "debtRemain" => $debtRemain,
+                 "status" => $status,
+                 "id" => $id,
+                 "subscriber" => Auth::user()->subscriber,
+                 "limitData" => $limitData,
+             ]
+);
 
-         WHERE uidUser = :uidUser AND paidStatus = 'dettes' AND subscriber=:subscriber
-         LIMIT 50", array(
-
-             "uidUser" => $uidUser,
-             "subscriber"=>Auth::user()->subscriber
-         ));
 
      }
      return array(
@@ -1696,6 +1726,65 @@ public function viewSaleSyst(){ //this will view All sales based on systemId //n
         } catch (\Exception $e) {
             return response()->json(['error' => 'An error occurred', 'errorPrint' => $e->getMessage(), 'errorCode' => $e->getLine()], 500);
         }
+    }
+    public function OrderViewByUid($input){
+        try {
+
+            try {
+                $check = DB::select("
+                SELECT
+
+                    MAX(orderhistories.uid) AS uid,
+                    orderhistories.productCode,
+                    MAX(products.productName) AS productName,
+                    MAX(orderhistories.price) AS price,
+                    MAX(products.pcs) AS pcs,
+                    SUM(orderhistories.qty) AS totalQty,
+                    SUM(orderhistories.total) AS totalAmount,
+                    SUM(orderhistories.qty_count) AS totalCount
+                FROM orderhistories
+                INNER JOIN products ON orderhistories.productCode = products.productCode
+
+                WHERE orderhistories.uid =:orderId
+                    AND orderhistories.subscriber = :subscriber
+                    AND orderhistories.paidStatus='checked'
+                    AND orderhistories.status ='Open'
+
+                GROUP BY orderhistories.productCode order by orderhistories.id desc
+                LIMIT 25
+            ", [
+
+                'orderId' =>$input["orderId"],
+                'subscriber' => Auth::user()->subscriber,
+            ]);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'error' => 'An error occurred',
+                    'errorPrint' => $e->getMessage(),
+                    'errorCode' => $e->getLine(),
+                ], 500);
+            }
+
+            if($check)
+            {
+               return response([
+                   "status"=>true,
+                   "result"=>$check,
+
+               ],200);
+            }
+            else{
+               return response([
+                   "status"=>true,
+                   "result"=>0,
+
+               ],200);
+            }
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'An error occurred', 'errorPrint' => $e->getMessage(), 'errorCode' => $e->getLine()], 500);
+        }
+
     }
     public function StockCount($input){//count when product is out of stocks
 

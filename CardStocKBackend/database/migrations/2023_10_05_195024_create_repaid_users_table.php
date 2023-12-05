@@ -21,7 +21,8 @@ class CreateRepaidUsersTable extends Migration
             $table->string('uidReceiver')->default('none')->index('uidReceiver');//uyakiriye
             $table->string('amount')->default('none');
             $table->string('status')->default('none')->index('status');
-
+            $table->string('subscriber')->default('none')->index('subscriber');
+            $table->string('systemUid')->default('none')->index("systemUid");//systemUid
             $table->string('signature')->default('none')->index('signature');//finger print
             $table->string('purpose')->default('none')->index("purpose");
             $table->json('temporalData')->nullable();

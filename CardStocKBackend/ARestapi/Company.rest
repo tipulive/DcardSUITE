@@ -980,6 +980,14 @@ Authorization: Bearer {{Auth_token}}
 {
 
 }
+### View Order When Someone Submit
+GET  {{baseUrl}}/OrderViewByUid
+content-type: application/json;charset=UTF-8
+Authorization: Bearer {{Auth_token}}
+
+{
+"orderId":"0s"
+}
 
 
 ### take OuT Stock and Shout
@@ -992,7 +1000,7 @@ Authorization: Bearer {{Auth_token}}
 "uid":"0s",
 "productCode":"bido_1698592481",
 "uidTransport":"Qito",
-"qty_Transport":4,
+"qty_Transport":1,
 "stockName":"M crispin",
 "ref":"NeeMaUid",
 "status":"delivered",

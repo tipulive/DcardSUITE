@@ -209,40 +209,40 @@ class _SetStockCompState extends State<SetStockComp> {
                       GestureDetector(
                           onTap: () async{
                             // This function will be called when the icon is tapped.
-setState(() {
-  showOveray=true;
-});
+                            setState(() {
+                              showOveray=true;
+                            });
                             try {
 
 
                               var resultData=(await ParticipatedQuery().getPreviousPriceOnline(Topups(endlimit:int.parse(_data[index]['count'])),BonusModel(uidUser:'',productName:_data[index]["productCode"]))).data;
-                            if(resultData["status"])
-                            {
-                            setState(() {
-                            //print(Resul);
-                            isLoading=false;
+                              if(resultData["status"])
+                              {
+                                setState(() {
+                                  //print(Resul);
+                                  isLoading=false;
 
-                            bottomResult.clear();
+                                  bottomResult.clear();
 
-                            bottomResult.addAll(resultData["result"]);
-                            showOveray=false;
-                            });
-                           // print(bottomResult);
-                            var pcs="${(_data[index]['pcs']=='none')?'0':_data[index]['pcs']}";
-                            Get.put(HideShowState()).setDefaultInterest(5);
-                            viewThisProduct(_data[index]['productCode'],pcs);
+                                  bottomResult.addAll(resultData["result"]);
+                                  showOveray=false;
+                                });
+                                // print(bottomResult);
+                                var pcs="${(_data[index]['pcs']=='none')?'0':_data[index]['pcs']}";
+                                Get.put(HideShowState()).setDefaultInterest(5);
+                                viewThisProduct(_data[index]['productCode'],pcs);
 
 
-                            }
-                            else{
-                              //showOveray=false;
-                            bottomResult.clear();
+                              }
+                              else{
+                                //showOveray=false;
+                                bottomResult.clear();
 
-                            }
+                              }
 
 
                             } catch (e) {
-                            Text("${e}");
+                              Text("${e}");
                             }
 
                           },
@@ -280,8 +280,8 @@ setState(() {
     super.initState();
     //getapi();
 
-      Quickdata();
-      _scrollController.addListener(_scrollListener);
+    Quickdata();
+    _scrollController.addListener(_scrollListener);
 
   }
   void _scrollListener() {
@@ -361,67 +361,67 @@ setState(() {
           children: [
 
             Center(child: Text("${productName}")),
-          Container(
-            width: 40,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Obx(()=>
-                    SizedBox(
+            Container(
+              width: 40,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Obx(()=>
+                      SizedBox(
 
-                      child: IntrinsicWidth(
-                        child: TextField(
-                          //controller: TextEditingController(text:"${_data[index]["textchange_var"]??_data[index]["qty"]}"),
+                        child: IntrinsicWidth(
+                          child: TextField(
+                            //controller: TextEditingController(text:"${_data[index]["textchange_var"]??_data[index]["qty"]}"),
 
-                          keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
-                            hintText: ' interest is ${Get.put(HideShowState()).defaultInterest.value} Change interest',
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                              hintText: ' interest is ${Get.put(HideShowState()).defaultInterest.value} Change interest',
 
-                            hintStyle: TextStyle(color: Colors.blue),
-                            contentPadding: EdgeInsets.all(0),
-                            isDense: true,
+                              hintStyle: TextStyle(color: Colors.blue),
+                              contentPadding: EdgeInsets.all(0),
+                              isDense: true,
 
 
 
-                          ),
-                          style: TextStyle(
-                            color: Colors.blue, // Set the text color to red
+                            ),
+                            style: TextStyle(
+                              color: Colors.blue, // Set the text color to red
 
-                          ),
-                          onChanged: (text) {
+                            ),
+                            onChanged: (text) {
 
-                            try {
-                              //numVal = num.parse(str);
-                              var myValue = int.tryParse(text);
+                              try {
+                                //numVal = num.parse(str);
+                                var myValue = int.tryParse(text);
 
-                              if (myValue != null && !myValue.isNaN && myValue>=0) {
+                                if (myValue != null && !myValue.isNaN && myValue>=0) {
 
-                                Get.put(HideShowState()).setDefaultInterest(myValue);
+                                  Get.put(HideShowState()).setDefaultInterest(myValue);
 
-                              } else {
+                                } else {
 
+                                }
+                              } catch (e) {
+
+                                print('Error: $e');
                               }
-                            } catch (e) {
 
-                              print('Error: $e');
-                            }
-
-                            //print(this._data[index]["total_var"]);
-                            // print("Text changed to: $text");
-                          },
-                          focusNode: FocusNode(),
+                              //print(this._data[index]["total_var"]);
+                              // print("Text changed to: $text");
+                            },
+                            focusNode: FocusNode(),
 
 
+                          ),
+                          stepWidth: 0.5, // set minimum width to 100
                         ),
-                        stepWidth: 0.5, // set minimum width to 100
                       ),
-                    ),
 
 
-                ),
-              ],
+                  ),
+                ],
+              ),
             ),
-          ),
             ListView.builder(
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
@@ -448,38 +448,38 @@ setState(() {
 
                     child: ListTile(
 
-                      title: Container(
-                        child: Obx(()=>
-                            Column(
+                        title: Container(
+                          child: Obx(()=>
+                              Column(
 
-                              children: [
-                                Center(child: Text('Price:${bottomResult[index]["price"]} ')),
-                                SizedBox(height:5,),
-                               Visibility(
-                                 visible: false,
-                                   child: Text("${Get.put(HideShowState()).defaultInterest.value}")),
+                                children: [
+                                  Center(child: Text('Price:${bottomResult[index]["price"]} ')),
+                                  SizedBox(height:5,),
+                                  Visibility(
+                                      visible: false,
+                                      child: Text("${Get.put(HideShowState()).defaultInterest.value}")),
 
 
-                               if(num.parse(pcs)>0)
-                               Column(
-                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                 children: [
+                                  if(num.parse(pcs)>0)
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
 
-                                   Text('- Price(1pc)=${(num.parse(bottomResult[index]["price"])+Get.put(HideShowState()).defaultInterest.value)/num.parse(pcs)}'),
-                                   SizedBox(height:5,),
+                                        Text('- Price(1pc)=${(num.parse(bottomResult[index]["price"])+Get.put(HideShowState()).defaultInterest.value)/num.parse(pcs)}'),
+                                        SizedBox(height:5,),
 
-                                   Text('- Price(12pcs)=${((num.parse(bottomResult[index]["price"])+Get.put(HideShowState()).defaultInterest.value)/num.parse(pcs))*12}',),
-                                   SizedBox(height:5,),
+                                        Text('- Price(12pcs)=${((num.parse(bottomResult[index]["price"])+Get.put(HideShowState()).defaultInterest.value)/num.parse(pcs))*12}',),
+                                        SizedBox(height:5,),
 
-                                   Text('- Price Bds (${pcs}pcs)=${((num.parse(bottomResult[index]["price"])+Get.put(HideShowState()).defaultInterest.value))}',),
+                                        Text('- Price Bds (${pcs}pcs)=${((num.parse(bottomResult[index]["price"])+Get.put(HideShowState()).defaultInterest.value))}',),
 
-                                 ],
-                               )
+                                      ],
+                                    )
 
-                              ],
-                            )
-                        ),
-                      )
+                                ],
+                              )
+                          ),
+                        )
                     ),
                   ),
                 );
@@ -501,5 +501,4 @@ setState(() {
 
 //
 }
-
 

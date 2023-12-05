@@ -1,10 +1,13 @@
-
+import 'dart:math';
 
 
 import 'package:dcard/Query/CardQuery.dart';
 import 'package:dcard/Query/TopupQuery.dart';
+import 'package:dcard/Query/StockQuery.dart';
 import 'package:dcard/models/CardModel.dart';
+import 'package:dcard/models/QuickBonus.dart';
 import 'package:dcard/models/Topups.dart';
+
 import '../models/BonusModel.dart';
 
 import '../Pages/ProfilePage.dart';
@@ -20,6 +23,7 @@ import 'package:get/get.dart';
 
 
 import 'package:dcard/models/Participated.dart';
+
 import 'package:dcard/models/Promotions.dart';
 import '../Query/AdminQuery.dart';
 import '../Pages/components/BottomNavigator/HomeNavigator.dart';
@@ -30,7 +34,9 @@ import 'package:cool_alert/cool_alert.dart';
 
 import 'package:dcard/Query/PromotionQuery.dart';
 import '../Query/ParticipatedQuery.dart';
+
 import '../Utilconfig/HideShowState.dart';
+import '../models/User.dart';
 
 
 
@@ -46,10 +52,14 @@ class Homepage extends StatefulWidget {
 }
 class _HomepageState extends State<Homepage> {
 
-
+  List<dynamic> dataSearch = [];
+  List<dynamic> cartData = [];
   PromotionQuery promotionState=Get.put(PromotionQuery());
   AdminQuery adminStatedata=Get.put(AdminQuery());
-
+  //StockQuery stockQueryData=Get.put(StockQuery());
+  String searchText = '';
+  TextEditingController inputDataDept=TextEditingController();
+  TextEditingController searchContro=TextEditingController();
   TextEditingController PromoName=TextEditingController();
   TextEditingController uidInput=TextEditingController();//uid promo
   TextEditingController uidInput2=TextEditingController(text:'kebineericMuna_1668935593');//userid of user that will be available after qr scan
@@ -108,55 +118,262 @@ class _HomepageState extends State<Homepage> {
         children: [
           Column(
             children: [
-          Obx(
-          () =>Visibility(
-                visible:Get.put(HideShowState()).isCameraVisible.value,
-                child: Expanded(
-                    flex: 5,
-                    child:Stack(
-                      alignment:Alignment.bottomCenter,
-                      children: [
-                        QRView(key: qrkey,onQRViewCreated: _onQRViewCreated,),
+              //Qr Code
+              SizedBox(height: 20,),
+              // SearchBarField(search: _data,searchController:searchContro,PerformSearch:,),
+              SearchBarField(
+                // Correct: explicitly assigning null
+                searchMethod:(text) async{
+                  if (text!= searchText) {
 
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
+                    performSearch(text);//note i must figure out how to avoid
+                    searchText=text;
+                  }else{
 
-                                CameraSwitch(),
-                                //SizedBox(width: 10.0,),
 
-                                // SizedBox(width: 10.0,),
-                                FlashSwitch(),
-                                Image.asset(
-                                  Flashvalue ? 'images/on.png' : 'images/off.png',
-                                  height: 30,
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
+                    print("no search");
 
-                      ],
-                    )
+                  }
 
-                ),
-
+                },
+                searchController: searchContro,
               ),
-          ),
+
+              Expanded(
+                child: ProductSearchList(addCartMethod:(dynamicData){
+                  addCartPlus(dynamicData);
+
+                },searchResult:dataSearch),
+              ),
+              Text("My Cart"),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+
+                  //primary: Colors.grey[300],
+                  backgroundColor: Colors.green,
+                  elevation:0,
+                ),
+                onPressed: () async{
+                  setState(() {
+                    cartData.removeWhere((item) => item['productCode'] == "webcam_1700726985");
+                  });
+
+                  print(cartData);
+                },
+                child: Text('Check'),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+
+                  //primary: Colors.grey[300],
+                  backgroundColor: Colors.green,
+                  elevation:0,
+                ),
+                onPressed: () async{
+                  //print((Get.put(StockQuery()).dataCartui));
+                  List<dynamic> testdata=[
+                    {
+                      'name': 'bebese',
+                      'uid': 'feke',
+                      'productCode': 'Velo',
+                      'productName': 'webcam',
+                      'price': 30,
+                      'pcs': 30,
+                      'totalQty': 25,
+                      'totalAmount': 750,
+                      'totalCount': 25,
+                    },
+                    {
+                      'name': 'bebese',
+                      'uid': 'feke',
+                      'productCode': 'Matabaro',
+                      'productName': 'bido',
+                      'price': 30,
+                      'pcs': 20,
+                      'totalQty': 30,
+                      'totalAmount': 900,
+                      'totalCount': 30,
+                    },
+                  ];
+                  setState(() {
+                    cartData.insertAll(0,testdata);
+                    //cartData.addAll(testdata);
+                  });
+                  (Get.put(StockQuery()).updateOrder(testdata));
+                },
+                child: Text('Confirm Order'),
+              ),
+              Center(child: Text("${(Get.put(StockQuery()).order)["resultData"][0]["name"]}")),
+              Center(child: Text("OrderId:${(Get.put(StockQuery()).order)["resultData"][0]["uid"]}")),
+              Text("Total:${(Get.put(StockQuery()).orderSum)}"),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(40,0,40,0),
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(5,0,5,0),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10.0),
+                    border: Border.all(
+                      color: Colors.grey, // You can customize the border color
+                    ),
+                  ),
+                  child: Row(
+
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          // Perform an action when the "Delete" button is tapped
+
+                          print('Delete Tapped. Entered Text: ');
+                        },
+                        child: Visibility(
+                          visible: true,
+                          child: Container(
+                            padding: EdgeInsets.all(10.0),
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              borderRadius: BorderRadius.only(
+                                //topLeft: Radius.circular(10.0),
+                                //bottomLeft: Radius.circular(10.0),
+                              ),
+                            ),
+                            child: Text(
+                              'Dept ${(Get.put(StockQuery()).dept)}',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: TextField(
+
+                            decoration: InputDecoration(
+                              hintText: 'Enter Amount...',
+                              border: InputBorder.none,
+                            ),
+                            controller: inputDataDept,
+                            onChanged: (value){
+                              if((double.tryParse(value) != null)){
+                                num deptVal=(Get.put(StockQuery()).orderSum)-num.parse(value);
+                                setState(() {
+                                  (Get.put(StockQuery()).updateDeptOrder(deptVal));
+                                });
+
+                              }
+
+
+
+
+                            },
+                          ),
+                        ),
+                      ),
+                      InkWell(
+                        onTap: () async{
+                         // print("${inputDataDept.text} ${(Get.put(StockQuery())).orderSum } ${Get.put(StockQuery().order["resultData"][0]["uid"])}");
+
+                          // Perform an action when the "Confirm" button is tapped
+                          setState(() {
+
+                            showOveray=true;
+                            // dataSearch.clear();
+
+
+                          });
+
+                         try {
+
+                            var resultData=(await StockQuery().submitOrder(Participated(uid:"Nyota_1672353378"
+                                ,uidUser:"kebineericMuna_1674160265",subscriber:"${Get.put(StockQuery().order["resultData"][0]["uid"])}",inputData:"${inputDataDept.text}"),Promotions(
+                              token:"${(Get.put(StockQuery())).orderSum }",reach:"1200",gain:"350",uid:"PointSales_1"
+                            ))).data;
+                          if(resultData["status"])
+                          {
+                          //print(resultData);
+
+
+                          num totalVal=0;
+
+                          (Get.put(StockQuery()).updateSumOrder(totalVal));
+
+
+                          setState(() {
+                          showOveray=false;
+                          cartData.clear();
+                          // dataSearch.clear();
+
+                          });
+                          }
+                          else{
+
+                          setState(() {
+
+                          showOveray=false;
+
+
+
+                          });
+                          }
+                          } catch (e) {
+                           setState(() {
+
+                             showOveray=false;
+
+
+
+                           });
+                          }
+
+                        },
+                        child: Container(
+                          padding: EdgeInsets.all(10.0),
+                          decoration: BoxDecoration(
+                            color: Colors.green,
+                            borderRadius: BorderRadius.only(
+                              topRight: Radius.circular(10.0),
+                              bottomRight: Radius.circular(10.0),
+                            ),
+                          ),
+                          child: Text(
+                            'Confirm',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              Expanded(child: CheckoutPage(chekoutResult:cartData,changeQtyCheckout:(index,price,valueData){
+                ChangeQtyMethod(index,price,valueData);
+
+              },deleteCheckout:(productCode){
+                setState(() {
+                  cartData.removeWhere((item) => item['productCode'] == productCode);
+                  num totalVal = cartData.fold(0, (previousValue, element) => previousValue + element['totalAmount']);
+                  (Get.put(StockQuery()).updateSumOrder(totalVal));
+                });
+              },)),
+
+              // CheckoutPage(),
+
+
+
 
               Visibility(
                 visible: true,
                 child: Expanded(
-                  flex: 2,
+                  flex: 0,
                   child: SingleChildScrollView(
 
                     child: Center(
                         child:Column(
                           children: [
                             (result!=null)?Text("barcode Type ${describeEnum(result!.format)} Data ${result!.code}"): const Text("Scan Code"),
+
+
 
 
 
@@ -200,99 +417,99 @@ class _HomepageState extends State<Homepage> {
     Get.bottomSheet(
       StatefulBuilder(
         builder: (BuildContext context, StateSetter setState) {
-         return
+          return
 
-           Stack(
-            alignment: Alignment.bottomCenter,
-            children: [
-              Container(
-                height:400,
+            Stack(
+              alignment: Alignment.bottomCenter,
+              children: [
+                Container(
+                  height:400,
 
-                child: Column(
-                  children: [
-                    Container(
+                  child: Column(
+                    children: [
+                      Container(
 
-                      height: 400,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(16),
-                          topRight: Radius.circular(16),
+                        height: 400,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(16),
+                            topRight: Radius.circular(16),
+                          ),
+                        ),
+                        child: ListView(
+                          children: [
+
+                            MyTextWidget(uid,name)
+                          ],
                         ),
                       ),
-                      child: ListView(
-                        children: [
-
-                          MyTextWidget(uid,name)
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                // height: 60,
-                //color: Colors.white,
-                child: HomeNavigator(),
-              ),
-
-              Positioned(
-                right: 15.0,
-                bottom:70,
-                child: FloatingActionButton(
-                  onPressed:()async {
-                    Get.put(HideShowState()).isVisible(true);
-                    ResultDatas=(await Get.put(TopupQuery()).GetBalance(Topups(uid:"${(Get.put(CardQuery()).obj)["resultData"]["UserDetail"]["uid"]??'none'}"))).data;
-                    if(ResultDatas["status"])
-                    {
-                      await Get.put(TopupQuery()).updateTopupState(ResultDatas);
-                      Get.put(HideShowState()).isVisible(false);
-                      Get.to(() => ProfilePage());
-                    }
-                    else{
-
-                      await Get.put(TopupQuery()).updateTopupState(ResultDatas);
-                      Get.put(HideShowState()).isVisible(false);
-                      Get.to(() => ProfilePage());
-                    }
-
-
-                  },
-                  tooltip: 'Increment',
-                  child: CircleAvatar(
-                    radius: 50,
-                    backgroundImage: AssetImage("images/profile.jpg",
-                    ),
+                    ],
                   ),
                 ),
-              ),
-
-              Positioned.fill(
-                  child:  Obx(
-          () =>Visibility(
-            visible: Get.put(HideShowState()).isVisible.value,
-                    child: Container(
-                      color: Colors.black.withOpacity(0.65),
-                    ),
-                  ),
-                  )
+                Container(
+                  // height: 60,
+                  //color: Colors.white,
+                  child: HomeNavigator(),
                 ),
 
                 Positioned(
-                  top: 0,
+                  right: 15.0,
+                  bottom:70,
+                  child: FloatingActionButton(
+                    onPressed:()async {
+                      Get.put(HideShowState()).isVisible(true);
+                      ResultDatas=(await Get.put(TopupQuery()).GetBalance(Topups(uid:"${(Get.put(CardQuery()).obj)["resultData"]["UserDetail"]["uid"]??'none'}"))).data;
+                      if(ResultDatas["status"])
+                      {
+                        await Get.put(TopupQuery()).updateTopupState(ResultDatas);
+                        Get.put(HideShowState()).isVisible(false);
+                        Get.to(() => ProfilePage());
+                      }
+                      else{
 
-                  child:  Obx(
-          () =>Visibility(
-            visible: Get.put(HideShowState()).isVisible.value,
-                    child: Container(
-                      //padding: EdgeInsets.all(16),
-                      child: CircularProgressIndicator(),
+                        await Get.put(TopupQuery()).updateTopupState(ResultDatas);
+                        Get.put(HideShowState()).isVisible(false);
+                        Get.to(() => ProfilePage());
+                      }
+
+
+                    },
+                    tooltip: 'Increment',
+                    child: CircleAvatar(
+                      radius: 50,
+                      backgroundImage: AssetImage("images/profile.jpg",
+                      ),
                     ),
                   ),
-                  )
                 ),
-            ],
-          );
+
+                Positioned.fill(
+                    child:  Obx(
+                          () =>Visibility(
+                        visible: Get.put(HideShowState()).isVisible.value,
+                        child: Container(
+                          color: Colors.black.withOpacity(0.65),
+                        ),
+                      ),
+                    )
+                ),
+
+                Positioned(
+                    top: 0,
+
+                    child:  Obx(
+                          () =>Visibility(
+                        visible: Get.put(HideShowState()).isVisible.value,
+                        child: Container(
+                          //padding: EdgeInsets.all(16),
+                          child: CircularProgressIndicator(),
+                        ),
+                      ),
+                    )
+                ),
+              ],
+            );
         },
       ),
     ).whenComplete(() {
@@ -325,26 +542,26 @@ class _HomepageState extends State<Homepage> {
                       onPressed: ()  async{
 
                         try {
-                         setState(() {
-                           showOveray=true;
-                         });
+                          setState(() {
+                            showOveray=true;
+                          });
                           var resul=(await ParticipatedQuery().GetUidSubmitQuickBonusEventOnline(BonusModel(uidUser:'${(Get.put(CardQuery()).obj)["resultData"]["UserDetail"]["uid"]??'none'}'))).data;
 
 
                           if(resul["status"])
                           {
-                         var dataresult=resul["resultData"];
-                         for(int i=0;i<resul["count"];i++)
-                           {
-                             setState(() {
-                               showOveray=false;
-                               Get.put(ParticipatedQuery()).updateCartUi(resul,true,true);
-                               Get.put(ParticipatedQuery()).dataCartui["countData"]["count"]=resul["count"];
-                               Get.put(ParticipatedQuery()).dataCartui["products"]["${dataresult[i]["quickUid"]}"]=dataresult[i]["price"];
+                            var dataresult=resul["resultData"];
+                            for(int i=0;i<resul["count"];i++)
+                            {
+                              setState(() {
+                                showOveray=false;
+                                Get.put(ParticipatedQuery()).updateCartUi(resul,true,true);
+                                Get.put(ParticipatedQuery()).dataCartui["countData"]["count"]=resul["count"];
+                                Get.put(ParticipatedQuery()).dataCartui["products"]["${dataresult[i]["quickUid"]}"]=dataresult[i]["price"];
 
-                               // Update the value of _counter and trigger a rebuild
-                             });
-                           }
+                                // Update the value of _counter and trigger a rebuild
+                              });
+                            }
 
 
                             Get.to(() => QuickBonusPage());
@@ -572,7 +789,7 @@ class _HomepageState extends State<Homepage> {
                     onPressed: ()async =>{
                       Get.put(HideShowState()).isVisible(true),
 
-                     /* setState(() {
+                      /* setState(() {
 
 
                         showOveray=true;
@@ -583,7 +800,7 @@ class _HomepageState extends State<Homepage> {
                       //print((Get.put(ParticipatedQuery()).obj)),
                       if((Get.put(ParticipatedQuery()).obj)["resultData"]["reach"]!=null)
                         {
-                         /* setState(() {
+                          /* setState(() {
 
 
                             showOveray=false;
@@ -769,6 +986,7 @@ class _HomepageState extends State<Homepage> {
   {
     super.initState();
     //getapi();
+    cartDisplay();
     setState(() {
       showOveray=false;
     });
@@ -776,7 +994,708 @@ class _HomepageState extends State<Homepage> {
 
 //Method
 
+  cartDisplay()async
+  {
+
+
+
+    try {
+
+      var resultData=(await StockQuery().viewUserTempOrder(QuickBonus(uid:"nyota"))).data;
+      if(resultData["status"])
+      {
+        num totalVal = resultData["result"].fold(0, (previousValue, element) => previousValue + element['totalAmount']);
+       // (Get.put(StockQuery()).updateOrderId("${resultData["result"][0]["uid"]}"));
+
+        (Get.put(StockQuery()).updateSumOrder(totalVal));
+
+        (Get.put(StockQuery()).updateOrder(resultData["result"]));
+
+        setState(() {
+
+
+          cartData.clear();
+
+          cartData.addAll(resultData["result"]);
+        });
+      }
+      else{
+        setState(() {
+
+
+          cartData.clear();
+
+
+        });
+      }
+
+
+    } catch (e) {
+
+    }
+
+
+
+
+  }
+
+  void performSearch(String text) async{
+
+
+    try {
+
+      var resultData=(await StockQuery().searchProduct(QuickBonus(uid:text,productName:'none'))).data;
+      if(resultData["status"])
+      {
+
+        setState(() {
+
+
+          dataSearch.clear();
+
+          dataSearch.addAll(resultData["result"]);
+        });
+      }
+      else{
+        setState(() {
+
+
+          dataSearch.clear();
+
+
+        });
+      }
+
+
+    } catch (e) {
+
+    }
+
+
+
+  }
+  void ChangeQtyMethod(indexData,price,valueData){
+   /* cartData.forEach((item) {
+      if (item['productCode'] == dataDynamic["productCode"]) {
+        item['totalAmount'] = valueData;
+      }
+    });*/
+
+
+    setState(() {
+      cartData[indexData]["totalAmount"]=price*valueData;
+      cartData[indexData]["totalQty"]=valueData;
+
+      num totalVal = cartData.fold(0, (previousValue, element) => previousValue + element['totalAmount']);
+      (Get.put(StockQuery()).updateSumOrder(totalVal));
+    });
+
+
+
+
+  }
+  void addCartPlus(dynamic dynamicData) async{
+
+    bool containsProductCode = cartData.any((item) => item['productCode'] == dynamicData["productCode"]);
+
+    num b=2;
+   if(containsProductCode)
+     {
+       print("product exist please");
+     }
+   else{
+    // print(containsProductCode);
+
+
+    setState(() {
+
+       showOveray=true;
+      // dataSearch.clear();
+
+
+     });
+
+     try {
+       dynamicData["totalQty"]=((num.parse(dynamicData["req_qty"]))>1)?dynamicData["totalQty"]:1;
+       dynamicData['totalAmount']=((num.parse(dynamicData["req_qty"]))>1)?dynamicData['totalAmount']:num.parse(dynamicData['price']);
+       dynamicData['totalCount']=((num.parse(dynamicData["req_qty"]))>1)?dynamicData['totalQty']:1;
+       num totalVal=((num.parse(dynamicData["req_qty"]))>1)?dynamicData["totalAmount"]+((Get.put(StockQuery()).orderSum)):(num.parse(dynamicData["price"]))+((Get.put(StockQuery()).orderSum));
+
+
+       var resultData=(await StockQuery().placeOrder(QuickBonus(uid:dynamicData["productCode"],qty:dynamicData["req_qty"],subscriber:"${(Get.put(StockQuery()).order)["resultData"][0]["uid"]}"),User(uid: "kebineericMuna_1674160265"))).data;
+       if(resultData["status"])
+       {
+         //print(resultData);
+         setState(() {
+           showOveray=false;
+
+
+           (Get.put(StockQuery()).updateSumOrder(totalVal));
+
+
+           cartData.insertAll(0,[dynamicData]);
+
+           dataSearch.clear();
+
+         });
+
+
+       }
+       else{
+
+         setState(() {
+
+           showOveray=false;
+           dataSearch.clear();
+
+
+         });
+       }
+     } catch (e) {
+
+     }
+
+
+
+   }
+
+
+
+
+   /* setState(() {
+      showOveray=true;
+
+
+    });
+
+
+    try {
+
+      var resultData=(await StockQuery().placeOrder(QuickBonus(uid:dynamicData["productCode"],qty:dynamicData["req_qty"],productName:"none"),User(uid: "kebineericMuna_1674160265"))).data;
+      if(resultData["status"])
+      {
+        //print(resultData);
+        setState(() {
+          showOveray=false;
+
+          dataSearch.clear();
+
+          dataSearch.addAll(resultData["result"]);
+        });
+      }
+      else{
+        print(dynamicData);
+        setState(() {
+
+          showOveray=false;
+          dataSearch.clear();
+
+
+        });
+      }
+    } catch (e) {
+
+    }*/
+
+
+
+  }
+
 //method
 }
+
+Color getRandomColor() {
+  Random random = Random();
+  return Color.fromARGB(
+    255,
+    random.nextInt(256),
+    random.nextInt(256),
+    random.nextInt(256),
+  );
+}
+IconData _getRandomIcon() {
+  Random random = Random();
+  List<IconData> icons = [Icons.favorite,Icons.star,Icons.thumb_up,Icons.access_time,Icons.access_time,Icons.fastfood,Icons.directions_bike,      Icons.directions_walk,      Icons.directions_car,      Icons.directions_boat,      Icons.airplanemode_active,      Icons.airport_shuttle,      Icons.beach_access,      Icons.camera,      Icons.movie,      Icons.music_note,      Icons.spa,      Icons.palette,      Icons.account_balance,      Icons.attach_money,    ];
+  return icons[random.nextInt(icons.length)];
+}
+
+class SearchBarField extends StatelessWidget {
+
+  /*const SearchBarField({
+    Key? key,
+    required this.search,
+    required this.searchController,
+    required this.PerformSearch,
+  }) : super(key: key);
+
+  final dynamic search;
+  final TextEditingController searchController;
+  final VoidCallback PerformSearch;*/
+
+  const SearchBarField({
+    Key? key,
+    required this.searchMethod,
+    required this.searchController,
+  }) : super(key: key);
+
+  final void Function(String) searchMethod;
+  final TextEditingController searchController;
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.fromLTRB(5, 20, 5, 0),
+      child: TextField(
+        controller: searchController,
+        decoration: InputDecoration(
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(50.0),
+          ),
+          labelText: 'Search',
+          suffixIcon: IconButton(
+            icon: Icon(Icons.camera_alt),
+            onPressed: () async {
+              try {
+
+                var resultData=(await StockQuery().viewUserTempOrder(QuickBonus(uid:"nyota"))).data;
+                print(resultData);
+
+
+              } catch (e) {
+                print(e);
+
+              }
+              // Handle scan button press
+              // You can navigate to a scan screen or perform a scan action here
+            },
+          ),
+        ),
+        onChanged: (text) async{
+
+          searchMethod(text);
+
+
+
+        },
+      ),
+    );
+  }
+}
+
+class ProductSearchList extends StatelessWidget {
+  const ProductSearchList({
+    Key? key,
+    required this.addCartMethod,
+    required this.searchResult,
+  }) : super(key: key);
+  final void Function(dynamic) addCartMethod;
+  final dynamic searchResult;
+  @override
+
+  Widget build(BuildContext context) {
+
+    return ListView.builder(
+
+
+      itemCount: searchResult.length+1,
+      itemBuilder: (context, index) {
+
+        if(index<searchResult.length)
+        {
+          searchResult[index]['req_qty']="1";
+          searchResult[index]['name']="none";
+
+
+
+
+          return Container(
+            margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
+            child: Card(
+              elevation:0,
+              //margin: EdgeInsets.symmetric(vertical:1,horizontal:5),
+              //color:Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(9.0),
+                // side: BorderSide(color:_data[index]["color_var"]??true?Colors.white:Colors.green, width: 2),
+              ),
+
+              child: Column(
+                children: [
+                  ListTile(
+                      leading: CircleAvatar(
+                        child: Icon(_getRandomIcon()),
+                        backgroundColor:getRandomColor(),
+                      ),
+                      title:Row(
+                        children: [
+                          Expanded(
+
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+
+                                RichText(
+                                  text: TextSpan(
+                                    text:"${searchResult[index]["productCode"]} (${searchResult[index]["pcs"]} pcs):",
+                                    style: DefaultTextStyle.of(context).style,
+                                    children: <TextSpan>[
+                                      TextSpan(
+                                        text: " 1X${searchResult[index]["price"]}",
+                                        style: TextStyle(color: Colors.blue),
+
+
+                                      ),
+
+                                    ],
+                                  ),
+                                ),
+                                Text.rich(
+                                    TextSpan(
+                                        children: [
+                                          TextSpan(
+                                            text: 'Qty :',
+
+                                          ),
+
+                                          WidgetSpan(
+
+                                            child: IntrinsicWidth(
+                                              child: TextField(
+                                                //controller: TextEditingController(text:"${_data[index]["textchange_var"]??_data[index]["qty"]}"),
+
+                                                keyboardType: TextInputType.number,
+                                                decoration: InputDecoration(
+                                                  hintText: '-1-',
+                                                  hintStyle: TextStyle(color: Colors.blue),
+                                                  contentPadding: EdgeInsets.all(0),
+                                                  isDense: true,
+
+
+
+                                                ),
+                                                style: TextStyle(
+                                                  color: Colors.blue, // Set the text color to red
+
+                                                ),
+                                                onChanged: (text) {
+
+                                                  if((double.tryParse(text) != null)){
+                                                    searchResult[index]['req_qty']=text;
+                                                    // print(searchResult[index]);
+
+                                                    searchResult[index]['totalQty']=text;
+                                                    searchResult[index]['totalAmount']=num.parse(searchResult[index]['price'])*num.parse(text);
+                                                    searchResult[index]['totalCount']=text;
+
+
+                                                  }
+
+
+
+
+                                                },
+                                              ),
+                                              stepWidth: 0.5, // set minimum width to 100
+                                            ),
+                                          ),
+
+                                        ]
+                                    )
+                                ),
+                                SizedBox(height: 5,),
+                                Text("Qty left:${num.parse(searchResult[index]["qty"])-num.parse(searchResult[index]["qty_sold"])}"),
+
+
+                              ],
+                            ),
+                          )
+
+
+
+
+
+
+                        ],
+                      ),
+
+                      subtitle: Wrap(
+                        //crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+
+                          Icon(Icons.segment,color:Colors.orange,size:13,),
+                          Text("tags:${searchResult[index]["tags"]} "),
+
+
+
+                        ],
+                      ),
+                      trailing:Column(
+                        children: [
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+
+
+                              IconButton(
+                                icon: Icon(Icons.add_shopping_cart,
+                                    size: 23.0,
+                                    color: Colors.grey),
+                                onPressed: () async{
+                                  addCartMethod(searchResult[index]);
+                                },
+                              ) ,Visibility(
+                                  visible:true,
+                                  child: Text("")),
+                              IconButton(
+                                icon: Icon(
+                                    Icons.grid_view,
+                                    size: 23.0,
+                                    color: Colors.orange
+                                ),
+                                onPressed: () {
+
+
+                                },
+                              ),
+                            ],
+                          ),
+
+                        ],
+                      )
+
+                    //trailing: Text()
+                  ),
+                  Visibility(
+                    visible: false,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(8,0,8,8),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text("1088888880808  8766"),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                ],
+              ),
+            ),
+          );
+
+        }
+        else{
+          return Container();
+        }
+
+      },
+    );
+  }
+
+}
+
+
+class CheckoutPage extends StatelessWidget {
+  const CheckoutPage({
+    Key? key,
+    required this.chekoutResult,
+    required this.changeQtyCheckout,
+    required this.deleteCheckout,
+  }) : super(key: key);
+
+  final dynamic chekoutResult;
+  final void Function(int,num,num) changeQtyCheckout;
+  final void Function(String) deleteCheckout;
+
+
+  @override
+  Widget build(BuildContext context) {
+
+
+    return ListView.builder(
+
+
+      itemCount: chekoutResult.length+1,
+      itemBuilder: (context, index) {
+
+        if(index<chekoutResult.length)
+        {
+
+
+          return Container(
+            margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
+            child: Card(
+              elevation:0,
+              //margin: EdgeInsets.symmetric(vertical:1,horizontal:5),
+              //color:Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(9.0),
+                // side: BorderSide(color:_data[index]["color_var"]??true?Colors.white:Colors.green, width: 2),
+              ),
+
+              child: Column(
+                children: [
+                  // Text("sum:${orderSum}"),
+                  ListTile(
+                      leading: CircleAvatar(
+                        child: Icon(_getRandomIcon()),
+                        backgroundColor:getRandomColor(),
+                      ),
+                      title:Row(
+                        children: [
+                          Expanded(
+
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+
+                                RichText(
+                                  text: TextSpan(
+                                    text:"${chekoutResult[index]["productCode"]} (${chekoutResult[index]["pcs"]} pcs):",
+                                    style: DefaultTextStyle.of(context).style,
+                                    children: <TextSpan>[
+                                      TextSpan(
+                                        text: "${chekoutResult[index]["totalQty"]}X${chekoutResult[index]["price"]}",
+                                        style: TextStyle(color: Colors.blue),
+
+
+                                      ),
+
+                                    ],
+                                  ),
+                                ),
+                                Text.rich(
+                                    TextSpan(
+                                        children: [
+                                          TextSpan(
+                                            text: 'Qty :',
+
+                                          ),
+
+                                          WidgetSpan(
+
+                                            child: IntrinsicWidth(
+                                              child: TextField(
+                                                //controller: TextEditingController(text:"${_data[index]["textchange_var"]??_data[index]["qty"]}"),
+
+                                                keyboardType: TextInputType.number,
+                                                decoration: InputDecoration(
+                                                  hintText: '-${chekoutResult[index]["totalQty"]}-',
+                                                  hintStyle: TextStyle(color: Colors.blue),
+                                                  contentPadding: EdgeInsets.all(0),
+                                                  isDense: true,
+
+
+
+                                                ),
+                                                style: TextStyle(
+                                                  color: Colors.blue, // Set the text color to red
+
+                                                ),
+                                                onChanged: (text) {
+                                              if((double.tryParse(text) != null)){
+                                                changeQtyCheckout(index,(num.parse(chekoutResult[index]["price"])),(num.parse(text)));
+
+                                              }
+
+                                                  //print(this._data[index]["total_var"]);
+                                                  // print("Text changed to: $text");
+                                                },
+                                              ),
+                                              stepWidth: 0.5, // set minimum width to 100
+                                            ),
+                                          ),
+
+                                        ]
+                                    )
+                                ),
+
+
+                              ],
+                            ),
+                          )
+
+
+
+
+
+
+                        ],
+                      ),
+
+
+                      trailing:Column(
+                        children: [
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+
+
+                              IconButton(
+                                icon: Icon(Icons.add_shopping_cart,
+                                    size: 23.0,
+                                    color: Colors.grey),
+                                onPressed: () async{
+
+                                },
+                              ) ,Visibility(
+                                  visible:true,
+                                  child: Text("")),
+                              IconButton(
+                                icon: Icon(
+                                    Icons.delete,
+                                    size: 23.0,
+                                    color: Colors.red
+                                ),
+                                onPressed: () {
+                                deleteCheckout("${chekoutResult[index]["productCode"]}");
+
+                                },
+                              ),
+                            ],
+                          ),
+
+                        ],
+                      )
+
+                    //trailing: Text()
+                  ),
+                  Visibility(
+                    visible: true,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(8,0,8,8),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text("${chekoutResult[index]["totalAmount"]}"),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                ],
+              ),
+            ),
+          );
+
+        }
+        else{
+          return Container();
+        }
+
+      },
+    );
+  }
+
+}
+
+
+
+
+
+
+
+
 
 

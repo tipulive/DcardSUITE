@@ -20,7 +20,9 @@ class CreateDepensesTable extends Migration
             $table->string('uidCreator')->default('none')->index('uidCreator');//uyakiriye
             $table->string('amount')->default('none');
             $table->string('status')->default('none')->index('status');
+            $table->string('subscriber')->default('none')->index('subscriber');
             $table->json('temporalData')->nullable();
+            $table->string('systemUid')->default('none')->index("systemUid");//systemUid
             $table->string('purpose')->default('none')->index("purpose");
             $table->longtext('commentData')->nullable();//
             $table->timestamps();

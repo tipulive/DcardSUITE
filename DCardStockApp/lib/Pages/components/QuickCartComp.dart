@@ -585,8 +585,6 @@ class _QuickCartCompState extends State<QuickCartComp> {
                        Get.put(ParticipatedQuery()).dataCartui["products"].clear();
                        //print(Resul);
 
-
-
                      });
                      Get.toNamed("QuickBonus");
 
