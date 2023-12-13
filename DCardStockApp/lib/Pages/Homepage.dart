@@ -154,11 +154,12 @@ class _HomepageState extends State<Homepage> {
                   elevation:0,
                 ),
                 onPressed: () async{
-                  setState(() {
+                 /* setState(() {
                     cartData.removeWhere((item) => item['productCode'] == "webcam_1700726985");
                   });
 
-                  print(cartData);
+                  print(cartData);*/
+                  print(cartData.length);
                 },
                 child: Text('Check'),
               ),
@@ -204,7 +205,8 @@ class _HomepageState extends State<Homepage> {
                 child: Text('Confirm Order'),
               ),
               Center(child: Text("${(Get.put(StockQuery()).order)["resultData"][0]["name"]}")),
-              Center(child: Text("OrderId:${(Get.put(StockQuery()).order)["resultData"][0]["uid"]}")),
+               if(((Get.put(StockQuery()).order)["resultData"][0]["uid"])!="")
+                 Center(child: Text("OrderId:${(Get.put(StockQuery()).order)["resultData"][0]["uid"]}")),
               Text("Total:${(Get.put(StockQuery()).orderSum)}"),
               Padding(
                 padding: const EdgeInsets.fromLTRB(40,0,40,0),
@@ -247,7 +249,7 @@ class _HomepageState extends State<Homepage> {
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
                           child: TextField(
-
+                            keyboardType: TextInputType.number,
                             decoration: InputDecoration(
                               hintText: 'Enter Amount...',
                               border: InputBorder.none,
@@ -283,25 +285,34 @@ class _HomepageState extends State<Homepage> {
                           });
 
                          try {
+                           var inputDataText=(inputDataDept.text=="")?"0":inputDataDept.text;
 
                             var resultData=(await StockQuery().submitOrder(Participated(uid:"Nyota_1672353378"
-                                ,uidUser:"kebineericMuna_1674160265",subscriber:"${Get.put(StockQuery().order["resultData"][0]["uid"])}",inputData:"${inputDataDept.text}"),Promotions(
-                              token:"${(Get.put(StockQuery())).orderSum }",reach:"1200",gain:"350",uid:"PointSales_1"
+                                ,uidUser:"kebineericMuna_1674160265",subscriber:"${(Get.put(StockQuery()).order["resultData"][0]["uid"])}",inputData:"${inputDataText}"),Promotions(
+                              token:"${(Get.put(StockQuery())).orderSum }",reach:"1200",gain:"350",uid:"PointSales1"
                             ))).data;
                           if(resultData["status"])
                           {
                           //print(resultData);
 
-
+                            List<dynamic> OrderVal=[
+                              {
+                                "name":"Unknown",
+                                "uid":""
+                              }
+                            ];
                           num totalVal=0;
 
                           (Get.put(StockQuery()).updateSumOrder(totalVal));
 
-
                           setState(() {
                           showOveray=false;
                           cartData.clear();
-                          // dataSearch.clear();
+                          (Get.put(StockQuery()).updateOrder(OrderVal));
+                          (Get.put(StockQuery()).updateDeptOrder(0));
+                          inputDataDept.text="";
+
+                            // dataSearch.clear();
 
                           });
                           }
@@ -346,15 +357,64 @@ class _HomepageState extends State<Homepage> {
                 ),
               ),
 
-              Expanded(child: CheckoutPage(chekoutResult:cartData,changeQtyCheckout:(index,price,valueData){
-                ChangeQtyMethod(index,price,valueData);
+              Expanded(child: CheckoutPage(chekoutResult:cartData,changeQtyCheckout:(index,price,valueData,checkHide){
+                ChangeQtyMethod(index,price,valueData,checkHide);
 
-              },deleteCheckout:(productCode){
-                setState(() {
+              },saveChangeQtyCheckout:(productCode,indexData){
+                saveChangeQtyMethod(productCode,indexData);
+              },deleteCheckout:(productCode) async{
+
+               print(await (Get.put(StockQuery()).order)["resultData"][0]["uid"]);
+
+               try {
+
+
+                 var resultData=(await StockQuery().deleteTSingleOrder(QuickBonus(productName:productCode,uid:await (Get.put(StockQuery()).order)["resultData"][0]["uid"] ))).data;
+                 if(resultData["status"])
+                 {
+                   //print(resultData);
+                   List<dynamic> OrderVal=[
+                     {
+                       "name":"Unknown",
+                       "uid":""
+                     }
+                   ];
+                   setState(() {
+                     showOveray=false;
+                     setState(() {
+                       cartData.removeWhere((item) => item['productCode'] == productCode);
+                       num totalVal = cartData.fold(0, (previousValue, element) => previousValue + element['totalAmount']);
+                       (Get.put(StockQuery()).updateSumOrder(totalVal));
+
+                       if(cartData.length<=0)
+                         {
+                           (Get.put(StockQuery()).updateOrder(OrderVal));
+                         }
+                     });
+
+                   });
+
+
+                 }
+                 else{
+
+                   setState(() {
+
+                     showOveray=false;
+                     dataSearch.clear();
+
+
+                   });
+                 }
+               } catch (e) {
+
+               }
+
+               /*setState(() {
                   cartData.removeWhere((item) => item['productCode'] == productCode);
                   num totalVal = cartData.fold(0, (previousValue, element) => previousValue + element['totalAmount']);
                   (Get.put(StockQuery()).updateSumOrder(totalVal));
-                });
+                });*/
               },)),
 
               // CheckoutPage(),
@@ -1074,23 +1134,74 @@ class _HomepageState extends State<Homepage> {
 
 
   }
-  void ChangeQtyMethod(indexData,price,valueData){
-   /* cartData.forEach((item) {
-      if (item['productCode'] == dataDynamic["productCode"]) {
-        item['totalAmount'] = valueData;
-      }
-    });*/
+  void ChangeQtyMethod(indexData,price,valueData,checkHide) {
 
-
+if(checkHide)
+  {
     setState(() {
-      cartData[indexData]["totalAmount"]=price*valueData;
-      cartData[indexData]["totalQty"]=valueData;
+      cartData[indexData]["saveChangeBtn"]=false;
 
-      num totalVal = cartData.fold(0, (previousValue, element) => previousValue + element['totalAmount']);
-      (Get.put(StockQuery()).updateSumOrder(totalVal));
     });
+  }
+else{
+
+  setState(() {
+    cartData[indexData]["saveChangeBtn"]=true;
+    cartData[indexData]["totalAmount"]=price*valueData;
+    cartData[indexData]["totalQty"]=valueData;
+
+    num totalVal = cartData.fold(0, (previousValue, element) => previousValue + element['totalAmount']);
+    //(Get.put(StockQuery()).updateSumOrder(totalVal));
+  });
+
+}
 
 
+
+
+
+
+  }
+  void saveChangeQtyMethod(productCode,indexData) async{
+
+
+    //cartData[indexData]["totalAmount"]=price*valueData;
+   // cartData[indexData]["totalQty"]=valueData;
+    //print("${cartData[indexData]["totalQty"]}");
+    try {
+    var resultData=(await StockQuery().editTOrder(QuickBonus(productName:"${productCode}",qty:"${cartData[indexData]["totalQty"]}",uid:(Get.put(StockQuery()).order)["resultData"][0]["uid"]), User(uid:"kebineericMuna_1674160265"))).data;
+
+    if(resultData["status"])
+    {
+
+      setState(() {
+        showOveray=false;
+
+
+        cartData[indexData]["saveChangeBtn"]=true;
+
+        num totalVal = cartData.fold(0, (previousValue, element) => previousValue + element['totalAmount']);
+        (Get.put(StockQuery()).updateSumOrder(totalVal));
+
+
+
+      });
+
+
+    }
+    else{
+
+      setState(() {
+
+        showOveray=false;
+        dataSearch.clear();
+
+
+      });
+    }
+    } catch (e) {
+
+    }
 
 
   }
@@ -1125,11 +1236,24 @@ class _HomepageState extends State<Homepage> {
        var resultData=(await StockQuery().placeOrder(QuickBonus(uid:dynamicData["productCode"],qty:dynamicData["req_qty"],subscriber:"${(Get.put(StockQuery()).order)["resultData"][0]["uid"]}"),User(uid: "kebineericMuna_1674160265"))).data;
        if(resultData["status"])
        {
+         //{status: true, OrderId: UID_tb_1702314752}
+     // {status: false, resultData: [{name: none, uid: none}]}
+        print(cartData.length);
+
+//here i must Add no assign Card Then Unknown else Card ClientName
+        List<dynamic> OrderVal=[
+          {
+            "name":"Unknown",
+            "uid":resultData["OrderId"]
+          }
+        ];
+
+
          //print(resultData);
          setState(() {
            showOveray=false;
 
-
+           (Get.put(StockQuery()).updateOrder(OrderVal));
            (Get.put(StockQuery()).updateSumOrder(totalVal));
 
 
@@ -1501,11 +1625,13 @@ class CheckoutPage extends StatelessWidget {
     Key? key,
     required this.chekoutResult,
     required this.changeQtyCheckout,
+    required this.saveChangeQtyCheckout,
     required this.deleteCheckout,
   }) : super(key: key);
 
   final dynamic chekoutResult;
-  final void Function(int,num,num) changeQtyCheckout;
+  final void Function(int,num,num,bool) changeQtyCheckout;
+  final void Function(String,int) saveChangeQtyCheckout;
   final void Function(String) deleteCheckout;
 
 
@@ -1595,8 +1721,11 @@ class CheckoutPage extends StatelessWidget {
                                                 ),
                                                 onChanged: (text) {
                                               if((double.tryParse(text) != null)){
-                                                changeQtyCheckout(index,(num.parse(chekoutResult[index]["price"])),(num.parse(text)));
 
+                                                changeQtyCheckout(index,(num.parse(chekoutResult[index]["price"])),(num.parse(text)),false);
+
+                                              }else{
+                                                changeQtyCheckout(index,1,1,true);
                                               }
 
                                                   //print(this._data[index]["total_var"]);
@@ -1631,17 +1760,15 @@ class CheckoutPage extends StatelessWidget {
                             mainAxisSize: MainAxisSize.min,
                             children: <Widget>[
 
-
-                              IconButton(
-                                icon: Icon(Icons.add_shopping_cart,
+                               if((chekoutResult[index]["saveChangeBtn"])??false)
+                                  IconButton(
+                                   icon: Icon(Icons.add_shopping_cart,
                                     size: 23.0,
                                     color: Colors.grey),
                                 onPressed: () async{
-
-                                },
-                              ) ,Visibility(
-                                  visible:true,
-                                  child: Text("")),
+                                    saveChangeQtyCheckout("${chekoutResult[index]["productCode"]}",index);
+                                    },
+                                   ) ,
                               IconButton(
                                 icon: Icon(
                                     Icons.delete,

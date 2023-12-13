@@ -6,6 +6,7 @@
     </shared>
   </component>
   <component name="AndroidLogFilters">
+    <option name="TOOL_WINDOW_LOG_LEVEL" value="assert" />
     <option name="TOOL_WINDOW_CONFIGURED_FILTER" value="Show only selected application" />
   </component>
   <component name="AutoImportSettings">
@@ -13,21 +14,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fe13c1e5-b7ca-4b84-a854-5c4e0fd95bcb" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/lib/Pages/SetDepensePage.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/Pages/SetOrderPage.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/Pages/components/SetDepenseComp.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/Pages/components/SetOrderComp.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/Pages/components/deptComp.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/Pages/components/employeComp.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/Pages/deptPage.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/Pages/employePage.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../CardStocKBackend/ARestapi/Company.rest" beforeDir="false" afterPath="$PROJECT_DIR$/../CardStocKBackend/ARestapi/Company.rest" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../CardStocKBackend/app/Http/Controllers/Auth/AuthAdminLoginController.php" beforeDir="false" afterPath="$PROJECT_DIR$/../CardStocKBackend/app/Http/Controllers/Auth/AuthAdminLoginController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../CardStocKBackend/app/Http/Controllers/CompanyController.php" beforeDir="false" afterPath="$PROJECT_DIR$/../CardStocKBackend/app/Http/Controllers/CompanyController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../CardStocKBackend/app/Http/Controllers/StockController.php" beforeDir="false" afterPath="$PROJECT_DIR$/../CardStocKBackend/app/Http/Controllers/StockController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../CardStocKBackend/app/Http/Controllers/TestController.php" beforeDir="false" afterPath="$PROJECT_DIR$/../CardStocKBackend/app/Http/Controllers/TestController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../CardStocKBackend/routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/../CardStocKBackend/routes/api.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/Pages/Homepage.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/Homepage.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/Pages/components/SettingComp.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/components/SettingComp.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/Query/StockQuery.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Query/StockQuery.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -120,7 +112,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
           <url>file://$PROJECT_DIR$/lib/Query/StockQuery.dart</url>
-          <line>566</line>
+          <line>557</line>
           <option name="timeStamp" value="7" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
@@ -130,8 +122,13 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
           <url>file://$PROJECT_DIR$/lib/Query/StockQuery.dart</url>
-          <line>695</line>
+          <line>686</line>
           <option name="timeStamp" value="9" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
+          <url>file://$PROJECT_DIR$/lib/Pages/components/SetOrderComp.dart</url>
+          <line>552</line>
+          <option name="timeStamp" value="10" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

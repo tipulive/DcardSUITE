@@ -60,13 +60,13 @@ class _SettingCompState extends State<SettingComp> {
                 onTap: (){
                   viewOrder();
                 },
-                child: detailsProfile("Orders",Icons.calendar_month_outlined,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,viewOrder)),//Last Time Purchase
+                child: detailsProfile("Dispatch Orders",Icons.calendar_month_outlined,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,viewOrder)),//Last Time Purchase
             const SizedBox(height:5,),
             GestureDetector(
                 onTap: (){
                   depense();
                 },
-                child: detailsProfile("Depense",Icons.calendar_month_outlined,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,viewOrder)),//Last Time Purchase
+                child: detailsProfile("Spendings",Icons.calendar_month_outlined,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,viewOrder)),//Last Time Purchase
             const SizedBox(height:5,),
             GestureDetector(
                 onTap: (){

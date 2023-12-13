@@ -30,11 +30,12 @@ class StockQuery extends GetxController{
     "status":false,
     "resultData":[
       {
-        "name":"none",
-        "uid":"0s"
+        "name":"Unknown",
+        "uid":""
       }
     ],
   };
+
   updateOrder(orderVal){
     order = {
       "status":false,
@@ -312,20 +313,17 @@ dynamic dataTest=[];
     }
 
   }
-  editTOrder(Topups topupData,User userData) async{//balance and Bonus Widthdraw History
+  editTOrder(QuickBonus product,User userData) async{//balance and Bonus Widthdraw History
     try {
 
       var params =  {
+//optionCase
 
-        "LimitStart":topupData.endlimit,  //page
-        "LimitEnd":topupData.startlimit,//limit
-        "uid":userData.uid,//userid
-        "optionCase":topupData.optionCase,//optionCase
-
-        "productCode":"bido_1698592481",
-        "req_qty":2,
-        "current_qty":10,
-        "uid":"KoBZ8"
+        "productCode":product.productName,
+        "req_qty":product.qty,
+        "uid":product.uid,
+        "uidclient":userData.uid,
+        "statusForm":"editOrder"
 
       };
 
@@ -355,20 +353,13 @@ dynamic dataTest=[];
       print(e);
     }
   }
-  deleteTSingleOrder(Topups topupData,User userData) async{//balance and Bonus Widthdraw History
+  deleteTSingleOrder(QuickBonus product) async{//balance and Bonus Widthdraw History
     try {
 
       var params =  {
 
-        "LimitStart":topupData.endlimit,  //page
-        "LimitEnd":topupData.startlimit,//limit
-        "uid":userData.uid,//userid
-        "optionCase":topupData.optionCase,//optionCase
-
-        "productCode":"bido_1698592481",
-        "req_qty":2,
-        "current_qty":10,
-        "uid":"KoBZ8"
+        "productCode":product.productName,
+        "uid":product.uid
 
       };
 
@@ -753,7 +744,7 @@ dynamic dataTest=[];
         "ref":"Eric",
         "reach":"1200",
         "gain":"350",
-        "systemUid":"PointSales_1",
+        "systemUid":"PointSales1",
         "commentData":"karera"
 
         //"options": [1,2,3],
