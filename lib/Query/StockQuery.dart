@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dcard/Query/AdminQuery.dart';
+import 'package:dcard/models/Participated.dart';
+import 'package:dcard/models/Promotions.dart';
 import 'package:dcard/models/User.dart';
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
@@ -28,12 +30,29 @@ class StockQuery extends GetxController{
     "status":false,
     "resultData":[
       {
+        "name":"Unknown",
+        "uid":""
+      }
+    ],
+  };
+
+  updateOrder(orderVal){
+    order = {
+      "status":false,
+      "resultData":orderVal,
+    };
+    update();
+  }
+  dynamic orderCount = {
+    "status":false,
+    "resultData":[
+      {
         "name":"none",
         "uid":"0s"
       }
     ],
   };
-  updateOrder(orderVal){
+  updateOrderCount(orderVal){
     order = {
       "status":false,
       "resultData":orderVal,
@@ -216,17 +235,13 @@ dynamic dataTest=[];
     try {
 
       var params =  {
-        /*"uid":TopupData.uid,//just to avoid error nothing else
-        "uidUser":TopupData.uidCreator,//uidUser
-        "balance":TopupData.amount,
-        "description":TopupData.desc,*/
         "uidclient":user.uid,
         "productCode":product.uid,
         "req_qty":product.qty,
         "ref":"test",
         "comment":"ok",
         "statusForm":"none",
-        "orderIdFromEdit":product.productName //this is orderId
+        "orderIdFromEdit":product.subscriber //this is orderId
 
         //"options": [1,2,3],
       };
@@ -256,23 +271,19 @@ dynamic dataTest=[];
     }
 
   }
-  submitOrder(Topups TopupData) async{
+  submitOrder(Participated participatedData,Promotions promotionData) async{
 
     try {
 
       var params =  {
-
-        "balance":TopupData.amount,
-        "description":TopupData.desc,
-
-        "uid":"Nyota_1672353378",
-        "uidUser":"kebineericMuna_1674160265",
-        "OrderId":"aKCrj",
-        "inputData":"50",
-        "all_total":"500",
-        "reach":"1200",
-        "gain":"350",
-        "systemUid":"PointSales_1"
+        "uid":participatedData.uid,
+        "uidUser":participatedData.uidUser,
+        "OrderId":participatedData.subscriber,
+        "inputData":participatedData.inputData,
+        "all_total":promotionData.token,
+        "reach":promotionData.reach,
+        "gain":promotionData.gain,
+        "systemUid":promotionData.uid
 
         //"options": [1,2,3],
       };
@@ -302,20 +313,17 @@ dynamic dataTest=[];
     }
 
   }
-  editTOrder(Topups topupData,User userData) async{//balance and Bonus Widthdraw History
+  editTOrder(QuickBonus product,User userData) async{//balance and Bonus Widthdraw History
     try {
 
       var params =  {
+//optionCase
 
-        "LimitStart":topupData.endlimit,  //page
-        "LimitEnd":topupData.startlimit,//limit
-        "uid":userData.uid,//userid
-        "optionCase":topupData.optionCase,//optionCase
-
-        "productCode":"bido_1698592481",
-        "req_qty":2,
-        "current_qty":10,
-        "uid":"KoBZ8"
+        "productCode":product.productName,
+        "req_qty":product.qty,
+        "uid":product.uid,
+        "uidclient":userData.uid,
+        "statusForm":"editOrder"
 
       };
 
@@ -345,20 +353,13 @@ dynamic dataTest=[];
       print(e);
     }
   }
-  deleteTSingleOrder(Topups topupData,User userData) async{//balance and Bonus Widthdraw History
+  deleteTSingleOrder(QuickBonus product) async{//balance and Bonus Widthdraw History
     try {
 
       var params =  {
 
-        "LimitStart":topupData.endlimit,  //page
-        "LimitEnd":topupData.startlimit,//limit
-        "uid":userData.uid,//userid
-        "optionCase":topupData.optionCase,//optionCase
-
-        "productCode":"bido_1698592481",
-        "req_qty":2,
-        "current_qty":10,
-        "uid":"KoBZ8"
+        "productCode":product.productName,
+        "uid":product.uid
 
       };
 
@@ -598,25 +599,99 @@ dynamic dataTest=[];
       print(e);
     }
   }
-  stockCount(Topups topupData,User userData) async{//balance and Bonus Widthdraw History
+  orderViewCount(Topups topupData) async{//balance and Bonus Widthdraw History
+    try {
+
+      var params =  {
+        "LimitEnd":topupData.startlimit,
+        "LimitStart":topupData.endlimit,  //page
+      };
+
+      String authToken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
+      var url="${ConstantClassUtil.urlLink}/OrderViewCount";
+      var response = await Dio().get(url,
+        options: Options(headers: {
+          HttpHeaders.contentTypeHeader: "application/json",
+          HttpHeaders.authorizationHeader:"Bearer ${authToken}"
+        }),
+        queryParameters: params,
+      );
+      if (response.statusCode == 200) {
+
+
+        // return (response.data).length;
+        //updateEventState(response.data);
+        //return "hello";
+
+        //updateBalanceHistState(response.data);
+        //return response.data;
+
+        return response;
+
+
+      } else {
+        return false;
+        //print(false);
+      }
+    } catch (e) {
+      //return false;
+      print(e);
+    }
+  }
+  orderViewByUid(Topups topupData) async{//balance and Bonus Widthdraw History
+    try {
+
+      var params =  {
+        "orderId":topupData.uid,
+        "LimitEnd":topupData.startlimit,
+        "LimitStart":topupData.endlimit,  //page
+      };
+
+      String authToken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
+      var url="${ConstantClassUtil.urlLink}/OrderViewByUid";
+      var response = await Dio().get(url,
+        options: Options(headers: {
+          HttpHeaders.contentTypeHeader: "application/json",
+          HttpHeaders.authorizationHeader:"Bearer ${authToken}"
+        }),
+        queryParameters: params,
+      );
+      if (response.statusCode == 200) {
+
+
+        // return (response.data).length;
+        //updateEventState(response.data);
+        //return "hello";
+
+        //updateBalanceHistState(response.data);
+        //return response.data;
+
+        return response;
+
+
+      } else {
+        return false;
+        //print(false);
+      }
+    } catch (e) {
+      //return false;
+      print(e);
+    }
+  }
+  stockCount(Topups topupData,QuickBonus product,User user) async{//balance and Bonus Widthdraw History
     try {
 
       var params =  {
 
-        "LimitStart":topupData.endlimit,  //page
-        "LimitEnd":topupData.startlimit,//limit
-        "uid":userData.uid,//userid
-        "optionCase":topupData.optionCase,//optionCase
 
-        "id":1,
-        "productCode":"viva_1693508831",
-        "uidTransport":"Qito",
-        "qty_Transport":6,
-        "stockName":"M crispin",
-        "safariId":"test",
-        "ref":"NeeMaUid",
-        "status":"delivered",
-        "comment":"comment Test"
+        "uid":topupData.uid,
+        "productCode":product.uid,
+        "qty_Transport":product.qty,
+        "stockName":product.subscriber,
+        "uidTransport":user.uid,
+        "ref":user.name,
+        "status":product.status,
+        "comment":product.description
 
 
       };
@@ -669,7 +744,7 @@ dynamic dataTest=[];
         "ref":"Eric",
         "reach":"1200",
         "gain":"350",
-        "systemUid":"PointSales_1",
+        "systemUid":"PointSales1",
         "commentData":"karera"
 
         //"options": [1,2,3],

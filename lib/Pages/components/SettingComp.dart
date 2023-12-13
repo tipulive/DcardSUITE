@@ -12,10 +12,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../SetDepensePage.dart';
+import '../SetOrderPage.dart';
 import '../SetPartHistPage.dart';
 import '../SetPartPage.dart';
 import '../SetQuickBoHistPage.dart';
 import '../SetWithdrawBalancePage.dart';
+import '../deptPage.dart';
+import '../employePage.dart';
 
 
 
@@ -52,6 +56,30 @@ class _SettingCompState extends State<SettingComp> {
             ),
 
             divLine(),
+            GestureDetector(
+                onTap: (){
+                  viewOrder();
+                },
+                child: detailsProfile("Dispatch Orders",Icons.calendar_month_outlined,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,viewOrder)),//Last Time Purchase
+            const SizedBox(height:5,),
+            GestureDetector(
+                onTap: (){
+                  depense();
+                },
+                child: detailsProfile("Spendings",Icons.calendar_month_outlined,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,viewOrder)),//Last Time Purchase
+            const SizedBox(height:5,),
+            GestureDetector(
+                onTap: (){
+                  dept();
+                },
+                child: detailsProfile("Dept",Icons.calendar_month_outlined,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,viewOrder)),//Last Time Purchase
+            const SizedBox(height:5,),
+            GestureDetector(
+                onTap: (){
+                  employe();
+                },
+                child: detailsProfile("Employee",Icons.calendar_month_outlined,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,viewOrder)),//Last Time Purchase
+            const SizedBox(height:5,),
             GestureDetector(
                 onTap: (){
                   viewStock();
@@ -319,13 +347,33 @@ Widget detailsProfile(iconText,icon,iconDescr,listBackground,iconrightText,iconr
   );
 }
 
+viewOrder() async{
+
+  Get.to(() =>SetOrderPage());
+
+}
+depense() async{
+
+  Get.to(() =>SetDepensePage());
+
+}
+dept() async{
+
+  Get.to(() =>deptPage());
+
+}
+employe() async{
+
+  Get.to(() =>employePage());
+
+}
+
 viewStock() async{
-  //(await Get.put(TopupQuery()).GetBalanceHist(Topups(uid:"${(Get.put(CardQuery()).obj)["resultData"]["UserDetail"]["uid"]??'none'}")));
+
   Get.to(() =>SetStockPage());
 
 }
 partfunc() async{
-  //(await Get.put(ParticipatedQuery()).getCountParticipateEventOnline(Participated(uidUser:"${(Get.put(CardQuery()).obj)["resultData"]["UserDetail"]["uid"]??'none'}")));
 
   Get.to(() =>SetPartPage());
 

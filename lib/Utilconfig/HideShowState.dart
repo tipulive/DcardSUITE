@@ -10,7 +10,34 @@ class HideShowState extends GetxController{
   var defaultInterest=5.obs;
   var homenavigator=0.obs;
   var profilenavigator=0.obs;
+  //var delivery=0.obs;
+  /*final delivery = [
+    {
+      "totalCount": "Unknown",
+      "uid": "test"
+    }
+  ].obs;*/
+  final dynamicList =[].obs;
+  final delivery=[];
 
+
+  isDelivery(valData)
+  {
+
+
+   delivery.clear();
+
+    delivery.addAll(valData);
+update();
+
+
+
+  }
+  isChangeDelivery(valData,indexData,qty_product){
+    delivery[indexData]["totalCount"]=qty_product;
+    delivery.addAll(valData);
+    update();
+  }
   isHiden(valData){
     isVisible.value=valData;
   }
