@@ -575,18 +575,13 @@ return \QrCode::size(500)
         var_dump($check);//null */
 
 
-$random = Str::random(5);
-
-//echo $random;
-return response([
-    "status"=>true,
-    "result"=>$random,
-    "test"=>Auth::user(),
-
-
-
-    ],200);
-
+$bol="1";
+$m="teta";
+$n="keb";
+    list($q,$v)=($bol=="1")?[$m,$n]:["deja"];
+    return response([
+        "data" => $q
+    ]);
 
     }
 

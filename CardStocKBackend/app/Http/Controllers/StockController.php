@@ -930,6 +930,7 @@ else{
 
             "status"=>true,
             //"result"=>$results,
+
             "OrderId"=>$uid,
             //"data"=>$data
 
@@ -1278,14 +1279,14 @@ public function viewTotalSales(){ //this will view All sales
     DB::select("select *from admnin_records where uid=:uid and status=:status and subscriber=:subscriber order by id desc limit 25",[
          "uid"=>Auth::user()->uid,
         "subscriber"=>Auth::user()->subscriber,
-        "status"=>'sales'
+        "status"=>'Sales'
     ]);
 }
 public function viewSaleSyst(){ //this will view All sales based on systemId //not done
     DB::select("select *from admnin_records where uid=:uid and status=:status and subscriber=:subscriber order by id desc limit 25",[
          "uid"=>Auth::user()->uid,
         "subscriber"=>Auth::user()->subscriber,
-        "status"=>'sales'
+        "status"=>'Sales'
     ]);
 }
 
@@ -1317,8 +1318,13 @@ public function viewSaleSyst(){ //this will view All sales based on systemId //n
             return $this->admin_record($input);
         }
         else{
-            $this->admin_record($input);
-            //return (new ParticipateController)->participate($input);
+           return $this->admin_record($input);
+
+
+           //return (new ParticipateController)->participate($input);
+
+
+
         }
 
 //$check_InputData<=0?(new ParticipateController)->participate($input):$this->notparticipate();//means client azaba yishyuye yose nta deni afite
@@ -1333,7 +1339,7 @@ public function viewSaleSyst(){ //this will view All sales based on systemId //n
         try{
 
 
-            $check=DB::transaction(function () use ($input) {
+            $checks=DB::transaction(function () use ($input) {
                 $uidCreator=Auth::user()->uid; //is the one who will pay money to client when he will withdraw
             $subscriber=Auth::user()->subscriber;
             $systemUid=$input['systemUid'];
@@ -1402,19 +1408,20 @@ public function viewSaleSyst(){ //this will view All sales based on systemId //n
         ));
         if($check)
         {
-
+            return $check;
         }
         else{
-            DB::table("admnin_records")
+            $dataInsert=DB::table("admnin_records")
             ->insert([
                 "uid"=>$uidCreator,
                 "subscriber"=>$subscriber,
                 "systemUid"=>$input['systemUid'],
-                "status"=>'sales',
+                "status"=>'Sales',
                 "balance"=>$input['all_total'],
                 "dettes"=>($input['all_total']-$input['inputData'])
 
             ]);
+            return $dataInsert;
         }
 
 
@@ -1434,10 +1441,19 @@ public function viewSaleSyst(){ //this will view All sales based on systemId //n
 
             //DB::commit();// Use DB::unprepared for multi-statement queries
 
+            return response([
 
+                "status"=>true,
+                "result"=>$checks,
+
+
+
+
+
+                ],200);
 
             // Code executed successfully, return a JSON response
-            return response()->json(['message' => 'Data inserted successfully',"status"=>true], 200);
+            //return response()->json(['message' => 'Data inserted successfully',"status"=>true], 200);
             } catch (\Exception $e) {
                 DB::rollback();
                // throw $e;
@@ -1494,7 +1510,8 @@ public function viewSaleSyst(){ //this will view All sales based on systemId //n
                  "cardUid"=>$cardUid
               );
             list($varInput,$query,$arrayValue)=($phoneNumber!='none')?[$phoneNumber,$Query1A,$varArrayA]:[$cardUid,$Query1B,$varArrayB];
-            $check = DB::select("SELECT users.uid AS uidUser, users.name, SUM(orders.debt) as debt
+
+           $check = DB::select("SELECT users.uid AS uidUser, users.name, SUM(orders.debt) as debt
             FROM orders
             INNER JOIN users ON orders.uidUser = users.uid
             $query",$arrayValue);
@@ -1506,6 +1523,7 @@ public function viewSaleSyst(){ //this will view All sales based on systemId //n
                     "status"=>true,
                     "message"=>"get debt",
                     "result"=>$check,
+                    "testUser"=>Auth::user()->email
 
                 ],200);
             }
@@ -1560,12 +1578,14 @@ public function viewSaleSyst(){ //this will view All sales based on systemId //n
              $commentData=$input["commentData"]??'none';
              $status=$input["status"]??'PaidDette';
          // this query will give you a list of how much you will pay every Admin in This Company by dividing according,based on every someone you have debts
-         DB::select("SET @requested_qty = ?", [$inputData]);
+
+         DB::select("SET @requested_qty=?",[$inputData]);
          $data=DB::select("SELECT
          id,
          uid,
          debt AS prevDebt,
          uidCreator,
+         systemUid,
          CASE
              WHEN @requested_qty >= debt THEN debt
              ELSE @requested_qty
@@ -1585,8 +1605,8 @@ public function viewSaleSyst(){ //this will view All sales based on systemId //n
      FROM
          orders
      WHERE
-        'uidUser'=:uidUser AND
-        'subscriber'=:subscriber AND
+        uidUser=:uidUser AND
+        subscriber=:subscriber AND
          debt != 0 AND
          @requested_qty > 0
      ORDER BY
@@ -1594,68 +1614,103 @@ public function viewSaleSyst(){ //this will view All sales based on systemId //n
             "uidUser"=>$uidUser,
             "subscriber"=>$subscriber
          ));
-
          $dataLimit=count($data);
-     for($i=0;$i<$dataLimit;$i++)
-     {
-        $debtRemain=abs($data[$i]->remaining);
-        $id=$data[$i]->id;
-        $status=$data[$i]->new_status;
-        $paidAmount=$data[$i]->dettes;
-         $json_array =  [
-             [
-                "uid"=>$data[$i]->uid,//orders ID
+         for($i=0;$i<$dataLimit;$i++)
+         {
+            $debtRemain=abs($data[$i]->remaining);
+            $id=$data[$i]->id;
+            $status=$data[$i]->new_status;
+            $paidAmount=$data[$i]->debt;
+             $json_array =  [
+                 [
+                    "uid"=>$data[$i]->uid,//orders ID
+                     "uidUser"=>$uidUser,
+                     "uidReceiver"=>$data[$i]->uidCreator,//owner of dettes
+                     "uidCreator"=>$uidCreator,//who received amount as admin
+                     "amount"=>$paidAmount,//amount Paid
+                     "InputAmount"=>$inputData,//amount Submitted
+                     "paidStatus"=>(($data[$i]->uidCreator==$uidCreator?'paidReceived':'PaidAdminNotReceived')),//
+                     "ref"=>$input['ref']??'none',
+                     "PrevDebt"=>$data[$i]->prevDebt,//PrevDebt
+                     "remain"=>$debtRemain,//Debt Remain
+                     "systemUid"=>$data[$i]->systemUid,
+                     "subscriber"=>$subscriber,
+                     "commentData"=>$input['commentData']??'none',
+                     "created_at"=>$this->today,
+                     "updated_at"=>$this->today
+                 ]
+             ];
+             DB::table("paid_dettes")
+             ->insert([
+                 "uid"=>$data[$i]->uid,//orders ID
                  "uidUser"=>$uidUser,
                  "uidReceiver"=>$data[$i]->uidCreator,//owner of dettes
                  "uidCreator"=>$uidCreator,//who received amount as admin
-                 "amount"=>$paidAmount,//amount Paid
-                 "InputAmount"=>$inputData,//amount Submitted
+                 "amount"=>$paidAmount,//amount
                  "paidStatus"=>(($data[$i]->uidCreator==$uidCreator?'paidReceived':'PaidAdminNotReceived')),//
-                 "ref"=>$input['ref']??'none',
-                 "PrevDebt"=>$data[$i]->prevDebt,//PrevDebt
-                 "remain"=>$debtRemain,//Debt Remain
+                 "temporalData"=>json_encode($json_array),
                  "systemUid"=>$data[$i]->systemUid,
                  "subscriber"=>$subscriber,
                  "commentData"=>$input['commentData']??'none',
-                 "created_at"=>$this->today,
-                 "updated_at"=>$this->today
-             ]
-         ];
-         DB::table("paid_dettes")
-         ->insert([
-             "uid"=>$data[$i]->uid,//orders ID
-             "uidUser"=>$uidUser,
-             "uidReceiver"=>$data[$i]->uidCreator,//owner of dettes
-             "uidCreator"=>$uidCreator,//who received amount as admin
-             "amount"=>$paidAmount,//amount
-             "paidStatus"=>(($data[$i]->uidCreator==$uidCreator?'paidReceived':'PaidAdminNotReceived')),//
-             "temporalData"=>json_encode($json_array),
-             "systemUid"=>$data[$i]->systemUid,
-             "subscriber"=>$subscriber,
-             "commentData"=>$input['commentData']??'none',
-             "created_at"=>$this->today
-         ]);
-         DB::update("UPDATE orders
-             SET debt = :debtRemain,
-                 paidStatus = :status
-             WHERE id = :id
-                 AND subscriber = :subscriber
-             LIMIT :limitData",
-             [
-                 "debtRemain" => $debtRemain,
-                 "status" => $status,
-                 "id" => $id,
-                 "subscriber" => Auth::user()->subscriber,
-                 "limitData" => $limitData,
-             ]
-);
+                 "created_at"=>$this->today
+             ]);
+             DB::update("UPDATE orders
+                 SET debt = :debtRemain,
+                     paidStatus = :status
+                 WHERE id = :id
+                     AND subscriber = :subscriber
+                 LIMIT :limitData",
+                 [
+                     "debtRemain"=>$debtRemain,
+                     "status"=>$status,
+                     "id"=>$id,
+                     "subscriber"=>Auth::user()->subscriber,
+                     "limitData"=>$dataLimit,
+                 ]
+    );
+    $Query1="update admnin_records set dettes=dettes-:dettes";
+    $QueryArray1=array(
+        "uid"=>$data[$i]->uidCreator,
+        "subscriber"=>Auth::user()->subscriber,
+        "systemUid"=>$data[$i]->systemUid,
+        "status"=>"Sales",
+        "dettes"=>$inputData
+     );
+     $Query2="update admnin_records set safeBalance=safeBalance+:safeBalance,dettes=dettes-:dettes";
+    $QueryArray2=array(
+        "uid"=>$data[$i]->uidCreator,
+        "subscriber"=>Auth::user()->subscriber,
+        "systemUid"=>$data[$i]->systemUid,
+        "status"=>"Sales",
+        "safeBalance"=>$inputData,
+        "dettes"=>$inputData
+     );
+    $Query3="update admnin_records set borrowBalance=+:borrowBalance";
+    $QueryArray3=[
+        "uid"=>Auth::user()->uid,
+        "subscriber"=>Auth::user()->subscriber,
+        "systemUid"=>$data[$i]->systemUid,
+        "status"=>"Sales",
+        "borrowBalance"=>$inputData
+    ];
 
 
-     }
+        $updateAdmin='DB::select("update admnin_records set borrowBalance=+:borrowBalance where uid=:uid and status=:status and systemUid=:systemUid and subscriber=:subscriber", $QueryArray3)';
+
+        list($Query,$QueryArray,$lastQuery)=($data[$i]->uidCreator==$uidCreator)?[$Query1,$QueryArray1,""]:[$Query2,$QueryArray2,eval('return ' . $updateAdmin . ';')];
+
+
+    DB::update("$Query where uid=:uid and status=:status and systemUid=:systemUid and subscriber=:subscriber",$QueryArray);
+
+
+
+         }
+
      return array(
-        //"result"=>$results[0]->id,
+        "result"=>$data,
         "datacount"=>count($data)
      );
+
 
 
         });
@@ -1670,10 +1725,7 @@ public function viewSaleSyst(){ //this will view All sales based on systemId //n
                  }
     }
 
-    public function repaidDebt($input){//when admin received amount that is not belong to him
 
-
-    }
     public function OrderViewCount($input){
         try {
 
@@ -1682,6 +1734,7 @@ public function viewSaleSyst(){ //this will view All sales based on systemId //n
                 SELECT
                    orderhistories.uid as OrderId,
                     MAX(users.name) AS name,
+                    MAX(1) AS hideAddCart,
 
                     SUM(orderhistories.qty) AS totalQty,
                     SUM(orderhistories.total) AS totalAmount,
@@ -1709,6 +1762,7 @@ public function viewSaleSyst(){ //this will view All sales based on systemId //n
 
             if($check)
             {
+                //$check["hideAddCart"]=true;
                return response([
                    "status"=>true,
                    "result"=>$check,
@@ -1735,6 +1789,8 @@ public function viewSaleSyst(){ //this will view All sales based on systemId //n
                 SELECT
 
                     MAX(orderhistories.uid) AS uid,
+                    MAX(1) AS hideAddCart,
+                    MAX(1) AS currentQty,
                     orderhistories.productCode,
                     MAX(products.productName) AS productName,
                     MAX(orderhistories.price) AS price,
@@ -1916,11 +1972,12 @@ return $results;
     }
     //stock Count//
 
+
     public function repaidUser($input){
 
         DB::table("repaid_users")
         ->insert([
-            "uid"=>$uidCreator,
+            "uid"=>$uid,//uid of paid
             "uidPaid"=>$input['uidPaid'],
             "amount"=>$input['amount'],
             "status"=>$input['status'],
@@ -1948,27 +2005,34 @@ return $results;
 
         $check=DB::transaction(function () use ($input) {
             $uidUser=Auth::user()->uid;
-            $systemUid="GeneralSpend";
+
+            $uid="SUID"."_".Str::random(2).""."_".date(time());//SUID means Spend UID
             $check=DB::table("depenses")
             ->insert([
-                "uid"=>$uidCreator,
+                "uid"=>$uid,
                 "uidUser"=>$input['uidUser']??Auth::user()->uid,
                 "amount"=>$input['amount'],
                 "uidCreator"=>Auth::user()->uid,
 
                 "status"=>$input['status'],
+                "systemUid"=>$input["systemUid"],
+                "subscriber"=>Auth::user()->subscriber,
 
-                "purpose"=>$input['purpose'],
+                "purpose"=>$input['purpose']??'none',
                 "commentData"=>$input['commentData'],
                 "created_at"=>$this->today
 
             ]);
 
         if($check1){
-           $check=DB::update("update admnin_records set balance=balance+:balance where uid=:uid and systemUid=:systemUid limit 1",array(
+
+           $check=DB::update("update admnin_records set balance=balance+:balance where uid=:uid and status=:status and subscriber=:subscriber and systemUid=:systemUid limit 1",array(
             "balance"=>$input['balance'],
             "uid"=>$uidUser,
-            "systemUid"=>$systemUid,
+            "status"=>$input["status"],
+
+            "systemUid"=>$input["systemUid"],
+            "subscriber"=>Auth::user()->subscriber
            ));
 
            if($check){
@@ -1982,7 +2046,8 @@ return $results;
             ->insert(
                 [
                     "uid"=>Auth::user()->uid,
-                    "systemUid"=>$systemUid,
+                    "systemUid"=>$input["systemUid"],
+                    "status"=>$input["status"],
                     "balance"=>$input['balance'],
                     "created_at"=>$this->today
                 ]
@@ -2018,9 +2083,10 @@ return $results;
                 }
     }
 
-    public function ViewDepense($input){
-     DB::select("select uidUser,amount,purpose from depenses where uidUser=:uidUser",array(
-        "uidUser"=>Auth::user()->uid
+    public function viewDepense($input){
+     DB::select("select uidUser,amount,purpose from depenses where uidUser=:uidUser and subscriber=:subscriber",array(
+        "uidUser"=>Auth::user()->uid,
+        "subscriber"=>Auth::user()->subscriber,
      ));
     }
 

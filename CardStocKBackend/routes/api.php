@@ -132,6 +132,8 @@ Route::post('/PaidDette','CompanyController@PaidDette')->name('PaidDette');
 Route::get('/OrderViewCount','CompanyController@OrderViewCount')->name('OrderViewCount');
 Route::get('/OrderViewByUid','CompanyController@OrderViewByUid')->name('OrderViewByUid');
 Route::get('/StockCount','CompanyController@StockCount')->name('StockCount');
+Route::post('/addDepense','CompanyController@addDepense')->name('addDepense');
+Route::get('/viewDepense','CompanyController@viewDepense')->name('viewDepense');
 /*safari*/
 Route::get('/SafariGetAll','CompanyController@CompanySafariGetAll')->name('CompanySafariGetAll');
 Route::post('/SafariCreate','CompanyController@CompanySafariCreate')->name('CompanySafariCreate');

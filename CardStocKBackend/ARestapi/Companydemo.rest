@@ -1,8 +1,8 @@
 @baseUrl = http://localhost:8000/api
-@email=company@gmail.com
-@PhoneNumber=+250782389359
+@email=kopa@gmail.com
+@PhoneNumber=+243978787877
 @password=1
-@Auth_token=403|tMpZq6lQVD38pW0E0GHpOaQCBYyjIeYjEnOnxxSc
+@Auth_token=401|9HDxK5MWETpPYlu89eKg0gV8kfrjeRECSxCB0Vud
 
 ### Company Login with email
 POST  {{baseUrl}}/AdminLoginEmail/
@@ -726,7 +726,6 @@ Authorization: Bearer {{Auth_token}}
 
 ###place order ,this oTher ref after req_qty are after sales not allowed negative value
 ### more order i need to Add orderId value to orderIdFromEdit to track my Order
-### req_qty must be number
 POST  {{baseUrl}}/placeOrder/
 content-type: application/json;charset=UTF-8
 Authorization: Bearer {{Auth_token}}
@@ -734,7 +733,7 @@ Authorization: Bearer {{Auth_token}}
 {
 "productCode":"bido_1698592481",
 "uidclient":"kebineericMuna_1674160265",
-"req_qty":4,
+"req_qty":6,
 "ref":"test",
 "comment":"ok",
 "statusForm":"none",
@@ -745,7 +744,6 @@ Authorization: Bearer {{Auth_token}}
 
 ###
 ###Edit temporary Order edit order done not allowed negative Value 100% tested and working perfect
-### req_qty must be number
 GET  {{baseUrl}}/EditOrder/
 content-type: application/json;charset=UTF-8
 Authorization: Bearer {{Auth_token}}
@@ -793,9 +791,9 @@ Authorization: Bearer {{Auth_token}}
 {
 "uid":"Nyota_1672353378",
 "uidUser":"kebineericMuna_1674160265",
-"OrderId":"UID_DX_1702452146",
-"inputData":"180",
-"all_total":"180",
+"OrderId":"0s",
+"inputData":"150",
+"all_total":"200",
 "reach":"1200",
 "gain":"350",
 "systemUid":"PointSales1"
@@ -954,7 +952,7 @@ Authorization: Bearer {{Auth_token}}
 
 
 }
-### paid dette done,remain is admin repay to Owner,input Data must be number
+### paid dette done,remain is admin repay to Owner
 POST  {{baseUrl}}/PaidDette
 Content-Type: application/json
 Authorization: Bearer {{Auth_token}}
@@ -962,8 +960,9 @@ Authorization: Bearer {{Auth_token}}
 {
 
 "uidUser":"kebineericMuna_1674160265",
-"inputData":100,
-"all_total":"215",
+
+"inputData":75,
+"all_total":"2000",
 "ref":"Eric",
 "reach":"1200",
 "gain":"350",
@@ -987,7 +986,7 @@ content-type: application/json;charset=UTF-8
 Authorization: Bearer {{Auth_token}}
 
 {
-"orderId":"UID_jT_1702383743"
+"orderId":"0s"
 }
 
 
@@ -998,7 +997,7 @@ content-type: application/json;charset=UTF-8
 Authorization: Bearer {{Auth_token}}
 
 {
-"uid":"UID_jT_1702383743",
+"uid":"0s",
 "productCode":"bido_1698592481",
 "uidTransport":"Qito",
 "qty_Transport":1,

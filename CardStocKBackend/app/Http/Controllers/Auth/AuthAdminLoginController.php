@@ -21,6 +21,10 @@ class AuthAdminLoginController extends Controller
       // $this->otp='20 seconds';//test purpose
         $this->email_confirm='24 hours';
 
+        //$this->adminStatus_record=["test_PointSales1","Salary_PointSales1","beg_PointSales1","Sifa_PointSales1"];//Status_SystemUd
+      $this->adminStatus_record=["Sales_PointSales1","Salary_PointSales1","GeneralSpend_PointSales1","Funded_PointSales1","Sponsor_PointSales1","OrderCount_PointSales1"];//Status_SystemUd
+
+
     }
     //
     public function AdminLoginEmail($input){
@@ -70,26 +74,30 @@ class AuthAdminLoginController extends Controller
             $user=auth::guard('Admin')->user();
             $success['token']=$user->createToken('MyApp')->plainTextToken;
             $success['name']=$user->email;
+//create admin_records
+      $this->createAdmin_record();
 
-            return response([
-                "status"=>true,
-               // "result"=>Auth::guard('Admin')->user(),
-                "token"=>$success['token'],
-                "User"=>[
-                    "uid"=>Auth::guard('Admin')->user()->uid,
-                    "first_name"=>Auth::guard('Admin')->user()->fname,
-                    "last_name"=>Auth::guard('Admin')->user()->name,
-                    "name"=>Auth::guard('Admin')->user()->name,
-                    "email"=>Auth::guard('Admin')->user()->email,
-                    "tel"=>Auth::guard('Admin')->user()->phone,
-                    "Ccode"=>Auth::guard('Admin')->user()->Ccode,
-                    "status"=>Auth::guard('Admin')->user()->status,
-                    "platform"=>Auth::guard('Admin')->user()->platform,
-                    "CompanyName"=>Auth::guard('Admin')->user()->CompanyName,
-                    "subscriber"=>Auth::guard('Admin')->user()->subscriber,
-                ]
+        return response([
+            "status"=>true,
+           // "result"=>Auth::guard('Admin')->user(),
+            "token"=>$success['token'],
+            "User"=>[
+                "uid"=>Auth::guard('Admin')->user()->uid,
+                "first_name"=>Auth::guard('Admin')->user()->fname,
+                "last_name"=>Auth::guard('Admin')->user()->name,
+                "name"=>Auth::guard('Admin')->user()->name,
+                "email"=>Auth::guard('Admin')->user()->email,
+                "tel"=>Auth::guard('Admin')->user()->phone,
+                "Ccode"=>Auth::guard('Admin')->user()->Ccode,
+                "status"=>Auth::guard('Admin')->user()->status,
+                "platform"=>Auth::guard('Admin')->user()->platform,
+                "CompanyName"=>Auth::guard('Admin')->user()->CompanyName,
+                "subscriber"=>Auth::guard('Admin')->user()->subscriber,
+            ]
 
-            ],200);
+        ],200);
+
+
 
         }
 
@@ -101,6 +109,56 @@ class AuthAdminLoginController extends Controller
         ],200);
 
     }
+    }
+    public function createAdmin_record(){
+
+        try {
+            //code...
+
+            $check=DB::transaction(function ()  {//
+                 $arraySize = count($this->adminStatus_record);
+
+            if(count($this->adminStatus_record)==(Auth::guard('Admin')->user()->AdminRecord_Status))
+            {
+              return true;
+            }
+            else{
+
+                 $remainingArray = array_slice($this->adminStatus_record,(Auth::guard('Admin')->user()->AdminRecord_Status));
+
+                 $limitData=count($remainingArray);
+            for($i=0;$i<$limitData;$i++)
+              {
+                $underscorePos = strpos($remainingArray[$i], "_");
+                  DB::table("admnin_records")
+                  ->insert([
+                    "uid"=>Auth::guard('Admin')->user()->uid,
+                    "subscriber"=>Auth::guard('Admin')->user()->subscriber,
+                    "status"=>(substr($remainingArray[$i], 0, $underscorePos)),
+                    "systemUid"=>(substr($remainingArray[$i],$underscorePos +1)),
+                    "created_at"=>$this->today
+                  ]);
+
+              }
+
+              DB::update("update admins set AdminRecord_Status=AdminRecord_Status+:AdminRecord_Status where uid=:uid limit 1",array(
+                "AdminRecord_Status"=>$limitData,
+                "uid"=>Auth::guard('Admin')->user()->uid
+              ));
+              return true;
+            }
+
+            });
+
+        } catch (\Exception $e) {
+            DB::rollback();
+           // throw $e;
+            return response()->json(['error' => 'An error occurred',
+        'errorPrint'=>$e->getMessage(),"errorCode"=>$e->getLine()], 500); // Return an error JSON response
+        }
+
+
+
     }
     public function AdminLoginPhone($input){
 

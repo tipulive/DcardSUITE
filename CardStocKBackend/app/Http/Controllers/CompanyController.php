@@ -882,6 +882,62 @@ class CompanyController extends Controller
             ],200);
         }
     }
+    public function addDepense(Request $request){
+        if(Auth::check())
+        {
+
+            if(Auth::user()->platform==$this->platform1)
+            {
+                $input=$request->all();
+
+                return (new StockController)->addDepense($input);
+            }
+            else{
+                return response([
+                    "status"=>false,
+                    "result"=>$this->Admin_Auth_result_error,
+                    "error"=>$this->Admin_Auth_error,
+
+                ],200);
+            }
+        }
+        else{
+            return response([
+                "status"=>false,
+                "result"=>$this->Admin_Auth_result_error,
+                "error"=>$this->Admin_Auth_error,
+
+            ],200);
+        }
+    }
+    public function viewDepense(Request $request){
+        if(Auth::check())
+        {
+
+            if(Auth::user()->platform==$this->platform1)
+            {
+                $input=$request->all();
+
+                return (new StockController)->viewDepense($input);
+            }
+            else{
+                return response([
+                    "status"=>false,
+                    "result"=>$this->Admin_Auth_result_error,
+                    "error"=>$this->Admin_Auth_error,
+
+                ],200);
+            }
+        }
+        else{
+            return response([
+                "status"=>false,
+                "result"=>$this->Admin_Auth_result_error,
+                "error"=>$this->Admin_Auth_error,
+
+            ],200);
+        }
+    }
     /*Safari Stock New Code */
    /*SafariCode calculation */
    public function CompanySafariGetAll(Request $request){
