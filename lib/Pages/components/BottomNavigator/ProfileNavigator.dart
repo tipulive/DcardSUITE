@@ -1,4 +1,4 @@
-import 'package:dcard/Pages/UserAccountPage.dart';
+import '../../../Pages/UserAccountPage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

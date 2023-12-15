@@ -19,14 +19,14 @@ import 'package:google_fonts/google_fonts.dart';
 
 
 
-class deptComp extends StatefulWidget {
-  const deptComp({Key? key}) : super(key: key);
+class SetSaleComp extends StatefulWidget {
+  const SetSaleComp({Key? key}) : super(key: key);
 
   @override
-  State<deptComp> createState() => _deptCompState();
+  State<SetSaleComp> createState() => _SetSaleCompState();
 }
 
-class _deptCompState extends State<deptComp> {
+class _SetSaleCompState extends State<SetSaleComp> {
 
   ScrollController _scrollController = ScrollController();// detect scroll
   List<dynamic> _data = [];
@@ -35,6 +35,7 @@ class _deptCompState extends State<deptComp> {
 
 
   var bottomResult=[];
+  num countData=0;
 
   int _page=0;
   int limit=0;
@@ -91,7 +92,100 @@ class _deptCompState extends State<deptComp> {
       children: [
         //ProfilePic().profile(),
 
-        Text("Orders",style:GoogleFonts.pacifico(fontSize:15,color: Colors.teal,fontWeight: FontWeight.w700)),
+        Padding(
+          padding:EdgeInsets.fromLTRB(8,10,8,0),
+          child: Card(
+            elevation:0,
+            margin: EdgeInsets.symmetric(vertical:1,horizontal:5),
+            //color:Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15.0),
+              //side: BorderSide(color:_data[0]["color_var"]??true?Colors.white:Colors.green, width: 2),
+            ),
+
+            child: ListTile(
+                leading: CircleAvatar(
+                  child: Icon(_getRandomIcon()),
+                  backgroundColor:getRandomColor(),
+                ),
+                title:Row(
+                  children: [
+
+
+                    Expanded(
+                      flex: 1,
+                      child: Stack(
+                        children: [
+
+                          Column(
+                            children: [
+
+                              Center(
+                                child: RichText(
+                                  text: TextSpan(
+                                    text: "Total:",
+                                    style: DefaultTextStyle.of(context).style,
+                                    children: <TextSpan>[
+
+
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+
+
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+
+                subtitle: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Column(
+
+                      children: [
+                        Wrap(
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+
+                            Icon(Icons.segment,color:Colors.orange,size:13,),
+                            Text("${(_data.length>0)?_data[0]['saleBalance']:0}",style:GoogleFonts.pacifico(fontSize:15,color: Colors.orange,fontWeight: FontWeight.w700)),
+
+
+                          ],
+                        ),
+
+
+
+
+
+
+                      ],
+                    ),
+
+                  ],
+                ),
+                trailing:Container(child:
+                GestureDetector(
+                    onTap: () async{
+
+
+
+                    },
+                    child:Icon(Icons.grid_view,color:Colors.orange)
+                )
+
+
+                )
+
+              //trailing: Text()
+            ),
+          ),
+        ),
 
 
 
@@ -222,30 +316,12 @@ class _deptCompState extends State<deptComp> {
                                   children: [
 
                                     Icon(Icons.segment,color:Colors.orange,size:13,),
-                                    Text("Qty:${_data[index]['totalQty']}"),
+                                    Text("Amount:${_data[index]['totalPaid']}"),
 
                                   ],
                                 ),
 
-                                Wrap(
-                                  crossAxisAlignment: WrapCrossAlignment.center,
-                                  children: [
 
-                                    Icon(Icons.segment,color:Colors.orange,size:13,),
-                                    Text("Amount:${_data[index]['totalAmount']}"),
-
-                                  ],
-                                ),
-
-                                Wrap(
-                                  crossAxisAlignment: WrapCrossAlignment.center,
-                                  children: [
-
-                                    Icon(Icons.segment,color:Colors.orange,size:13,),
-                                    Text("Deliver:${_data[index]['totalQty']-_data[index]['totalCount']}"),
-
-                                  ],
-                                ),
 
 
                               ],
@@ -263,6 +339,7 @@ class _deptCompState extends State<deptComp> {
 
 
                             orderData=_data[index].values.toList();
+                            print(orderData);
 
 
                             //print((await thisOrder())["result"]);
@@ -271,10 +348,10 @@ class _deptCompState extends State<deptComp> {
                             if(resultData["status"]){
 
 
-
                               setState(() {
                                 isLoading=false;
                                 thisListOrder.clear();
+
                                 thisListOrder.addAll(resultData["result"]);
 
 
@@ -303,7 +380,7 @@ class _deptCompState extends State<deptComp> {
                   child:Center(
                       child:hasMoreData?
                       CircularProgressIndicator()
-                          :Text("no more Data")
+                          :const Text("no more Data")
 
                   ),
                 );
@@ -367,18 +444,23 @@ class _deptCompState extends State<deptComp> {
     isLoading=true;
     int limit=10;
 
-    var resultData=(await StockQuery().orderViewCount(Topups(startlimit:limit,endlimit:_page))).data;
+    var resultData=(await StockQuery().viewSales(Topups(startlimit:limit,endlimit:_page))).data;
 
 
     if(resultData["status"])
     {
+
       setState(() {
         isLoading=false;
         hasMoreData=false;
 
+        if(resultData["result"]!=0)
+        {
+          _data.clear();
+          _data.addAll(resultData["result"]);
 
-        _data.clear();
-        _data.addAll(resultData["result"]);
+        }
+
 
       });
       return true;
@@ -425,7 +507,7 @@ class _deptCompState extends State<deptComp> {
     int limit=10;
 
 
-    var resultData=(await StockQuery().orderViewByUid(Topups(uid:"${orderData[0]}",startlimit:limit,endlimit:_page))).data;
+    var resultData=(await StockQuery().viewSalesByUid(Topups(uid:"${orderData[0]}",startlimit:limit,endlimit:_page))).data;
     // var resultData=(await StockQuery().orderViewByUid(Topups(uid:"0s",startlimit:limit,endlimit:_page))).data;
     //print(resultData);
     if(resultData["status"])
@@ -445,212 +527,159 @@ class _deptCompState extends State<deptComp> {
   void viewThisOrder() {
 
     Get.bottomSheet(
-      Container(
-        padding:EdgeInsets.all(5.0),
-        height: 600,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(30),
-            topRight: Radius.circular(30),
-          ),
-        ),
-        child: Column(
-          children: [
-            Center(child: Text("ClientName:${orderData[1]}")),
-            Center(child: Text("UID:${orderData[0]}")),
 
-            Expanded(
-              child: ListView.builder(
+      StatefulBuilder(
+        builder: (BuildContext context, StateSetter setState) {
+          return
+            Container(
+
+              padding:EdgeInsets.all(5.0),
+              height: 600,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(30),
+                  topRight: Radius.circular(30),
+                ),
+              ),
+              child: Column(
+                children: [
+
+                  Center(child: Text("Client:${orderData[1]}")),
+                  Center(child: Text("UID:${orderData[0]}")),
+
+                  Expanded(
+                    child: ListView.builder(
 
 
-                itemCount:thisListOrder.length+1,
-                itemBuilder: (context, index) {
+                      itemCount:thisListOrder.length+1,
+                      itemBuilder: (context, index) {
 
-                  if(index<thisListOrder.length)
-                  {
+                        if(index<thisListOrder.length)
+                        {
+
+                          (Get.put(HideShowState())).isDelivery(thisListOrder);
 
 
-                    return Container(
-                      margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                      child: Card(
-                        elevation:0,
-                        //margin: EdgeInsets.symmetric(vertical:1,horizontal:5),
-                        //color:Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(9.0),
-                          // side: BorderSide(color:_data[index]["color_var"]??true?Colors.white:Colors.green, width: 2),
-                        ),
 
-                        child: Column(
-                          children: [
-                            // Text("sum:${orderSum}"),
-                            ListTile(
-                                leading: CircleAvatar(
-                                  child: Icon(_getRandomIcon()),
-                                  backgroundColor:getRandomColor(),
-                                ),
-                                title:Row(
-                                  children: [
-                                    Expanded(
+                          //Get.put(HideShowState())).isDelivery(thisListOrder[index]);
 
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+
+                          return Container(
+                            margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                            child: Card(
+                              elevation:0.5,
+                              //margin: EdgeInsets.symmetric(vertical:1,horizontal:5),
+                              //color:Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(7),
+                                //side: BorderSide(color:_data[index]["color_var"]??true?Colors.white:Colors.green, width: 2),
+                              ),
+
+                              child: Column(
+                                children: [
+                                  // Text("sum:${orderSum}"),
+                                  ListTile(
+                                      leading: CircleAvatar(
+                                        child: Icon(_getRandomIcon()),
+                                        backgroundColor:getRandomColor(),
+                                      ),
+                                      title:Row(
                                         children: [
+                                          Expanded(
 
-                                          RichText(
-                                            text: TextSpan(
-                                              text:"${thisListOrder[index]["productName"]} (${thisListOrder[index]["pcs"]} pcs):",
-                                              style: DefaultTextStyle.of(context).style,
-                                              children: <TextSpan>[
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+
+                                                RichText(
+                                                  text: TextSpan(
+                                                    text:"${thisListOrder[index]["productName"]} (${thisListOrder[index]["pcs"]} pcs):",
+                                                    style: DefaultTextStyle.of(context).style,
+                                                    children: <TextSpan>[
+
+
+                                                    ],
+                                                  ),
+                                                ),
+                                                Text("Price:${(thisListOrder[index]["price"])}"),
+
+
+                                                Text.rich(
+                                                    TextSpan(
+                                                        children: [
+                                                          TextSpan(
+                                                            text: 'Qty ${thisListOrder[index]["totalQty"]}:',
+
+                                                          ),
+
+
+
+                                                        ]
+                                                    )
+                                                ),
+                                                Text("Deliver:${(((Get.put(HideShowState()).delivery)[index]["totalQty"])!=((Get.put(HideShowState()).delivery)[index]["totalCount"]))?(((Get.put(HideShowState()).delivery)[index]["totalQty"]-(Get.put(HideShowState()).delivery)[index]["totalCount"])):0}"),
 
 
                                               ],
                                             ),
-                                          ),
-                                          Text("Price:${(thisListOrder[index]["price"])}"),
-
-
-                                          Text.rich(
-                                              TextSpan(
-                                                  children: [
-                                                    TextSpan(
-                                                      text: 'Qty ${thisListOrder[index]["totalQty"]}:',
-
-                                                    ),
-
-                                                    WidgetSpan(
-
-                                                      child: IntrinsicWidth(
-                                                        child: TextField(
-
-
-                                                          keyboardType: TextInputType.number,
-                                                          decoration: InputDecoration(
-                                                            hintText: '-1-',
-                                                            hintStyle: TextStyle(color: Colors.red),
-                                                            contentPadding: EdgeInsets.all(0),
-                                                            isDense: true,
+                                          )
 
 
 
-                                                          ),
-                                                          style: TextStyle(
-                                                            color: Colors.blue, // Set the text color to red
 
-                                                          ),
-                                                          onChanged: (text) {
-                                                            if((double.tryParse(text) != null)){
-                                                              qty_product=num.parse(text);
-
-                                                            }
-
-                                                            //print(this._data[index]["total_var"]);
-                                                            // print("Text changed to: $text");
-                                                          },
-                                                        ),
-                                                        stepWidth: 0.5, // set minimum width to 100
-                                                      ),
-                                                    ),
-
-                                                  ]
-                                              )
-                                          ),
-                                          Text("Deliver:${(thisListOrder[index]["totalQty"])-(thisListOrder[index]["totalCount"])}")
 
 
                                         ],
                                       ),
-                                    )
 
 
+                                      trailing:Text("${thisListOrder[index]["totalAmount"]}"),
+
+                                    //trailing: Text()
+                                  ),
 
 
-
-
-                                  ],
-                                ),
-
-
-                                trailing:Column(
-                                  children: [
-                                    Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: <Widget>[
-
-
-                                        IconButton(
-                                          icon: Icon(Icons.add_shopping_cart,
-                                              size: 23.0,
-                                              color: Colors.grey),
-                                          onPressed: () async{
-                                            productCode=thisListOrder[index]["productCode"];
-                                            await stockCount();
-
-                                          },
-                                        ) ,Visibility(
-                                            visible:true,
-                                            child: Text("")),
-                                        IconButton(
-                                          icon: Icon(
-                                              Icons.delete,
-                                              size: 23.0,
-                                              color: Colors.red
-                                          ),
-                                          onPressed: () {
-
-
-                                          },
-                                        ),
-                                      ],
-                                    ),
-
-                                  ],
-                                )
-
-                              //trailing: Text()
-                            ),
-                            Visibility(
-                              visible: true,
-                              child: Padding(
-                                padding: const EdgeInsets.fromLTRB(8,0,8,8),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    Text("${thisListOrder[index]["totalAmount"]}"),
-                                  ],
-                                ),
+                                ],
                               ),
                             ),
+                          );
 
-                          ],
-                        ),
-                      ),
-                    );
+                        }
+                        else{
+                          return Container();
+                        }
 
-                  }
-                  else{
-                    return Container();
-                  }
-
-                },
+                      },
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ],
-        ),
+            );
+        },
       ),
     ).whenComplete(() {
-
+      // Get.put(HideShowState()).isDelivery(0);
       //do whatever you want after closing the bottom sheet
     });
 
   }
 
-  stockCount()async
+  stockCount(indexData)async
   {
 
 
-    var resultData=(await StockQuery().stockCount(Topups(uid:"${orderData[0]}"),QuickBonus(uid:"${productCode}",qty:"${qty_product}",subscriber:"StockName",status:"status",description:"Delivered"), User(uid: "UidTransport",name:"refName"))).data;
+    (Get.put(HideShowState())).isChangeDelivery(thisListOrder[indexData],indexData,qty_product);
+
+
+    // print((Get.put(HideShowState()).delivery)[indexData]);
+    //print(thisListOrder[indexData]);
+
+
+
+
+
+    /*var resultData=(await StockQuery().stockCount(Topups(uid:"${orderData[0]}"),QuickBonus(uid:"${productCode}",qty:"${qty_product}",subscriber:"StockName",status:"status",description:"Delivered"), User(uid: "UidTransport",name:"refName"))).data;
 
 
     if(resultData["status"])
@@ -658,7 +687,7 @@ class _deptCompState extends State<deptComp> {
       Quickdata();
       thisOrder2();
 
-    }
+    }*/
 
 
 
@@ -672,4 +701,5 @@ class _deptCompState extends State<deptComp> {
 
 //
 }
+
 

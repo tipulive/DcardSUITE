@@ -1,24 +1,29 @@
 
 
 
-import 'package:dcard/Pages/SetEditCardNoPage.dart';
-import 'package:dcard/Pages/SetStockPage.dart';
-import 'package:dcard/Pages/SetWithdrawBonusPage.dart';
-import 'package:dcard/Query/AdminQuery.dart';
-import 'package:dcard/Query/TopupQuery.dart';
-import 'package:dcard/Utilconfig/HideShowState.dart';
+import '../../Pages/SetEditCardNoPage.dart';
+import '../../Pages/SetStockPage.dart';
+import '../../Pages/SetWithdrawBonusPage.dart';
+import '../../Query/AdminQuery.dart';
+import '../../Query/TopupQuery.dart';
+import '../../Utilconfig/HideShowState.dart';
+
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../SetDepensePage.dart';
+
+import '../SetDeptPage.dart';
 import '../SetOrderPage.dart';
 import '../SetPartHistPage.dart';
 import '../SetPartPage.dart';
 import '../SetQuickBoHistPage.dart';
+import '../SetRepayPage.dart';
+import '../SetSalePage.dart';
+import '../SetSpendingPage.dart';
 import '../SetWithdrawBalancePage.dart';
-import '../deptPage.dart';
+
 import '../employePage.dart';
 
 
@@ -58,27 +63,39 @@ class _SettingCompState extends State<SettingComp> {
             divLine(),
             GestureDetector(
                 onTap: (){
-                  viewOrder();
+                  dispatchOrder();
                 },
-                child: detailsProfile("Dispatch Orders",Icons.calendar_month_outlined,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,viewOrder)),//Last Time Purchase
+                child: detailsProfile("Dispatch Orders",Icons.calendar_month_outlined,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,dispatchOrder)),//Last Time Purchase
             const SizedBox(height:5,),
             GestureDetector(
                 onTap: (){
-                  depense();
+                  sales();
                 },
-                child: detailsProfile("Spendings",Icons.calendar_month_outlined,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,viewOrder)),//Last Time Purchase
+                child: detailsProfile("Sales",Icons.calendar_month_outlined,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,sales)),//Last Time Purchase
+            const SizedBox(height:5,),
+            GestureDetector(
+                onTap: (){
+                  spending();
+                },
+                child: detailsProfile("Spendings",Icons.calendar_month_outlined,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,spending)),//Last Time Purchase
             const SizedBox(height:5,),
             GestureDetector(
                 onTap: (){
                   dept();
                 },
-                child: detailsProfile("Dept",Icons.calendar_month_outlined,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,viewOrder)),//Last Time Purchase
+                child: detailsProfile("Dept",Icons.calendar_month_outlined,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,dept)),//Last Time Purchase
+            const SizedBox(height:5,),
+            GestureDetector(
+                onTap: (){
+                  repay();
+                },
+                child: detailsProfile("Repay",Icons.calendar_month_outlined,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,repay)),
             const SizedBox(height:5,),
             GestureDetector(
                 onTap: (){
                   employe();
                 },
-                child: detailsProfile("Employee",Icons.calendar_month_outlined,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,viewOrder)),//Last Time Purchase
+                child: detailsProfile("Employee",Icons.calendar_month_outlined,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,employe)),//Last Time Purchase
             const SizedBox(height:5,),
             GestureDetector(
                 onTap: (){
@@ -184,6 +201,7 @@ class _SettingCompState extends State<SettingComp> {
   }
 
 
+  @override
   void initState()
   {
     super.initState();
@@ -318,24 +336,14 @@ Widget detailsProfile(iconText,icon,iconDescr,listBackground,iconrightText,iconr
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Container(
 
-                    width: 30,
-                    height: 30,
-
-                    child:
-                    GestureDetector(
-                        onTap: () {
-                          // This function will be called when the icon is tapped.
-                          myfunct();
-                        },
-                        child: Icon(iconright,color:
-                        Colors.teal,size: 22,)
-                    )
-
-
-
-
+                GestureDetector(
+                    onTap: () {
+                      // This function will be called when the icon is tapped.
+                      myfunct();
+                    },
+                    child: Icon(iconright,color:
+                    Colors.teal,size: 22,)
                 ),
 
               ],
@@ -347,65 +355,75 @@ Widget detailsProfile(iconText,icon,iconDescr,listBackground,iconrightText,iconr
   );
 }
 
-viewOrder() async{
+dispatchOrder() async{
 
-  Get.to(() =>SetOrderPage());
+  Get.to(() =>const SetOrderPage());
 
 }
-depense() async{
+sales()async{
 
-  Get.to(() =>SetDepensePage());
+  Get.to(() =>const SetSalePage());
+
+}
+spending() async{
+
+  Get.to(() =>const SetSpendingPage());
 
 }
 dept() async{
 
-  Get.to(() =>deptPage());
+  Get.to(() =>const SetDeptPage());
+
+}
+repay() async{
+
+  Get.to(() =>const SetRepayPage());
 
 }
 employe() async{
 
-  Get.to(() =>employePage());
+  Get.to(() =>const employePage());
 
 }
 
 viewStock() async{
 
-  Get.to(() =>SetStockPage());
+  Get.to(() =>const SetStockPage());
 
 }
 partfunc() async{
 
-  Get.to(() =>SetPartPage());
+  Get.to(() =>const SetPartPage());
 
 
 }
 partHistfunc() async{
   //(await Get.put(ParticipatedQuery()).getCountParticipateEventOnline(Participated(uidUser:"${(Get.put(CardQuery()).obj)["resultData"]["UserDetail"]["uid"]??'none'}")));
 
-  Get.to(() =>SetPartHistPage());
+  Get.to(() =>const SetPartHistPage());
 
 
 }
 quickBoHistfunc() async{
   //(await Get.put(TopupQuery()).GetBalanceHist(Topups(uid:"${(Get.put(CardQuery()).obj)["resultData"]["UserDetail"]["uid"]??'none'}")));
-  Get.to(() =>SetQuickBoHistPage());
+  Get.to(() =>const SetQuickBoHistPage());
 
 }
 
 editCardfunc() async{
-  Get.to(() =>SetEditCardNoPage());
+  Get.to(() =>const SetEditCardNoPage());
 }
 logout() async{
   Get.dialog(
     AlertDialog(
-      title: Text('Confirmation'),
-      content: Text('Do you Want to Logout?'),
+      title: const Text('Confirmation'),
+      content: const Text('Do you Want to Logout?'),
       actions: [
         ElevatedButton(
           style: ElevatedButton.styleFrom(
 
             //primary: Colors.grey[300],
-            backgroundColor: Color(0xff9a1c55),
+            backgroundColor: const Color(0xff9a1c55),
             elevation:0,
           ),
           onPressed: () async{
@@ -415,13 +433,13 @@ logout() async{
 
             Get.toNamed('/Login');
           },
-          child: Text('Yes'),
+          child: const Text('Yes'),
         ),
         ElevatedButton(
           onPressed: () {
             Get.back(); // close the alert dialog
           },
-          child: Text('Close'),
+          child: const Text('Close'),
         ),
       ],
     ),
@@ -429,10 +447,10 @@ logout() async{
 }
 
 withdrawBonusFunc(){
-  Get.to(() =>SetWithdrawBonusPage());
+  Get.to(() =>const SetWithdrawBonusPage());
 }
 withdrawBalanceFunc(){
-  Get.to(() =>SetWithdrawBalancePage());
+  Get.to(() =>const SetWithdrawBalancePage());
 }
 
 

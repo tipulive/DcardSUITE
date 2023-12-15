@@ -1,8 +1,8 @@
 
-import 'package:dcard/Pages/AllEventPage.dart';
-import 'package:dcard/Pages/BalancePage.dart';
-import 'package:dcard/Pages/BonusPage.dart';
-import 'package:dcard/Pages/WBonusHistPage.dart';
+import '../../../Pages/AllEventPage.dart';
+import '../../../Pages/BalancePage.dart';
+import '../../../Pages/BonusPage.dart';
+import '../../../Pages/WBonusHistPage.dart';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

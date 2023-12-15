@@ -1,4 +1,4 @@
-import 'package:dcard/Pages/ProfilePage.dart';
+import '../../../Pages/ProfilePage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -7,18 +7,18 @@ import 'package:wakelock/wakelock.dart';
 import 'package:get/get.dart';
 import 'dart:io';
 
-import 'package:dcard/models/Admin.dart';
-import 'package:dcard/models/Participated.dart';
-import 'package:dcard/models/Promotions.dart';
+import '../../../models/Admin.dart';
+import '../../../models/Participated.dart';
+import '../../../models/Promotions.dart';
 import 'Query/AdminQuery.dart';
 
 import 'models/User.dart';
 import 'Query/UserQuery.dart';
 
 
-import 'package:dcard/Query/PromotionQuery.dart';
-import 'package:dcard/Query/ParticipatedQuery.dart';
-import 'package:dcard/Dateconfig/DateClassUtil.dart';
+import '../../../Query/PromotionQuery.dart';
+import '../../../Query/ParticipatedQuery.dart';
+import '../../../Dateconfig/DateClassUtil.dart';
 
 void main() {
   /*this will make apps not going to sleep Mode*/

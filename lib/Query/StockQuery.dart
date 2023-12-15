@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:dcard/Query/AdminQuery.dart';
-import 'package:dcard/models/Participated.dart';
-import 'package:dcard/models/Promotions.dart';
-import 'package:dcard/models/User.dart';
+import '../../../Query/AdminQuery.dart';
+import '../../../models/Participated.dart';
+import '../../../models/Promotions.dart';
+import '../../../models/User.dart';
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 
@@ -131,7 +131,7 @@ dynamic dataTest=[];
       var response = await Dio().post(url,
         options: Options(headers: {
           HttpHeaders.contentTypeHeader: "application/json",
-          HttpHeaders.authorizationHeader:"Bearer ${Authtoken}"
+          HttpHeaders.authorizationHeader:"Bearer $Authtoken"
         }),
         data: jsonEncode(params),
       );
@@ -169,7 +169,7 @@ dynamic dataTest=[];
       var response = await Dio().get(url,
         options: Options(headers: {
           HttpHeaders.contentTypeHeader: "application/json",
-          HttpHeaders.authorizationHeader:"Bearer ${authToken}"
+          HttpHeaders.authorizationHeader:"Bearer $authToken"
         }),
         queryParameters: params,
       );
@@ -204,7 +204,7 @@ dynamic dataTest=[];
       var response = await Dio().get(url,
         options: Options(headers: {
           HttpHeaders.contentTypeHeader: "application/json",
-          HttpHeaders.authorizationHeader:"Bearer ${authToken}"
+          HttpHeaders.authorizationHeader:"Bearer $authToken"
         }),
         queryParameters: params,
       );
@@ -250,7 +250,7 @@ dynamic dataTest=[];
       var response = await Dio().post(url,
         options: Options(headers: {
           HttpHeaders.contentTypeHeader: "application/json",
-          HttpHeaders.authorizationHeader:"Bearer ${Authtoken}"
+          HttpHeaders.authorizationHeader:"Bearer $Authtoken"
         }),
         data: jsonEncode(params),
       );
@@ -287,12 +287,13 @@ dynamic dataTest=[];
 
         //"options": [1,2,3],
       };
+   //print(params);
       String Authtoken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
       var url="${ConstantClassUtil.urlLink}/SubmitOrder";
       var response = await Dio().post(url,
         options: Options(headers: {
           HttpHeaders.contentTypeHeader: "application/json",
-          HttpHeaders.authorizationHeader:"Bearer ${Authtoken}"
+          HttpHeaders.authorizationHeader:"Bearer $Authtoken"
         }),
         data: jsonEncode(params),
       );
@@ -313,6 +314,88 @@ dynamic dataTest=[];
     }
 
   }
+  viewSales(Topups topupData) async{//balance and Bonus Widthdraw History
+    try {
+
+      var params =  {
+
+        "LimitStart":topupData.endlimit,  //page
+        "LimitEnd":topupData.startlimit,//limit
+
+      };
+
+      String authToken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
+      var url="${ConstantClassUtil.urlLink}/viewSales";
+      var response = await Dio().get(url,
+        options: Options(headers: {
+          HttpHeaders.contentTypeHeader: "application/json",
+          HttpHeaders.authorizationHeader:"Bearer $authToken"
+        }),
+        queryParameters: params,
+      );
+      if (response.statusCode == 200) {
+
+
+        // return (response.data).length;
+        //updateEventState(response.data);
+        //return "hello";
+
+        //updateBalanceHistState(response.data);
+        //return response.data;
+
+        return response;
+
+
+      } else {
+        return false;
+        //print(false);
+      }
+    } catch (e) {
+      //return false;
+
+    }
+  }//calculate safari Interet
+  viewSalesByUid(Topups topupData) async{//balance and Bonus Widthdraw History
+    try {
+
+      var params =  {
+        "orderId":topupData.uid,
+        "LimitEnd":topupData.startlimit,
+        "LimitStart":topupData.endlimit,  //page
+      };
+
+      String authToken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
+      var url="${ConstantClassUtil.urlLink}/viewSalesByUid";
+      var response = await Dio().get(url,
+        options: Options(headers: {
+          HttpHeaders.contentTypeHeader: "application/json",
+          HttpHeaders.authorizationHeader:"Bearer $authToken"
+        }),
+        queryParameters: params,
+      );
+      if (response.statusCode == 200) {
+
+
+        // return (response.data).length;
+        //updateEventState(response.data);
+        //return "hello";
+
+        //updateBalanceHistState(response.data);
+        //return response.data;
+
+        return response;
+
+
+      } else {
+        return false;
+        //print(false);
+      }
+    } catch (e) {
+      //return false;
+      print(e);
+    }
+  }
+
   editTOrder(QuickBonus product,User userData) async{//balance and Bonus Widthdraw History
     try {
 
@@ -332,7 +415,7 @@ dynamic dataTest=[];
       var response = await Dio().get(url,
         options: Options(headers: {
           HttpHeaders.contentTypeHeader: "application/json",
-          HttpHeaders.authorizationHeader:"Bearer ${authToken}"
+          HttpHeaders.authorizationHeader:"Bearer $authToken"
         }),
         queryParameters: params,
       );
@@ -368,7 +451,7 @@ dynamic dataTest=[];
       var response = await Dio().get(url,
         options: Options(headers: {
           HttpHeaders.contentTypeHeader: "application/json",
-          HttpHeaders.authorizationHeader:"Bearer ${authToken}"
+          HttpHeaders.authorizationHeader:"Bearer $authToken"
         }),
         queryParameters: params,
       );
@@ -411,7 +494,7 @@ dynamic dataTest=[];
       var response = await Dio().get(url,
         options: Options(headers: {
           HttpHeaders.contentTypeHeader: "application/json",
-          HttpHeaders.authorizationHeader:"Bearer ${authToken}"
+          HttpHeaders.authorizationHeader:"Bearer $authToken"
         }),
         queryParameters: params,
       );
@@ -454,7 +537,7 @@ dynamic dataTest=[];
       var response = await Dio().get(url,
         options: Options(headers: {
           HttpHeaders.contentTypeHeader: "application/json",
-          HttpHeaders.authorizationHeader:"Bearer ${authToken}"
+          HttpHeaders.authorizationHeader:"Bearer $authToken"
         }),
         queryParameters: params,
       );
@@ -496,7 +579,7 @@ dynamic dataTest=[];
       var response = await Dio().get(url,
         options: Options(headers: {
           HttpHeaders.contentTypeHeader: "application/json",
-          HttpHeaders.authorizationHeader:"Bearer ${authToken}"
+          HttpHeaders.authorizationHeader:"Bearer $authToken"
         }),
         queryParameters: params,
       );
@@ -533,7 +616,7 @@ dynamic dataTest=[];
       var response = await Dio().get(url,
         options: Options(headers: {
           HttpHeaders.contentTypeHeader: "application/json",
-          HttpHeaders.authorizationHeader:"Bearer ${authToken}"
+          HttpHeaders.authorizationHeader:"Bearer $authToken"
         }),
         queryParameters: params,
       );
@@ -573,7 +656,7 @@ dynamic dataTest=[];
       var response = await Dio().get(url,
         options: Options(headers: {
           HttpHeaders.contentTypeHeader: "application/json",
-          HttpHeaders.authorizationHeader:"Bearer ${authToken}"
+          HttpHeaders.authorizationHeader:"Bearer $authToken"
         }),
         queryParameters: params,
       );
@@ -612,7 +695,7 @@ dynamic dataTest=[];
       var response = await Dio().get(url,
         options: Options(headers: {
           HttpHeaders.contentTypeHeader: "application/json",
-          HttpHeaders.authorizationHeader:"Bearer ${authToken}"
+          HttpHeaders.authorizationHeader:"Bearer $authToken"
         }),
         queryParameters: params,
       );
@@ -652,7 +735,7 @@ dynamic dataTest=[];
       var response = await Dio().get(url,
         options: Options(headers: {
           HttpHeaders.contentTypeHeader: "application/json",
-          HttpHeaders.authorizationHeader:"Bearer ${authToken}"
+          HttpHeaders.authorizationHeader:"Bearer $authToken"
         }),
         queryParameters: params,
       );
@@ -701,7 +784,7 @@ dynamic dataTest=[];
       var response = await Dio().get(url,
         options: Options(headers: {
           HttpHeaders.contentTypeHeader: "application/json",
-          HttpHeaders.authorizationHeader:"Bearer ${authToken}"
+          HttpHeaders.authorizationHeader:"Bearer $authToken"
         }),
         queryParameters: params,
       );
@@ -727,7 +810,136 @@ dynamic dataTest=[];
       print(e);
     }
   }
-  paidDette(Topups TopupData) async{
+  addSpending(Topups topupData) async{
+
+    try {
+
+      var params =  {
+        //just to avoid error nothing else
+        //"uidUser":TopupData.uidCreator,//uidUser
+        "balance":topupData.amount,
+        "purpose":topupData.purpose,
+        "status":"GeneralSpend",
+        "commentData":topupData.desc,
+        "systemUid":"PointSales1"
+
+
+
+        //"options": [1,2,3],
+      };
+      String Authtoken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
+      var url="${ConstantClassUtil.urlLink}/addSpending";
+      var response = await Dio().post(url,
+        options: Options(headers: {
+          HttpHeaders.contentTypeHeader: "application/json",
+          HttpHeaders.authorizationHeader:"Bearer $Authtoken"
+        }),
+        data: jsonEncode(params),
+      );
+      if (response.statusCode == 200) {
+
+        //updateParticipateState(response.data);
+        return response;
+
+
+
+
+      } else {
+        return false;
+        //print(false);
+      }
+    } catch (e) {
+      //return false;
+
+    }
+
+  }
+  editSpending(Topups topupData) async{
+
+    try {
+
+      var params =  {
+        "balance":topupData.amount,
+        "purpose":topupData.purpose,
+        "status":"GeneralSpend",
+        "commentData":topupData.desc,
+        "systemUid":"PointSales1"
+
+        //"options": [1,2,3],
+      };
+      String Authtoken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
+      var url="${ConstantClassUtil.urlLink}/editSpending";
+      var response = await Dio().post(url,
+        options: Options(headers: {
+          HttpHeaders.contentTypeHeader: "application/json",
+          HttpHeaders.authorizationHeader:"Bearer $Authtoken"
+        }),
+        data: jsonEncode(params),
+      );
+      if (response.statusCode == 200) {
+
+        //updateParticipateState(response.data);
+        return response;
+
+
+
+
+      } else {
+        return false;
+        //print(false);
+      }
+    } catch (e) {
+      //return false;
+
+    }
+
+  }
+
+  viewSpending(Topups topupData) async{//balance and Bonus Widthdraw History
+    try {
+
+      var params =  {
+
+
+        "LimitStart":topupData.endlimit,  //page
+        "LimitEnd":topupData.startlimit,//limit
+
+
+
+      };
+
+      String authToken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
+      var url="${ConstantClassUtil.urlLink}/viewSpending";
+      var response = await Dio().get(url,
+        options: Options(headers: {
+          HttpHeaders.contentTypeHeader: "application/json",
+          HttpHeaders.authorizationHeader:"Bearer $authToken"
+        }),
+        queryParameters: params,
+      );
+      if (response.statusCode == 200) {
+
+
+        // return (response.data).length;
+        //updateEventState(response.data);
+        //return "hello";
+
+        //updateBalanceHistState(response.data);
+        //return response.data;
+
+        return response;
+
+
+      } else {
+        return false;
+        //print(false);
+      }
+    } catch (e) {
+      //return false;
+
+    }
+  }
+  paidDept(Topups TopupData) async{
 
     try {
 
@@ -750,11 +962,11 @@ dynamic dataTest=[];
         //"options": [1,2,3],
       };
       String Authtoken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
-      var url="${ConstantClassUtil.urlLink}/PaidDette";
+      var url="${ConstantClassUtil.urlLink}/PaidDept";
       var response = await Dio().post(url,
         options: Options(headers: {
           HttpHeaders.contentTypeHeader: "application/json",
-          HttpHeaders.authorizationHeader:"Bearer ${Authtoken}"
+          HttpHeaders.authorizationHeader:"Bearer $Authtoken"
         }),
         data: jsonEncode(params),
       );
@@ -765,16 +977,236 @@ dynamic dataTest=[];
 
 
 
+
       } else {
         return false;
         //print(false);
       }
     } catch (e) {
       //return false;
-      print(e);
+
     }
 
   }
+  editPaidDept(Topups TopupData) async{
+
+    try {
+
+      var params =  {
+        "uid":TopupData.uid,//just to avoid error nothing else
+        "uidUser":TopupData.uidCreator,//uidUser
+        "balance":TopupData.amount,
+        "description":TopupData.desc,
+
+        "uidUser":"kebineericMuna_1674160265",
+
+        "inputData":"600",
+        "all_total":"2000",
+        "ref":"Eric",
+        "reach":"1200",
+        "gain":"350",
+        "systemUid":"PointSales1",
+        "commentData":"karera"
+
+        //"options": [1,2,3],
+      };
+      String Authtoken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
+      var url="${ConstantClassUtil.urlLink}/EditPaidDept";
+      var response = await Dio().post(url,
+        options: Options(headers: {
+          HttpHeaders.contentTypeHeader: "application/json",
+          HttpHeaders.authorizationHeader:"Bearer $Authtoken"
+        }),
+        data: jsonEncode(params),
+      );
+      if (response.statusCode == 200) {
+
+        //updateParticipateState(response.data);
+        return response;
+
+
+
+
+      } else {
+        return false;
+        //print(false);
+      }
+    } catch (e) {
+      //return false;
+
+    }
+
+  }
+  viewDept(Topups topupData) async{//balance and Bonus Widthdraw History
+    try {
+
+      var params =  {
+
+        "LimitStart":topupData.endlimit,  //page
+        "LimitEnd":topupData.startlimit,//limit
+
+
+      };
+
+      String authToken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
+      var url="${ConstantClassUtil.urlLink}/viewDept";
+      var response = await Dio().get(url,
+        options: Options(headers: {
+          HttpHeaders.contentTypeHeader: "application/json",
+          HttpHeaders.authorizationHeader:"Bearer $authToken"
+        }),
+        queryParameters: params,
+      );
+      if (response.statusCode == 200) {
+
+
+        // return (response.data).length;
+        //updateEventState(response.data);
+        //return "hello";
+
+        //updateBalanceHistState(response.data);
+        //return response.data;
+
+        return response;
+
+
+      } else {
+        return false;
+        //print(false);
+      }
+    } catch (e) {
+      //return false;
+
+    }
+  }//calculate safari Interet
+  viewPaidDept(Topups topupData) async{//balance and Bonus Widthdraw History
+    try {
+
+      var params =  {
+
+        "LimitStart":topupData.endlimit,  //page
+        "LimitEnd":topupData.startlimit,//limit
+
+
+      };
+
+      String authToken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
+      var url="${ConstantClassUtil.urlLink}/viewPaidDept";
+      var response = await Dio().get(url,
+        options: Options(headers: {
+          HttpHeaders.contentTypeHeader: "application/json",
+          HttpHeaders.authorizationHeader:"Bearer $authToken"
+        }),
+        queryParameters: params,
+      );
+      if (response.statusCode == 200) {
+
+
+        // return (response.data).length;
+        //updateEventState(response.data);
+        //return "hello";
+
+        //updateBalanceHistState(response.data);
+        //return response.data;
+
+        return response;
+
+
+      } else {
+        return false;
+        //print(false);
+      }
+    } catch (e) {
+      //return false;
+
+    }
+  }//
+  viewSafeBalance(Topups topupData,User userData) async{//balance and Bonus Widthdraw History
+    try {
+
+      var params =  {
+
+        "LimitStart":topupData.endlimit,  //page
+        "LimitEnd":topupData.startlimit,//limit
+        "uid":userData.uid,//userid
+        "optionCase":topupData.optionCase//optionCase
+
+      };
+
+      String authToken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
+      var url="${ConstantClassUtil.urlLink}/viewSafeBalance";
+      var response = await Dio().get(url,
+        options: Options(headers: {
+          HttpHeaders.contentTypeHeader: "application/json",
+          HttpHeaders.authorizationHeader:"Bearer $authToken"
+        }),
+        queryParameters: params,
+      );
+      if (response.statusCode == 200) {
+
+
+        // return (response.data).length;
+        //updateEventState(response.data);
+        //return "hello";
+
+        //updateBalanceHistState(response.data);
+        //return response.data;
+
+        return response;
+
+
+      } else {
+        return false;
+        //print(false);
+      }
+    } catch (e) {
+      //return false;
+
+    }
+  }//
+  viewBorrowBalance(Topups topupData,User userData) async{//balance and Bonus Widthdraw History
+    try {
+
+      var params =  {
+
+        "LimitStart":topupData.endlimit,  //page
+        "LimitEnd":topupData.startlimit,//limit
+        "uid":userData.uid,//userid
+        "optionCase":topupData.optionCase//optionCase
+
+      };
+
+      String authToken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
+      var url="${ConstantClassUtil.urlLink}/viewBorrowBalance";
+      var response = await Dio().get(url,
+        options: Options(headers: {
+          HttpHeaders.contentTypeHeader: "application/json",
+          HttpHeaders.authorizationHeader:"Bearer $authToken"
+        }),
+        queryParameters: params,
+      );
+      if (response.statusCode == 200) {
+
+
+        // return (response.data).length;
+        //updateEventState(response.data);
+        //return "hello";
+
+        //updateBalanceHistState(response.data);
+        //return response.data;
+
+        return response;
+
+
+      } else {
+        return false;
+        //print(false);
+      }
+    } catch (e) {
+      //return false;
+
+    }
+  }//
   getSafaris(Topups topupData,User userData) async{//balance and Bonus Widthdraw History
     try {
 
@@ -792,7 +1224,7 @@ dynamic dataTest=[];
       var response = await Dio().get(url,
         options: Options(headers: {
           HttpHeaders.contentTypeHeader: "application/json",
-          HttpHeaders.authorizationHeader:"Bearer ${authToken}"
+          HttpHeaders.authorizationHeader:"Bearer $authToken"
         }),
         queryParameters: params,
       );
@@ -838,7 +1270,7 @@ dynamic dataTest=[];
       var response = await Dio().get(url,
         options: Options(headers: {
           HttpHeaders.contentTypeHeader: "application/json",
-          HttpHeaders.authorizationHeader:"Bearer ${authToken}"
+          HttpHeaders.authorizationHeader:"Bearer $authToken"
         }),
         queryParameters: params,
       );

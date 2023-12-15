@@ -1,19 +1,17 @@
-
-import '../../../Pages/components/ParticipateHistComp.dart';
 import 'package:flutter/material.dart';
-
+import 'components/BottomNavigator/HomeNavigator.dart';
+import 'components/SafeDeptComp.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
-import 'components/BottomNavigator/ProfileNavigator.dart';
-import 'components/EventsComp.dart';
 
-class ParticipateHistPage extends StatelessWidget {
-  const ParticipateHistPage({Key? key}) : super(key: key);
+class SafeDeptPage extends StatelessWidget {
+  const SafeDeptPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(27.0), // customize toolbar height
         child: AppBar(
@@ -23,14 +21,16 @@ class ParticipateHistPage extends StatelessWidget {
             icon: Icon(Icons.arrow_back,color: Colors.black,),
             onPressed: () {
               Get.back();
+              //Get.toNamed('settings');
             },
           ),
         ),
       ),
-     // backgroundColor: Colors.yellow,
 
-      body: const ParticipateHistComp(),
-      bottomNavigationBar:ProfileNavigator(),
+
+      body:SafeDeptComp(),
+      bottomNavigationBar:HomeNavigator(),
+
 
 
     );

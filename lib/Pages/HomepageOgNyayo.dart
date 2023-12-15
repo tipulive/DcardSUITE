@@ -1,10 +1,10 @@
 
 
 
-import 'package:dcard/Query/CardQuery.dart';
-import 'package:dcard/Query/TopupQuery.dart';
-import 'package:dcard/models/CardModel.dart';
-import 'package:dcard/models/Topups.dart';
+import '../../../Query/CardQuery.dart';
+import '../../../Query/TopupQuery.dart';
+import '../../../models/CardModel.dart';
+import '../../../models/Topups.dart';
 import '../models/BonusModel.dart';
 
 import '../Pages/ProfilePage.dart';
@@ -19,8 +19,8 @@ import 'package:get/get.dart';
 
 
 
-import 'package:dcard/models/Participated.dart';
-import 'package:dcard/models/Promotions.dart';
+import '../../../models/Participated.dart';
+import '../../../models/Promotions.dart';
 import '../Query/AdminQuery.dart';
 import '../Pages/components/BottomNavigator/HomeNavigator.dart';
 
@@ -28,7 +28,7 @@ import '../Pages/components/BottomNavigator/HomeNavigator.dart';
 import 'package:cool_alert/cool_alert.dart';
 
 
-import 'package:dcard/Query/PromotionQuery.dart';
+import '../../../Query/PromotionQuery.dart';
 import '../Query/ParticipatedQuery.dart';
 import '../Utilconfig/HideShowState.dart';
 

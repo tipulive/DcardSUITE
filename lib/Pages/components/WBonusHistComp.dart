@@ -1,7 +1,7 @@
 import 'dart:math';
 
 
-import 'package:dcard/models/User.dart';
+import '../../../models/User.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';

@@ -1,8 +1,8 @@
 
 import 'dart:io';
 
-import 'package:dcard/Query/CardQuery.dart';
-import 'package:dcard/Utilconfig/HideShowState.dart';
+import '../../../Query/CardQuery.dart';
+import '../../../Utilconfig/HideShowState.dart';
 
 
 
@@ -13,7 +13,7 @@ import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:get/get.dart';
 
 
-import 'package:dcard/models/Admin.dart';
+import '../../../models/Admin.dart';
 
 
 
