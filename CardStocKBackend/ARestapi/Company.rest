@@ -802,6 +802,24 @@ Authorization: Bearer {{Auth_token}}
 
 
 }
+### done but not by SystemUid
+
+GET  {{baseUrl}}/viewSales
+Content-Type: application/json
+Authorization: Bearer {{Auth_token}}
+
+{
+
+
+}
+### View Order When Someone Submit
+GET  {{baseUrl}}/viewSalesByUid
+content-type: application/json;charset=UTF-8
+Authorization: Bearer {{Auth_token}}
+
+{
+"orderId":"UID_49_1702463907"
+}
 ###Edit  OginalOrder this is very Important but done later
 GET  {{baseUrl}}/EditOGOrder/
 content-type: application/json;charset=UTF-8
@@ -955,7 +973,83 @@ Authorization: Bearer {{Auth_token}}
 
 }
 ### paid dette done,remain is admin repay to Owner,input Data must be number
-POST  {{baseUrl}}/PaidDette
+POST  {{baseUrl}}/PaidDept
+Content-Type: application/json
+Authorization: Bearer {{Auth_token}}
+
+{
+
+"uidUser":"kebineericMuna_1674160265",
+"inputData":100,
+"all_total":"215",
+"ref":"Eric",
+"reach":"1200",
+"gain":"350",
+"systemUid":"PointSales1",
+"commentData":"karera"
+
+
+
+}
+### not done
+
+POST  {{baseUrl}}/EditPaidDept
+Content-Type: application/json
+Authorization: Bearer {{Auth_token}}
+
+{
+
+"uidUser":"kebineericMuna_1674160265",
+"inputData":100,
+"all_total":"215",
+"ref":"Eric",
+"reach":"1200",
+"gain":"350",
+"systemUid":"PointSales1",
+"commentData":"karera"
+
+
+
+}
+### done but not by SystemUid
+
+GET  {{baseUrl}}/viewDept
+Content-Type: application/json
+Authorization: Bearer {{Auth_token}}
+
+{
+
+}
+### not done but not by SystemUid
+
+GET  {{baseUrl}}/viewPaidDept
+Content-Type: application/json
+Authorization: Bearer {{Auth_token}}
+
+{
+
+}
+### done but not by SystemUid
+
+GET  {{baseUrl}}/viewSafeBalance
+Content-Type: application/json
+Authorization: Bearer {{Auth_token}}
+
+{
+
+}
+### done but not by SystemUid
+
+GET  {{baseUrl}}/viewBorrowBalance
+Content-Type: application/json
+Authorization: Bearer {{Auth_token}}
+
+{
+
+}
+### not done
+
+GET  {{baseUrl}}/viewRepay
 Content-Type: application/json
 Authorization: Bearer {{Auth_token}}
 
@@ -1014,19 +1108,32 @@ Authorization: Bearer {{Auth_token}}
 }
 
 ###Add Depense  //General Depense Status GeneralSpend ,
-POST  {{baseUrl}}/addDepense
+POST  {{baseUrl}}/addSpending
 content-type: application/json;charset=UTF-8
 Authorization: Bearer {{Auth_token}}
 
 {
-"amount":"40",
+"balance":"40",
+"status":"GeneralSpend",
+"purpose":"testViko",
+"commentData":"testViko",
+"systemUid":"PointSales1"
+}
+###edit Spending not done must have temporary data
+POST  {{baseUrl}}/editSpending
+content-type: application/json;charset=UTF-8
+Authorization: Bearer {{Auth_token}}
+
+{
+"uid":"",
+"balance":"40",
 "status":"GeneralSpend",
 "purpose":"testViko",
 "commentData":"testViko",
 "systemUid":"PointSales1"
 }
 #### View Depense
-GET  {{baseUrl}}/viewDepense
+GET  {{baseUrl}}/viewSpending
 content-type: application/json;charset=UTF-8
 Authorization: Bearer {{Auth_token}}
 

@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:dcard/Query/AdminQuery.dart';
-import 'package:dcard/models/User.dart';
+import '../../../Query/AdminQuery.dart';
+import '../../../models/User.dart';
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import 'package:sqflite/sqflite.dart';

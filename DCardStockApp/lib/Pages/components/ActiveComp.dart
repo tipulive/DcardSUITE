@@ -1,5 +1,5 @@
-import 'package:dcard/Pages/ParticipateHistPage.dart';
-import 'package:dcard/models/Participated.dart';
+import '../../../Pages/ParticipateHistPage.dart';
+import '../../../models/Participated.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';

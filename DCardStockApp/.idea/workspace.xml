@@ -14,12 +14,64 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fe13c1e5-b7ca-4b84-a854-5c4e0fd95bcb" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/lib/Pages/SafeDeptPage.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/Pages/SetDeptPage.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/Pages/SetRepayPage.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/Pages/SetSalePage.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/Pages/SetSpendingPage.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/Pages/components/SafeDeptComp.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/Pages/components/SetDeptComp.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/Pages/components/SetRepayComp.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/Pages/components/SetSaleComp.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/Pages/components/SetSpendingComp.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../App Features.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../App Features.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../CardStocKBackend/ARestapi/Company.rest" beforeDir="false" afterPath="$PROJECT_DIR$/../CardStocKBackend/ARestapi/Company.rest" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../CardStocKBackend/app/Http/Controllers/Auth/AuthAdminLoginController.php" beforeDir="false" afterPath="$PROJECT_DIR$/../CardStocKBackend/app/Http/Controllers/Auth/AuthAdminLoginController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../CardStocKBackend/ARestapi/Companydemo.rest" beforeDir="false" afterPath="$PROJECT_DIR$/../CardStocKBackend/ARestapi/Companydemo.rest" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../CardStocKBackend/app/Http/Controllers/CompanyController.php" beforeDir="false" afterPath="$PROJECT_DIR$/../CardStocKBackend/app/Http/Controllers/CompanyController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../CardStocKBackend/app/Http/Controllers/StockController.php" beforeDir="false" afterPath="$PROJECT_DIR$/../CardStocKBackend/app/Http/Controllers/StockController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../CardStocKBackend/app/Http/Controllers/TestController.php" beforeDir="false" afterPath="$PROJECT_DIR$/../CardStocKBackend/app/Http/Controllers/TestController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../CardStocKBackend/routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/../CardStocKBackend/routes/api.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/debug/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/debug/AndroidManifest.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/AndroidManifest.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/kotlin/com/example/dcard/MainActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/kotlin/com/example/dcard/MainActivity.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ios/Runner/Info.plist" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Runner/Info.plist" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Pages/Card/AddCardPage.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/Card/AddCardPage.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Pages/Card/EditCardPage.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/Card/EditCardPage.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Pages/Homepage.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/Homepage.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Pages/HomepageOgNyayo.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/HomepageOgNyayo.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Pages/Login.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/Login.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Pages/ParticipateHistPage.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/ParticipateHistPage.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Pages/components/ActiveComp.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/components/ActiveComp.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Pages/components/BalanceComp.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/components/BalanceComp.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Pages/components/BonusComp.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/components/BonusComp.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Pages/components/BottomNavigator/ProfileNavigator.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/components/BottomNavigator/ProfileNavigator.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Pages/components/EventsComp.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/components/EventsComp.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Pages/components/ParticipateHistComp.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/components/ParticipateHistComp.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Pages/components/ProfileComp.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/components/ProfileComp.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Pages/components/QuickBonusComp.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/components/QuickBonusComp.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Pages/components/QuickCartComp.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/components/QuickCartComp.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Pages/components/SetDepenseComp.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/components/SetDepenseComp.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Pages/components/SetEditCardNoComp.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/components/SetEditCardNoComp.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Pages/components/SetOrderComp.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/components/SetOrderComp.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Pages/components/SetPartComp.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/components/SetPartComp.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Pages/components/SetPartHistComp.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/components/SetPartHistComp.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Pages/components/SetQuickBoHistComp.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/components/SetQuickBoHistComp.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Pages/components/SetStockComp.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/components/SetStockComp.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Pages/components/SetWithdrawBalanceComp.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/components/SetWithdrawBalanceComp.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Pages/components/SetWithdrawBonusComp.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/components/SetWithdrawBonusComp.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Pages/components/SettingComp.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/components/SettingComp.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Pages/components/UserAccountComp.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/components/UserAccountComp.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Pages/components/WBonusHistComp.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/components/WBonusHistComp.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Pages/components/deptComp.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/components/deptComp.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Pages/components/employeComp.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/components/employeComp.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Query/ParticipatedQuery.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Query/ParticipatedQuery.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Query/StockQuery.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Query/StockQuery.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Query/TopupQuery.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Query/TopupQuery.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/mainog1.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/mainog1.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/macos/Flutter/GeneratedPluginRegistrant.swift" beforeDir="false" afterPath="$PROJECT_DIR$/macos/Flutter/GeneratedPluginRegistrant.swift" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/widget_test.dart" beforeDir="false" afterPath="$PROJECT_DIR$/test/widget_test.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -67,6 +119,7 @@
     <property name="project.structure.last.edited" value="Facets" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
+    <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
     <property name="settings.editor.selected.configurable" value="project.propVCSSupport.Mappings" />
     <property name="show.migrate.to.gradle.popup" value="false" />
   </component>
@@ -107,12 +160,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
           <url>file://$PROJECT_DIR$/lib/Pages/Login.dart</url>
-          <line>254</line>
+          <line>255</line>
           <option name="timeStamp" value="6" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
           <url>file://$PROJECT_DIR$/lib/Query/StockQuery.dart</url>
-          <line>557</line>
+          <line>640</line>
           <option name="timeStamp" value="7" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
@@ -122,12 +175,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
           <url>file://$PROJECT_DIR$/lib/Query/StockQuery.dart</url>
-          <line>686</line>
+          <line>769</line>
           <option name="timeStamp" value="9" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
           <url>file://$PROJECT_DIR$/lib/Pages/components/SetOrderComp.dart</url>
-          <line>552</line>
+          <line>557</line>
           <option name="timeStamp" value="10" />
         </line-breakpoint>
       </breakpoints>

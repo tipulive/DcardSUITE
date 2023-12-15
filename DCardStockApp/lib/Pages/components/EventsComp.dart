@@ -1,7 +1,7 @@
-import 'package:dcard/Pages/ActiveEventPage.dart';
-import 'package:dcard/Pages/ReachEventPage.dart';
-import 'package:dcard/Pages/AllEventPage.dart';
-import 'package:dcard/Query/ParticipatedQuery.dart';
+import '../../../Pages/ActiveEventPage.dart';
+import '../../../Pages/ReachEventPage.dart';
+import '../../../Pages/AllEventPage.dart';
+import '../../../Query/ParticipatedQuery.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';

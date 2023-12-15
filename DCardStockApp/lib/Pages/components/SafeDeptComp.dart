@@ -19,14 +19,14 @@ import 'package:google_fonts/google_fonts.dart';
 
 
 
-class SetOrderComp extends StatefulWidget {
-  const SetOrderComp({Key? key}) : super(key: key);
+class SafeDeptComp extends StatefulWidget {
+  const SafeDeptComp({Key? key}) : super(key: key);
 
   @override
-  State<SetOrderComp> createState() => _SetOrderCompState();
+  State<SafeDeptComp> createState() => _SafeDeptCompState();
 }
 
-class _SetOrderCompState extends State<SetOrderComp> {
+class _SafeDeptCompState extends State<SafeDeptComp> {
 
   ScrollController _scrollController = ScrollController();// detect scroll
   List<dynamic> _data = [];
@@ -41,11 +41,11 @@ class _SetOrderCompState extends State<SetOrderComp> {
   int limit=0;
   bool hasMoreData=true;
   bool isLoading=false;
-num qty_product=1;
+  num qty_product=1;
   String productCode="";
 
   String clientOrder="";
-String OrderId="";
+  String OrderId="";
 
 
 
@@ -92,7 +92,8 @@ String OrderId="";
       children: [
         //ProfilePic().profile(),
 
-        Text("Orders",style:GoogleFonts.pacifico(fontSize:15,color: Colors.teal,fontWeight: FontWeight.w700)),
+        Text("Dept",style:GoogleFonts.pacifico(fontSize:15,color: Colors.teal,fontWeight: FontWeight.w700)),
+        Text("Total:${(_data.length>0)?_data[0]['totDept']:0}",style:GoogleFonts.pacifico(fontSize:15,color: Colors.orange,fontWeight: FontWeight.w700)),
 
 
 
@@ -206,7 +207,7 @@ String OrderId="";
                         child: Row(
                           children: [
                             Column(
-                             crossAxisAlignment: CrossAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Wrap(
                                   crossAxisAlignment: WrapCrossAlignment.center,
@@ -223,32 +224,13 @@ String OrderId="";
                                   children: [
 
                                     Icon(Icons.segment,color:Colors.orange,size:13,),
-                                    Text("Qty:${_data[index]['totalQty']}"),
+                                    Text("Dept:${_data[index]['dept']}"),
 
                                   ],
                                 ),
 
-                                Wrap(
-                                  crossAxisAlignment: WrapCrossAlignment.center,
-                                  children: [
-
-                                    Icon(Icons.segment,color:Colors.orange,size:13,),
-                                    Text("Amount:${_data[index]['totalAmount']}"),
-
-                                  ],
-                                ),
-
-                                Wrap(
-                                  crossAxisAlignment: WrapCrossAlignment.center,
-                                  children: [
-
-                                    Icon(Icons.segment,color:Colors.orange,size:13,),
-                                    Text("Deliver:${_data[index]['totalQty']-_data[index]['totalCount']}"),
 
 
-
-                                  ],
-                                ),
 
 
                               ],
@@ -261,31 +243,31 @@ String OrderId="";
                       GestureDetector(
                           onTap: () async{
                             // This function will be called when the icon is tapped.
-                           // thisOrder(_data[index],index);
+                            // thisOrder(_data[index],index);
 
 
 
-                              orderData=_data[index].values.toList();
+                            orderData=_data[index].values.toList();
 
 
-                           //print((await thisOrder())["result"]);
-                           var resultData=(await thisOrder());
-                           //print(resultData);
-                           if(resultData["status"]){
+                            //print((await thisOrder())["result"]);
+                            var resultData=(await thisOrder());
+                            //print(resultData);
+                            if(resultData["status"]){
 
 
-                             setState(() {
-                               isLoading=false;
-                               thisListOrder.clear();
+                              setState(() {
+                                isLoading=false;
+                                thisListOrder.clear();
 
-                               thisListOrder.addAll(resultData["result"]);
+                                thisListOrder.addAll(resultData["result"]);
 
 
-                             });
-                             viewThisOrder();
-                           }
+                              });
+                              viewThisOrder();
+                            }
 
-                              //
+                            //
 
 
                           },
@@ -370,7 +352,7 @@ String OrderId="";
     isLoading=true;
     int limit=10;
 
-    var resultData=(await StockQuery().orderViewCount(Topups(startlimit:limit,endlimit:_page))).data;
+    var resultData=(await StockQuery().viewDept(Topups(startlimit:limit,endlimit:_page))).data;
 
 
     if(resultData["status"])
@@ -381,11 +363,11 @@ String OrderId="";
         hasMoreData=false;
 
         if(resultData["result"]!=0)
-          {
-            _data.clear();
-            _data.addAll(resultData["result"]);
+        {
+          _data.clear();
+          _data.addAll(resultData["result"]);
 
-          }
+        }
 
 
       });
@@ -434,7 +416,7 @@ String OrderId="";
 
 
     var resultData=(await StockQuery().orderViewByUid(Topups(uid:"${orderData[0]}",startlimit:limit,endlimit:_page))).data;
-   // var resultData=(await StockQuery().orderViewByUid(Topups(uid:"0s",startlimit:limit,endlimit:_page))).data;
+    // var resultData=(await StockQuery().orderViewByUid(Topups(uid:"0s",startlimit:limit,endlimit:_page))).data;
     //print(resultData);
     if(resultData["status"])
     {
@@ -546,7 +528,7 @@ String OrderId="";
                                                                 keyboardType: TextInputType.number,
                                                                 decoration: InputDecoration(
                                                                   hintText: '-1-',
-                                                                 // hintText: '   -${(((Get.put(HideShowState()).delivery)[index]["totalQty"])!=((Get.put(HideShowState()).delivery)[index]["totalCount"]))?(((Get.put(HideShowState()).delivery)[index]["totalQty"]-(Get.put(HideShowState()).delivery)[index]["totalCount"])):1}-',
+                                                                  // hintText: '   -${(((Get.put(HideShowState()).delivery)[index]["totalQty"])!=((Get.put(HideShowState()).delivery)[index]["totalCount"]))?(((Get.put(HideShowState()).delivery)[index]["totalQty"]-(Get.put(HideShowState()).delivery)[index]["totalCount"])):1}-',
                                                                   hintStyle: TextStyle(color: Colors.red),
                                                                   contentPadding: EdgeInsets.all(0),
                                                                   isDense: true,
@@ -579,13 +561,13 @@ String OrderId="";
 
 
                                                                     }
-                                                           else{
+                                                                    else{
 
                                                                       setState(() {
                                                                         (Get.put(HideShowState()).delivery)[index]["hideAddCart"]=0;
                                                                       });
 
-                                                              }
+                                                                    }
 
                                                                   }
                                                                   else{
@@ -630,34 +612,35 @@ String OrderId="";
                                             mainAxisSize: MainAxisSize.min,
                                             children: <Widget>[
                                               if((Get.put(HideShowState()).delivery)[index]["hideAddCart"]==1)
-                                                  IconButton(
-                                                   icon: Icon(Icons.add_shopping_cart,
-                                                    size: 23.0,
-                                                    color: Colors.grey),
-                                                onPressed: () async{
-                                                  productCode=thisListOrder[index]["productCode"];
+                                                IconButton(
+                                                  icon: Icon(Icons.add_shopping_cart,
+                                                      size: 23.0,
+                                                      color: Colors.grey),
+                                                  onPressed: () async{
+                                                    productCode=thisListOrder[index]["productCode"];
 
 
-                                                  //await stockCount(index);
+                                                    //await stockCount(index);
 
 
-                                                  num totCount=(((Get.put(HideShowState()).delivery)[index]["totalCount"]-(Get.put(HideShowState()).delivery)[index]["currentQty"])>=0)?(Get.put(HideShowState()).delivery)[index]["totalCount"]:0;
-                                                  if(totCount>0)
-                                                  {
-                                                    var resultData=(await StockQuery().stockCount(Topups(uid:"${orderData[0]}"),QuickBonus(uid:"${productCode}",qty:"${(Get.put(HideShowState()).delivery)[index]["currentQty"]}",subscriber:"StockName",status:"status",description:"Delivered"), User(uid: "UidTransport",name:"refName"))).data;
-
-                                                    if(resultData["status"])
+                                                    num totCount=(((Get.put(HideShowState()).delivery)[index]["totalCount"]-(Get.put(HideShowState()).delivery)[index]["currentQty"])>=0)?(Get.put(HideShowState()).delivery)[index]["totalCount"]:0;
+                                                    if(totCount>0)
                                                     {
-                                                      Quickdata();
-                                                      // thisOrder2();
-                                                      setState(() {
+                                                      var resultData=(await StockQuery().stockCount(Topups(uid:"${orderData[0]}"),QuickBonus(uid:"${productCode}",qty:"${(Get.put(HideShowState()).delivery)[index]["currentQty"]}",subscriber:"StockName",status:"status",description:"Delivered"), User(uid: "UidTransport",name:"refName"))).data;
 
-                                                        (Get.put(HideShowState()).delivery)[index]["totalCount"]=(Get.put(HideShowState()).delivery)[index]["totalCount"]-(Get.put(HideShowState()).delivery)[index]["currentQty"];
+                                                      if(resultData["status"])
+                                                      {
+                                                        Quickdata();
+                                                        // thisOrder2();
+                                                        setState(() {
 
-                                                      });
+                                                          (Get.put(HideShowState()).delivery)[index]["totalCount"]=(Get.put(HideShowState()).delivery)[index]["totalCount"]-(Get.put(HideShowState()).delivery)[index]["currentQty"];
+
+                                                        });
+                                                      }
+
                                                     }
 
-                                                  }
 
 
 
@@ -666,9 +649,8 @@ String OrderId="";
 
 
 
-
-                                                     },
-                                                   ),
+                                                  },
+                                                ),
 
 
                                               IconButton(
@@ -722,7 +704,7 @@ String OrderId="";
         },
       ),
     ).whenComplete(() {
-     // Get.put(HideShowState()).isDelivery(0);
+      // Get.put(HideShowState()).isDelivery(0);
       //do whatever you want after closing the bottom sheet
     });
 
@@ -735,7 +717,7 @@ String OrderId="";
     (Get.put(HideShowState())).isChangeDelivery(thisListOrder[indexData],indexData,qty_product);
 
 
-   // print((Get.put(HideShowState()).delivery)[indexData]);
+    // print((Get.put(HideShowState()).delivery)[indexData]);
     //print(thisListOrder[indexData]);
 
 

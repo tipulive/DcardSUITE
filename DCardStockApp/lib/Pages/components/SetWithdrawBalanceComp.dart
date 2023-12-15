@@ -1,8 +1,8 @@
 import 'dart:math';
 
 
-import 'package:dcard/Query/TopupQuery.dart';
-import 'package:dcard/models/User.dart';
+import '../../../Query/TopupQuery.dart';
+import '../../../models/User.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';

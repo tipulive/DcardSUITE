@@ -1,10 +1,10 @@
 import 'dart:math';
 
 
-import 'package:dcard/Query/ParticipatedQuery.dart';
-import 'package:dcard/Utilconfig/HideShowState.dart';
+import '../../../Query/ParticipatedQuery.dart';
+import '../../../Utilconfig/HideShowState.dart';
 
-import 'package:dcard/models/Topups.dart';
+import '../../../models/Topups.dart';
 import 'package:get/get.dart';
 
 import '../../models/BonusModel.dart';

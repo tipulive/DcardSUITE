@@ -1,6 +1,6 @@
 
-import 'package:dcard/Pages/Card/EditCardPage.dart';
-import 'package:dcard/Utilconfig/HideShowState.dart';
+import '../../../Pages/Card/EditCardPage.dart';
+import '../../../Utilconfig/HideShowState.dart';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

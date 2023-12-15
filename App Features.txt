@@ -47,7 +47,26 @@ Qr Scanner Products :izajya ishowing products ni clicka adcart
 yongere inyereke scan product cg impe na button zo gusubirayo
 
 Munsi hazajya hagaragara List Cart 
+
+ndaza kubikora nyuma kubwo search izajya ihita ihinduka overay
   
+Note On deleting Og Order or edit Og Order I need to create Backup
+
+User Interface ya qr scan izajya iboneka Hariya hari product search 
+noneho nizaba iri Qr izajya i poping scanning nimara gu scanning nkande add maze productsearchResult ihite iba disappear hagarukemo Qr
+Qr ninzajya nandika muri search izajya iba disappear cg ahari button haho hazajya hiyandika close Qr
+
+ariko normal search izajya itanga result gusa ni submitting igumeho
+
+
+Hari error nakoze ,ndiku adding data zindi urugero namara gu changing qty,na adding indi qty zose zikahita zingana niyo na adding
+qty must reset 
+
+Errors on Orders and Error on View Order qty are not the same even Total Are not the same
+
+
+
+
 
    
 

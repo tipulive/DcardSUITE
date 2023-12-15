@@ -1,12 +1,12 @@
 import 'dart:math';
 
 
-import 'package:dcard/Query/CardQuery.dart';
-import 'package:dcard/Query/TopupQuery.dart';
-import 'package:dcard/Query/StockQuery.dart';
-import 'package:dcard/models/CardModel.dart';
-import 'package:dcard/models/QuickBonus.dart';
-import 'package:dcard/models/Topups.dart';
+import '../../../Query/CardQuery.dart';
+import '../../../Query/TopupQuery.dart';
+import '../../../Query/StockQuery.dart';
+import '../../../models/CardModel.dart';
+import '../../../models/QuickBonus.dart';
+import '../../../models/Topups.dart';
 
 import '../models/BonusModel.dart';
 
@@ -22,9 +22,9 @@ import 'package:get/get.dart';
 
 
 
-import 'package:dcard/models/Participated.dart';
+import '../../../models/Participated.dart';
 
-import 'package:dcard/models/Promotions.dart';
+import '../../../models/Promotions.dart';
 import '../Query/AdminQuery.dart';
 import '../Pages/components/BottomNavigator/HomeNavigator.dart';
 
@@ -32,7 +32,7 @@ import '../Pages/components/BottomNavigator/HomeNavigator.dart';
 import 'package:cool_alert/cool_alert.dart';
 
 
-import 'package:dcard/Query/PromotionQuery.dart';
+import '../../../Query/PromotionQuery.dart';
 import '../Query/ParticipatedQuery.dart';
 
 import '../Utilconfig/HideShowState.dart';
@@ -1720,9 +1720,14 @@ class CheckoutPage extends StatelessWidget {
 
                                                 ),
                                                 onChanged: (text) {
-                                              if((double.tryParse(text) != null)){
+                                              if((num.tryParse(text) != null) && (num.tryParse(text)!=0)){
+                                                if(num.parse(text)>0)
+                                                  {
+                                                    changeQtyCheckout(index,(num.parse(chekoutResult[index]["price"])),(num.parse(text)),false);
 
-                                                changeQtyCheckout(index,(num.parse(chekoutResult[index]["price"])),(num.parse(text)),false);
+                                                  }
+
+
 
                                               }else{
                                                 changeQtyCheckout(index,1,1,true);

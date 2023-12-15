@@ -2,7 +2,7 @@
 @email=kopa@gmail.com
 @PhoneNumber=+243978787877
 @password=1
-@Auth_token=401|9HDxK5MWETpPYlu89eKg0gV8kfrjeRECSxCB0Vud
+@Auth_token=407|5tMJ6kuQ0eTgsibMQuOCTLJFWpuKOx3FruGmW1S0
 
 ### Company Login with email
 POST  {{baseUrl}}/AdminLoginEmail/
@@ -726,6 +726,7 @@ Authorization: Bearer {{Auth_token}}
 
 ###place order ,this oTher ref after req_qty are after sales not allowed negative value
 ### more order i need to Add orderId value to orderIdFromEdit to track my Order
+### req_qty must be number
 POST  {{baseUrl}}/placeOrder/
 content-type: application/json;charset=UTF-8
 Authorization: Bearer {{Auth_token}}
@@ -733,7 +734,7 @@ Authorization: Bearer {{Auth_token}}
 {
 "productCode":"bido_1698592481",
 "uidclient":"kebineericMuna_1674160265",
-"req_qty":6,
+"req_qty":4,
 "ref":"test",
 "comment":"ok",
 "statusForm":"none",
@@ -744,6 +745,7 @@ Authorization: Bearer {{Auth_token}}
 
 ###
 ###Edit temporary Order edit order done not allowed negative Value 100% tested and working perfect
+### req_qty must be number
 GET  {{baseUrl}}/EditOrder/
 content-type: application/json;charset=UTF-8
 Authorization: Bearer {{Auth_token}}
@@ -791,12 +793,22 @@ Authorization: Bearer {{Auth_token}}
 {
 "uid":"Nyota_1672353378",
 "uidUser":"kebineericMuna_1674160265",
-"OrderId":"0s",
-"inputData":"150",
-"all_total":"200",
+"OrderId":"UID_DX_1702452146",
+"inputData":"180",
+"all_total":"180",
 "reach":"1200",
 "gain":"350",
 "systemUid":"PointSales1"
+
+
+}
+### done but not by SystemUid
+
+GET  {{baseUrl}}/viewSales
+Content-Type: application/json
+Authorization: Bearer {{Auth_token}}
+
+{
 
 
 }
@@ -952,17 +964,83 @@ Authorization: Bearer {{Auth_token}}
 
 
 }
-### paid dette done,remain is admin repay to Owner
-POST  {{baseUrl}}/PaidDette
+### paid dette done,remain is admin repay to Owner,input Data must be number
+POST  {{baseUrl}}/PaidDept
 Content-Type: application/json
 Authorization: Bearer {{Auth_token}}
 
 {
 
 "uidUser":"kebineericMuna_1674160265",
+"inputData":100,
+"all_total":"215",
+"ref":"Eric",
+"reach":"1200",
+"gain":"350",
+"systemUid":"PointSales1",
+"commentData":"karera"
 
-"inputData":75,
-"all_total":"2000",
+
+
+}
+### not done
+
+POST  {{baseUrl}}/EditPaidDept
+Content-Type: application/json
+Authorization: Bearer {{Auth_token}}
+
+{
+
+"uidUser":"kebineericMuna_1674160265",
+"inputData":100,
+"all_total":"215",
+"ref":"Eric",
+"reach":"1200",
+"gain":"350",
+"systemUid":"PointSales1",
+"commentData":"karera"
+
+
+
+}
+### done but not by SystemUid
+
+GET  {{baseUrl}}/viewDept
+Content-Type: application/json
+Authorization: Bearer {{Auth_token}}
+
+{
+
+}
+### done but not by SystemUid
+
+GET  {{baseUrl}}/viewSafeBalance
+Content-Type: application/json
+Authorization: Bearer {{Auth_token}}
+
+{
+
+}
+### done but not by SystemUid
+
+GET  {{baseUrl}}/viewBorrowBalance
+Content-Type: application/json
+Authorization: Bearer {{Auth_token}}
+
+{
+
+}
+### not done
+
+GET  {{baseUrl}}/viewRepay
+Content-Type: application/json
+Authorization: Bearer {{Auth_token}}
+
+{
+
+"uidUser":"kebineericMuna_1674160265",
+"inputData":100,
+"all_total":"215",
 "ref":"Eric",
 "reach":"1200",
 "gain":"350",
@@ -986,7 +1064,7 @@ content-type: application/json;charset=UTF-8
 Authorization: Bearer {{Auth_token}}
 
 {
-"orderId":"0s"
+"orderId":"UID_jT_1702383743"
 }
 
 
@@ -997,7 +1075,7 @@ content-type: application/json;charset=UTF-8
 Authorization: Bearer {{Auth_token}}
 
 {
-"uid":"0s",
+"uid":"UID_jT_1702383743",
 "productCode":"bido_1698592481",
 "uidTransport":"Qito",
 "qty_Transport":1,

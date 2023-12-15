@@ -1,0 +1,25 @@
+reste ni hide iyarangije igahita iba complete 100% ibi ndabikora nyuma nikuri order delivery kuberako ngomba guhisha iyarangiye
+nyuma niho nzakora ukubu congongoman aho ndigutanga hagasiraga hari higlight yicyatsi
+
+hariya hari error iri grave ituma umuntu adashobora kurenga uriya mubare wundi aho nikuri order delivery done fixing
+
+
+
+App  iri kugenda buhoro igihe ndi ku loading nta data zihari view Order Empty nukuvugango ndashyiraho condition igihe nta data ziri hariya ziri empty zose
+
+
+i must add 0 by default as Homepage done
+
+sinzi error iri kuvuka ngahita submitting qty nyinshi Homepage ndimo nda deleting nongera gushyiramo izindi
+delete full order is not available there
+
+
+
+
+
+make sure return return (new ParticipateController)->participate($input); is inside adminrecords or combine boths
+
+iyo creating admin user ngashyiraho email,ntago izi servise ziba created(ni hagati ya email na phone)
+
+
+qty left za safariproducts zitandukanye nizo nsigaranye muri products

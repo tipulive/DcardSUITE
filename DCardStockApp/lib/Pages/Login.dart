@@ -235,6 +235,7 @@ setState(() {
       if (response.statusCode == 200) {
         //print(params);
        // print("done");
+        print(response);
         //return response.data;
         //return response.data["User"]["name"];
         if((await AdminQuery().addData(Admin(uid:response.data["User"]["uid"],name:response.data["User"]["name"],subscriber:response.data["User"]["subscriber"],AuthToken: response.data["token"],email: response.data["User"]["email"],phone: response.data["User"]["tel"])))>0)
@@ -256,6 +257,7 @@ setState(() {
         setState(() {
           showOveray=false;
         });
+
         Get.toNamed('/ErrorPage');
       }
     } catch (e) {
@@ -263,6 +265,7 @@ setState(() {
       setState(() {
         showOveray=false;
       });
+
       Get.toNamed('/ErrorPage');
     }
 

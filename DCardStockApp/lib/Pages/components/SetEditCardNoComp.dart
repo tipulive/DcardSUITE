@@ -1,5 +1,5 @@
 
-import 'package:dcard/models/Admin.dart';
+import '../../../models/Admin.dart';
 
 import 'package:intl_phone_field/intl_phone_field.dart';
 

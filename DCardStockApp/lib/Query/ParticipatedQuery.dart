@@ -1,4 +1,4 @@
-import 'package:dcard/models/Promotions.dart';
+import '../../../models/Promotions.dart';
 import 'package:sqflite/sqflite.dart';
 import 'dart:convert';
 import 'dart:io';

@@ -1275,20 +1275,12 @@ public function ViewUserTempOrder($input){//make sure order must not be more tha
 
 }
 
-public function viewTotalSales(){ //this will view All sales
-    DB::select("select *from admnin_records where uid=:uid and status=:status and subscriber=:subscriber order by id desc limit 25",[
-         "uid"=>Auth::user()->uid,
-        "subscriber"=>Auth::user()->subscriber,
-        "status"=>'Sales'
-    ]);
-}
-public function viewSaleSyst(){ //this will view All sales based on systemId //not done
-    DB::select("select *from admnin_records where uid=:uid and status=:status and subscriber=:subscriber order by id desc limit 25",[
-         "uid"=>Auth::user()->uid,
-        "subscriber"=>Auth::user()->subscriber,
-        "status"=>'Sales'
-    ]);
-}
+
+
+
+
+
+
 
     //my code of buying and calculator
 
@@ -1462,7 +1454,108 @@ public function viewSaleSyst(){ //this will view All sales based on systemId //n
             }
 
     }
+    public function viewSales($input){
+        $check = DB::select("
+        SELECT
+            Max(orders.uid) as OrderId,
+            MAX(users.name) AS name,
+            SUM(admnin_records.balance) AS saleBalance,
+            MAX(orders.total) AS totalPaid,
+            MAX(orders.paidStatus) as paidStatus
+        FROM orders
+        INNER JOIN admnin_records ON orders.uidCreator =admnin_records.uid
+        INNER JOIN users ON orders.uidUser = users.uid
+        WHERE orders.subscriber = :subscriber
+            AND orders.uidCreator = :uidCreator
+            AND admnin_records.status ='Sales'
+            AND admnin_records.subscriber=:adminSubscriber
 
+            GROUP BY orders.id
+            ORDER BY orders.id DESC
+
+        LIMIT 100
+    ", [
+        'subscriber' => Auth::user()->subscriber,
+        'adminSubscriber' => Auth::user()->subscriber,
+        'uidCreator' => Auth::user()->uid,
+    ]);
+
+    if($check)
+    {
+
+       return response([
+           "status"=>true,
+           "result"=>$check,
+
+       ],200);
+    }
+    else{
+       return response([
+           "status"=>true,
+           "result"=>0,
+
+       ],200);
+    }
+    }
+    public function viewSalesByUid($input){
+        try {
+
+            try {
+                $check = DB::select("
+                SELECT
+
+                    MAX(orderhistories.uid) AS uid,
+                    MAX(1) AS hideAddCart,
+                    MAX(1) AS currentQty,
+                    orderhistories.productCode,
+                    MAX(products.productName) AS productName,
+                    MAX(orderhistories.price) AS price,
+                    MAX(products.pcs) AS pcs,
+                    SUM(orderhistories.qty) AS totalQty,
+                    SUM(orderhistories.total) AS totalAmount,
+                    SUM(orderhistories.qty_count) AS totalCount
+                FROM orderhistories
+                INNER JOIN products ON orderhistories.productCode = products.productCode
+
+                WHERE orderhistories.uid =:orderId
+                    AND orderhistories.subscriber=:subscriber
+
+                GROUP BY orderhistories.productCode order by orderhistories.id desc
+                LIMIT 25
+            ", [
+
+                'orderId' =>$input["orderId"],
+                'subscriber' => Auth::user()->subscriber,
+            ]);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'error' => 'An error occurred',
+                    'errorPrint' => $e->getMessage(),
+                    'errorCode' => $e->getLine(),
+                ], 500);
+            }
+
+            if($check)
+            {
+               return response([
+                   "status"=>true,
+                   "result"=>$check,
+
+               ],200);
+            }
+            else{
+               return response([
+                   "status"=>true,
+                   "result"=>0,
+
+               ],200);
+            }
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'An error occurred', 'errorPrint' => $e->getMessage(), 'errorCode' => $e->getLine()], 500);
+        }
+
+    }
     public function notparticipate(){
         return response([
             "status"=>false,
@@ -1478,6 +1571,11 @@ public function viewSaleSyst(){ //this will view All sales based on systemId //n
             //throw $th;
         }
 
+    }
+    public function SingleDebt($input){
+        $phoneNumber=$input['PhoneNumber']??'none';
+        $phoneNumber=$input['PhoneNumber']??'none';
+        $cardUid=$input['cardUid']??'none';
     }
     public function GetDebt($input){//when you are going to pay,this will return only ID of User and Total Debt of That company
 
@@ -1549,7 +1647,7 @@ public function viewSaleSyst(){ //this will view All sales based on systemId //n
         }
 
     }
-    public function PaidDette($input){
+    public function PaidDept($input){
 
 
 
@@ -1724,7 +1822,190 @@ public function viewSaleSyst(){ //this will view All sales based on systemId //n
                  'errorPrint'=>$e->getMessage(),"errorCode"=>$e->getLine()], 500); // Return an error JSON response
                  }
     }
+    public function EditPaidDept($input){
 
+    }
+    public function viewDept($input){
+        $check = DB::select("
+        SELECT
+            Max(orders.uid) as OrderId,
+            MAX(users.name) AS name,
+            SUM(admnin_records.dettes) AS totDept,
+            MAX(orders.debt) AS debt
+        FROM orders
+        INNER JOIN admnin_records ON orders.uidCreator =admnin_records.uid
+        INNER JOIN users ON orders.uidUser = users.uid
+        WHERE orders.subscriber = :subscriber
+            AND orders.uidCreator = :uidCreator
+            AND admnin_records.status ='Sales'
+            AND admnin_records.subscriber=:adminSubscriber
+            AND orders.paidStatus='dettes'
+            GROUP BY orders.id
+            ORDER BY orders.id DESC
+
+        LIMIT 100
+    ", [
+        'subscriber' => Auth::user()->subscriber,
+        'adminSubscriber' => Auth::user()->subscriber,
+        'uidCreator' => Auth::user()->uid,
+    ]);
+
+    if($check)
+    {
+
+       return response([
+           "status"=>true,
+           "result"=>$check,
+
+       ],200);
+    }
+    else{
+       return response([
+           "status"=>true,
+           "result"=>0,
+
+       ],200);
+    }
+
+    }
+    public function viewPaidDept($input){//not done
+        $check = DB::select("
+        SELECT
+            Max(paid_dettes.uid) as OrderId,
+            MAX(users.name) AS name,
+            SUM(admnin_records.safeBalance) AS safeBalance,
+            MAX(paid_dettes.amount) AS amount,
+            MAX(admins.name) AS Recipient,
+            MAX(paid_dettes.paidStatus) as paidStatus
+        FROM paid_dettes
+        INNER JOIN admnin_records ON paid_dettes.uidReceiver=admnin_records.uid
+        INNER JOIN users ON paid_dettes.uidUser = users.uid
+        INNER JOIN admins ON paid_dettes.uidCreator = admins.uid
+        WHERE paid_dettes.subscriber =:subscriber
+            AND paid_dettes.uidReceiver=:uidReceiver
+            AND admnin_records.status='Sales'
+            AND admnin_records.subscriber=:adminSubscriber
+            GROUP BY paid_dettes.id
+            ORDER BY paid_dettes.id DESC
+
+        LIMIT 100
+    ", [
+        'subscriber'=>Auth::user()->subscriber,
+        'adminSubscriber'=>Auth::user()->subscriber,
+        'uidReceiver'=>Auth::user()->uid,
+    ]);
+
+
+    if($check)
+    {
+
+       return response([
+           "status"=>true,
+           "result"=>$check,
+
+       ],200);
+    }
+    else{
+       return response([
+           "status"=>true,
+           "result"=>0,
+
+       ],200);
+    }
+
+    }
+    public function viewSafeBalance($input){//to check admin who received my Amount
+        $check = DB::select("
+        SELECT
+            Max(paid_dettes.uid) as OrderId,
+            MAX(users.name) AS name,
+            SUM(admnin_records.safeBalance) AS safeBalance,
+            MAX(paid_dettes.amount) AS amount,
+            MAX(admins.name) AS Recipient,
+            MAX(paid_dettes.paidStatus) as paidStatus
+        FROM paid_dettes
+        INNER JOIN admnin_records ON paid_dettes.uidReceiver=admnin_records.uid
+        INNER JOIN users ON paid_dettes.uidUser = users.uid
+        INNER JOIN admins ON paid_dettes.uidCreator = admins.uid
+        WHERE paid_dettes.subscriber =:subscriber
+            AND paid_dettes.uidReceiver=:uidReceiver
+            AND admnin_records.status='Sales'
+            AND admnin_records.subscriber=:adminSubscriber
+            AND paid_dettes.paidStatus='PaidAdminNotReceived'
+            GROUP BY paid_dettes.id
+            ORDER BY paid_dettes.id DESC
+
+        LIMIT 100
+    ", [
+        'subscriber'=>Auth::user()->subscriber,
+        'adminSubscriber'=>Auth::user()->subscriber,
+        'uidReceiver'=>Auth::user()->uid,
+    ]);
+
+    if($check)
+    {
+
+       return response([
+           "status"=>true,
+           "result"=>$check,
+
+       ],200);
+    }
+    else{
+       return response([
+           "status"=>true,
+           "result"=>0,
+
+       ],200);
+    }
+    }
+    public function viewBorrowBalance($input){ //to check Money of Others I am having
+        $check = DB::select("
+        SELECT
+            Max(paid_dettes.uid) as OrderId,
+            MAX(users.name) AS name,
+            SUM(admnin_records.borrowBalance) AS borrowBalance,
+            MAX(paid_dettes.amount) AS amount,
+            MAX(admins.name) AS AmountOwner,
+            MAX(paid_dettes.paidStatus) as paidStatus
+        FROM paid_dettes
+        INNER JOIN admnin_records ON paid_dettes.uidCreator=admnin_records.uid
+        INNER JOIN users ON paid_dettes.uidUser = users.uid
+        INNER JOIN admins ON paid_dettes.uidReceiver = admins.uid
+        WHERE paid_dettes.subscriber =:subscriber
+            AND paid_dettes.uidCreator=:uidCreator
+            AND admnin_records.status='Sales'
+            AND admnin_records.subscriber=:adminSubscriber
+            AND paid_dettes.paidStatus='PaidAdminNotReceived'
+            GROUP BY paid_dettes.id
+            ORDER BY paid_dettes.id DESC
+
+        LIMIT 100
+    ", [
+        'subscriber'=>Auth::user()->subscriber,
+        'adminSubscriber'=>Auth::user()->subscriber,
+        'uidCreator'=>Auth::user()->uid,
+    ]);
+    if($check)
+    {
+
+       return response([
+           "status"=>true,
+           "result"=>$check,
+
+       ],200);
+    }
+    else{
+       return response([
+           "status"=>true,
+           "result"=>0,
+
+       ],200);
+    }
+    }
+    public function viewRepay($input){
+
+    }
 
     public function OrderViewCount($input){
         try {
@@ -1998,7 +2279,7 @@ return $results;
        ));
     }
 
-    public function addDepense($input){
+    public function addSpending($input){
 
         try{
 
@@ -2011,7 +2292,7 @@ return $results;
             ->insert([
                 "uid"=>$uid,
                 "uidUser"=>$input['uidUser']??Auth::user()->uid,
-                "amount"=>$input['amount'],
+                "amount"=>$input['balance'],
                 "uidCreator"=>Auth::user()->uid,
 
                 "status"=>$input['status'],
@@ -2024,7 +2305,7 @@ return $results;
 
             ]);
 
-        if($check1){
+        if($check){
 
            $check=DB::update("update admnin_records set balance=balance+:balance where uid=:uid and status=:status and subscriber=:subscriber and systemUid=:systemUid limit 1",array(
             "balance"=>$input['balance'],
@@ -2082,13 +2363,127 @@ return $results;
                 'errorPrint'=>$e->getMessage()], 500); // Return an error JSON response
                 }
     }
+    public function editSpending($input){ //not done
 
-    public function viewDepense($input){
-     DB::select("select uidUser,amount,purpose from depenses where uidUser=:uidUser and subscriber=:subscriber",array(
-        "uidUser"=>Auth::user()->uid,
-        "subscriber"=>Auth::user()->subscriber,
-     ));
+        try{
+
+
+        $check=DB::transaction(function () use ($input) {
+            $uidUser=Auth::user()->uid;
+
+            $uid="SUID"."_".Str::random(2).""."_".date(time());//SUID means Spend UID
+            $check1=DB::update("update depenses set amount=:amount,purpose=:purpose,commentData=:commentData,updated_at=:updated_at where uid=:uid and uidCreator=:uidCreator and status=:status and subscriber=:subscriber and systemUid=:systemUid limit 1 ",array(
+                "uid"=>$uid,
+
+                "amount"=>$input['balance'],
+                "uidCreator"=>Auth::user()->uid,
+
+                "status"=>$input['status'],
+                "systemUid"=>$input["systemUid"],
+                "subscriber"=>Auth::user()->subscriber,
+
+                "purpose"=>$input['purpose']??'none',
+                "commentData"=>$input['commentData'],
+                "updated_at"=>$this->today
+               ));
+
+        if($check1){
+
+           $check=DB::update("update admnin_records set balance=balance+:balance where uid=:uid and status=:status and subscriber=:subscriber and systemUid=:systemUid limit 1",array(
+            "balance"=>$input['balance'],
+            "uid"=>$uidUser,
+            "status"=>$input["status"],
+
+            "systemUid"=>$input["systemUid"],
+            "subscriber"=>Auth::user()->subscriber
+           ));
+
+           if($check){
+            return array(
+                "status"=>true,
+                "message"=>"Finish update records"
+            );
+           }
+           else{
+
+            return array(
+                "status"=>false,
+                "message"=>"no update records"
+            );
+           }
+           return array(
+            "status"=>true,
+            "message"=>"Finish add New admnin_records"
+        );
+         }
+         else{
+           return array(
+               "message"=>"Something went Wrong"
+           );
+         }
+        //
+    });
+
+
+    return response([
+       "status"=>true,
+       "result"=>$check,
+
+   ],200);
+
+
+                } catch (\Exception $e) {
+                    DB::rollback();
+                   // throw $e;
+                    return response()->json(['error' => 'An error occurred',
+                'errorPrint'=>$e->getMessage()], 500); // Return an error JSON response
+                }
     }
+    public function viewSpending($input){//General Spending
+        $check=DB::select("
+        SELECT
+            Max(depenses.uid) as spendId,
+            MAX(depenses.purpose) AS purpose,
+            MAX(depenses.commentData) AS commentData,
+            SUM(admnin_records.balance) AS totSpending,
+            MAX(depenses.amount) AS spending
+
+        FROM depenses
+        INNER JOIN admnin_records ON depenses.uidCreator=admnin_records.uid
+       WHERE depenses.subscriber=:subscriber
+            AND depenses.uidCreator=:uidCreator
+            AND admnin_records.status ='GeneralSpend'
+            AND admnin_records.subscriber=:adminSubscriber
+
+            GROUP BY depenses.id
+            ORDER BY depenses.id DESC
+
+        LIMIT 100
+    ", [
+        'subscriber'=>Auth::user()->subscriber,
+        'adminSubscriber'=>Auth::user()->subscriber,
+       'uidCreator'=>Auth::user()->uid,
+    ]);
+
+    if($check)
+    {
+
+       return response([
+           "status"=>true,
+           "result"=>$check,
+
+       ],200);
+    }
+    else{
+       return response([
+           "status"=>true,
+           "result"=>0,
+
+       ],200);
+    }
+    }
+
+
 
     //workers Code  Not to avoid slow app when view Worker it is where it may calculate everything
     public function AddWorker($input){

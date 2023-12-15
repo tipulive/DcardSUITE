@@ -1,12 +1,12 @@
 import 'dart:math';
 
 
-import 'package:dcard/Query/ParticipatedQuery.dart';
-import 'package:dcard/Utilconfig/HideShowState.dart';
-import 'package:dcard/models/QuickBonus.dart';
+import '../../../Query/ParticipatedQuery.dart';
+import '../../../Utilconfig/HideShowState.dart';
+import '../../../models/QuickBonus.dart';
 
-import 'package:dcard/models/Topups.dart';
-import 'package:dcard/models/User.dart';
+import '../../../models/Topups.dart';
+import '../../../models/User.dart';
 import 'package:get/get.dart';
 
 import '../../Query/StockQuery.dart';

@@ -741,6 +741,64 @@ class CompanyController extends Controller
             ],200);
         }
     }
+    public function viewSales(Request $request){
+        if(Auth::check())
+        {
+
+            if(Auth::user()->platform==$this->platform1)
+            {
+                $input=$request->all();
+
+                return (new StockController)->viewSales($input);
+            }
+            else{
+                return response([
+                    "status"=>false,
+                    "result"=>$this->Admin_Auth_result_error,
+                    "error"=>$this->Admin_Auth_error,
+
+                ],200);
+            }
+        }
+        else{
+            return response([
+                "status"=>false,
+                "result"=>$this->Admin_Auth_result_error,
+                "error"=>$this->Admin_Auth_error,
+
+            ],200);
+        }
+    }
+    public function viewSalesByUid(Request $request){
+        if(Auth::check())
+        {
+
+            if(Auth::user()->platform==$this->platform1)
+            {
+                $input=$request->all();
+
+                return (new StockController)-> viewSalesByUid($input);
+            }
+            else{
+                return response([
+                    "status"=>false,
+                    "result"=>$this->Admin_Auth_result_error,
+                    "error"=>$this->Admin_Auth_error,
+
+                ],200);
+            }
+        }
+        else{
+            return response([
+                "status"=>false,
+                "result"=>$this->Admin_Auth_result_error,
+                "error"=>$this->Admin_Auth_error,
+
+            ],200);
+        }
+    }
+
+
     public function GetDebt(Request $request){
         if(Auth::check())
         {
@@ -769,7 +827,7 @@ class CompanyController extends Controller
             ],200);
         }
     }
-    public function PaidDette(Request $request){
+    public function PaidDept(Request $request){
         if(Auth::check())
         {
 
@@ -777,7 +835,7 @@ class CompanyController extends Controller
             {
                 $input=$request->all();
 
-                return (new StockController)->PaidDette($input);
+                return (new StockController)->PaidDept($input);
             }
             else{
                 return response([
@@ -797,6 +855,150 @@ class CompanyController extends Controller
             ],200);
         }
     }
+    public function EditPaidDept(Request $request){
+        if(Auth::check())
+        {
+
+            if(Auth::user()->platform==$this->platform1)
+            {
+                $input=$request->all();
+
+                return (new StockController)->EditPaidDept($input);
+            }
+            else{
+                return response([
+                    "status"=>false,
+                    "result"=>$this->Admin_Auth_result_error,
+                    "error"=>$this->Admin_Auth_error,
+
+                ],200);
+            }
+        }
+        else{
+            return response([
+                "status"=>false,
+                "result"=>$this->Admin_Auth_result_error,
+                "error"=>$this->Admin_Auth_error,
+
+            ],200);
+        }
+    }
+    public function viewDept(Request $request){
+        if(Auth::check())
+        {
+
+            if(Auth::user()->platform==$this->platform1)
+            {
+                $input=$request->all();
+
+                return (new StockController)->viewDept($input);
+            }
+            else{
+                return response([
+                    "status"=>false,
+                    "result"=>$this->Admin_Auth_result_error,
+                    "error"=>$this->Admin_Auth_error,
+
+                ],200);
+            }
+        }
+        else{
+            return response([
+                "status"=>false,
+                "result"=>$this->Admin_Auth_result_error,
+                "error"=>$this->Admin_Auth_error,
+
+            ],200);
+        }
+    }
+    public function viewPaidDept(Request $request){
+        if(Auth::check())
+        {
+
+            if(Auth::user()->platform==$this->platform1)
+            {
+                $input=$request->all();
+
+                return (new StockController)->viewPaidDept($input);
+            }
+            else{
+                return response([
+                    "status"=>false,
+                    "result"=>$this->Admin_Auth_result_error,
+                    "error"=>$this->Admin_Auth_error,
+
+                ],200);
+            }
+        }
+        else{
+            return response([
+                "status"=>false,
+                "result"=>$this->Admin_Auth_result_error,
+                "error"=>$this->Admin_Auth_error,
+
+            ],200);
+        }
+    }
+
+
+public function viewSafeBalance(Request $request){
+    if(Auth::check())
+    {
+
+        if(Auth::user()->platform==$this->platform1)
+        {
+            $input=$request->all();
+
+            return (new StockController)->viewSafeBalance($input);
+        }
+        else{
+            return response([
+                "status"=>false,
+                "result"=>$this->Admin_Auth_result_error,
+                "error"=>$this->Admin_Auth_error,
+
+            ],200);
+        }
+    }
+    else{
+        return response([
+            "status"=>false,
+            "result"=>$this->Admin_Auth_result_error,
+            "error"=>$this->Admin_Auth_error,
+
+        ],200);
+    }
+}
+public function viewBorrowBalance(Request $request){
+    if(Auth::check())
+    {
+
+        if(Auth::user()->platform==$this->platform1)
+        {
+            $input=$request->all();
+
+            return (new StockController)->viewBorrowBalance($input);
+        }
+        else{
+            return response([
+                "status"=>false,
+                "result"=>$this->Admin_Auth_result_error,
+                "error"=>$this->Admin_Auth_error,
+
+            ],200);
+        }
+    }
+    else{
+        return response([
+            "status"=>false,
+            "result"=>$this->Admin_Auth_result_error,
+            "error"=>$this->Admin_Auth_error,
+
+        ],200);
+    }
+}
+
+
     public function OrderViewCount(Request $request){
         if(Auth::check())
         {
@@ -882,7 +1084,7 @@ class CompanyController extends Controller
             ],200);
         }
     }
-    public function addDepense(Request $request){
+    public function addSpending(Request $request){
         if(Auth::check())
         {
 
@@ -890,7 +1092,7 @@ class CompanyController extends Controller
             {
                 $input=$request->all();
 
-                return (new StockController)->addDepense($input);
+                return (new StockController)->addSpending($input);
             }
             else{
                 return response([
@@ -910,7 +1112,7 @@ class CompanyController extends Controller
             ],200);
         }
     }
-    public function viewDepense(Request $request){
+    public function editSpending(Request $request){
         if(Auth::check())
         {
 
@@ -918,7 +1120,35 @@ class CompanyController extends Controller
             {
                 $input=$request->all();
 
-                return (new StockController)->viewDepense($input);
+                return (new StockController)->editSpending($input);
+            }
+            else{
+                return response([
+                    "status"=>false,
+                    "result"=>$this->Admin_Auth_result_error,
+                    "error"=>$this->Admin_Auth_error,
+
+                ],200);
+            }
+        }
+        else{
+            return response([
+                "status"=>false,
+                "result"=>$this->Admin_Auth_result_error,
+                "error"=>$this->Admin_Auth_error,
+
+            ],200);
+        }
+    }
+    public function viewSpending(Request $request){
+        if(Auth::check())
+        {
+
+            if(Auth::user()->platform==$this->platform1)
+            {
+                $input=$request->all();
+
+                return (new StockController)->viewSpending($input);
             }
             else{
                 return response([
