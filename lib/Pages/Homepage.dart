@@ -54,6 +54,8 @@ class _HomepageState extends State<Homepage> {
 
   List<dynamic> dataSearch = [];
   List<dynamic> cartData = [];
+  List<dynamic>qrSearch = [];
+
   PromotionQuery promotionState=Get.put(PromotionQuery());
   AdminQuery adminStatedata=Get.put(AdminQuery());
   //StockQuery stockQueryData=Get.put(StockQuery());
@@ -71,6 +73,8 @@ class _HomepageState extends State<Homepage> {
   bool showprofile=false;
   bool showOveray=false;
   bool IsSubmitted=false;
+  bool productSearch=false;
+  bool  productSearchPopup=true;
   final GlobalKey qrkey = GlobalKey(debugLabel: 'QR');
   Barcode?result;
   QRViewController?controller;
@@ -82,6 +86,7 @@ class _HomepageState extends State<Homepage> {
   bool Cameravalue=false;
   bool Flashvalue=false;
   var ResultDatas;
+  GlobalKey userBottomSheetKey = GlobalKey();
 
   @override
 
@@ -119,6 +124,7 @@ class _HomepageState extends State<Homepage> {
           Column(
             children: [
               //Qr Code
+
               SizedBox(height: 20,),
               // SearchBarField(search: _data,searchController:searchContro,PerformSearch:,),
               SearchBarField(
@@ -126,7 +132,7 @@ class _HomepageState extends State<Homepage> {
                 searchMethod:(text) async{
                   if (text!= searchText) {
 
-                    performSearch(text);//note i must figure out how to avoid
+                    performSearch(text,"none");//note i must figure out how to avoid
                     searchText=text;
                   }else{
 
@@ -136,74 +142,37 @@ class _HomepageState extends State<Homepage> {
                   }
 
                 },
+                scanProductMethod: (){
+
+                  scanProduct();
+                },
                 searchController: searchContro,
               ),
 
-              Expanded(
-                child: ProductSearchList(addCartMethod:(dynamicData){
+               if(productSearch)
+                 Expanded(
+                 child: ProductSearchList(addCartMethod:(dynamicData){
                   addCartPlus(dynamicData);
 
-                },searchResult:dataSearch),
-              ),
-              Text("My Cart"),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-
-                  //primary: Colors.grey[300],
-                  backgroundColor: Colors.green,
-                  elevation:0,
+                 },searchResult:(Get.put(StockQuery()).dataSearch)),
                 ),
-                onPressed: () async{
-                 /* setState(() {
-                    cartData.removeWhere((item) => item['productCode'] == "webcam_1700726985");
-                  });
-
-                  print(cartData);*/
-                  print(cartData.length);
+              GestureDetector(
+                onTap: ()  {
+                  // Handle tap event here
+                 // print('Icon tapped!');
+                  scanUser();
                 },
-                child: Text('Check'),
-              ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-
-                  //primary: Colors.grey[300],
-                  backgroundColor: Colors.green,
-                  elevation:0,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.star, color: Colors.yellow), // Replace with your desired icon
+                    SizedBox(width: 8.0), // Adjust the space between icon and text
+                    Text('Favorite', style: TextStyle(fontSize: 16.0)),
+                  ],
                 ),
-                onPressed: () async{
-                  //print((Get.put(StockQuery()).dataCartui));
-                  List<dynamic> testdata=[
-                    {
-                      'name': 'bebese',
-                      'uid': 'feke',
-                      'productCode': 'Velo',
-                      'productName': 'webcam',
-                      'price': 30,
-                      'pcs': 30,
-                      'totalQty': 25,
-                      'totalAmount': 750,
-                      'totalCount': 25,
-                    },
-                    {
-                      'name': 'bebese',
-                      'uid': 'feke',
-                      'productCode': 'Matabaro',
-                      'productName': 'bido',
-                      'price': 30,
-                      'pcs': 20,
-                      'totalQty': 30,
-                      'totalAmount': 900,
-                      'totalCount': 30,
-                    },
-                  ];
-                  setState(() {
-                    cartData.insertAll(0,testdata);
-                    //cartData.addAll(testdata);
-                  });
-                  (Get.put(StockQuery()).updateOrder(testdata));
-                },
-                child: Text('Confirm Order'),
               ),
+             // Center(child: Text("${(Get.put(StockQuery()).userProfile)["name"]}")),
+
               Center(child: Text("${(Get.put(StockQuery()).order)["resultData"][0]["name"]}")),
                if(((Get.put(StockQuery()).order)["resultData"][0]["uid"])!="")
                  Center(child: Text("OrderId:${(Get.put(StockQuery()).order)["resultData"][0]["uid"]}")),
@@ -288,14 +257,14 @@ class _HomepageState extends State<Homepage> {
                            var inputDataText=(inputDataDept.text=="")?"0":inputDataDept.text;
 
                             var resultData=(await StockQuery().submitOrder(Participated(uid:"Nyota_1672353378"
-                                ,uidUser:"kebineericMuna_1674160265",subscriber:"${(Get.put(StockQuery()).order["resultData"][0]["uid"])}",inputData:"${inputDataText}"),Promotions(
+                                ,uidUser:"${(Get.put(StockQuery()).userProfile)["uid"]}",subscriber:"${(Get.put(StockQuery()).order["resultData"][0]["uid"])}",inputData:"${inputDataText}"),Promotions(
                               token:"${(Get.put(StockQuery())).orderSum }",reach:"1200",gain:"350",uid:"PointSales1"
                             ))).data;
                           if(resultData["status"])
                           {
                           //print(resultData);
 
-                            List<dynamic> OrderVal=[
+                            List<dynamic> orderVal=[
                               {
                                 "name":"Unknown",
                                 "uid":""
@@ -308,7 +277,7 @@ class _HomepageState extends State<Homepage> {
                           setState(() {
                           showOveray=false;
                           cartData.clear();
-                          (Get.put(StockQuery()).updateOrder(OrderVal));
+                          (Get.put(StockQuery()).updateOrder(orderVal));
                           (Get.put(StockQuery()).updateDeptOrder(0));
                           inputDataDept.text="";
 
@@ -373,7 +342,7 @@ class _HomepageState extends State<Homepage> {
                  if(resultData["status"])
                  {
                    //print(resultData);
-                   List<dynamic> OrderVal=[
+                   List<dynamic> orderVal=[
                      {
                        "name":"Unknown",
                        "uid":""
@@ -388,7 +357,7 @@ class _HomepageState extends State<Homepage> {
 
                        if(cartData.length<=0)
                          {
-                           (Get.put(StockQuery()).updateOrder(OrderVal));
+                           (Get.put(StockQuery()).updateOrder(orderVal));
                          }
                      });
 
@@ -472,456 +441,6 @@ class _HomepageState extends State<Homepage> {
 
   }
 
-  ScanPopup(uid,name){
-
-    Get.bottomSheet(
-      StatefulBuilder(
-        builder: (BuildContext context, StateSetter setState) {
-          return
-
-            Stack(
-              alignment: Alignment.bottomCenter,
-              children: [
-                Container(
-                  height:400,
-
-                  child: Column(
-                    children: [
-                      Container(
-
-                        height: 400,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(16),
-                            topRight: Radius.circular(16),
-                          ),
-                        ),
-                        child: ListView(
-                          children: [
-
-                            MyTextWidget(uid,name)
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  // height: 60,
-                  //color: Colors.white,
-                  child: HomeNavigator(),
-                ),
-
-                Positioned(
-                  right: 15.0,
-                  bottom:70,
-                  child: FloatingActionButton(
-                    onPressed:()async {
-                      Get.put(HideShowState()).isVisible(true);
-                      ResultDatas=(await Get.put(TopupQuery()).GetBalance(Topups(uid:"${(Get.put(CardQuery()).obj)["resultData"]["UserDetail"]["uid"]??'none'}"))).data;
-                      if(ResultDatas["status"])
-                      {
-                        await Get.put(TopupQuery()).updateTopupState(ResultDatas);
-                        Get.put(HideShowState()).isVisible(false);
-                        Get.to(() => ProfilePage());
-                      }
-                      else{
-
-                        await Get.put(TopupQuery()).updateTopupState(ResultDatas);
-                        Get.put(HideShowState()).isVisible(false);
-                        Get.to(() => ProfilePage());
-                      }
-
-
-                    },
-                    tooltip: 'Increment',
-                    child: CircleAvatar(
-                      radius: 50,
-                      backgroundImage: AssetImage("images/profile.jpg",
-                      ),
-                    ),
-                  ),
-                ),
-
-                Positioned.fill(
-                    child:  Obx(
-                          () =>Visibility(
-                        visible: Get.put(HideShowState()).isVisible.value,
-                        child: Container(
-                          color: Colors.black.withOpacity(0.65),
-                        ),
-                      ),
-                    )
-                ),
-
-                Positioned(
-                    top: 0,
-
-                    child:  Obx(
-                          () =>Visibility(
-                        visible: Get.put(HideShowState()).isVisible.value,
-                        child: Container(
-                          //padding: EdgeInsets.all(16),
-                          child: CircularProgressIndicator(),
-                        ),
-                      ),
-                    )
-                ),
-              ],
-            );
-        },
-      ),
-    ).whenComplete(() {
-      controller!.resumeCamera();
-      //do whatever you want after closing the bottom sheet
-    });
-  }
-  Widget MyTextWidget(uid,name){
-    if((promotionState.obj["id"])==1) return Center(child: CircularProgressIndicator());
-    PromoName.text="${(promotionState.obj["resultData"]["result"][0]["promoName"])}";
-    PromoMsg=(promotionState.obj["resultData"]["result"][0]["promo_msg"]);
-    uidInput.text="${(promotionState.obj["resultData"]["result"][0]["uid"])}";
-    uidInput4.text="${(promotionState.obj["resultData"]["result"][0]["reach"])}";
-    uidInput5.text="${(promotionState.obj["resultData"]["result"][0]["gain"])}";
-    uidInput2.text="${uid}";
-    ClientName.text="${name}";
-
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-
-        children: [
-          Visibility(
-              visible: true,
-              child: Column(
-
-                children: [
-
-                  TextButton(
-                      onPressed: ()  async{
-
-                        try {
-                          setState(() {
-                            showOveray=true;
-                          });
-                          var resul=(await ParticipatedQuery().GetUidSubmitQuickBonusEventOnline(BonusModel(uidUser:'${(Get.put(CardQuery()).obj)["resultData"]["UserDetail"]["uid"]??'none'}'))).data;
-
-
-                          if(resul["status"])
-                          {
-                            var dataresult=resul["resultData"];
-                            for(int i=0;i<resul["count"];i++)
-                            {
-                              setState(() {
-                                showOveray=false;
-                                Get.put(ParticipatedQuery()).updateCartUi(resul,true,true);
-                                Get.put(ParticipatedQuery()).dataCartui["countData"]["count"]=resul["count"];
-                                Get.put(ParticipatedQuery()).dataCartui["products"]["${dataresult[i]["quickUid"]}"]=dataresult[i]["price"];
-
-                                // Update the value of _counter and trigger a rebuild
-                              });
-                            }
-
-
-                            Get.to(() => QuickBonusPage());
-
-
-                          }
-                          else{
-                            //hide cart
-                            setState(() {
-                              Get.put(ParticipatedQuery()).updateCartUi(resul,false,false);
-                              Get.put(ParticipatedQuery()).dataCartui["countData"]["count"]=0;
-
-
-                              // Update the value of _counter and trigger a rebuild
-                            });
-
-                            Get.to(() => QuickBonusPage());
-
-
-                          }
-
-
-                        } catch (e) {
-                          setState(() {
-                            showOveray=false;
-                          });
-                          print('Error: $e');
-                        }
-
-                        //print(this._data[index]["total_var"]);
-                        // print("Text changed to: $text");
-                      },
-                      child: const Text("QuickBonus Qr")
-                  ),                  Center(child: Text(name)),
-                  SizedBox(height:10.0,),
-                  TextField(
-                    controller:PromoName,
-                    enabled: false,
-                    //obscureText: true,
-                    decoration: InputDecoration(
-                      contentPadding: const EdgeInsets.symmetric(vertical: 3,horizontal: 3),
-                      border: OutlineInputBorder(),
-                      labelText: 'Promotion Name',
-                      hintText: 'Promotion Name',
-                      hintStyle: TextStyle(
-                        color: Colors.grey,
-                      ),
-
-                    ),
-                  ),
-                  Visibility(
-                    visible:false,
-                    child: TextField(
-                      controller: uidInput,
-                      //obscureText: true,
-                      decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.symmetric(vertical: 3,horizontal: 3),
-                        border: OutlineInputBorder(),
-                        labelText: 'Uid of Promotion ',
-                        hintText: 'Uid of Promotion',
-                        hintStyle: TextStyle(
-                          color: Colors.grey,
-                        ),
-
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 10.0,),
-                  Visibility(
-                    visible:false,
-                    child: TextField(
-                      controller: uidInput2,
-                      //obscureText: true,
-                      decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.symmetric(vertical: 3,horizontal: 3),
-                        border: OutlineInputBorder(),
-                        labelText: 'UserID',
-                        hintText: 'Enter your name',
-                        hintStyle: TextStyle(
-                          color: Colors.grey,
-                        ),
-
-                      ),
-                    ),
-                  ),
-                  //SizedBox(height: 10.0,),
-                  Visibility(
-                    visible:false,
-                    child: TextField(
-                      controller: ClientName,
-                      enabled: false,
-                      //obscureText: true,
-                      decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.symmetric(vertical: 3,horizontal: 3),
-                        border: OutlineInputBorder(),
-                        labelText: 'Name',
-                        hintText: 'Enter your name',
-                        hintStyle: TextStyle(
-                          color: Colors.grey,
-                        ),
-
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 10.0,),
-                  TextField(
-                    controller: uidInput3,
-
-                    //obscureText: true,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      contentPadding: const EdgeInsets.symmetric(vertical: 3,horizontal: 3),
-                      border: OutlineInputBorder(),
-                      // labelText: 'Enter ${Promo_data["result"][0]["promo_msg"]}',${promotionState.obj["resultData"]["result"][0]["uid"]}
-                      labelText: '${PromoMsg}',
-                      hintText: 'InputData',
-                      hintStyle: TextStyle(
-                        color: Colors.grey,
-                      ),
-                      suffixIcon:  GestureDetector(
-                        child: Icon(Icons.settings),
-                        onTap: () {
-                          _groupVal=uidInput.text;
-                          Get.dialog(
-                            AlertDialog(
-                              title: Center(child: const Text('Choose Promotion')),
-                              content:SingleChildScrollView(
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  mainAxisAlignment:MainAxisAlignment.start,
-                                  crossAxisAlignment:CrossAxisAlignment.start,
-                                  children: <Widget> [
-
-
-                                    if(((Get.put(PromotionQuery()).obj)["id"])==1)...[Center(child: CircularProgressIndicator())],
-
-                                    for(var i=0;i<(Get.put(PromotionQuery()).obj)["resultData"]["result"].length;i++)
-                                      RadioListTile(
-                                        title: Text("${i==null?"none":(Get.put(PromotionQuery()).obj)["resultData"]["result"][i]["promoName"]}"),
-                                        value: "${i==null?"none":(Get.put(PromotionQuery()).obj)["resultData"]["result"][i]["uid"]}",
-                                        //value:"${items[i]}",
-
-                                        groupValue:_groupVal,
-                                        onChanged: (value){
-
-                                          this._groupVal=value.toString();
-                                          //value="male";
-
-                                          uidInput.text=this._groupVal;
-                                          PromoName.text="${(Get.put(PromotionQuery()).obj)["resultData"]["result"][i]["promoName"]}";
-                                          PromoMsg="${(Get.put(PromotionQuery()).obj)["resultData"]["result"][i]["promo_msg"]}";
-                                          uidInput4.text="${(Get.put(PromotionQuery()).obj)["resultData"]["result"][i]["reach"]}";
-                                          uidInput5.text="${(Get.put(PromotionQuery()).obj)["resultData"]["result"][i]["gain"]}";
-
-                                          //print(_groupVal);
-                                          //Get.back(result: value);
-                                          Get.back();
-                                        },
-                                      ),
-
-                                  ],
-                                ),
-                              ),
-                              actions: [
-                                TextButton(
-                                  child: const Text("Close"),
-                                  onPressed: () => Get.back(),
-                                ),
-                              ],
-                            ),
-                          );
-
-
-                          // Perform some action when the icon is pressed
-                        },
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 10.0,),
-                  Visibility(
-                    visible:false,
-                    child: TextField(
-                      controller: uidInput4,
-                      //obscureText: true,
-                      decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.symmetric(vertical: 3,horizontal: 3),
-                        border: OutlineInputBorder(),
-                        labelText: 'reach',
-                        hintText: 'reache',
-                        hintStyle: TextStyle(
-                          color: Colors.grey,
-                        ),
-
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 10.0,),
-                  Visibility(
-                    visible:false,
-                    child: TextField(
-                      controller: uidInput5,
-                      //obscureText: true,
-                      decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.symmetric(vertical: 3,horizontal: 3),
-                        border: OutlineInputBorder(),
-                        labelText: 'gain',
-                        hintText: 'gain',
-                        hintStyle: TextStyle(
-                          color: Colors.grey,
-                        ),
-
-                      ),
-                    ),
-                  ),
-
-
-
-                  FloatingActionButton.extended(
-                    label: Text('Participate'), // <-- Text
-                    backgroundColor: Colors.black,
-                    icon: Icon( // <-- Icon
-                      Icons.thumb_up,
-                      size: 24.0,
-                    ),
-                    onPressed: ()async =>{
-                      Get.put(HideShowState()).isVisible(true),
-
-                      /* setState(() {
-
-
-                        showOveray=true;
-                      }),*/
-
-
-                      await Get.put(ParticipatedQuery()).ParticipateEventOnline(Participated(uid:uidInput.text,uidUser:uidInput2.text,inputData:uidInput3.text),Promotions(reach:uidInput4.text,gain:uidInput5.text)),
-                      //print((Get.put(ParticipatedQuery()).obj)),
-                      if((Get.put(ParticipatedQuery()).obj)["resultData"]["reach"]!=null)
-                        {
-                          /* setState(() {
-
-
-                            showOveray=false;
-                          }),*/
-                          Get.put(HideShowState()).isVisible(false),
-                          uidInput3.text="",
-                          Get.close(1),
-                          controller!.resumeCamera(),
-                          CoolAlert.show(
-                            context: context,
-                            backgroundColor:Color(0xff940e4b),
-                            type: CoolAlertType.success,
-                            title:"Congratulation !!!",
-                            text: "You Reach ${(Get.put(ParticipatedQuery()).obj)["resultData"]["reach"]}\$ and You win ${(Get.put(ParticipatedQuery()).obj)["resultData"]["gain"]} !",
-
-                          ),
-
-
-
-                          //Get.back(),
-
-                        }else{
-                        if((Get.put(ParticipatedQuery()).obj)["resultData"]["status"])
-                          {
-                            /*setState(() {
-
-                              showOveray=false;
-                            }),*/
-                            Get.put(HideShowState()).isVisible(false),
-                            uidInput3.text="",
-                            Get.close(1),
-                            controller!.resumeCamera(),
-
-                            Get.snackbar("Success", "Data Submitted",backgroundColor: Color(0xff9a1c55),
-                                colorText: Color(0xffffffff),
-                                titleText: Text("Participate"),
-
-                                icon: Icon(Icons.access_alarm),
-                                duration: Duration(seconds: 5)),
-
-
-
-
-                          },
-
-
-                        //print((Get.put(ParticipatedQuery()).obj)),
-                      },
-                      //
-                      //
-
-
-                    },
-                  ),
-                ],
-              )
-          ),
-        ],
-      ),
-    );
-  }
   void _onQRViewCreated(QRViewController controller)
   {
     this.controller=controller;
@@ -929,75 +448,91 @@ class _HomepageState extends State<Homepage> {
       setState((){
         result=scanData;
       });
-      await scanMethod();
+      //await scanMethod();
+      //print("${result!.code}");
+      if(result!=null)
+        {
+         // controller!.pauseCamera();
+
+          bool containsProductCode = qrSearch.any((item) => item['productCode'] == result!.code);
+          if(containsProductCode)
+            {
+              //data already scaned
+              //print("already exist");
+             // print("${(Get.put(StockQuery()).dataSearch).toString()}");
+            }
+          else{
+            var listData={
+              "productCode":result!.code
+            };
+            qrSearch.insertAll(0,[listData]);
+            //print(qrSearch);
+            searchQr(result!.code);
+
+
+          }
+          //
+        }
     });
   }
-  scanMethod() async{
+  searchQr(result) async{
+   // await performSearch("$result","gh");
+    await performSearch("$result","gh");
+  }
 
-    // uidInput2.text="${result!.code}";
-    //uidInput2.text="${(await Get.put(CardQuery()).GetDetailCardOnline(CardModel(uid:'${result!.code}')))["UserDetail"]["uid"]}";
-    if(result!=null)
-    {
-
-      controller!.pauseCamera();
-      setState(() {
-        showOveray=true;
+  void _onUserQRViewCreated(QRViewController controller)
+  {
+    this.controller=controller;
+    controller.scannedDataStream.listen((scanData) async{
+      setState((){
+        result=scanData;
       });
-      try {
+      //await scanMethod();
 
-
-        // controller!.pauseCamera();
-        //controller!.pauseCamera();
-        var ResultData=(await Get.put(CardQuery()).GetDetailCardOnline(CardModel(uid:'${result!.code}'))).data;
-        if(ResultData["status"])
-        {
-          setState(() {
-            showOveray=false;
-          });
-
-          //print(ResultData["UserDetail"]["uid"]);
-          ScanPopup(ResultData["UserDetail"]["uid"],ResultData["UserDetail"]["name"]);
-          (await Get.put(CardQuery()).updateCardState(ResultData));
-        }
-        else{
-          controller!.pauseCamera();
-          setState(() {
-            showOveray=false;
-          });
-          CoolAlert.show(
-            context: context,
-            backgroundColor:Color(0xff940e4b),
-            type: CoolAlertType.error,
-            title:"Error !!!",
-            text: "This Card is not exist",
-
-          ).then((value) {
-            // Event to trigger when the alert is dismissed
-            controller!.resumeCamera();
-          });
-          //uidInput2.text="${ResultData["status"]}";
-        }
-
-      } catch (e) {
-        setState(() {
-          showOveray=false;
-        });
-        //return false;
-        //print(e);
+      bool containsProductCode = qrSearch.any((item) => item['productCode'] == result!.code);
+      if(containsProductCode)
+      {
+        //data already scaned
+        //print("already exist");
+        // print("${(Get.put(StockQuery()).dataSearch).toString()}");
       }
+      else{
+        var listData={
+          "productCode":result!.code
+        };
+        qrSearch.insertAll(0,[listData]);
+        //print(qrSearch);
+        getCardDetail(result!.code);
+
+
+      }
+
+    });
+  }
+  getCardDetail(resultCode) async{
+    (Get.put(StockQuery()).updateHideLoader(false));
+    var resultData=(await CardQuery().GetDetailCardOnline(CardModel(uid:"$resultCode"))).data;
+    if(resultData["status"])
+    {
+      Get.close(1);
+      (Get.put(StockQuery()).updateHideLoader(true));
+      setState(() {
+        //(Get.put(StockQuery()).updateUserProfile(resultData["UserDetail"]));
+       // (Get.put(StockQuery()).order)["resultData"][0]["name"]=resultData["UserDetail"]["name"];
+      });
+
+      //print("result ${resultData["UserDetail"]}");
+
 
     }
     else{
-
-      setState(() {
-        showOveray=false;
-      });
-      uidInput2.text="test";
+      (Get.put(StockQuery()).updateHideLoader(true));
+      Get.close(1);
     }
-
-
+    //Get.close(1);
 
   }
+
   @override
   void dispose(){
     controller?.dispose();
@@ -1064,14 +599,28 @@ class _HomepageState extends State<Homepage> {
       var resultData=(await StockQuery().viewUserTempOrder(QuickBonus(uid:"nyota"))).data;
       if(resultData["status"])
       {
-        num totalVal = resultData["result"].fold(0, (previousValue, element) => previousValue + element['totalAmount']);
-       // (Get.put(StockQuery()).updateOrderId("${resultData["result"][0]["uid"]}"));
+
+
+
+
+        num totalVal = resultData["result"].fold(0, (previousValue, element) {
+          // Convert 'totalAmount' to a num using double.parse
+          num totalAmount = num.parse(element['totalAmount'].toString());
+
+          // Add the converted totalAmount to previousValue
+          return previousValue + totalAmount;
+        });
 
         (Get.put(StockQuery()).updateSumOrder(totalVal));
 
+
+
         (Get.put(StockQuery()).updateOrder(resultData["result"]));
 
-        setState(() {
+
+        //print(resultData);
+
+       setState(() {
 
 
           cartData.clear();
@@ -1099,28 +648,33 @@ class _HomepageState extends State<Homepage> {
 
   }
 
-  void performSearch(String text) async{
+  performSearch(String text,String statusSearch) async{
 
 
     try {
-
-      var resultData=(await StockQuery().searchProduct(QuickBonus(uid:text,productName:'none'))).data;
+   bool searchHide=(statusSearch=='none')?true:false;//to check if is Qr search or no Qr
+      var resultData=(await StockQuery().searchProduct(QuickBonus(uid:text,productName:'none',status:statusSearch))).data;
       if(resultData["status"])
       {
 
         setState(() {
+          productSearch=searchHide;
 
-
+          //(Get.put(StockQuery()).updateTextMessage("$text Added Successfully"));
+          (Get.put(StockQuery()).updateHideProductList(false));
           dataSearch.clear();
 
           dataSearch.addAll(resultData["result"]);
+          (Get.put(StockQuery()).updatedataSearch(dataSearch));
         });
+        //print("hello ${Get.put(StockQuery().dataSearch)}");
       }
       else{
         setState(() {
 
 
           dataSearch.clear();
+          (Get.put(StockQuery()).updatedataSearch(dataSearch));
 
 
         });
@@ -1195,6 +749,8 @@ else{
 
         showOveray=false;
         dataSearch.clear();
+        (Get.put(StockQuery()).updatedataSearch(dataSearch));
+
 
 
       });
@@ -1206,13 +762,17 @@ else{
 
   }
   void addCartPlus(dynamic dynamicData) async{
-
+    (Get.put(StockQuery()).updateHideLoader(false));
     bool containsProductCode = cartData.any((item) => item['productCode'] == dynamicData["productCode"]);
 
     num b=2;
    if(containsProductCode)
      {
-       print("product exist please");
+       (Get.put(StockQuery()).updateHideLoader(true));
+       (Get.put(StockQuery()).updateTextMessage("${dynamicData['ProductName']} Product already Added"));
+       (Get.put(StockQuery()).updateHideProductList(true));
+
+
      }
    else{
     // print(containsProductCode);
@@ -1221,6 +781,8 @@ else{
     setState(() {
 
        showOveray=true;
+
+      // productSearchPopup=false;
       // dataSearch.clear();
 
 
@@ -1233,17 +795,17 @@ else{
        num totalVal=((num.parse(dynamicData["req_qty"]))>1)?dynamicData["totalAmount"]+((Get.put(StockQuery()).orderSum)):(num.parse(dynamicData["price"]))+((Get.put(StockQuery()).orderSum));
 
 
+       //print("${dynamicData["req_qty"]}");
        var resultData=(await StockQuery().placeOrder(QuickBonus(uid:dynamicData["productCode"],qty:dynamicData["req_qty"],subscriber:"${(Get.put(StockQuery()).order)["resultData"][0]["uid"]}"),User(uid: "kebineericMuna_1674160265"))).data;
-       if(resultData["status"])
+        if(resultData["status"])
        {
-         //{status: true, OrderId: UID_tb_1702314752}
-     // {status: false, resultData: [{name: none, uid: none}]}
-        print(cartData.length);
+
+       // print(cartData.length);
 
 //here i must Add no assign Card Then Unknown else Card ClientName
-        List<dynamic> OrderVal=[
+        List<dynamic> orderVal=[
           {
-            "name":"Unknown",
+            "name":"${(Get.put(StockQuery()).userProfile)["name"]}",
             "uid":resultData["OrderId"]
           }
         ];
@@ -1253,13 +815,18 @@ else{
          setState(() {
            showOveray=false;
 
-           (Get.put(StockQuery()).updateOrder(OrderVal));
+           (Get.put(StockQuery()).updateOrder(orderVal));
            (Get.put(StockQuery()).updateSumOrder(totalVal));
 
 
            cartData.insertAll(0,[dynamicData]);
 
            dataSearch.clear();
+           //(Get.put(StockQuery()).updatedataSearch(dataSearch));
+
+           (Get.put(StockQuery()).updateTextMessage("${dynamicData['ProductName']} Added Successfully"));
+           (Get.put(StockQuery()).updateHideProductList(true));
+           (Get.put(StockQuery()).updateHideLoader(true));
 
          });
 
@@ -1271,6 +838,9 @@ else{
 
            showOveray=false;
            dataSearch.clear();
+           (Get.put(StockQuery()).updatedataSearch(dataSearch));
+
+           (Get.put(StockQuery()).updateHideLoader(true));
 
 
          });
@@ -1286,45 +856,214 @@ else{
 
 
 
-   /* setState(() {
-      showOveray=true;
 
-
-    });
-
-
-    try {
-
-      var resultData=(await StockQuery().placeOrder(QuickBonus(uid:dynamicData["productCode"],qty:dynamicData["req_qty"],productName:"none"),User(uid: "kebineericMuna_1674160265"))).data;
-      if(resultData["status"])
-      {
-        //print(resultData);
-        setState(() {
-          showOveray=false;
-
-          dataSearch.clear();
-
-          dataSearch.addAll(resultData["result"]);
-        });
-      }
-      else{
-        print(dynamicData);
-        setState(() {
-
-          showOveray=false;
-          dataSearch.clear();
-
-
-        });
-      }
-    } catch (e) {
-
-    }*/
 
 
 
   }
 
+
+  void scanProduct() async{
+
+    Get.bottomSheet(
+      StatefulBuilder(
+        builder: (BuildContext context, StateSetter setState) {
+          return
+          Stack(
+            children: [
+              Container(
+                padding:EdgeInsets.all(5.0),
+                height: 600,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(30),
+                    topRight: Radius.circular(30),
+                  ),
+                ),
+                child: Column(
+                  children: [
+
+                    // (result!=null)?Text("barcode Type ${describeEnum(result!.format)} Data ${result!.code}"): const Text("Scan Code"),
+                    Center(child: Text("Text")),
+                    GetBuilder<StockQuery>(
+                      builder: (myController) {
+                        //return Text('Data: ${(_controller.dataSearch).toString()}');
+
+                        return
+                          (myController.hideProductList)?
+                          Text(myController.textMessage):
+                          Expanded(
+                            child:ProductSearchList(addCartMethod:(dynamicData){
+                              addCartPlus(dynamicData);
+
+                            },searchResult:(Get.put(StockQuery()).dataSearch)),
+                          );
+
+
+                      },
+                    ),
+                    //if(productSearchPopup)
+                    SizedBox(height: 20,),
+                    Expanded(
+                        flex: 5,
+                        child:Stack(
+                          alignment:Alignment.bottomCenter,
+                          children: [
+                            QRView(key: qrkey,onQRViewCreated: _onQRViewCreated,),
+
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+
+                                    CameraSwitch(),
+                                    //SizedBox(width: 10.0,),
+
+                                    // SizedBox(width: 10.0,),
+                                    FlashSwitch(),
+                                    Image.asset(
+                                      Flashvalue ? 'images/on.png' : 'images/off.png',
+                                      height: 30,
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+
+                          ],
+                        )
+
+                    )
+
+
+
+
+                  ],
+                ),
+              ),
+              GetBuilder<StockQuery>(
+                builder: (myLoadercontroller) {
+                  //return Text('Data: ${_controller.data}');
+                  return
+                    (myLoadercontroller.hideLoader)?
+                        Text(""):
+                    Positioned.fill(
+                    child: Center(
+                      child: Container(
+                        alignment: Alignment.center,
+                        color: Colors.white70,
+                        child: CircularProgressIndicator(),
+                      ),
+                    ),
+                  );
+                },
+              ),
+
+            ],
+          );
+
+        },
+      ),
+    ).whenComplete(() {
+      qrSearch.clear();
+    });
+
+  }
+  void scanUser() async{//not finished User
+
+    Get.bottomSheet(
+
+      StatefulBuilder(
+        builder: (BuildContext context, StateSetter setState) {
+          return
+            Stack(
+              key:userBottomSheetKey,
+              children: [
+                Container(
+
+                  padding:EdgeInsets.all(5.0),
+                  height: 600,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(30),
+                      topRight: Radius.circular(30),
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+
+                      SizedBox(height: 20,),
+                      Expanded(
+                          flex: 5,
+                          child:Stack(
+                            alignment:Alignment.bottomCenter,
+                            children: [
+                              QRView(key: qrkey,onQRViewCreated: _onUserQRViewCreated,),
+
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+
+                                      CameraSwitch(),
+                                      //SizedBox(width: 10.0,),
+
+                                      // SizedBox(width: 10.0,),
+                                      FlashSwitch(),
+                                      Image.asset(
+                                        Flashvalue ? 'images/on.png' : 'images/off.png',
+                                        height: 30,
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+
+                            ],
+                          )
+
+                      )
+
+
+
+
+                    ],
+                  ),
+                ),
+                GetBuilder<StockQuery>(
+                  builder: (myLoadercontroller) {
+                    //return Text('Data: ${_controller.data}');
+                    return
+                      (myLoadercontroller.hideLoader)?
+                      Text(""):
+                      Positioned.fill(
+                        child: Center(
+                          child: Container(
+                            alignment: Alignment.center,
+                            color: Colors.white70,
+                            child: CircularProgressIndicator(),
+                          ),
+                        ),
+                      );
+                  },
+                ),
+
+              ],
+            );
+
+        },
+      ),
+    ).whenComplete(() {
+      qrSearch.clear();
+    });
+
+  }
 //method
 }
 
@@ -1359,10 +1098,12 @@ class SearchBarField extends StatelessWidget {
   const SearchBarField({
     Key? key,
     required this.searchMethod,
+    required this.scanProductMethod,
     required this.searchController,
   }) : super(key: key);
 
   final void Function(String) searchMethod;
+  final void Function() scanProductMethod;
   final TextEditingController searchController;
 
 
@@ -1382,8 +1123,9 @@ class SearchBarField extends StatelessWidget {
             onPressed: () async {
               try {
 
-                var resultData=(await StockQuery().viewUserTempOrder(QuickBonus(uid:"nyota"))).data;
-                print(resultData);
+                /*var resultData=(await StockQuery().viewUserTempOrder(QuickBonus(uid:"nyota"))).data;
+                print(resultData);*/
+                scanProductMethod();
 
 
               } catch (e) {

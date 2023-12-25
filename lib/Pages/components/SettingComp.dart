@@ -16,6 +16,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../SetDeptPage.dart';
 import '../SetOrderPage.dart';
+import '../SetPaidDeptPage.dart';
 import '../SetPartHistPage.dart';
 import '../SetPartPage.dart';
 import '../SetQuickBoHistPage.dart';
@@ -84,6 +85,12 @@ class _SettingCompState extends State<SettingComp> {
                   dept();
                 },
                 child: detailsProfile("Dept",Icons.calendar_month_outlined,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,dept)),//Last Time Purchase
+            const SizedBox(height:5,),
+            GestureDetector(
+                onTap: (){
+                  paidDept();
+                },
+                child: detailsProfile("Paid Dept",Icons.calendar_month_outlined,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,paidDept)),//Last Time Purchase
             const SizedBox(height:5,),
             GestureDetector(
                 onTap: (){
@@ -373,6 +380,11 @@ spending() async{
 dept() async{
 
   Get.to(() =>const SetDeptPage());
+
+}
+paidDept() async{
+
+  Get.to(() =>const SetPaidDeptPage());
 
 }
 repay() async{

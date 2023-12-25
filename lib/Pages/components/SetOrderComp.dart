@@ -243,7 +243,7 @@ String OrderId="";
                                   children: [
 
                                     Icon(Icons.segment,color:Colors.orange,size:13,),
-                                    Text("Deliver:${_data[index]['totalQty']-_data[index]['totalCount']}"),
+                                    Text("Deliver:${num.parse(_data[index]['totalQty'])-num.parse(_data[index]['totalCount'])}"),
 
 
 
@@ -271,19 +271,23 @@ String OrderId="";
                            //print((await thisOrder())["result"]);
                            var resultData=(await thisOrder());
                            //print(resultData);
-                           if(resultData["status"]){
+                              if(resultData.length>0)
+                                {
+                                  if(resultData["status"]){
 
 
-                             setState(() {
-                               isLoading=false;
-                               thisListOrder.clear();
+                                    setState(() {
+                                      isLoading=false;
+                                      thisListOrder.clear();
 
-                               thisListOrder.addAll(resultData["result"]);
+                                      thisListOrder.addAll(resultData["result"]);
 
 
-                             });
-                             viewThisOrder();
-                           }
+                                    });
+                                    viewThisOrder();
+                                  }
+                                }
+
 
                               //
 
@@ -564,9 +568,9 @@ String OrderId="";
 
 
 
-                                                                    if(((Get.put(HideShowState()).delivery)[index]["totalQty"])>=(Get.put(HideShowState()).delivery)[index]["currentQty"])
+                                                                    if((num.parse((Get.put(HideShowState()).delivery)[index]["totalQty"]))>=(Get.put(HideShowState()).delivery)[index]["currentQty"])
                                                                     {
-                                                                      print((Get.put(HideShowState()).delivery)[index]["currentQty"]);
+                                                                     // print((Get.put(HideShowState()).delivery)[index]["currentQty"]);
 
 
 
@@ -608,7 +612,7 @@ String OrderId="";
                                                         ]
                                                     )
                                                 ),
-                                                Text("Deliver:${(((Get.put(HideShowState()).delivery)[index]["totalQty"])!=((Get.put(HideShowState()).delivery)[index]["totalCount"]))?(((Get.put(HideShowState()).delivery)[index]["totalQty"]-(Get.put(HideShowState()).delivery)[index]["totalCount"])):0}"),
+                                                Text("Deliver:${(((Get.put(HideShowState()).delivery)[index]["totalQty"])!=((Get.put(HideShowState()).delivery)[index]["totalCount"]))?((num.parse((Get.put(HideShowState()).delivery)[index]["totalQty"])-num.parse((Get.put(HideShowState()).delivery)[index]["totalCount"]))):0}"),
 
 
                                               ],
@@ -641,7 +645,7 @@ String OrderId="";
                                                   //await stockCount(index);
 
 
-                                                  num totCount=(((Get.put(HideShowState()).delivery)[index]["totalCount"]-(Get.put(HideShowState()).delivery)[index]["currentQty"])>=0)?(Get.put(HideShowState()).delivery)[index]["totalCount"]:0;
+                                                  num totCount=((num.parse((Get.put(HideShowState()).delivery)[index]["totalCount"])-(Get.put(HideShowState()).delivery)[index]["currentQty"])>=0)?num.parse((Get.put(HideShowState()).delivery)[index]["totalCount"]):0;
                                                   if(totCount>0)
                                                   {
                                                     var resultData=(await StockQuery().stockCount(Topups(uid:"${orderData[0]}"),QuickBonus(uid:"${productCode}",qty:"${(Get.put(HideShowState()).delivery)[index]["currentQty"]}",subscriber:"StockName",status:"status",description:"Delivered"), User(uid: "UidTransport",name:"refName"))).data;

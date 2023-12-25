@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'components/BottomNavigator/HomeNavigator.dart';
-import 'components/SetSpendingComp.dart';
+import 'components/SetPaidDeptComp.dart';
 import 'package:get/get.dart';
 
 
-class SetSpendingPage extends StatelessWidget {
-  const SetSpendingPage({Key? key}) : super(key: key);
+class SetPaidDeptPage extends StatelessWidget {
+  const SetPaidDeptPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -24,13 +24,13 @@ class SetSpendingPage extends StatelessWidget {
               //Get.toNamed('settings');
             },
           ),
-          title: Center(child:  Text("Spending",style:GoogleFonts.pacifico(fontSize:15,color: Colors.teal,fontWeight: FontWeight.w700)),
+          title: Center(child:  Text("Paid Dept",style:GoogleFonts.pacifico(fontSize:15,color: Colors.teal,fontWeight: FontWeight.w700)),
           ),
         ),
       ),
 
 
-      body:SetSpendingComp(),
+      body:SetPaidDeptComp(),
       bottomNavigationBar:HomeNavigator(),
 
 
