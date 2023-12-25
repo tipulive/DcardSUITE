@@ -638,13 +638,26 @@ Authorization: Bearer {{Auth_token}}
 
 ###Search productCode or productName  done or i may search both productCode and productName together
 ### either productCode equal none or productName equal none
+### when $productQr is available means Search By Qr
 GET  {{baseUrl}}/SearchProduct
 content-type: application/json;charset=UTF-8
 Authorization: Bearer {{Auth_token}}
 
 {
-"productCode":"b",
-"productName":"none"
+"productCode":"bido_1698592481",
+"productName":"none",
+"productQr":"n"
+
+
+}
+
+### printQrProduct
+GET  {{baseUrl}}/printQrProduct
+content-type: application/json;charset=UTF-8
+Authorization: Bearer {{Auth_token}}
+
+{
+"productCode":"webcam_1700726985"
 
 
 }
@@ -734,7 +747,7 @@ Authorization: Bearer {{Auth_token}}
 {
 "productCode":"bido_1698592481",
 "uidclient":"kebineericMuna_1674160265",
-"req_qty":4,
+"req_qty":7,
 "ref":"test",
 "comment":"ok",
 "statusForm":"none",
@@ -745,21 +758,22 @@ Authorization: Bearer {{Auth_token}}
 
 ###
 ###Edit temporary Order edit order done not allowed negative Value 100% tested and working perfect
-### req_qty must be number
-GET  {{baseUrl}}/EditOrder/
+### req_qty must be number,uid is orderId
+
+POST  {{baseUrl}}/EditTOrder/
 content-type: application/json;charset=UTF-8
 Authorization: Bearer {{Auth_token}}
 
 {
-"productCode":"webcam_1700726985",
-"req_qty":0,
-"uidclient":"kebineericMuna_1674160265",
-
-"uid":"OrderId_2S_1700747346",
+"productCode":"",
+"req_qty":7,
+"uid":"orderId",
+"uidclient":"useridClient",
 "statusForm":"editOrder"
 
 
 }
+
 
 ###delete Single temporary Order tested Done
 GET  {{baseUrl}}/deleteTSingleOrder/
@@ -779,7 +793,7 @@ Authorization: Bearer {{Auth_token}}
 
 {
 
-"uid":"0s"
+"uid":"UID_ES_1703103164"
 
 }
 
@@ -793,9 +807,9 @@ Authorization: Bearer {{Auth_token}}
 {
 "uid":"Nyota_1672353378",
 "uidUser":"kebineericMuna_1674160265",
-"OrderId":"UID_DX_1702452146",
-"inputData":"180",
-"all_total":"180",
+"OrderId":"UID_Cy_1703429917",
+"inputData":"100",
+"all_total":"350",
 "reach":"1200",
 "gain":"350",
 "systemUid":"PointSales1"
@@ -821,15 +835,13 @@ Authorization: Bearer {{Auth_token}}
 "orderId":"UID_49_1702463907"
 }
 ###Edit  OginalOrder this is very Important but done later
-GET  {{baseUrl}}/EditOGOrder/
+GET  {{baseUrl}}/EditOrder/
 content-type: application/json;charset=UTF-8
 Authorization: Bearer {{Auth_token}}
 
 {
-"productCode":"bido_1698592481",
-"req_qty":2,
-"current_qty":10,
-"uid":"KoBZ8"
+"uid":"UID_pK_1703144910"
+
 
 
 }

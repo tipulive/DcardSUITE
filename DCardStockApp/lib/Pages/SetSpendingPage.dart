@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'components/BottomNavigator/HomeNavigator.dart';
 import 'components/SetSpendingComp.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 

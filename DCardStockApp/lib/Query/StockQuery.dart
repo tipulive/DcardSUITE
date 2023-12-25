@@ -16,6 +16,63 @@ import '../models/QuickBonus.dart';
 
 
 class StockQuery extends GetxController{
+  Map<String, dynamic> userProfile=
+    {
+      /*"uid": "kebineericMuna_1674160265",
+      "name": "unknown",*/
+      "uid": "test",
+      "name": "testName",
+      "email": "on@gmail.com",
+      "phone": "782389359",
+      "Ccode": "+250",
+      "country": "Rwanda",
+      "initCountry": "none",
+      "PhoneNumber": "+250782389359",
+      "carduid": "TEALTD_7hEnj_1672352175"
+    }
+  ;
+  updateUserProfile(valData)
+  {
+    //userProfile.clear();
+    userProfile=valData;
+    update();
+  }
+ var dataSearch = [];
+ updatedataSearch(valdata)
+ {
+   dataSearch=valdata;
+   update();
+ }
+ var clientDebt = [
+   {
+     "debt":0,
+     "uidUser":"none",
+     "name":"none"
+   }
+ ];
+ updateClientDebt(valdata)
+ {
+   clientDebt=valdata;
+   update();
+ }
+ String textMessage="";
+ updateTextMessage(valData)
+ {
+   textMessage=valData;
+   update();
+ }
+ bool hideProductList=false;
+ updateHideProductList(valdata)
+ {
+   hideProductList=valdata;
+   update();
+ }
+ bool hideLoader=true;
+ updateHideLoader(valdata)
+ {
+   hideLoader=valdata;
+   update();
+ }
 
   dynamic dataCartui = {
     "id":1,
@@ -26,6 +83,7 @@ class StockQuery extends GetxController{
       }
     ],
   };
+
   dynamic order = {
     "status":false,
     "resultData":[
@@ -35,6 +93,7 @@ class StockQuery extends GetxController{
       }
     ],
   };
+
 
   updateOrder(orderVal){
     order = {
@@ -153,19 +212,20 @@ dynamic dataTest=[];
 
   }//not done Spending as depense
 
-  searchProduct(QuickBonus product,) async{
+  searchProduct(QuickBonus product) async{
     try {
 
       var params =  {
 
         "productCode":product.uid,
         "productName":product.productName,
+        "productQr":product.status
 
 
       };
 
       String authToken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
-      var url="http://10.0.2.2:8000/api/SearchProduct";
+      var url="${ConstantClassUtil.urlLink}/SearchProduct";
       var response = await Dio().get(url,
         options: Options(headers: {
           HttpHeaders.contentTypeHeader: "application/json",
@@ -178,7 +238,8 @@ dynamic dataTest=[];
 
 
 
-       return response;
+        return response;
+
 
 
       } else {
@@ -186,6 +247,7 @@ dynamic dataTest=[];
         //print(false);
       }
     } catch (e) {
+      print(e);
       //return false;
 
     }
@@ -237,14 +299,17 @@ dynamic dataTest=[];
       var params =  {
         "uidclient":user.uid,
         "productCode":product.uid,
-        "req_qty":product.qty,
+        "req_qty":num.parse("${product.qty}"),
+
         "ref":"test",
         "comment":"ok",
         "statusForm":"none",
         "orderIdFromEdit":product.subscriber //this is orderId
 
+
         //"options": [1,2,3],
       };
+
       String Authtoken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
       var url="${ConstantClassUtil.urlLink}/placeOrder";
       var response = await Dio().post(url,
@@ -403,7 +468,7 @@ dynamic dataTest=[];
 //optionCase
 
         "productCode":product.productName,
-        "req_qty":product.qty,
+        "req_qty":num.parse("${product.qty}"),
         "uid":product.uid,
         "uidclient":userData.uid,
         "statusForm":"editOrder"
@@ -637,17 +702,14 @@ dynamic dataTest=[];
 
     }
   }
-  getDebt(Topups topupData,User userData) async{//balance and Bonus Widthdraw History
+  getDebt(User userData) async{//balance and Bonus Widthdraw History
     try {
 
       var params =  {
 
-        "LimitStart":topupData.endlimit,  //page
-        "LimitEnd":topupData.startlimit,//limit
-        "uid":userData.uid,//userid
-        "optionCase":topupData.optionCase,//optionCase
 
-        "cardUid":"TEALTD_7hEnj_1672352175"
+        "cardUid":userData.carduid//userid
+
 
       };
 
@@ -939,21 +1001,18 @@ dynamic dataTest=[];
 
     }
   }
-  paidDept(Topups TopupData) async{
+  paidDept(User userData) async{
 
     try {
 
       var params =  {
-        "uid":TopupData.uid,//just to avoid error nothing else
-        "uidUser":TopupData.uidCreator,//uidUser
-        "balance":TopupData.amount,
-        "description":TopupData.desc,
 
-        "uidUser":"kebineericMuna_1674160265",
 
-        "inputData":"600",
+        "uidUser":userData.uid,
+
+        "inputData":userData.inputData,
         "all_total":"2000",
-        "ref":"Eric",
+        "ref":"none",
         "reach":"1200",
         "gain":"350",
         "systemUid":"PointSales1",

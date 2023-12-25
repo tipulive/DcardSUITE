@@ -105,6 +105,7 @@ Route::get('/CheckQuickBonus','CompanyController@CompanyPartCheckQuickBonus')->n
 Route::get('/GetSafaris','CompanyController@GetSafaris')->name('GetSafaris');
 Route::post('/CreateSafari','CompanyController@CreateSafari')->name('CreateSafari');
 Route::get('/EditSafari','CompanyController@EditSafari')->name('EditSafari');
+Route::get('/printQrProduct','CompanyController@printQrProduct')->name('printQrProduct');
 Route::get('/SearchProduct','CompanyController@SearchProduct')->name('SearchProduct');
 Route::post('/CreateStockProduct','CompanyController@CreateStockProduct')->name('CreateStockProduct');
 Route::post('/EditProductPrice','CompanyController@EditProductPrice')->name('EditProductPrice');
@@ -113,6 +114,7 @@ Route::post('/EditStockQty','CompanyController@EditStockQty')->name('EditStockQt
 Route::post('/EditStockFactPrice','CompanyController@EditStockFactPrice')->name('EditStockFactPrice');
 Route::post('/placeOrder','CompanyController@placeOrder')->name('placeOrder');
 Route::get('/EditTOrder','CompanyController@EditTOrder')->name('EditTOrder');
+Route::get('/EditOrder','CompanyController@EditOrder')->name('EditOrder');//Edit Original Order
 Route::get('/deleteTSingleOrder','CompanyController@deleteTSingleOrder')->name('deleteTSingleOrder');
 Route::get('/deleteTOrder','CompanyController@deleteTOrder')->name('deleteTOrder');
 Route::get('/ViewTempOrder','CompanyController@ViewTempOrder')->name('ViewTempOrder');

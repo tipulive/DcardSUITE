@@ -146,42 +146,111 @@ class StockController extends Controller
         }
     }
 
-    public function SearchProduct($input)
+    public function printQrProduct($input)
     {
-    $productName=strtolower($input["productName"]??'none');
+           //later more develop,in database i will add how to track if Qr Code product has been created or not
+           // to avoid twice Qr code image to be created,because admin may select more products and prints all using
+           //array of request product,product will have Name,pcs,and Image of Products ,dou zaine
 
-    $productCode=strtolower($input["productCode"]??'none');
-    list($queryData,$itemName) = ($productCode!='none') ? ['productCode','%' . $productCode. '%'] : ['productName','%' . $productName. '%'];
-
-
-        $check=DB::select("select *from products where subscriber=:subscriber and $queryData LIKE :itemName LIMIT 20",array(
-            "itemName"=>$itemName,
+          $isProductExist=DB::select("select pcs,productName,productCode,img_url,isQr from products where productCode=:productCode and subscriber=:subscriber",[
+            "productCode"=>$input["productCode"],
             "subscriber"=>Auth::user()->subscriber
 
-           ));
+          ]);
+          if($isProductExist)
+          {
+            if($isProductExist[0]->isQr)
+            {
+           //printQr images as PDF or save
+           echo "Qr Exist";
+            }
+            else{
+                DB::update("update products set isQr=:isQr where productCode=:productCode and subscriber=:subscriber limit 1",[
+                    "productCode"=>$input["productCode"],
+                    "subscriber"=>Auth::user()->subscriber,
+                    "isQr"=>true
+                ]);
+                $filename=Auth::user()->subscriber.""."_".$isProductExist[0]->productCode;
+                return \QrCode::size(500)
+                ->format('png')
+                //->merge('images/api.jpg', 0.5, true)
+                ->generate($isProductExist[0]->productCode, public_path("images/ProductsQr/".$filename.".png"));
+            }
 
-        if($check)
-        {
-           return response([
-               // "allinput"=>$input,
-               // "data2"=>$input["item"],
-               "status"=>true,
+          }
+          else{
 
-               "result"=>$check
 
-            ]);
+          }
 
-        }
-        else{
-           return response([
-               // "allinput"=>$input,
-               // "data2"=>$input["item"],
-               "status"=>false,
-               "result"=>$check
 
-            ]);
-        }
+
+
     }
+
+
+    public function SearchProduct($input)
+    {
+        try {
+            // Code...
+            $productName = strtolower($input["productName"] ?? 'none');
+            $productCode = strtolower($input["productCode"] ?? 'none');
+            $productQr = strtolower($input["productQr"] ?? 'none');
+
+            if ($productQr == 'none') {
+                list($queryData, $itemName) = ($productCode != 'none')
+                    ? (['productCode', '%' . $productCode . '%'])
+                    : (['productName', '%' . $productName . '%']);
+
+                $check = DB::select("select *from products where subscriber=:subscriber and $queryData LIKE :itemName LIMIT 20", array(
+                    "itemName" => $itemName,
+                    "subscriber" => Auth::user()->subscriber
+                ));
+
+                if ($check) {
+                    return response([
+                        "status" => true,
+                        "searchType" => "NotQr",
+                        "result" => $check
+                    ]);
+                } else {
+                    return response([
+                        "status" => false,
+                        "searchType" => "NotQr",
+                        "result" => $check
+                    ]);
+                }
+            } else {
+                $check = DB::select("select *from products where productCode=:itemName and subscriber=:subscriber LIMIT 1", array(
+                    "itemName" => $input['productCode'],
+                    "subscriber" => Auth::user()->subscriber
+                ));
+
+                if ($check) {
+                    return response([
+                        "status" => true,
+                        "searchType" => "Qr",
+                        "result" => $check
+                    ]);
+                } else {
+                    return response([
+                        "status" => false,
+                        "searchType" => "Qr",
+                        "result" => $check
+                    ]);
+                }
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'An error occurred',
+                'errorPrint' => $e->getMessage(),
+                'errorCode' => $e->getLine(),
+            ], 500);
+        }
+
+
+    }
+
     public function AddItem($input)//Add product in Product and SafariProduct too ,this require me to add transaction
     {
         //Ndakora check if product exist in products and in safariProducts mbere yo gushyiramo Products
@@ -371,7 +440,7 @@ class StockController extends Controller
                     'updated_at'=>$this->today
                     ));
 
-                    $check=DB::update("update safariProducts set qty=qty+:qty,updated_at=:updated_at where subscriber=:subscriber and safariId=:safariId and productCode=:productCode limit 1",array(
+                    $check=DB::update("update safariproducts set qty=qty+:qty,updated_at=:updated_at where subscriber=:subscriber and safariId=:safariId and productCode=:productCode limit 1",array(
                         "productCode"=>$input['productCode'],
                         "safariId"=>$input["safariId"],
                         "subscriber"=>Auth::user()->subscriber,
@@ -399,7 +468,7 @@ class StockController extends Controller
 
 
 
-        $check=DB::update("update safariProducts set fact_price=:fact_price,updated_at=:updated_at where subscriber=:subscriber and safariId=:safariId and productCode=:productCode  limit 1",array(
+        $check=DB::update("update safariproducts set fact_price=:fact_price,updated_at=:updated_at where subscriber=:subscriber and safariId=:safariId and productCode=:productCode  limit 1",array(
             "productCode"=>$input["productCode"],
             "safariId"=>$input["safariId"],
             "subscriber"=>Auth::user()->subscriber,
@@ -431,7 +500,7 @@ class StockController extends Controller
     public function DeleteItem($input)
     {
         $safariuid=$input["safariuid"];
-        $check=DB::delete("delete from safariProducts where safariuid=:safariuid limit 1",array(
+        $check=DB::delete("delete from safariproducts where safariuid=:safariuid limit 1",array(
 
             "safariuid"=>$safariuid
         ));
@@ -455,7 +524,7 @@ class StockController extends Controller
     public function EditProductsd($input) //Edit Item in Product and in StockProducts
     {
 
-        $check=DB::update("update safariProducts set uid=:uid,price=:price,SoldInterest=:SoldInterest,qty=:qty,pcs=:pcs,updated_at=:updated_at,comment=:comment where safariuid=:safariuid and id=:id limit 1",array(
+        $check=DB::update("update safariproducts set uid=:uid,price=:price,SoldInterest=:SoldInterest,qty=:qty,pcs=:pcs,updated_at=:updated_at,comment=:comment where safariuid=:safariuid and id=:id limit 1",array(
             "safariuid"=>$input["safariuid"],
              "id"=>$input["id"],
              "uid"=>$input["uid"],
@@ -543,10 +612,10 @@ class StockController extends Controller
             SUM(totQty) AS TotQty,
             SUM(SoldOut) AS QtySoldOut,
             SUM(TotSoldAmount - TotBuyAmount) AS interest
-        FROM safariProducts where safariId=:safariId limit 1000",array(
+        FROM safariproducts where safariId=:safariId limit 1000",array(
                 "safariId"=>$safariId
              ));
-             $displayData=DB::select("select * from safariProducts where safariId=:safariId limit 1000",array(
+             $displayData=DB::select("select * from safariproducts where safariId=:safariId limit 1000",array(
                  "safariId"=>$safariId
               ));
 
@@ -846,7 +915,7 @@ else{
                     END AS remaining,
                     @requested_qty := GREATEST(@requested_qty - qty, 0) AS updated_requested_qty
                 FROM
-                    safariProducts
+                safariproducts
                 WHERE
                     subscriber='$subscriber' and
                     productCode='$productCode' AND
@@ -891,13 +960,15 @@ else{
                 'safariId'=>$results[$i]->safariId,
                 "order_creator"=>Auth::user()->uid,
                 "subscriber"=>Auth::user()->subscriber,
-                'ProductCode'=>$productCode,
+                'productCode'=>$productCode,
                 'price'=>$product[0]->price,
                 'qty'=>$results[$i]->qty,
                 'qty_count'=>$results[$i]->qty,
                 'total'=>$results[$i]->qty*$product[0]->price,
                 'OrderData'=>json_encode([]),
                 'comment_count'=>json_encode([]),
+                "created_at"=>$this->today,
+                "updated_at"=>$this->today
 
 
                 // Add more rows here if needed
@@ -906,7 +977,7 @@ else{
             $SoldOut=$results[$i]->qty;
             $totAm=$SoldOut*$product[0]->price;
             $qtyData=abs($results[$i]->remaining);
-           DB::update("update safariProducts set qty=:qty,SoldOut=SoldOut+$SoldOut,TotSoldAmount=TotSoldAmount+$totAm where safariId=:safariId and productCode=:productCode and subscriber=:subscriber limit $limitData",array(
+           DB::update("update safariproducts set qty=:qty,SoldOut=SoldOut+$SoldOut,TotSoldAmount=TotSoldAmount+$totAm where safariId=:safariId and productCode=:productCode and subscriber=:subscriber limit $limitData",array(
            "qty"=>$qtyData,
            "subscriber"=>Auth::user()->subscriber,
            "safariId"=>$results[$i]->safariId,
@@ -977,7 +1048,7 @@ else{
                 // Add more rows here if needed
             ];*/
             //reset all
-           DB::update("update safariProducts set qty=qty+:qty,SoldOut=SoldOut-:SoldOut,TotSoldAmount=TotSoldAmount-:TotSoldAmout where safariId=:safariId and productCode=:productCode limit 100 ",array(
+           DB::update("update safariproducts set qty=qty+:qty,SoldOut=SoldOut-:SoldOut,TotSoldAmount=TotSoldAmount-:TotSoldAmout where safariId=:safariId and productCode=:productCode limit 100 ",array(
                    "qty"=>$results[$i]->qty,
                    "SoldOut"=>$results[$i]->qty,
                    "TotSoldAmout"=>$results[$i]->total,
@@ -1032,7 +1103,7 @@ WHERE
         $ids[]=$results[$i]->id;
         $orderId=$results[$i]->uid;
 
-       DB::update("update safariProducts set qty=qty+:qty,SoldOut=SoldOut-:SoldOut,TotSoldAmount=TotSoldAmount-:TotSoldAmout where safariId=:safariId and productCode=:productCode limit 100 ",array(
+       DB::update("update safariproducts set qty=qty+:qty,SoldOut=SoldOut-:SoldOut,TotSoldAmount=TotSoldAmount-:TotSoldAmout where safariId=:safariId and productCode=:productCode limit 100 ",array(
                "qty"=>$results[$i]->qty,
                "SoldOut"=>$results[$i]->qty,
                "TotSoldAmout"=>$results[$i]->total,
@@ -1083,8 +1154,14 @@ public function deleteTOrder($input){
     $results=DB::select("select *FROM
     orderhistories
 WHERE
-    uid='$uid' AND
-    subscriber='$subscriber'");
+    uid=:uid AND
+    paidStatus='none' AND
+    subscriber=:subscriber limit 200",
+    [
+       "uid"=>$uid,
+       "subscriber"=>$subscriber
+    ]
+);
 
 
     $data=[];
@@ -1100,7 +1177,7 @@ WHERE
         $orderId=$results[$i]->uid;
         $qty=$results[$i]->qty;
 
-       DB::update("update safariProducts set qty=qty+:qty,SoldOut=SoldOut-:SoldOut,TotSoldAmount=TotSoldAmount-:TotSoldAmout where safariId=:safariId and productCode=:productCode limit 100 ",array(
+       DB::update("update safariproducts set qty=qty+:qty,SoldOut=SoldOut-:SoldOut,TotSoldAmount=TotSoldAmount-:TotSoldAmout where safariId=:safariId and productCode=:productCode limit 100 ",array(
                "qty"=>$results[$i]->qty,
                "SoldOut"=>$results[$i]->qty,
                "TotSoldAmout"=>$results[$i]->total,
@@ -1134,14 +1211,198 @@ WHERE
 
 
 }
-public function EditOGOrder($input){
+public function EditOrder($input){
+
+    //Clone First
+    //deleteAll pending Order
+    //then create Backup of That orders edited
+    //reverse any promotion if existed
+    //then change Status
+    //When cloned must be visible to all admins to know that someone edited that rows
+    //Then superAdmin will only be able to remove that redwarning to order UID
+
+
+    try {
+
+        $check=DB::transaction(function () use ($input) {
+     //
+
+$actionStatus=($input["orderAction"])??"EditOrder";
+//dettes must be selected too
+$check1 = DB::select("
+    SELECT
+        ('$actionStatus') as orderAction,
+        ('$this->today') as updated_at,
+        (orders.debt) as orderDebt,
+        (orders.paidStatus) as orderPaidStatus,
+        (orders.promotionUid) as orderPromotionUid,
+        (orders.reach) as orderReach,
+        (orders.gain) as orderGain,
+        orderhistories.uid,
+        orderhistories.userid,
+        orderhistories.safariId,
+        orderhistories.order_creator,
+        orderhistories.subscriber,
+        orderhistories.productCode,
+        orderhistories.price,
+        orderhistories.qty,
+        orderhistories.qty_count,
+        orderhistories.OrderData,
+        orderhistories.comment_count,
+        orderhistories.clientId,
+        orderhistories.ref,
+        orderhistories.total,
+        orderhistories.all_total,
+        orderhistories.custom_price,
+        orderhistories.custom_total,
+        orderhistories.status,
+        orderhistories.paidStatus,
+        orderhistories.permission,
+        orderhistories.description,
+        orderhistories.order_created,
+        orderhistories.created_at,
+        orderhistories.promotionUid,
+        orderhistories.bonusType,
+        orderhistories.bonusValue,
+        orderhistories.giftId,
+        orderhistories.giftQty
+    FROM
+        orderhistories
+    INNER JOIN
+        orders ON orders.uid = orderhistories.uid
+    WHERE
+        orders.uid =:orderId
+        AND orders.uidCreator=:uidCreator
+        AND (orders.paidStatus='dettes' OR orders.paidStatus='paid' OR orders.paidStatus='paidReturn')
+", [
+    "orderId" => $input["uid"],
+    "uidCreator" => Auth::user()->uid
+]);
+
+
+if($check1)
+{
+    $this->deleteOGOrder($input);
+$dataInsert=array_map(function ($item) {
+   return (array) $item;
+}, $check1);
+$isBackup=DB::table("orderhistories_backup")
+   ->insert($dataInsert);
+   if($isBackup)
+   {
+     //reverse promotion orders here is missing
+     //Then delete orders orderUid,Then update orderHistories
+     $checkDB=DB::delete("delete from orders where uid=:uid limit 1",[
+       "uid"=>$input["uid"]
+     ]);
+     if($checkDB)
+     {
+        //just reset admin_records too dettes and submit
+        DB::update("update admnin_records set balance=balance-:balance,dettes=dettes-:dettes where uid=:uid and status='Sales' limit 1",[
+         "uid"=>Auth::user()->uid,
+        "balance"=>$check1[0]->all_total,
+         "dettes"=>$check1[0]->orderDebt
+        ]);
+       DB::update("update orderhistories set paidStatus='none' where uid=:uid",[
+           "uid"=>$input["uid"]
+       ]);
+     }
+
+   }
+}
+
+     //
+
+
+   });
+   return response([
+
+    "status"=>true,
+
+
+    "result"=>$check,
+    //"data"=>$data
+
+
+
+    ],200);
+
+       } catch (\Exception $e) {
+           return response()->json([
+               'error' => 'An error occurred',
+               'errorPrint' => $e->getMessage(),
+               'errorCode' => $e->getLine(),
+           ], 500);
+       }
 
 }
 
-    public function testCancelOrder(){
+public function deleteOGOrder($input){
 
 
-    }
+    // $current_qty=$input['current_qty'];
+     $uid=$input['uid'];
+     $subscriber=Auth::user()->subscriber;
+     $results=DB::select("select *FROM
+     orderhistories
+ WHERE
+     order_creator=:order_creator AND
+     paidStatus='none' AND
+     subscriber=:subscriber limit 200",
+     [
+        "order_creator"=>Auth::user()->uid,
+        "subscriber"=>$subscriber
+     ]
+ );
+
+
+     $data=[];
+     $ids=[];
+
+       $limitData=count($results);
+          $totalQty=0;
+     for($i=0;$i<$limitData;$i++)
+     {
+         $totalQty+=$results[$i]->qty;
+         $id=$results[$i]->id;
+         $ids[]=$results[$i]->id;
+         $orderId=$results[$i]->uid;
+         $qty=$results[$i]->qty;
+
+        DB::update("update safariproducts set qty=qty+:qty,SoldOut=SoldOut-:SoldOut,TotSoldAmount=TotSoldAmount-:TotSoldAmout where safariId=:safariId and productCode=:productCode limit 100 ",array(
+                "qty"=>$results[$i]->qty,
+                "SoldOut"=>$results[$i]->qty,
+                "TotSoldAmout"=>$results[$i]->total,
+                "safariId"=>$results[$i]->SafariId,
+                "productCode"=>$results[$i]->productCode
+
+         ));
+         DB::delete("delete from orderhistories where uid=:uid and productCode=:productCode limit 50",array(
+             "uid"=>$orderId,
+             "productCode"=>$results[$i]->productCode
+
+
+             ));
+
+             $checkProduct=DB::update("update products set qty_sold=qty_sold-$qty where subscriber=:subscriber and productCode=:productCode  limit 1",array(
+                 "productCode"=>$results[$i]->productCode,
+                 "subscriber"=>Auth::user()->subscriber
+              ));
+
+            if ($i == ($limitData-1)) {
+                 return response([
+                     "status"=>true,
+                     "result"=>$checkProduct,
+
+                 ],200);
+
+             }
+     }
+
+
+
+
+ }
 public function testSubmitOrder(){
 
     $check=DB::update("update users set  notify");
@@ -1233,7 +1494,7 @@ public function ViewUserTempOrder($input){//make sure order must not be more tha
                 AND orderhistories.subscriber = :subscriber
                 AND orderhistories.paidStatus='none'
             GROUP BY orderhistories.productCode order by orderhistories.id desc
-            LIMIT 25
+            LIMIT 100
         ", [
 
             'orderCreator' => Auth::user()->uid,
@@ -1286,7 +1547,7 @@ public function ViewUserTempOrder($input){//make sure order must not be more tha
 
     //stock Count//
 
-    public function ViewOrderDeliver($input){
+public function ViewOrderDeliver($input){
 
         $check=DB::select("SELECT oh.qty_count, s.sumqty AS mySumqty_count
         FROM orderhistories oh
@@ -1298,11 +1559,10 @@ public function ViewUserTempOrder($input){//make sure order must not be more tha
 
         ) AS s ON 1 = 1
         WHERE oh.uid = 'O4Pft' AND productCode='keb'");
+}
 
-    }
 
-
-    public function SubmitOrder($input){
+public function SubmitOrder($input){
         $check_InputData=$input['all_total']-$input['inputData'];//all_total :niyo total ya orders,custom_price or inputData=niyo client yishyuye cash
 
         if($input['all_total']>$input['inputData'])
@@ -1322,12 +1582,9 @@ public function ViewUserTempOrder($input){//make sure order must not be more tha
 //$check_InputData<=0?(new ParticipateController)->participate($input):$this->notparticipate();//means client azaba yishyuye yose nta deni afite
 
     }
+public function admin_record($input){
 
-    public function admin_record($input){
 
-        $uidCreator=Auth::user()->uid; //is the one who will pay money to client when he will withdraw
-        $subscriber=Auth::user()->subscriber;
-        $systemUid=$input['systemUid'];
         try{
 
 
@@ -1337,7 +1594,7 @@ public function ViewUserTempOrder($input){//make sure order must not be more tha
             $systemUid=$input['systemUid'];
 
     //
-    DB::update("update Orderhistories set
+    DB::update("update orderhistories set
 
     all_total=:all_total,custom_price=:custom_price,
     paidStatus ='checked'
@@ -1349,13 +1606,17 @@ public function ViewUserTempOrder($input){//make sure order must not be more tha
 
     ));
 
-    $paidStatus=($input['inputData']==$input['all_total'])?'paid':($input['inputData']>$input['all_total'])?'paidReturn':'dettes';
+    $paidStatus = ($input['inputData'] == $input['all_total']) ? 'paid' : (($input['inputData'] > $input['all_total']) ? 'paidReturn' : 'dettes');
+
     $json_array =  [
         [
         "uid"=>$input["OrderId"],//orderId
         "total"=>$input['all_total'],
         "paid"=>$input['inputData'],
         "debt"=>$input['all_total']-$input['inputData'],
+        "promotionUid"=>$input['uid'],
+        "reach"=>$input['reach'],
+        "gain"=>$input['gain'],
         "paidStatus"=>$paidStatus,
         "actionStatus"=>"Created",
         "systemUid"=>$systemUid,
@@ -1374,6 +1635,9 @@ public function ViewUserTempOrder($input){//make sure order must not be more tha
         "paid"=>$input['inputData'],
         "debt"=>$input['all_total']-$input['inputData'],
         "paidStatus"=>$paidStatus,
+        "promotionUid"=>$input['uid'],
+        "reach"=>$input['reach'],
+        "gain"=>$input['gain'],
         "systemUid"=>$systemUid,
         "uidUser"=>($input['uidUser']??$uidCreator),
         "uidCreator"=>$uidCreator,
@@ -1385,13 +1649,6 @@ public function ViewUserTempOrder($input){//make sure order must not be more tha
     ] );
 
 
-
-    /*$check=DB::select("select status from admnin_records where uid=:uid and systemUid=:systemUid limit 1",array(
-        "uid"=>$uidCreator,
-        "systemUid"=>$input['systemUid']
-       ));*/
-
-       //note I must add form vaildations to check if it is number
         $check=DB::update("update admnin_records set balance=balance+:balance,dettes=dettes+:dettes where uid=:uid and systemUid=:systemUid limit 1",array(
             "uid"=>$uidCreator,
             "systemUid"=>$input['systemUid'],
@@ -1415,23 +1672,8 @@ public function ViewUserTempOrder($input){//make sure order must not be more tha
             ]);
             return $dataInsert;
         }
+ });
 
-
-
-    //
-
-
-
-
-
-
-
-            });
-
-            // Execute the prepared statement
-
-
-            //DB::commit();// Use DB::unprepared for multi-statement queries
 
             return response([
 
@@ -1444,13 +1686,12 @@ public function ViewUserTempOrder($input){//make sure order must not be more tha
 
                 ],200);
 
-            // Code executed successfully, return a JSON response
-            //return response()->json(['message' => 'Data inserted successfully',"status"=>true], 200);
+
             } catch (\Exception $e) {
                 DB::rollback();
                // throw $e;
                 return response()->json(["status"=>false,'error' => 'An error occurred',
-            'errorPrint'=>$e->getMessage()], 500); // Return an error JSON response
+            'errorPrint'=>$e->getMessage(),"errorCode"=>$e->getLine()], 500); // Return an error JSON response
             }
 
     }

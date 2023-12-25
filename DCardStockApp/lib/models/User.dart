@@ -1,6 +1,7 @@
 class User {
   final int? id;
   final String uid;
+  final num? inputData;
   final String? carduid;
   final String? uidCreator;
   final String? gender;
@@ -17,6 +18,7 @@ class User {
   final String? subscriber;
   final String? country;
 
+
   final String? created_at;
   final String? updated_at;
 
@@ -24,6 +26,7 @@ class User {
   User({
     this.id,
     required this.uid,
+    this.inputData,
     this.carduid,
     this.uidCreator,
     this.gender,
@@ -48,6 +51,7 @@ class User {
   factory User.fromMap(Map<String, dynamic> json) => new User(
       id: json['id'],
       uid: json['uid'],
+      inputData: json['inputData'],
       carduid: json['carduid'],
       uidCreator: json['uidCreator'],
       gender: json['gender'],
