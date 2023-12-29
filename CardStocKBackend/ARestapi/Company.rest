@@ -2,7 +2,7 @@
 @email=company@gmail.com
 @PhoneNumber=+250782389359
 @password=1
-@Auth_token=403|tMpZq6lQVD38pW0E0GHpOaQCBYyjIeYjEnOnxxSc
+@Auth_token=422|Aljq67Y9Q90cnMZnhKvD927J1IWAfhlxSvO5sbhm
 
 ### Company Login with email
 POST  {{baseUrl}}/AdminLoginEmail/
@@ -74,6 +74,10 @@ Authorization: Bearer {{Auth_token}}
 "carduid":"TEALTD_lN7o8_1672352175"
 
 }
+### view all
+GET  {{baseUrl}}/AdminProductComeFrom
+content-type: application/json;charset=UTF-8
+Authorization: Bearer {{Auth_token}}
 ### view all
 GET  {{baseUrl}}/view
 content-type: application/json;charset=UTF-8
@@ -670,8 +674,8 @@ Authorization: Bearer {{Auth_token}}
 
 {
 "safariId":"Mbona_tbSwL_1697829219",
-"name":"Phone",
-"uid":"Uid",
+"name":"safariName",
+"uid":"SafariUid",
 "cat":"1",
 "catName":"China",
 "productName":"WebCam",
@@ -733,7 +737,7 @@ Authorization: Bearer {{Auth_token}}
 {
 "productCode":"veve_1697829456",
 "safariId":"veve_1697829456",
-"qty":"40"
+"price":"40"
 
 }
 
@@ -747,7 +751,7 @@ Authorization: Bearer {{Auth_token}}
 {
 "productCode":"bido_1698592481",
 "uidclient":"kebineericMuna_1674160265",
-"req_qty":7,
+"req_qty":5,
 "ref":"test",
 "comment":"ok",
 "statusForm":"none",
@@ -807,9 +811,9 @@ Authorization: Bearer {{Auth_token}}
 {
 "uid":"Nyota_1672353378",
 "uidUser":"kebineericMuna_1674160265",
-"OrderId":"UID_Cy_1703429917",
+"OrderId":"UID_vD_1703534924",
 "inputData":"100",
-"all_total":"350",
+"all_total":"150",
 "reach":"1200",
 "gain":"350",
 "systemUid":"PointSales1"
@@ -1032,7 +1036,7 @@ Authorization: Bearer {{Auth_token}}
 {
 
 }
-### not done but not by SystemUid
+### done but not by SystemUid
 
 GET  {{baseUrl}}/viewPaidDept
 Content-Type: application/json
@@ -1059,6 +1063,34 @@ Authorization: Bearer {{Auth_token}}
 {
 
 }
+
+### done uidReceiver is Admin Owner of Dept
+
+PoST  {{baseUrl}}/repaidBack
+Content-Type: application/json
+Authorization: Bearer {{Auth_token}}
+
+{
+"uidReceiver":"kebineericMuna_1668935525",
+"amount":100
+}
+
+### Confirm Payment
+GET  {{baseUrl}}/confirmRepaidBack
+Content-Type: application/json
+Authorization: Bearer {{Auth_token}}
+
+{
+
+"uid":"PID_SG_1703526591"
+
+
+
+
+}
+###
+
+
 ### not done
 
 GET  {{baseUrl}}/viewRepay
@@ -1119,7 +1151,7 @@ Authorization: Bearer {{Auth_token}}
 
 }
 
-###Add Depense  //General Depense Status GeneralSpend ,
+###Add Depense  //General Depense Status GeneralSpend ,option others means that not safarispending
 POST  {{baseUrl}}/addSpending
 content-type: application/json;charset=UTF-8
 Authorization: Bearer {{Auth_token}}
@@ -1127,9 +1159,13 @@ Authorization: Bearer {{Auth_token}}
 {
 "balance":"40",
 "status":"GeneralSpend",
-"purpose":"testViko",
+"safariId":"GeneralSpend",
+"safariName":"mbona",
+"purpose":"testVikok",
 "commentData":"testViko",
-"systemUid":"PointSales1"
+"systemUid":"PointSales1",
+"options":"pepe"
+
 }
 ###edit Spending not done must have temporary data
 POST  {{baseUrl}}/editSpending

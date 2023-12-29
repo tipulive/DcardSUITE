@@ -1,8 +1,8 @@
 @baseUrl = http://localhost:8000/api
 @email=kopa@gmail.com
-@PhoneNumber=+243978787877
+@PhoneNumber=ceke@gmail.com
 @password=1
-@Auth_token=407|5tMJ6kuQ0eTgsibMQuOCTLJFWpuKOx3FruGmW1S0
+@Auth_token=419|RvwedLDSkFY7TBnqdDPmbqtV9ZXqSUD5H9EmKbEl
 
 ### Company Login with email
 POST  {{baseUrl}}/AdminLoginEmail/
@@ -1030,8 +1030,30 @@ Authorization: Bearer {{Auth_token}}
 {
 
 }
-### not done
+### done and tested
+PoST  {{baseUrl}}/repaidBack
+Content-Type: application/json
+Authorization: Bearer {{Auth_token}}
 
+{
+"uidReceiver":"kebineericMuna_1668935525",
+"amount":10,
+"systemUid":"PointSales1",
+}
+### Confirm Payment
+GET  {{baseUrl}}/confirmRepaidBack
+Content-Type: application/json
+Authorization: Bearer {{Auth_token}}
+
+{
+
+"uid":"PID_SG_1703526591"
+
+
+
+
+}
+###
 GET  {{baseUrl}}/viewRepay
 Content-Type: application/json
 Authorization: Bearer {{Auth_token}}

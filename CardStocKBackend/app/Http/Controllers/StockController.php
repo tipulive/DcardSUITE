@@ -352,6 +352,11 @@ class StockController extends Controller
     }
     public function createInStockProduct($input,$productCode)//everything related in That Stock
     {
+        $stockInterest=$input['safariId']."_"."int";//interest
+            $stockDisplay=$input['safariId']."_"."dis";//display Stock
+
+            Cache::put($stockInterest,'',now()->addMinutes(0));//Reset
+            Cache::put($stockDisplay,'',now()->addMinutes(0));//Reset
 
           try {
             //code...
@@ -363,13 +368,15 @@ class StockController extends Controller
                 "price"=>$input["fact_price"],
                 "qty"=>$input["qty"],
                 "totQty"=>$input["qty"],
+                "TotSoldAmount"=>$input["TotSoldAmount"]??"0",
                 "TotBuyAmount"=>$input["qty"]*$input["fact_price"],
                 "status"=>$input["status"]??"none",
                 "CommentStatus"=>$input["CommentStatus"]??"none",
 
                 "uidCreator"=>Auth::user()->uid,
                 "subscriber"=>Auth::user()->subscriber,
-                "created_at"=>$this->today
+                "created_at"=>$this->today,
+                "updated_at"=>$this->today
             ]);
             if($check)
             {
@@ -431,25 +438,74 @@ class StockController extends Controller
 
 
         try {
-            $check=DB::transaction(function () use ($input) {//
+            $checkDB=DB::transaction(function () use ($input) {//
+                $stockInterest=$input['safariId']."_"."int";//interest
+                $stockDisplay=$input['safariId']."_"."dis";//display Stock
 
-                $checkDB=DB::update("update products set qty=qty+:qty,updated_at=:updated_at where productCode=:productCode and subscriber=:subscriber limit 1",array(
-                    'productCode'=>$input['productCode'],//product id
-                    'qty'=>$qty,
-                    "subscriber"=>Auth::user()->subscriber,
-                    'updated_at'=>$this->today
-                    ));
+                Cache::forget($stockInterest);
+                Cache::forget($stockDisplay);
+                $checkTotQty=DB::select("select productCode,totQty,TotSoldAmount from safariproducts where safariId=:safariId and productCode=:productCode limit 1",[
+                    "productCode"=>$input['productCode'],
+                    "safariId"=>$input["safariId"],
+                ]);
+                if($checkTotQty)
+                {
 
-                    $check=DB::update("update safariproducts set qty=qty+:qty,updated_at=:updated_at where subscriber=:subscriber and safariId=:safariId and productCode=:productCode limit 1",array(
-                        "productCode"=>$input['productCode'],
-                        "safariId"=>$input["safariId"],
-                        "subscriber"=>Auth::user()->subscriber,
-                         "price"=>$input["price"],
+                    if($checkTotQty[0]->TotSoldAmount==='0')
+                    {
+                        $check1=DB::update("update products set qty=(qty-:prevQty)+:qty,updated_at=:updated_at where productCode=:productCode and subscriber=:subscriber limit 1",array(
+                            'productCode'=>$input['productCode'],//product id
+                            'qty'=>$input["qty"],
+                            'prevQty'=>$checkTotQty[0]->totQty,
+                            "subscriber"=>Auth::user()->subscriber,
+                            'updated_at'=>$this->today
+                            ));
 
 
-                         "updated_at"=>$this->today
-                    ));
+                            $check = DB::update("
+                            UPDATE safariproducts
+                            SET
+                                totQty = :totQty,
+                                TotBuyAmount = price * :QtyCh,
+                                updated_at = :updated_at
+                            WHERE
+                                subscriber = :subscriber
+                                AND safariId = :safariId
+                                AND productCode = :productCode
+                            LIMIT 1",
+                            [
+                                "productCode" => $input['productCode'],
+                                "safariId" => $input["safariId"],
+                                "subscriber" => Auth::user()->subscriber,
+                                "totQty" =>$input["qty"],
+                                "QtyCh" =>$input["qty"],
+                                "updated_at" => $this->today
+                            ]
+                        );
+                        return array(
+                            "status"=>true,
+                            "datacount"=>"resulr"
+                         );
+
+                    }
+                    else{
+                        return array(
+                            "status"=>false,
+
+                         );
+                    }
+
+
+
+                }
+
+
+
+
             });
+
+                return response($checkDB,200);
+
 
 
         } catch (\Exception $e) {
@@ -465,35 +521,59 @@ class StockController extends Controller
 
     public function EditStockFactPrice($input) //Edit Stock Factories price tempTable is missing
     {
+        $stockInterest=$input['safariId']."_"."int";//interest
+        $stockDisplay=$input['safariId']."_"."dis";//display Stock
 
-
-
-        $check=DB::update("update safariproducts set fact_price=:fact_price,updated_at=:updated_at where subscriber=:subscriber and safariId=:safariId and productCode=:productCode  limit 1",array(
-            "productCode"=>$input["productCode"],
+        Cache::forget($stockInterest);
+        Cache::forget($stockDisplay);
+        $checkTotQty=DB::select("select productCode,totQty,TotSoldAmount from safariproducts where safariId=:safariId and productCode=:productCode limit 1",[
+            "productCode"=>$input['productCode'],
             "safariId"=>$input["safariId"],
-            "subscriber"=>Auth::user()->subscriber,
-             "price"=>$input["price"],
-
-
-             "updated_at"=>$this->today
-        ));
-        if($check)
+        ]);
+        if($checkTotQty)
         {
-            return response([
-                "status"=>true,
-                "safariuid"=>$input["safariId"],
-               // "name"=>$input["SafariName"]
 
-            ],200);
+            if($checkTotQty[0]->TotSoldAmount==='0')
+            {
+                $check=DB::update("update safariproducts set price=:price,TotBuyAmount=totQty*:currentPrize,updated_at=:updated_at where subscriber=:subscriber and safariId=:safariId and productCode=:productCode  limit 1",array(
+                    "productCode"=>$input["productCode"],
+                    "safariId"=>$input["safariId"],
+                    "subscriber"=>Auth::user()->subscriber,
+                     "price"=>$input["price"],
+                     "currentPrize"=>$input["price"],
 
+
+                     "updated_at"=>$this->today
+                ));
+                if($check)
+                {
+                    return response([
+                        "status"=>true,
+                        "safariuid"=>$input["safariId"],
+                       // "name"=>$input["SafariName"]
+
+                    ],200);
+
+                }
+                else{
+                 return response([
+                     "status"=>false,
+                     "result"=>$check,
+
+                 ],201);
+                }
+            }
+            else{
+                return response([
+                    "status"=>false,
+                    "result"=>"none",
+
+                ],201);
+               }
         }
-        else{
-         return response([
-             "status"=>false,
-             "result"=>$check,
 
-         ],201);
-        }
+
+
     }
 
 
@@ -615,14 +695,14 @@ class StockController extends Controller
         FROM safariproducts where safariId=:safariId limit 1000",array(
                 "safariId"=>$safariId
              ));
-             $displayData=DB::select("select * from safariproducts where safariId=:safariId limit 1000",array(
+             $displayData=DB::select("select * from safariproducts where safariId=:safariId order by updated_at desc limit 1000 ",array(
                  "safariId"=>$safariId
               ));
 
 
 
-             Cache::put($stockInterest,$interest,now()->addMinutes(60));
-             Cache::put($stockDisplay,$displayData,now()->addMinutes(60));
+             Cache::put($stockInterest,$interest,now()->addMinutes(7200));
+             Cache::put($stockDisplay,$displayData,now()->addMinutes(7200));
         }
       }
     public function calculateAll($input){
@@ -1700,7 +1780,7 @@ public function admin_record($input){
         SELECT
             Max(orders.uid) as OrderId,
             MAX(users.name) AS name,
-            SUM(admnin_records.balance) AS saleBalance,
+            Max(admnin_records.balance) AS saleBalance,
             MAX(orders.total) AS totalPaid,
             MAX(orders.paidStatus) as paidStatus
         FROM orders
@@ -1986,6 +2066,7 @@ public function admin_record($input){
                  "uidReceiver"=>$data[$i]->uidCreator,//owner of dettes
                  "uidCreator"=>$uidCreator,//who received amount as admin
                  "amount"=>$paidAmount,//amount
+                 "safeAmount"=>$paidAmount,//amount
                  "paidStatus"=>(($data[$i]->uidCreator==$uidCreator?'paidReceived':'PaidAdminNotReceived')),//
                  "temporalData"=>json_encode($json_array),
                  "systemUid"=>$data[$i]->systemUid,
@@ -2054,7 +2135,7 @@ public function admin_record($input){
 
         });
 
-        return response()->json(['message' => 'Payment Received',"data"=>$check], 200);
+        return response()->json(['status'=>true,'message' => 'Payment Received',"data"=>$check], 200);
 
             } catch (\Exception $e) {
                      DB::rollback();
@@ -2071,7 +2152,7 @@ public function admin_record($input){
         SELECT
             Max(orders.uid) as OrderId,
             MAX(users.name) AS name,
-            SUM(admnin_records.dettes) AS totDept,
+            Max(admnin_records.dettes) AS totDept,
             MAX(orders.debt) AS debt
         FROM orders
         INNER JOIN admnin_records ON orders.uidCreator =admnin_records.uid
@@ -2109,12 +2190,13 @@ public function admin_record($input){
     }
 
     }
-    public function viewPaidDept($input){//not done
+    public function viewPaidDept($input){//view Paid means is to view all whether owner received or not
         $check = DB::select("
         SELECT
             Max(paid_dettes.uid) as OrderId,
             MAX(users.name) AS name,
-            SUM(admnin_records.safeBalance) AS safeBalance,
+            Max(admnin_records.safeBalance) AS safeBalance,
+            Max(admnin_records.dettes) AS totalDebt,
             MAX(paid_dettes.amount) AS amount,
             MAX(admins.name) AS Recipient,
             MAX(paid_dettes.paidStatus) as paidStatus
@@ -2158,10 +2240,10 @@ public function admin_record($input){
     public function viewSafeBalance($input){//to check admin who received my Amount
         $check = DB::select("
         SELECT
-            Max(paid_dettes.uid) as OrderId,
+            Max(paid_dettes.uidCreator) as recipientId,
             MAX(users.name) AS name,
-            SUM(admnin_records.safeBalance) AS safeBalance,
-            MAX(paid_dettes.amount) AS amount,
+            Max(admnin_records.safeBalance) AS safeBalance,
+            sum(paid_dettes.safeAmount) AS amount,
             MAX(admins.name) AS Recipient,
             MAX(paid_dettes.paidStatus) as paidStatus
         FROM paid_dettes
@@ -2169,18 +2251,21 @@ public function admin_record($input){
         INNER JOIN users ON paid_dettes.uidUser = users.uid
         INNER JOIN admins ON paid_dettes.uidCreator = admins.uid
         WHERE paid_dettes.subscriber =:subscriber
+            AND paid_dettes.safeAmount>0
             AND paid_dettes.uidReceiver=:uidReceiver
             AND admnin_records.status='Sales'
             AND admnin_records.subscriber=:adminSubscriber
             AND paid_dettes.paidStatus='PaidAdminNotReceived'
-            GROUP BY paid_dettes.id
+
+            GROUP BY paid_dettes.uidCreator
             ORDER BY paid_dettes.id DESC
 
-        LIMIT 100
+
     ", [
         'subscriber'=>Auth::user()->subscriber,
         'adminSubscriber'=>Auth::user()->subscriber,
         'uidReceiver'=>Auth::user()->uid,
+
     ]);
 
     if($check)
@@ -2189,6 +2274,7 @@ public function admin_record($input){
        return response([
            "status"=>true,
            "result"=>$check,
+           "uid"=>Auth::user()->uid
 
        ],200);
     }
@@ -2203,10 +2289,10 @@ public function admin_record($input){
     public function viewBorrowBalance($input){ //to check Money of Others I am having
         $check = DB::select("
         SELECT
-            Max(paid_dettes.uid) as OrderId,
+        Max(paid_dettes.uidReceiver) as OwnerDept,
             MAX(users.name) AS name,
-            SUM(admnin_records.borrowBalance) AS borrowBalance,
-            MAX(paid_dettes.amount) AS amount,
+            Max(admnin_records.borrowBalance) AS borrowBalance,
+            sum(paid_dettes.safeAmount) AS amount,
             MAX(admins.name) AS AmountOwner,
             MAX(paid_dettes.paidStatus) as paidStatus
         FROM paid_dettes
@@ -2214,18 +2300,19 @@ public function admin_record($input){
         INNER JOIN users ON paid_dettes.uidUser = users.uid
         INNER JOIN admins ON paid_dettes.uidReceiver = admins.uid
         WHERE paid_dettes.subscriber =:subscriber
+           AND paid_dettes.safeAmount>0
             AND paid_dettes.uidCreator=:uidCreator
             AND admnin_records.status='Sales'
             AND admnin_records.subscriber=:adminSubscriber
             AND paid_dettes.paidStatus='PaidAdminNotReceived'
-            GROUP BY paid_dettes.id
+            GROUP BY paid_dettes.uidReceiver
             ORDER BY paid_dettes.id DESC
 
-        LIMIT 100
+
     ", [
         'subscriber'=>Auth::user()->subscriber,
         'adminSubscriber'=>Auth::user()->subscriber,
-        'uidCreator'=>Auth::user()->uid,
+        'uidCreator'=>Auth::user()->uid
     ]);
     if($check)
     {
@@ -2233,6 +2320,7 @@ public function admin_record($input){
        return response([
            "status"=>true,
            "result"=>$check,
+           "uid"=>Auth::user()->uid
 
        ],200);
     }
@@ -2244,9 +2332,7 @@ public function admin_record($input){
        ],200);
     }
     }
-    public function viewRepay($input){
 
-    }
 
     public function OrderViewCount($input){
         try {
@@ -2495,32 +2581,163 @@ return $results;
     //stock Count//
 
 
-    public function repaidUser($input){
+    public function repaidBack($input){//Admin Paid Another Admin because he has received amount that is not his Amount
 
-        DB::table("repaid_users")
-        ->insert([
-            "uid"=>$uid,//uid of paid
-            "uidPaid"=>$input['uidPaid'],
-            "amount"=>$input['amount'],
-            "status"=>$input['status'],
-            "signature"=>$input['signature']??'none',
-            "purpose"=>$input['purpose'],
-            "commentData"=>$input['commentData'],
-            "created_at"=>$this->today
+        try{
 
-        ]);
+            $checkData=DB::transaction(function () use ($input) {
+            $amount=$input['amount'];
+        DB::select("SET @requested_qty=?",[$amount]);
+        $data=DB::select("SELECT
+        id,
+        uid,
+        safeAmount AS prevSafeAmount,
+        uidReceiver,
+        uidCreator,
+        systemUid,
+        CASE
+            WHEN @requested_qty >=safeAmount THEN  safeAmount
+            ELSE @requested_qty
+        END AS safeAmount,
+        CASE
+            WHEN @requested_qty >= safeAmount THEN 0
+            ELSE @requested_qty - safeAmount
+        END AS remaining,
+        CASE
+            WHEN @requested_qty >=safeAmount THEN 'paidReceived'
+            ELSE 'PaidAdminNotReceived'
+        END AS new_status,
+
+
+        @requested_qty := GREATEST(@requested_qty-safeAmount, 0) AS updated_requested_qty
+
+    FROM
+        paid_dettes
+    WHERE
+    uidCreator=:uidCreator AND
+    uidReceiver=:uidReceiver AND
+       subscriber=:subscriber AND
+       paidStatus='PaidAdminNotReceived' AND
+
+        safeAmount != 0 AND
+        @requested_qty > 0
+    ORDER BY
+        id",array(
+           "uidCreator"=>Auth::user()->uid,
+           "uidReceiver"=>$input['uidReceiver'],
+           "subscriber"=>Auth::user()->subscriber
+        ));
+        if($data)
+        {
+            $uid="PID"."_".Str::random(2).""."_".date(time());
+            $check1=DB::table("repaid_users")
+            ->insert([
+                "uid"=>$uid,//uid of paid
+                "uidPaid"=>Auth::user()->uid,//who paid borrower(ni Admin uri kwishyura ideni)
+                "uidReceiver"=>$input['uidReceiver'],//Owner of Debt
+                "subscriber"=>Auth::user()->subscriber,
+                "amount"=>$input['amount'],
+                "systemUid"=>$input['systemUid'],
+                "status"=>'Paid',
+                "purpose"=>$input['purpose']??'none',
+                "commentData"=>$input['commentData']??'none',
+                "created_at"=>$this->today
+
+            ]);
+            if($check1)
+            {
+                DB::update("update admnin_records set borrowBalance=borrowBalance-:amount where uid=:uid and status='Sales' limit 1",[
+                    "uid"=>Auth::user()->uid,
+                    "amount"=>$input['amount'],
+
+                   ]);
+                   DB::update("update admnin_records set safeBalance=safeBalance-:amount where uid=:uid and status='Sales' limit 1",[
+                    "uid"=>$input['uidReceiver'],
+                    "amount"=>$input['amount'],
+
+                   ]);
+                   $dataLimit=count($data);
+                   for($i=0;$i<$dataLimit;$i++)
+                   {
+                    $debtRemain=abs($data[$i]->remaining);
+                    $id=$data[$i]->id;
+                    $status=$data[$i]->new_status;
+
+                    DB::update("UPDATE paid_dettes
+                    SET safeAmount = :debtRemain,
+                        paidStatus = :status
+                    WHERE id = :id
+                        AND subscriber = :subscriber
+                    LIMIT :limitData",
+                    [
+                        "debtRemain"=>$debtRemain,
+                        "status"=>$status,
+                        "id"=>$id,
+                        "subscriber"=>Auth::user()->subscriber,
+                        "limitData"=>$dataLimit,
+                    ]
+       );
+                   }
+
+
+            }
+
+        }
+        else{
+
+        }
+
+
+        });
+
+        return response()->json(['status'=>true,'message' => 'Payment Received',"result"=>$checkData], 200);
+
+            } catch (\Exception $e) {
+                     DB::rollback();
+                    // throw $e;
+                     return response()->json(['error' => 'An error occurred',
+                 'errorPrint'=>$e->getMessage(),"errorCode"=>$e->getLine()], 500); // Return an error JSON response
+                 }
+
     }
-    public function ConfirmRepaidUser($input){
+    public function confirmRepaidBack($input){
 
-       DB::update("update repaid_users set uidReceiver=:uidReceiver,status=:status,updated_at=:updated_at where uid=:uid limit 1",array(
-        "uid"=>$input['uid'],
-        "status"=>$input["status"],
+        $check=DB::update("update repaid_users set status=:status,receiverComment=:receiverComment,signature=:signature,updated_at=:updated_at where uid=:uid and uidReceiver=:uidReceiver and subscriber=:subscriber limit 1",array(
+        "uid"=>$input['uid'],//paid ID
+        "subscriber"=>Auth::user()->subscriber,
+        "status"=>"PaidReceived",
         "uidReceiver"=>Auth::user()->uid,
+        "signature"=>$input['signature']??'1',
+        "receiverComment"=>$input['receiverComment']??'Received',
         "updated_at"=>$this->today,
        ));
-    }
+       if($check){
+        return response([
+            "status"=>true,
+            "message"=>"Received this Amount"
+             ],200);
+     }
+     else{
+        return response([
+            "status"=>false,
+            "message"=>"Something Wrong "
+             ],200);
+     }
 
+    }
+    public function viewRepay($input){
+
+    }
     public function addSpending($input){
+        if(strtolower($input["options"])=='others')
+        {
+            return $this->add_OtherSpending($input);
+        }
+        else{
+            return $this->add_SafariSpending($input);
+        }
+    }
+    public function add_OtherSpending($input){
 
         try{
 
@@ -2686,7 +2903,7 @@ return $results;
             Max(depenses.uid) as spendId,
             MAX(depenses.purpose) AS purpose,
             MAX(depenses.commentData) AS commentData,
-            SUM(admnin_records.balance) AS totSpending,
+            Max(admnin_records.balance) AS totSpending,
             MAX(depenses.amount) AS spending
 
         FROM depenses
@@ -2724,6 +2941,132 @@ return $results;
     }
     }
 
+    public function add_SafariSpending($input){
+
+        try{
+
+
+        $check=DB::transaction(function () use ($input) {
+            $stockInterest=$input['safariId']."_"."int";//interest
+            $stockDisplay=$input['safariId']."_"."dis";//display Stock
+
+            Cache::put($stockInterest,'',now()->addMinutes(0));//Reset
+            Cache::put($stockDisplay,'',now()->addMinutes(0));//Reset
+            $uidUser=Auth::user()->uid;
+
+            $uid="SAFID"."_".Str::random(2).""."_".date(time());//SUID means Spend UID
+            $check5=DB::table("depenses")
+            ->insert([
+                "uid"=>$uid,
+                "safariId"=>$input['safariId'],
+                "uidUser"=>$input['uidUser']??Auth::user()->uid,
+                "amount"=>$input['balance'],
+                "uidCreator"=>Auth::user()->uid,
+
+                "status"=>"spendSafaris",
+                "systemUid"=>$input["systemUid"]??'PointSales1',
+                "subscriber"=>Auth::user()->subscriber,
+
+                "purpose"=>$input['purpose']??'none',
+                "commentData"=>$input['commentData']??'none',
+                "created_at"=>$this->today
+
+            ]);
+
+        if($check5){
+
+           $check1=DB::update("update admnin_records set balance=balance+:balance where uid=:uid and status=:status and subscriber=:subscriber and systemUid=:systemUid limit 1",array(
+            "balance"=>$input['balance'],
+            "uid"=>$uidUser,
+            "status"=>"GeneralSpend",
+
+            "systemUid"=>$input["systemUid"]??'PointSales1',
+            "subscriber"=>Auth::user()->subscriber
+           ));
+
+           if($check1){
+
+           $check2=DB::update("update safariproducts set TotBuyAmount=TotBuyAmount+:TotBuyAmount,updated_at=:updated_at where safariId=:safariId and status='spendSafaris' and subscriber=:subscriber limit 1",[
+            "TotBuyAmount"=>$input['balance'],
+            "updated_at"=>$this->today,
+            "safariId"=>$input['safariId'],
+            "subscriber"=>Auth::user()->subscriber
+           ]);
+
+           if($check2){
+            return array(
+                "status"=>true,
+                "safariuid"=>$input["safariId"],
+                "safariName"=>$input["safariName"]
+            );
+           }
+           else{
+            $check3=DB::table("safariproducts")
+            ->insert([
+                "safariId"=>$input["safariId"],
+                "productCode"=>$uid,//(it may be productCode or uid of spending)
+                "price"=>"0",
+                "qty"=>"0",
+                "totQty"=>"0",
+                "TotSoldAmount"=>"0",
+                "TotBuyAmount"=>$input['balance'],
+                "status"=>"spendSafaris",
+                "CommentStatus"=>"SafariSpending",
+
+                "uidCreator"=>Auth::user()->uid,
+                "subscriber"=>Auth::user()->subscriber,
+                "created_at"=>$this->today,
+                "updated_at"=>$this->today
+            ]);
+            if($check3)
+            {
+
+                 return array(
+                    "status"=>true,
+                    "safariuid"=>$input["safariId"],
+                    "safariName"=>$input["safariName"]
+                );
+            }
+           }
+
+           }
+           else{
+            DB::table("admnin_records")
+            ->insert(
+                [
+                    "uid"=>Auth::user()->uid,
+                    "systemUid"=>$input["systemUid"],
+                    "status"=>$input["status"],
+                    "balance"=>$input['balance'],
+                    "created_at"=>$this->today
+                ]
+                );
+
+           }
+           return array(
+            "status"=>true,
+            "message"=>"Finish add New admnin_records"
+        );
+         }
+         else{
+           return array(
+               "message"=>"Something went Wrong"
+           );
+         }
+        //
+    });
+
+
+    return response($check,200);
+
+
+                } catch (\Exception $e) {
+                    DB::rollback();
+                   // throw $e;
+                    return response()->json(['error' => 'An error occurred',
+                'errorPrint'=>$e->getMessage()], 500); // Return an error JSON response
+                }
+    }
 
 
     //workers Code  Not to avoid slow app when view Worker it is where it may calculate everything

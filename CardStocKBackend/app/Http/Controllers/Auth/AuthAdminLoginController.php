@@ -40,7 +40,7 @@ class AuthAdminLoginController extends Controller
             $user=auth::guard('Admin')->user();
             $success['token']=$user->createToken('MyApp')->plainTextToken;
             $success['name']=$user->email;
-
+            $this->createAdmin_record();
             return response([
                 "status"=>true,
                // "result"=>Auth::guard('Admin')->user(),
@@ -174,7 +174,7 @@ class AuthAdminLoginController extends Controller
             $user=auth::guard('Admin')->user();
             $success['token']=$user->createToken('MyApp')->plainTextToken;
             $success['name']=$user->email;
-
+            $this->createAdmin_record();
             return response([
                 "status"=>true,
                // "result"=>Auth::guard('Admin')->user(),

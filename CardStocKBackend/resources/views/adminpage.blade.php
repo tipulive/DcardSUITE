@@ -1254,10 +1254,10 @@ $('.MyRequest_table').html("");
 
 
 }
-function autoCompleteQuickBonus(thisdata)
+function autoCompleteStock(thisdata)
 {
-    $('.autocompleteIcon').html(`<i class="fas fa-exclamation-triangle text-danger">`);
-        //
+    $('.autocompleteIcon').html(`<i class="fas fa-exclamation-triangle text-danger onclick="hidePopup()"></i>`);
+    //
         if(thisdata.value=="") return EmptyautoCompleteTopItem();
 //
 
@@ -1265,12 +1265,16 @@ var Usertoken=localStorage.getItem("Usertoken");
    //search products
    $.ajax({
 
-url:`https://stock.appdev.live/api/viewSearchAllStock`,
+url:`./api/SearchProduct`,
 type:'get',
 headers: {
         "Content-Type": "application/json;charset=UTF-8",
         //"Authorization": `Bearer ${Usertoken}`
     },
+    headers: {
+    "Content-Type": "application/json;charset=UTF-8",
+    "Authorization": `Bearer ${Usertoken}`
+},
 data:{
     productCode:thisdata.value,
 },
@@ -1285,7 +1289,7 @@ var data=data.result;
      console.log(data);
 
     getdata+=`
-    <li class="list-group-item d-flex justify-content-between align-items-center mylogout myhover" onclick="return addItemQuickBonus('${data[i].productCode}','${data[i].price}')">
+    <li class="list-group-item d-flex justify-content-between align-items-center mylogout myhover" onclick="return addItemStock('${data[i].productCode}','${data[i].price}')">
     ${data[i].productCode}=>${data[i].tags}
     <span class="badge "></span>
   </li>
@@ -1298,8 +1302,87 @@ var data=data.result;
 
 
 
+
+
+
 }
 else{
+    isAvailable=true;
+    $('.productCodePopup').val("0");
+    $('.isProductExist').hide();
+    $('.isProductNotExist').show();
+    /*$('.autoCompleteTopItem').html("");
+    $('.autoCompleteTopItem').hide();*/
+    EmptyautoCompleteTopItem();
+}
+
+
+
+},
+error:function(data){
+//alert("errors occured please retry this process again or contact system Admin");
+//window.location.href = "./login";
+}
+});
+    return false;
+}
+function autoCompleteSpendPurpose(thisdata)
+{
+    $('.autocompleteIcon').html(`<i class="fas fa-exclamation-triangle text-danger onclick="hidePopup()"></i>`);
+    //
+        if(thisdata.value=="") return EmptyautoCompleteTopItem();
+//
+
+var Usertoken=localStorage.getItem("Usertoken");
+   //search products
+   $.ajax({
+
+url:`./api/searchSpendPurpose`,
+type:'get',
+headers: {
+        "Content-Type": "application/json;charset=UTF-8",
+        //"Authorization": `Bearer ${Usertoken}`
+    },
+    headers: {
+    "Content-Type": "application/json;charset=UTF-8",
+    "Authorization": `Bearer ${Usertoken}`
+},
+data:{
+    purpose:thisdata.value,
+},
+success:function(data){
+if(data.status){//return data as true
+
+    $('.autoCompleteTopItem').show();
+
+var data=data.result;
+ var getdata="";
+ for(var i=0;i<data.length;i++){
+     console.log(data);
+
+    getdata+=`
+    <li class="list-group-item d-flex justify-content-between align-items-center mylogout myhover" onclick="return addItemStock('${data[i].productCode}','${data[i].price}')">
+    ${data[i].purpose}=>${data[i].amount}
+    <span class="badge "></span>
+  </li>
+    `;
+
+ }
+
+ $('.autoCompleteTopItem').html(getdata);
+
+
+
+
+
+
+
+}
+else{
+    isAvailable=true;
+    $('.productCodePopup').val("0");
+    $('.isProductExist').hide();
+    $('.isProductNotExist').show();
     /*$('.autoCompleteTopItem').html("");
     $('.autoCompleteTopItem').hide();*/
     EmptyautoCompleteTopItem();
@@ -1321,6 +1404,16 @@ function addItemQuickBonus(itemName,itemPrice){
     $('.autoCompleteTopItem').html("");
     $('.autoCompleteTopItem').hide();
     $('.autocompleteIcon').html(`<i class="fas fa-check text-success"></i>`);
+}
+function addItemStock(itemName,itemPrice){
+
+    $('.productCodeClass').val(itemName);
+    $('.productCodePriceClass').val(itemPrice);
+    $('.autoCompleteTopItem').html("");
+    $('.autoCompleteTopItem').hide();
+    $('.autocompleteIcon').html(`<i class="fas fa-check text-success"></i>`);
+    $('.isProductExist').show();
+    $('.isProductNotExist').hide();
 }
 
 function autoCompleteGiftQuickBonus(thisdata)
@@ -1548,7 +1641,8 @@ var getData=`
 <hr>
 <h6 class="text-center text-danger">${data.name}</h6>
 <hr>
-<div class="pb-2">
+
+<div class="pb-2 ">
 <button type="button" class="btn btn-danger" onclick="return spendButton('${btoa(JSON.stringify(data))}')">Spending</button>
 
 
@@ -1609,8 +1703,12 @@ getData=`
 
 
 </div>
-
 <div class="pb-2">
+<button type="button" class="btn btn-dark" onclick="return FormCalcItemSafariStock('${btoa(JSON.stringify(data))}','spendProduct')">Products</button>
+
+<button type="button" class="btn btn-danger" onclick="return FormAddItemSafariStockSpent('${btoa(JSON.stringify(data))}','spendSafari')">Others</button>
+</div>
+<div class="pb-2 d-none">
 <button type="button" class="btn btn-danger" onclick="return spendButton('${btoa(JSON.stringify(data))}')">Spending</button>
 
 
@@ -1621,12 +1719,183 @@ getData=`
 
 
 `;
+//console.log(data);
+
+getData+=`
+
+
+<table class="viewReqTable">
+<thead>
+<tr>
+<th scope="col">#</th>
+<th scope="col">Name</th>
+<th scope="col">Fact Price $</th>
+<th scope="col">Init qty</th>
+<th scope="col">Spending</th>
+<th scope="col">SoldOut Qty</th>
+<th scope="col">SoldOut $</th>
+<th scope="col">updated_at</th>
+<th scope="col">Action</th>
+
+
+</tr>
+</thead>
+<tbody>
+`;
+var resultData=data["result"];
+console.log(resultData);
+for(var i=0;i<resultData.length;i++){
+var resultObject=resultData[i];
+ getData+=`
+
+ <tr>
+  <td data-label="#">${i+1}</td>
+  <td data-label="Name">${resultData[i].productCode}</td>
+  <td data-label="Fact Price $">
+  ${(resultData[i].status!='spendSafaris')?`<span class="Formchange" id="CustomPrice_Add_1" onchange="return  OnChangeFactPrice('${btoa(JSON.stringify(resultObject))}',this,'${safariName}')" onkeyup="return OnChangeFactPrice('${btoa(JSON.stringify(resultObject))}',this,'${safariName}')" contenteditable="true">${resultData[i].price}</span><span class="${"Price_"+resultData[i].productCode}"></span>`:'Spending'}
+  </td>
+  <td data-label="Init qty">
+  ${(resultData[i].status!='spendSafaris')?`<span class="Formchange" id="CustomPrice_Add_1" onchange="return  OnChangeInitQty('${btoa(JSON.stringify(resultObject))}',this,'${safariName}')" onkeyup="return OnChangeInitQty('${btoa(JSON.stringify(resultObject))}',this,'${safariName}')" contenteditable="true">${resultData[i].totQty}</span><span class="${"Qty_"+resultData[i].productCode}"></span>`:'Spending'}
+ </td>
+  <td data-label="Spending">${resultData[i].TotBuyAmount}</td>
+  <td data-label="SoldOut Qty">${resultData[i].SoldOut}</td>
+  <td data-label="SoldOut $">${resultData[i].TotSoldAmount}</td>
+  <td data-label="updated_at">${resultData[i].updated_at}</td>
+  <td data-label="Action">action</td>
+
+
+</tr>`;
+
+}
+getData+=`
+</tbody>
+</table>`;
 
 $('.MainForm').html(getData);
 
 
     //
 }
+function OnChangeInitQty(dataPass,thisdata,safari)
+{
+
+
+
+    var initQty=Number(thisdata.innerText);
+    if (!(typeof(initQty) === "number" && initQty > 0)) return null;
+    console.log(dataPass);
+    data=atob(dataPass);
+    data=JSON.parse(data);
+    console.log(data);
+    var classData=data["productCode"];
+    $(`.${"Qty_"+classData}`).html(`<i class="fas fa-check text-success mylogout" onclick="return EditStockQty('${dataPass}','${btoa(initQty)}','${safari}')"></i>`);
+
+}
+function EditStockQty(dataPass,initQty,safari)
+{
+    dataV=atob(dataPass);
+   dataV=JSON.parse(dataV);
+    $('.cover-spin').show();
+
+var Usertoken=localStorage.getItem("Usertoken");
+$.ajax({
+
+url:`./api/EditStockQty`,
+type:'post',
+beforeSend: function (xhr) {
+xhr.setRequestHeader('Authorization', `Bearer ${Usertoken}`);
+},
+//dataType: "json",
+data:{
+productCode:dataV["productCode"],
+safariId:dataV["safariId"],
+prevQty:dataV["totQty"],
+qty:atob(initQty),
+
+
+},
+success:function(data){
+if(data.status){//return data as true
+$('.cover-spin').hide();
+
+var safariId=btoa(dataV["safariId"]);
+
+ViewItemSafariStock(safariId,safari);
+
+
+}
+else{
+    $('.cover-spin').hide();
+alert("This Product has been used Please Contact System Admin if you want to edit this Quantity");
+
+}
+
+
+
+},
+error:function(data){
+    $('.cover-spin').hide();
+}
+});
+}
+function OnChangeFactPrice(dataPass,thisdata,safari)
+{
+    var factPrice=Number(thisdata.innerText);
+    if (!(typeof(factPrice) === "number" && factPrice > 0)) return null;
+    console.log(dataPass);
+    data=atob(dataPass);
+    data=JSON.parse(data);
+    console.log(data);
+    var classData=data["productCode"];
+    $(`.${"Price_"+classData}`).html(`<i class="fas fa-check text-success mylogout" onclick="return EditStockFactPrice('${dataPass}','${btoa(factPrice)}','${safari}')"></i>`);
+}
+function EditStockFactPrice(dataPass,factPrice,safari)
+{
+    dataV=atob(dataPass);
+    dataV=JSON.parse(dataV);
+    $('.cover-spin').show();
+
+var Usertoken=localStorage.getItem("Usertoken");
+$.ajax({
+
+url:`./api/EditStockFactPrice`,
+type:'post',
+beforeSend: function (xhr) {
+xhr.setRequestHeader('Authorization', `Bearer ${Usertoken}`);
+},
+//dataType: "json",
+data:{
+productCode:dataV["productCode"],
+safariId:dataV["safariId"],
+price:atob(factPrice),
+
+
+},
+success:function(data){
+if(data.status){//return data as true
+$('.cover-spin').hide();
+
+var safariId=btoa(dataV["safariId"]);
+
+ViewItemSafariStock(safariId,safari);
+
+
+}
+else{
+    $('.cover-spin').hide();
+alert("This Product has been used Please Contact System Admin if you want to edit this Factory Price");
+
+}
+
+
+
+},
+error:function(data){
+    $('.cover-spin').hide();
+}
+});
+}
+
 function ViewEditItemSafariStock(id,uid,safariuid,qty,price,pcs,comment,name,SoldInterest){
 
 
@@ -2000,7 +2269,7 @@ var getData=`
 <div class="pb-2">
 <button type="button" class="btn btn-dark" onclick="return FormCalcItemSafariStock('${dataPass}','spendProduct')">Products</button>
 
-<button type="button" class="btn btn-danger" onclick="return FormAddItemSafariStockSpent('${dataPass}','spendOthers')">Others</button>
+<button type="button" class="btn btn-danger" onclick="return FormAddItemSafariStockSpent('${dataPass}','spendSafari')">Others</button>
 </div>
 `;
 
@@ -2022,6 +2291,12 @@ $('.ModalPassword').html(`
 
 <form class="formAddItemSafariStock" onsubmit="return SafariStockAddItem()">
 <div class="p-2">
+
+<div class="form-group d-none">
+<label>Safari Name</label>
+<input type="text" class="form-control" name="name" value="${data.name}"/>
+<input type="text" class="form-control" name="uid" value="${data.safariuid}"/>
+</div>
 <div class="form-group ">
 
 <input type="text" class="form-control" name="safariId" value="${data.safariuid}"/>
@@ -2030,30 +2305,55 @@ $('.ModalPassword').html(`
 <input type="hidden" class="form-control" name="typeData" value="spend"/>
 
 </div>
-
 <div class="form-group right-inner-addon">
-<label>Item Name</label>
-<input type="text" class="form-control item_nameAdd" autocomplete="off" name="productCode" onkeyup="SafariautoCompleteTopItem(this,'${btoa('spend')}')" required/>
-<span class="autocompleteIcon"></span>
+<label>Search Product<span class="text-danger">*</span></label>
+<input type="text" class="form-control productCodeClass"  autocomplete="off" onkeyup="autoCompleteStock(this)" name="productName" required/>
+<span class="autocompleteIcon" onclick="hidePopup()"><i class="fas fa-exclamation-triangle text-danger" ></i></span>
 </div>
 <ul class="list-group  autoCompleteTopItem">
 
 </ul>
+<div class="form-group d-none isProductExist">
+<label>Product Name</label>
+<input type="text" class="form-control productCodeClass productCodePopup" name="productCode" value="0" readonly/>
+</div>
 <div class="form-group ">
 <label>qty</label>
 <input type="number" class="form-control" name="qty" value="0" />
 </div>
-
-
 <div class="form-group ">
-<label>price</label>
-<input type="text" class="form-control" name="price" required/>
+<label>Factory Price</label>
+<input type="number" class="form-control" name="fact_price" />
+</div>
+
+<div class="form-group isProductNotExist">
+<label>Price</label>
+<input type="number" class="form-control" name="price" />
+</div>
+
+
+<div class="form-group ComeFromLoader isProductNotExist">
+
+</div>
+
+<div class="form-group isProductNotExist">
+<label>Pcs</label>
+<input type="text" class="form-control" name="pcs" />
+</div>
+<div class="form-group isProductNotExist">
+<label>tags</label>
+<input type="text" class="form-control" name="tags" />
+</div>
+<div class="form-group d-none">
+<label>Active</label>
+<input type="text" class="form-control" name="active" value="on"/>
+<input type="text" class="form-control" name="CommentStatus" value="Inserting Product"/>
 </div>
 
 
 <div class="form-group">
   <label for="exampleFormControlTextarea3">Enter Comment</label>
-  <textarea class="form-control" name="comment" placeholder="Enter Comment" rows="7"></textarea>
+  <textarea class="form-control" name="description" placeholder="Enter Comment" rows="7"></textarea>
 </div>
 
 
@@ -2066,6 +2366,83 @@ $('.ModalPassword').html(`
 </form>
 
 `)
+LoadSavedComeFrom();
+    //
+
+}
+function hidePopup(){
+    $('.productCodePopup').val("0");
+    $('.autoCompleteTopItem').html("");
+    $('.autoCompleteTopItem').hide();
+    $('.autocompleteIcon').html(`<i class="fas fa-check text-success"></i>`);
+}
+
+function FormAddItemSafariStockSpent(dataPass,status)
+{
+    data=atob(dataPass);
+    data=JSON.parse(data);
+    console.log(data);
+    $('.viewOrder').modal('show');
+
+$('.MyTitleModal').html(`<h5 class="text-center">  <strong>Add Item ${data.name}</strong></h5>`)
+$('.ModalPassword').html(`
+
+<form class="formAddItemSafariStock" onsubmit="return SafariSpendAddItem()">
+<div class="p-2">
+
+<div class="form-group d-none">
+<label>Safari Name</label>
+<input type="text" class="form-control" name="safariName" value="${data.name}"/>
+<input type="text" class="form-control" name="uid" value="${data.safariuid}"/>
+</div>
+<div class="form-group ">
+
+<input type="text" class="form-control" name="safariId" value="${data.safariuid}"/>
+<input type="text" class="form-control" name="options" value="spendSafari"/>
+
+
+
+</div>
+<div class="form-group right-inner-addon">
+<label>Eter Purpose<span class="text-danger">*</span></label>
+<input type="text" class="form-control productCodeClass"  autocomplete="off" onkeyup="autoCompleteSpendPurpose(this)" name="purpose" required/>
+<span class="autocompleteIcon" onclick="hidePopup()"><i class="fas fa-exclamation-triangle text-danger" ></i></span>
+</div>
+<ul class="list-group  autoCompleteTopItem">
+
+</ul>
+
+
+
+
+<div class="form-group ">
+<label>Price</label>
+<input type="number" class="form-control" name="balance" required/>
+</div>
+
+
+
+
+
+
+
+
+<div class="form-group">
+  <label for="exampleFormControlTextarea3">Enter Comment</label>
+  <textarea class="form-control" name="commentData" placeholder="Enter Comment" rows="7"></textarea>
+</div>
+
+
+
+<div class="form-group">
+
+<input type="submit" class="btn btn-danger"  value="submit" />
+</div>
+</div>
+</form>
+
+`)
+
     //
 
 }
@@ -2203,7 +2580,7 @@ function SafariStockAddItem(){
     var Usertoken=localStorage.getItem("Usertoken");
 $.ajax({
 
-url:`./api/calculateAll`,
+url:`./api/CreateStockProduct`,
 type:'post',
 beforeSend: function (xhr) {
 xhr.setRequestHeader('Authorization', `Bearer ${Usertoken}`);
@@ -2215,13 +2592,13 @@ if(data.status){//return data as true
     console.log(data);
     $('.cover-spin').hide();
     $('.viewOrder').modal('hide');
-    console.log(`done $${CalculateDeclClass}`);
+   // console.log(`done $${CalculateDeclClass}`);
 
     $('.formAddItemSafari .form-control').val("");
     //var item_nameAdd=$('.item_nameAdd').val();
-    var safariuid=btoa(data.safariId);
-    var safariName=btoa(data.productCode);
-    //ViewItemSafariStock(safariuid,productCode);
+    var safariuid=btoa(data.safariuid);
+    var safariName=btoa(data.safariName);
+    ViewItemSafariStock(safariuid,safariName);
     //$(`.${CalculateDeclClass}`).click();
     //alert(` Item ${item_nameAdd} added `);
     /*$('.MainForm').html(`
@@ -3236,6 +3613,55 @@ if(data.status){//return data as true
     var safariuid=btoa(data.safariuid);
     var safariName=btoa(data.safariName);
     ViewItemSafari(safariuid,safariName);
+    //$(`.${CalculateDeclClass}`).click();
+    //alert(` Item ${item_nameAdd} added `);
+    /*$('.MainForm').html(`
+    <h5 class="text-center">Order List</h5>
+    `);*/
+ //console.log(hashfunction);
+
+
+}
+else{
+    alert("something Went Wrong ");
+}
+
+
+
+},
+error:function(data){
+//alert("errors occured please retry this process again or contact system Admin");
+//window.location.href = "./login";
+}
+});
+
+return false;
+}
+
+function SafariSpendAddItem(){
+    $('.cover-spin').show();
+    var Usertoken=localStorage.getItem("Usertoken");
+$.ajax({
+
+url:`./api/addSpending`,
+type:'post',
+beforeSend: function (xhr) {
+xhr.setRequestHeader('Authorization', `Bearer ${Usertoken}`);
+},
+dataType: "json",
+data:$('.formAddItemSafariStock').serialize(),
+success:function(data){
+if(data.status){//return data as true
+    $('.cover-spin').hide();
+    $('.viewOrder').modal('hide');
+    console.log(`done $${CalculateDeclClass}`);
+
+    $('.formAddItemSafariStock .form-control').val("");
+    //var item_nameAdd=$('.item_nameAdd').val();
+    var safariuid=btoa(data.safariuid);
+    var safariName=btoa(data.safariName);
+    ViewItemSafariStock(safariuid,safariName);
+
     //$(`.${CalculateDeclClass}`).click();
     //alert(` Item ${item_nameAdd} added `);
     /*$('.MainForm').html(`

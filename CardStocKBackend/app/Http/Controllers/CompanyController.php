@@ -35,7 +35,50 @@ class CompanyController extends Controller
         $this->platform1=env('PLATFORM3');
     }
     /*Safari Stock New Code */
+    public function searchSpendPurpose(Request $request){
+        $input=$request->all();
+        $item = strtolower($input["purpose"]);
+        $itemSearch='%'.$item.'%';
 
+        $check=DB::select("select purpose,amount from depenses where purpose LIKE :itemName limit 20",[
+            "itemName"=>$itemSearch
+        ]);
+        if($check)
+        {
+            return response([
+                "status"=>true,
+                "result"=>$check,
+
+            ],200);
+        }
+        else{
+            return response([
+                "status"=>false,
+                "result"=>$check,
+
+            ],200);
+        }
+    }
+    public function AdminProductComeFrom()
+    {
+ $check=DB::select("select *from come_froms");
+
+ if($check)
+        {
+         return response([
+             "status"=>true,
+             "result"=>$check,
+
+         ],200);
+        }
+        else{
+         return response([
+             "status"=>false,
+             "result"=>$check,
+
+         ],200);
+        }
+}
 
     public function GetSafaris(Request $request) {
         if(Auth::check())
@@ -1053,6 +1096,92 @@ public function viewBorrowBalance(Request $request){
         ],200);
     }
 }
+public function repaidBack(Request $request){
+    if(Auth::check())
+    {
+
+        if(Auth::user()->platform==$this->platform1)
+        {
+            $input=$request->all();
+
+            return (new StockController)->repaidBack($input);
+        }
+        else{
+            return response([
+                "status"=>false,
+                "result"=>$this->Admin_Auth_result_error,
+                "error"=>$this->Admin_Auth_error,
+
+            ],200);
+        }
+    }
+    else{
+        return response([
+            "status"=>false,
+            "result"=>$this->Admin_Auth_result_error,
+            "error"=>$this->Admin_Auth_error,
+
+        ],200);
+    }
+}
+
+public function confirmRepaidBack(Request $request){
+    if(Auth::check())
+    {
+
+        if(Auth::user()->platform==$this->platform1)
+        {
+            $input=$request->all();
+
+            return (new StockController)->confirmRepaidBack($input);
+        }
+        else{
+            return response([
+                "status"=>false,
+                "result"=>$this->Admin_Auth_result_error,
+                "error"=>$this->Admin_Auth_error,
+
+            ],200);
+        }
+    }
+    else{
+        return response([
+            "status"=>false,
+            "result"=>$this->Admin_Auth_result_error,
+            "error"=>$this->Admin_Auth_error,
+
+        ],200);
+    }
+}
+public function viewRepay(Request $request){
+    if(Auth::check())
+    {
+
+        if(Auth::user()->platform==$this->platform1)
+        {
+            $input=$request->all();
+
+            return (new StockController)->viewRepay($input);
+        }
+        else{
+            return response([
+                "status"=>false,
+                "result"=>$this->Admin_Auth_result_error,
+                "error"=>$this->Admin_Auth_error,
+
+            ],200);
+        }
+    }
+    else{
+        return response([
+            "status"=>false,
+            "result"=>$this->Admin_Auth_result_error,
+            "error"=>$this->Admin_Auth_error,
+
+        ],200);
+    }
+}
+
 
 
     public function OrderViewCount(Request $request){

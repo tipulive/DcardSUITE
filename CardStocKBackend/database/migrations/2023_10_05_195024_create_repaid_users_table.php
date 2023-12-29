@@ -27,6 +27,7 @@ class CreateRepaidUsersTable extends Migration
             $table->string('purpose')->default('none')->index("purpose");
             $table->json('temporalData')->nullable();
             $table->longtext('commentData')->nullable();//
+            $table->longtext('receiverComment')->nullable();//
             $table->timestamps();
         });
     }

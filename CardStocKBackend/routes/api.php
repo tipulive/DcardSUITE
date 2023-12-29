@@ -86,6 +86,8 @@ Route::get('/GetBalanceUser','CompanyController@CompanyTopupBalanceUser')->name(
 Route::get('/GetBalanceHist','CompanyController@CompanyTopupBalanceHistUser')->name('CompanyTopupBalanceHistUser');
 Route::get('/GetBalanceHistCreator','CompanyController@CompanyTopupBalanceHistCreator')->name('CompanyTopupBalanceHistCreator');
 Route::get('/GetWBalanceHistUser','CompanyController@CompanyTopupWBalanceHistUser')->name('CompanyTopupWBalanceHistUser');
+Route::get('/AdminProductComeFrom','CompanyController@AdminProductComeFrom')->name('AdminProductComeFrom');
+Route::get('/searchSpendPurpose','CompanyController@searchSpendPurpose')->name('searchSpendPurpose');
 
 /*Quickie Bonus */
 Route::post('/SetupQuickBonus','CompanyController@CompanyPartSetupQuickBonus')->name('CompanyPartSetupQuickBonus');
@@ -138,6 +140,8 @@ Route::get('/viewDept','CompanyController@viewDept')->name('viewDept');
 Route::get('/viewPaidDept','CompanyController@viewPaidDept')->name('viewPaidDept');
 Route::get('/viewSafeBalance','CompanyController@viewSafeBalance')->name('viewSafeBalance');
 Route::get('/viewBorrowBalance','CompanyController@viewBorrowBalance')->name('viewBorrowBalance');
+Route::post('/repaidBack','CompanyController@repaidBack')->name('repaidBack');
+Route::get('/confirmRepaidBack','CompanyController@confirmRepaidBack')->name('confirmRepaidBack');
 Route::get('/viewRepay','CompanyController@viewRepay')->name('viewRepay');
 Route::get('/OrderViewCount','CompanyController@OrderViewCount')->name('OrderViewCount');
 Route::get('/OrderViewByUid','CompanyController@OrderViewByUid')->name('OrderViewByUid');
