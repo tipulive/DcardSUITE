@@ -160,6 +160,7 @@ class _HomepageState extends State<Homepage> {
                 onTap: ()  {
                   // Handle tap event here
                  // print('Icon tapped!');
+
                   scanUser();
                 },
                 child: Row(
@@ -444,6 +445,7 @@ class _HomepageState extends State<Homepage> {
   void _onQRViewCreated(QRViewController controller)
   {
     this.controller=controller;
+    controller!.resumeCamera();
     controller.scannedDataStream.listen((scanData) async{
       setState((){
         result=scanData;
@@ -483,6 +485,8 @@ class _HomepageState extends State<Homepage> {
   void _onUserQRViewCreated(QRViewController controller)
   {
     this.controller=controller;
+    // Start scanning when the bottom sheet is opened
+    controller!.resumeCamera();
     controller.scannedDataStream.listen((scanData) async{
       setState((){
         result=scanData;
@@ -514,22 +518,54 @@ class _HomepageState extends State<Homepage> {
     var resultData=(await CardQuery().GetDetailCardOnline(CardModel(uid:"$resultCode"))).data;
     if(resultData["status"])
     {
-      Get.close(1);
-      (Get.put(StockQuery()).updateHideLoader(true));
-      setState(() {
-        //(Get.put(StockQuery()).updateUserProfile(resultData["UserDetail"]));
-       // (Get.put(StockQuery()).order)["resultData"][0]["name"]=resultData["UserDetail"]["name"];
-      });
+      if (controller!= null) {
+        controller!.pauseCamera();
+        //controller!.stopCamera();
+
+        (Get.put(StockQuery()).updateHideLoader(true));
+        setState(() {
+          (Get.put(StockQuery()).updateUserProfile(resultData["UserDetail"]));
+          (Get.put(StockQuery()).order)["resultData"][0]["name"]=resultData["UserDetail"]["name"];
+        });
+        //Get.close(1);
+        Navigator.of(context).pop();
+      }
 
       //print("result ${resultData["UserDetail"]}");
 
 
     }
     else{
-      (Get.put(StockQuery()).updateHideLoader(true));
-      Get.close(1);
+     // controller!.stopCamera();
+      if (controller!= null) {
+        controller!.pauseCamera();
+        (Get.put(StockQuery()).updateHideLoader(true));
+        var userProfile =
+        {
+          "uid": "kebineericMuna_1674160265",
+          "name": "unknown",
+
+          "email": "on@gmail.com",
+          "phone": "782389359",
+          "Ccode": "+250",
+          "country": "Rwanda",
+          "initCountry": "none",
+          "PhoneNumber": "+250782389359",
+          "carduid": "TEALTD_7hEnj_1672352175"
+        }
+        ;
+        setState(() {
+          (Get.put(StockQuery()).updateUserProfile(userProfile));
+          (Get
+              .put(StockQuery())
+              .order)["resultData"][0]["name"] = userProfile["name"];
+        });
+        // print("${(Get.put(StockQuery()).userProfile)}");
+        Navigator.of(context).pop();
+        //Get.close(1);
+      }
     }
-    //Get.close(1);
+    //
 
   }
 
@@ -910,7 +946,18 @@ else{
                         child:Stack(
                           alignment:Alignment.bottomCenter,
                           children: [
-                            QRView(key: qrkey,onQRViewCreated: _onQRViewCreated,),
+                            QRView(key: qrkey,onQRViewCreated: _onQRViewCreated,
+                              overlay: QrScannerOverlayShape(
+                                borderColor: Colors.yellow,
+                                borderRadius: 10,
+                                borderLength: 30,
+                                borderWidth: 10,
+                                cutOutSize: 300,
+                                // Add the laser effect
+
+                              ),
+
+                            ),
 
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -974,6 +1021,7 @@ else{
   }
   void scanUser() async{//not finished User
 
+
     Get.bottomSheet(
 
       StatefulBuilder(
@@ -985,7 +1033,7 @@ else{
                 Container(
 
                   padding:EdgeInsets.all(5.0),
-                  height: 600,
+
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.only(
@@ -1002,7 +1050,20 @@ else{
                           child:Stack(
                             alignment:Alignment.bottomCenter,
                             children: [
-                              QRView(key: qrkey,onQRViewCreated: _onUserQRViewCreated,),
+                              QRView(key: qrkey,
+                                onQRViewCreated:
+                                _onUserQRViewCreated,
+                                overlay: QrScannerOverlayShape(
+                                  borderColor: Colors.white,
+                                  borderRadius: 10,
+                                  borderLength: 30,
+                                  borderWidth: 10,
+                                  cutOutSize: 300,
+                                  // Add the laser effect
+
+                                ),
+                              ),
+
 
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,

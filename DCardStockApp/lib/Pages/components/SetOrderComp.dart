@@ -495,220 +495,226 @@ String OrderId="";
 
                           return Container(
                             margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                            child: Card(
-                              elevation:0,
-                              //margin: EdgeInsets.symmetric(vertical:1,horizontal:5),
-                              //color:Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(9.0),
-                                // side: BorderSide(color:_data[index]["color_var"]??true?Colors.white:Colors.green, width: 2),
-                              ),
+                            child:GetBuilder<StockQuery>(
+                              builder: (setOrderController) {
+                               return  Card(
+                                  elevation:0,
+                                  //margin: EdgeInsets.symmetric(vertical:1,horizontal:5),
+                                  //color:Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(9.0),
+                                    // side: BorderSide(color:_data[index]["color_var"]??true?Colors.white:Colors.green, width: 2),
+                                  ),
 
-                              child: Column(
-                                children: [
-                                  // Text("sum:${orderSum}"),
-                                  ListTile(
-                                      leading: CircleAvatar(
-                                        child: Icon(_getRandomIcon()),
-                                        backgroundColor:getRandomColor(),
-                                      ),
-                                      title:Row(
-                                        children: [
-                                          Expanded(
+                                  child: Column(
+                                    children: [
+                                      // Text("sum:${orderSum}"),
+                                      ListTile(
+                                          leading: CircleAvatar(
+                                            child: Icon(_getRandomIcon()),
+                                            backgroundColor:getRandomColor(),
+                                          ),
+                                          title:Row(
+                                            children: [
+                                              Expanded(
 
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
 
-                                                RichText(
-                                                  text: TextSpan(
-                                                    text:"${thisListOrder[index]["productName"]} (${thisListOrder[index]["pcs"]} pcs):",
-                                                    style: DefaultTextStyle.of(context).style,
-                                                    children: <TextSpan>[
-
-
-                                                    ],
-                                                  ),
-                                                ),
-                                                Text("Price:${(thisListOrder[index]["price"])}"),
+                                                    RichText(
+                                                      text: TextSpan(
+                                                        text:"${thisListOrder[index]["productName"]} (${thisListOrder[index]["pcs"]} pcs):",
+                                                        style: DefaultTextStyle.of(context).style,
+                                                        children: <TextSpan>[
 
 
-                                                Text.rich(
-                                                    TextSpan(
-                                                        children: [
-                                                          TextSpan(
-                                                            text: 'Qty ${thisListOrder[index]["totalQty"]}:',
-
-                                                          ),
-
-                                                          WidgetSpan(
-
-                                                            child: IntrinsicWidth(
-                                                              child: TextField(
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    Text("Price:${(thisListOrder[index]["price"])}"),
 
 
-                                                                keyboardType: TextInputType.number,
-                                                                decoration: InputDecoration(
-                                                                  hintText: '-1-',
-                                                                 // hintText: '   -${(((Get.put(HideShowState()).delivery)[index]["totalQty"])!=((Get.put(HideShowState()).delivery)[index]["totalCount"]))?(((Get.put(HideShowState()).delivery)[index]["totalQty"]-(Get.put(HideShowState()).delivery)[index]["totalCount"])):1}-',
-                                                                  hintStyle: TextStyle(color: Colors.red),
-                                                                  contentPadding: EdgeInsets.all(0),
-                                                                  isDense: true,
+                                                    Text.rich(
+                                                        TextSpan(
+                                                            children: [
+                                                              TextSpan(
+                                                                text: 'Qty ${thisListOrder[index]["totalQty"]}:',
 
-
-
-                                                                ),
-                                                                style: TextStyle(
-                                                                  color: Colors.blue, // Set the text color to red
-
-                                                                ),
-                                                                onChanged: (text) {
-                                                                  if((double.tryParse(text) != null)){
-                                                                    (Get.put(HideShowState()).delivery)[index]["currentQty"]=num.parse(text);
-
-
-
-                                                                    if((num.parse((Get.put(HideShowState()).delivery)[index]["totalQty"]))>=(Get.put(HideShowState()).delivery)[index]["currentQty"])
-                                                                    {
-                                                                     // print((Get.put(HideShowState()).delivery)[index]["currentQty"]);
-
-
-
-
-                                                                      setState(() {
-                                                                        (Get.put(HideShowState()).delivery)[index]["hideAddCart"]=1;
-
-
-                                                                      });
-
-
-                                                                    }
-                                                           else{
-
-                                                                      setState(() {
-                                                                        (Get.put(HideShowState()).delivery)[index]["hideAddCart"]=0;
-                                                                      });
-
-                                                              }
-
-                                                                  }
-                                                                  else{
-
-                                                                    setState(() {
-
-                                                                      (Get.put(HideShowState()).delivery)[index]["hideAddCart"]=0;
-
-                                                                    });
-
-                                                                  }
-
-
-                                                                },
                                                               ),
-                                                              stepWidth: 0.5, // set minimum width to 100
-                                                            ),
-                                                          ),
 
-                                                        ]
-                                                    )
+                                                              WidgetSpan(
+
+                                                                child: IntrinsicWidth(
+                                                                  child: TextField(
+
+
+                                                                    keyboardType: TextInputType.number,
+                                                                    decoration: InputDecoration(
+                                                                      hintText: '-1-',
+                                                                      // hintText: '   -${(((Get.put(HideShowState()).delivery)[index]["totalQty"])!=((Get.put(HideShowState()).delivery)[index]["totalCount"]))?(((Get.put(HideShowState()).delivery)[index]["totalQty"]-(Get.put(HideShowState()).delivery)[index]["totalCount"])):1}-',
+                                                                      hintStyle: TextStyle(color: Colors.red),
+                                                                      contentPadding: EdgeInsets.all(0),
+                                                                      isDense: true,
+
+
+
+                                                                    ),
+                                                                    style: TextStyle(
+                                                                      color: Colors.blue, // Set the text color to red
+
+                                                                    ),
+                                                                    onChanged: (text) {
+                                                                      if((double.tryParse(text) != null)){
+                                                                        (Get.put(HideShowState()).delivery)[index]["currentQty"]=num.parse(text);
+
+
+
+                                                                        if((num.parse((Get.put(HideShowState()).delivery)[index]["totalQty"]))>=(Get.put(HideShowState()).delivery)[index]["currentQty"])
+                                                                        {
+                                                                          // print((Get.put(HideShowState()).delivery)[index]["currentQty"]);
+
+
+
+
+                                                                          setState(() {
+                                                                            (Get.put(HideShowState()).delivery)[index]["hideAddCart"]=1;
+
+
+                                                                          });
+
+
+                                                                        }
+                                                                        else{
+
+                                                                          setState(() {
+                                                                            (Get.put(HideShowState()).delivery)[index]["hideAddCart"]=0;
+                                                                          });
+
+                                                                        }
+
+                                                                      }
+                                                                      else{
+
+                                                                        setState(() {
+
+                                                                          (Get.put(HideShowState()).delivery)[index]["hideAddCart"]=0;
+
+                                                                        });
+
+                                                                      }
+
+
+                                                                    },
+                                                                  ),
+                                                                  stepWidth: 0.5, // set minimum width to 100
+                                                                ),
+                                                              ),
+
+                                                            ]
+                                                        )
+                                                    ),
+                                                    Text("Deliver:${(((Get.put(HideShowState()).delivery)[index]["totalQty"])!=((Get.put(HideShowState()).delivery)[index]["totalCount"]))?((num.parse((Get.put(HideShowState()).delivery)[index]["totalQty"])-num.parse((Get.put(HideShowState()).delivery)[index]["totalCount"]))):0}"),
+
+
+                                                  ],
                                                 ),
-                                                Text("Deliver:${(((Get.put(HideShowState()).delivery)[index]["totalQty"])!=((Get.put(HideShowState()).delivery)[index]["totalCount"]))?((num.parse((Get.put(HideShowState()).delivery)[index]["totalQty"])-num.parse((Get.put(HideShowState()).delivery)[index]["totalCount"]))):0}"),
-
-
-                                              ],
-                                            ),
-                                          )
+                                              )
 
 
 
 
 
 
-                                        ],
-                                      ),
-
-
-                                      trailing:Column(
-                                        children: [
-                                          Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: <Widget>[
-                                              if((Get.put(HideShowState()).delivery)[index]["hideAddCart"]==1)
-                                                  IconButton(
-                                                   icon: Icon(Icons.add_shopping_cart,
-                                                    size: 23.0,
-                                                    color: Colors.grey),
-                                                onPressed: () async{
-                                                  productCode=thisListOrder[index]["productCode"];
-
-
-                                                  //await stockCount(index);
-
-
-                                                  num totCount=((num.parse((Get.put(HideShowState()).delivery)[index]["totalCount"])-(Get.put(HideShowState()).delivery)[index]["currentQty"])>=0)?num.parse((Get.put(HideShowState()).delivery)[index]["totalCount"]):0;
-                                                  if(totCount>0)
-                                                  {
-                                                    var resultData=(await StockQuery().stockCount(Topups(uid:"${orderData[0]}"),QuickBonus(uid:"${productCode}",qty:"${(Get.put(HideShowState()).delivery)[index]["currentQty"]}",subscriber:"StockName",status:"status",description:"Delivered"), User(uid: "UidTransport",name:"refName"))).data;
-
-                                                    if(resultData["status"])
-                                                    {
-                                                      Quickdata();
-                                                      // thisOrder2();
-                                                      setState(() {
-
-                                                        (Get.put(HideShowState()).delivery)[index]["totalCount"]=(Get.put(HideShowState()).delivery)[index]["totalCount"]-(Get.put(HideShowState()).delivery)[index]["currentQty"];
-
-                                                      });
-                                                    }
-
-                                                  }
-
-
-
-
-
-
-
-
-
-                                                     },
-                                                   ),
-
-
-                                              IconButton(
-                                                icon: Icon(
-                                                    Icons.delete,
-                                                    size: 23.0,
-                                                    color: Colors.red
-                                                ),
-                                                onPressed: () {
-
-
-                                                },
-                                              ),
                                             ],
                                           ),
 
-                                        ],
-                                      )
 
-                                    //trailing: Text()
-                                  ),
-                                  Visibility(
-                                    visible: true,
-                                    child: Padding(
-                                      padding: const EdgeInsets.fromLTRB(8,0,8,8),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.end,
-                                        children: [
-                                          Text("${thisListOrder[index]["totalAmount"]}"),
-                                        ],
+                                          trailing:Column(
+                                            children: [
+                                              Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: <Widget>[
+                                                  if((Get.put(HideShowState()).delivery)[index]["hideAddCart"]==1)
+                                                    IconButton(
+                                                      icon: Icon(Icons.add_shopping_cart,
+                                                          size: 23.0,
+                                                          color: Colors.grey),
+                                                      onPressed: () async{
+                                                        productCode=thisListOrder[index]["productCode"];
+
+
+                                                        //await stockCount(index);
+
+
+                                                        num totCount=((num.parse((Get.put(HideShowState()).delivery)[index]["totalCount"])-(Get.put(HideShowState()).delivery)[index]["currentQty"])>=0)?num.parse((Get.put(HideShowState()).delivery)[index]["totalCount"]):0;
+                                                        if(totCount>0)
+                                                        {
+                                                          var resultData=(await setOrderController.stockCount(Topups(uid:"${orderData[0]}"),QuickBonus(uid:"${productCode}",qty:"${(Get.put(HideShowState()).delivery)[index]["currentQty"]}",subscriber:"StockName",status:"status",description:"Delivered"), User(uid: "UidTransport",name:"refName"))).data;
+
+                                                          if(resultData["status"])
+                                                          {
+                                                            Quickdata();
+                                                            // thisOrder2();
+                                                            setState(() {
+
+                                                              num dats=(num.parse((Get.put(HideShowState()).delivery)[index]["totalCount"]))-(Get.put(HideShowState()).delivery)[index]["currentQty"];
+                                                              (Get.put(HideShowState()).delivery)[index]["totalCount"]="${dats}";
+
+
+                                                            });
+                                                          }
+
+                                                        }
+
+
+
+
+
+
+
+
+
+                                                      },
+                                                    ),
+
+
+                                                  IconButton(
+                                                    icon: Icon(
+                                                        Icons.delete,
+                                                        size: 23.0,
+                                                        color: Colors.red
+                                                    ),
+                                                    onPressed: () {
+
+
+                                                    },
+                                                  ),
+                                                ],
+                                              ),
+
+                                            ],
+                                          )
+
+                                        //trailing: Text()
                                       ),
-                                    ),
-                                  ),
+                                      Visibility(
+                                        visible: true,
+                                        child: Padding(
+                                          padding: const EdgeInsets.fromLTRB(8,0,8,8),
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.end,
+                                            children: [
+                                              Text("${thisListOrder[index]["totalAmount"]}"),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
 
-                                ],
-                              ),
+                                    ],
+                                  ),
+                                );
+                              },
                             ),
                           );
 

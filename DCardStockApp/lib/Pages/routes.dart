@@ -19,7 +19,7 @@ class AppRoutes {
     GetPage(name: '/ProfilePage', page: () => const ProfilePage()),
     GetPage(name: '/EventsPage', page: () => const EventsPage()),
     GetPage(name: '/UserAccount', page: () =>const UserAccountPage()),
-    GetPage(name: '/UserAccount', page: () =>const UserAccountPage()),
+
     GetPage(name: '/QuickBonus', page: () =>const QuickBonusPage()),
     GetPage(name: '/QuickCart', page: () =>const QuickCartPage()),
     GetPage(name: '/ErrorPage', page: () => const ErrorPage()),

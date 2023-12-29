@@ -143,7 +143,7 @@ class _SetPaidDeptCompState extends State<SetPaidDeptComp> {
                               Center(
                                 child: RichText(
                                   text: TextSpan(
-                                    text: "Total:",
+                                    text: "Total Dept:",
                                     style: DefaultTextStyle.of(context).style,
                                     children: <TextSpan>[
 
@@ -173,7 +173,7 @@ class _SetPaidDeptCompState extends State<SetPaidDeptComp> {
                           children: [
 
                             Icon(Icons.segment,color:Colors.orange,size:13,),
-                            Text("${(_data.length>0)?_data[0]['totSpending']:0}",style:GoogleFonts.pacifico(fontSize:15,color: Colors.orange,fontWeight: FontWeight.w700)),
+                            Text("${(_data.length>0)?_data[0]['totalDebt']:0}",style:GoogleFonts.pacifico(fontSize:15,color: Colors.orange,fontWeight: FontWeight.w700)),
 
 
                           ],
@@ -295,7 +295,7 @@ class _SetPaidDeptCompState extends State<SetPaidDeptComp> {
                                       padding: const EdgeInsets.fromLTRB(0, 10, 0, 2),
                                       child: RichText(
                                         text: TextSpan(
-                                          text: "${_data[index]['purpose']}",
+                                          text: "${_data[index]['Recipient']}",
                                           style: DefaultTextStyle.of(context).style,
                                           children: <TextSpan>[
 
@@ -326,7 +326,7 @@ class _SetPaidDeptCompState extends State<SetPaidDeptComp> {
                                   children: [
 
                                     Icon(Icons.segment,color:Colors.orange,size:13,),
-                                    Text("UID:${_data[index]['spendId']}"),
+                                    Text("UID:${_data[index]['OrderId']}"),
 
                                   ],
                                 ),
@@ -336,7 +336,7 @@ class _SetPaidDeptCompState extends State<SetPaidDeptComp> {
                                   children: [
 
                                     Icon(Icons.segment,color:Colors.orange,size:13,),
-                                    Text("Amount:${_data[index]['spending']}"),
+                                    Text("Amount:${_data[index]['amount']}"),
 
                                   ],
                                 ),
@@ -441,12 +441,13 @@ class _SetPaidDeptCompState extends State<SetPaidDeptComp> {
   void _onQRViewCreated(QRViewController controller)
   {
     this.controller=controller;
+    controller!.resumeCamera();
     controller.scannedDataStream.listen((scanData) async{
       setState((){
         result=scanData;
       });
       //await scanMethod();
-      print("${result!.code}");
+     // print("${result!.code}");
       if(result!=null)
       {
         // controller!.pauseCamera();
@@ -475,14 +476,26 @@ class _SetPaidDeptCompState extends State<SetPaidDeptComp> {
 
   getDebt(qrScanData) async{
     try {
+      (Get.put(StockQuery()).updatePaidDeptScanHide(true));
       (Get.put(StockQuery()).updateHideLoader(false));
       var resultData=(await StockQuery().getDebt(User(uid:'none',carduid:qrScanData))).data;
-    if(resultData["status"])
+    //print(resultData);
+      if(resultData["status"])
     {
-      (Get.put(StockQuery()).clientDebt).clear();
+      print(resultData["result"][0]);
       (Get.put(StockQuery()).updateHideLoader(true));
+      (Get.put(StockQuery()).updatePaidDeptScanHide(false));
+      (Get.put(StockQuery()).updateClientDebt(resultData["result"][0]));
 
-      (Get.put(StockQuery()).updateClientDebt(resultData["result"]));
+     /* setState(() {
+        (Get.put(StockQuery()).updateClientDebt(resultData["result"][0]));
+
+      });*/
+
+      print("${(Get.put(StockQuery()).clientDebt)}");
+
+
+
 
     }
     else{
@@ -498,7 +511,7 @@ class _SetPaidDeptCompState extends State<SetPaidDeptComp> {
   paidDebt() async{
     try {
       (Get.put(StockQuery()).updateHideLoader(false));
-      var resultData=(await StockQuery().paidDept(User(uid:"${(Get.put(StockQuery()).clientDebt)[0]["uidUser"]}",inputData:inputData))).data;
+      var resultData=(await StockQuery().paidDept(User(uid:"${(Get.put(StockQuery()).clientDebt)["uidUser"]}",inputData:inputData))).data;
       if(resultData["status"])
       {
         (Get.put(StockQuery()).clientDebt).clear();
@@ -514,7 +527,7 @@ class _SetPaidDeptCompState extends State<SetPaidDeptComp> {
 
 
     } catch (e) {
-
+      (Get.put(StockQuery()).updateHideLoader(true));
     }
   }
   Widget cameraSwitch()=>Transform.scale(
@@ -582,7 +595,7 @@ class _SetPaidDeptCompState extends State<SetPaidDeptComp> {
     isLoading=true;
     int limit=10;
 
-    var resultData=(await StockQuery().viewSpending(Topups(startlimit:limit,endlimit:_page))).data;
+    var resultData=(await StockQuery().viewPaidDept(Topups(startlimit:limit,endlimit:_page))).data;
 
 
     if(resultData["status"])
@@ -951,7 +964,7 @@ class _SetPaidDeptCompState extends State<SetPaidDeptComp> {
             Stack(
               children: [
                 Container(
-                  padding:EdgeInsets.all(5.0),
+                  padding:EdgeInsets.all(2.0),
                   height: 600,
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -971,7 +984,7 @@ class _SetPaidDeptCompState extends State<SetPaidDeptComp> {
                           return Column(
                             children: [
                               Padding(
-                                padding:EdgeInsets.fromLTRB(8,10,8,0),
+                                padding:EdgeInsets.fromLTRB(8,5,8,0),
                                 child: Card(
                                   elevation:0,
                                   margin: EdgeInsets.symmetric(vertical:1,horizontal:5),
@@ -1001,7 +1014,7 @@ class _SetPaidDeptCompState extends State<SetPaidDeptComp> {
                                                     Center(
                                                       child: RichText(
                                                         text: TextSpan(
-                                                          text: "${(Get.put(StockQuery()).clientDebt)[0]["name"]}",
+                                                          text: "${(Get.put(StockQuery()).clientDebt)["name"]}",
                                                           style: DefaultTextStyle.of(context).style,
                                                           children: <TextSpan>[
 
@@ -1030,64 +1043,23 @@ class _SetPaidDeptCompState extends State<SetPaidDeptComp> {
                                                 crossAxisAlignment: WrapCrossAlignment.center,
                                                 children: [
 
+                                                  Text("DEPT",style:GoogleFonts.odorMeanChey(fontSize:16,color: Colors.green,fontWeight: FontWeight.w700)),
+
+
+                                                ],
+                                              ),
+                                              Wrap(
+                                                crossAxisAlignment: WrapCrossAlignment.center,
+                                                children: [
+
                                                   Icon(Icons.segment,color:Colors.orange,size:13,),
-                                                  Text("${(Get.put(StockQuery()).clientDebt)[0]["debt"]}",style:GoogleFonts.pacifico(fontSize:15,color: Colors.orange,fontWeight: FontWeight.w700)),
+                                                  Text("${(Get.put(StockQuery()).clientDebt)["debt"]}",style:GoogleFonts.pacifico(fontSize:15,color: Colors.orange,fontWeight: FontWeight.w700)),
 
 
                                                 ],
                                               ),
-                                              Wrap(
-                                                crossAxisAlignment: WrapCrossAlignment.center,
-                                                children: [
-
-                                                  Expanded(
-                                                    child: Padding(
-                                                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                                      child: TextField(
-                                                        keyboardType: TextInputType.number,
-                                                        decoration: InputDecoration(
-                                                          hintText: 'Enter Amount...',
-                                                          border: InputBorder.none,
-                                                        ),
-                                                        //controller: inputDataDept,
-                                                        onChanged: (value){
-                                                          if((num.tryParse(value) != null)){
-                                                            setState((){
-                                                              inputData=num.parse(value);
-
-                                                              //print(value);
-                                                            });
-                                                           
 
 
-                                                          }
-
-
-
-
-                                                        },
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              Wrap(
-                                                crossAxisAlignment: WrapCrossAlignment.center,
-                                                children: [
-
-                                                  FloatingActionButton.extended(
-                                                      label: Text('Paid Dept'), // <-- Text
-                                                      backgroundColor: Colors.black,
-                                                      icon: Icon( // <-- Icon
-                                                        Icons.thumb_up,
-                                                        size: 24.0,
-                                                      ),
-                                                      onPressed: () =>{
-                                                        paidDebt()
-
-                                                      }),
-                                                ],
-                                              ),
 
 
 
@@ -1116,19 +1088,102 @@ class _SetPaidDeptCompState extends State<SetPaidDeptComp> {
                                   ),
                                 ),
                               ),
+
                             ],
                           );
                         },
                       ),
+                      if((Get.put(StockQuery()).paidDeptScanHide))
+                        Container(
 
-                      //if(productSearchPopup)
-                      SizedBox(height: 20,),
-                      Expanded(
+
+          padding:EdgeInsets.fromLTRB(5,0,10,0),
+
+
+          decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(30),
+          topRight: Radius.circular(30),
+          ),
+          ),
+          child: SingleChildScrollView(
+          child: Column(
+          children: [
+          SizedBox(height: 5.0,),
+
+          TextField(
+          // controller: uidEdit,
+
+          keyboardType: TextInputType.number,
+          //obscureText: true,
+          decoration: InputDecoration(
+          contentPadding: const EdgeInsets.symmetric(vertical: 3,horizontal: 3),
+          border: OutlineInputBorder(),
+          labelText: 'Enter Amount',
+          hintText: 'Enter Amount',
+          hintStyle: TextStyle(
+          color: Colors.grey,
+          ),
+
+          ),
+            onChanged: (value){
+              if((num.tryParse(value) != null)){
+                setState((){
+                  inputData=num.parse(value);
+
+                  //print(value);
+                });
+
+
+
+              }
+
+
+
+
+            },
+
+
+          ),
+
+
+            SizedBox(height: 2.0,),
+
+          FloatingActionButton.extended(
+          label: Text('Paid Dept'), // <-- Text
+          backgroundColor: Colors.black,
+          icon: Icon( // <-- Icon
+          Icons.thumb_up,
+          size: 24.0,
+          ),
+          onPressed: () =>{
+            paidDebt()
+
+          }),
+          ],
+          ),
+          ),
+          ),
+
+                      SizedBox(height:2.0,),
+                      //if(!(Get.put(StockQuery()).paidDeptScanHide))
+                       Expanded(
                           flex: 5,
                           child:Stack(
                             alignment:Alignment.bottomCenter,
                             children: [
-                              QRView(key: qrkey,onQRViewCreated: _onQRViewCreated,),
+                              QRView(key: qrkey,onQRViewCreated: _onQRViewCreated,
+                                overlay: QrScannerOverlayShape(
+                                  borderColor: Colors.pink,
+                                  borderRadius: 10,
+                                  borderLength: 30,
+                                  borderWidth: 10,
+                                  cutOutSize: 300,
+                                  // Add the laser effect
+
+                                ),
+                              ),
 
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -1186,7 +1241,7 @@ class _SetPaidDeptCompState extends State<SetPaidDeptComp> {
         },
       ),
     ).whenComplete(() {
-
+      qrDebt.clear();
     });
 
   }

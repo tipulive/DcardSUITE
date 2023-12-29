@@ -1,6 +1,9 @@
 import 'dart:math';
 
 
+import 'package:dStock/models/Participated.dart';
+import 'package:qr_code_scanner/qr_code_scanner.dart';
+
 import '../../../Query/ParticipatedQuery.dart';
 import '../../../Utilconfig/HideShowState.dart';
 import '../../../models/QuickBonus.dart';
@@ -32,10 +35,12 @@ class _SetRepayCompState extends State<SetRepayComp> {
   List<dynamic> _data = [];
   List<dynamic> thisListOrder = [];
   List<dynamic> orderData = [];
+  List<dynamic>qrDebt = [];
 
 
   var bottomResult=[];
   num countData=0;
+  var resultData="";
 
   int _page=0;
   int limit=0;
@@ -43,12 +48,27 @@ class _SetRepayCompState extends State<SetRepayComp> {
   bool isLoading=false;
   num qty_product=1;
   String productCode="";
+  num inputData=0;
 
+  bool cameraValue=false;
+  bool flashValue=false;
   String clientOrder="";
-  String OrderId="";
+
+  bool btnExpenseHide=false;
+  bool btnExpenseEditHide=false;
+  TextEditingController balance=TextEditingController();
+  TextEditingController purpose=TextEditingController();
+  TextEditingController commentData=TextEditingController();
+  TextEditingController uidEdit=TextEditingController();
+
+  TextEditingController balanceEdit=TextEditingController();
+  TextEditingController purposeEdit=TextEditingController();
+  TextEditingController commentDataEdit=TextEditingController();
 
 
-
+  final GlobalKey qrkey = GlobalKey(debugLabel: 'QR');
+  Barcode?result;
+  QRViewController?controller;
 
 
   bool showOveray=false;
@@ -92,7 +112,100 @@ class _SetRepayCompState extends State<SetRepayComp> {
       children: [
         //ProfilePic().profile(),
 
-        Text("Orders",style:GoogleFonts.pacifico(fontSize:15,color: Colors.teal,fontWeight: FontWeight.w700)),
+        Padding(
+          padding:EdgeInsets.fromLTRB(8,10,8,0),
+          child: Card(
+            elevation:0,
+            margin: EdgeInsets.symmetric(vertical:1,horizontal:5),
+            //color:Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15.0),
+              //side: BorderSide(color:_data[0]["color_var"]??true?Colors.white:Colors.green, width: 2),
+            ),
+
+            child: ListTile(
+                leading: CircleAvatar(
+                  child: Icon(_getRandomIcon()),
+                  backgroundColor:getRandomColor(),
+                ),
+                title:Row(
+                  children: [
+
+
+                    Expanded(
+                      flex: 1,
+                      child: Stack(
+                        children: [
+
+                          Column(
+                            children: [
+
+                              Center(
+                                child: RichText(
+                                  text: TextSpan(
+                                    text: "Repay Dept:",
+                                    style: DefaultTextStyle.of(context).style,
+                                    children: <TextSpan>[
+
+
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+
+
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+
+                subtitle: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Column(
+
+                      children: [
+                        Wrap(
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+
+                            Icon(Icons.segment,color:Colors.orange,size:13,),
+                            Text("${(_data.length>0)?_data[0]['borrowBalance']:0}",style:GoogleFonts.pacifico(fontSize:15,color: Colors.orange,fontWeight: FontWeight.w700)),
+
+
+                          ],
+                        ),
+
+
+
+
+
+
+                      ],
+                    ),
+
+                  ],
+                ),
+                trailing:Container(child:
+                GestureDetector(
+                    onTap: () async{
+
+                      getDebtWidget();
+
+                    },
+                    child:Icon(Icons.grid_view,color:Colors.orange)
+                )
+
+
+                )
+
+              //trailing: Text()
+            ),
+          ),
+        ),
 
 
 
@@ -182,7 +295,7 @@ class _SetRepayCompState extends State<SetRepayComp> {
                                       padding: const EdgeInsets.fromLTRB(0, 10, 0, 2),
                                       child: RichText(
                                         text: TextSpan(
-                                          text: "${_data[index]['name']}:",
+                                          text: "${_data[index]['AmountOwner']}",
                                           style: DefaultTextStyle.of(context).style,
                                           children: <TextSpan>[
 
@@ -213,42 +326,13 @@ class _SetRepayCompState extends State<SetRepayComp> {
                                   children: [
 
                                     Icon(Icons.segment,color:Colors.orange,size:13,),
-                                    Text("UID:${_data[index]['OrderId']}"),
+                                    Text("Amount:${_data[index]['amount']}"),
 
                                   ],
                                 ),
 
-                                Wrap(
-                                  crossAxisAlignment: WrapCrossAlignment.center,
-                                  children: [
-
-                                    Icon(Icons.segment,color:Colors.orange,size:13,),
-                                    Text("Qty:${_data[index]['totalQty']}"),
-
-                                  ],
-                                ),
-
-                                Wrap(
-                                  crossAxisAlignment: WrapCrossAlignment.center,
-                                  children: [
-
-                                    Icon(Icons.segment,color:Colors.orange,size:13,),
-                                    Text("Amount:${_data[index]['totalAmount']}"),
-
-                                  ],
-                                ),
-
-                                Wrap(
-                                  crossAxisAlignment: WrapCrossAlignment.center,
-                                  children: [
-
-                                    Icon(Icons.segment,color:Colors.orange,size:13,),
-                                    Text("Deliver:${_data[index]['totalQty']-_data[index]['totalCount']}"),
 
 
-
-                                  ],
-                                ),
 
 
                               ],
@@ -266,6 +350,7 @@ class _SetRepayCompState extends State<SetRepayComp> {
 
 
                             orderData=_data[index].values.toList();
+                            print(orderData);
 
 
                             //print((await thisOrder())["result"]);
@@ -341,8 +426,139 @@ class _SetRepayCompState extends State<SetRepayComp> {
 
 
     _scrollController.dispose();
+    controller?.dispose();
     super.dispose();
   }
+  void _onQRViewCreated(QRViewController controller)
+  {
+    this.controller=controller;
+    controller!.resumeCamera();
+    controller.scannedDataStream.listen((scanData) async{
+      setState((){
+        result=scanData;
+      });
+      //await scanMethod();
+      // print("${result!.code}");
+      if(result!=null)
+      {
+        // controller!.pauseCamera();
+
+        bool containsProductCode = qrDebt.any((item) => item['cardUid'] == result!.code);
+        if(containsProductCode)
+        {
+          //data already scaned
+          print("already exist");
+
+        }
+        else{
+          var listData={
+            "cardUid":result!.code
+          };
+          qrDebt.insertAll(0,[listData]);
+
+          getDebt(result!.code);
+
+
+        }
+        //
+      }
+    });
+  }
+
+  getDebt(qrScanData) async{
+    try {
+      (Get.put(StockQuery()).updatePaidDeptScanHide(true));
+      (Get.put(StockQuery()).updateHideLoader(false));
+      var resultData=(await StockQuery().getDebt(User(uid:'none',carduid:qrScanData))).data;
+      //print(resultData);
+      if(resultData["status"])
+      {
+        print(resultData["result"][0]);
+        (Get.put(StockQuery()).updateHideLoader(true));
+        (Get.put(StockQuery()).updatePaidDeptScanHide(false));
+        (Get.put(StockQuery()).updateClientDebt(resultData["result"][0]));
+
+        /* setState(() {
+        (Get.put(StockQuery()).updateClientDebt(resultData["result"][0]));
+
+      });*/
+
+        print("${(Get.put(StockQuery()).clientDebt)}");
+
+
+
+
+      }
+      else{
+        (Get.put(StockQuery()).updateHideLoader(true));
+
+      }
+
+
+    } catch (e) {
+
+    }
+  }
+  paidDebt() async{
+    try {
+      (Get.put(StockQuery()).updateHideLoader(false));
+      var resultData=(await StockQuery().paidDept(User(uid:"${(Get.put(StockQuery()).clientDebt)["uidUser"]}",inputData:inputData))).data;
+      if(resultData["status"])
+      {
+        (Get.put(StockQuery()).clientDebt).clear();
+        (Get.put(StockQuery()).updateHideLoader(true));
+
+        (Get.put(StockQuery()).updateClientDebt(resultData["result"]));
+
+      }
+      else{
+        (Get.put(StockQuery()).updateHideLoader(true));
+
+      }
+
+
+    } catch (e) {
+      (Get.put(StockQuery()).updateHideLoader(true));
+    }
+  }
+  Widget cameraSwitch()=>Transform.scale(
+    scale: 1,
+    child: Switch.adaptive(
+        activeColor: Colors.red,
+        activeTrackColor: Colors.red.withOpacity(0.4),
+        inactiveThumbColor: Colors.orange,
+        inactiveTrackColor: Colors.blueAccent,
+
+        value: cameraValue,
+        onChanged:(value)async{
+          setState((){
+            this.cameraValue=value;
+
+            //print(value);
+          });
+          await controller!.resumeCamera();
+        }
+    ),
+  );
+  Widget flashSwitch()=>Transform.scale(
+    scale: 1,
+    child: Switch.adaptive(
+        activeColor: Colors.red,
+        activeTrackColor: Colors.red.withOpacity(0.4),
+        inactiveThumbColor: Colors.orange,
+        inactiveTrackColor: Colors.blueAccent,
+
+        value:flashValue,
+        onChanged:(value)async{
+          setState((){
+            flashValue=value;
+
+            //print(value);
+          });
+          await controller!.toggleFlash();
+        }
+    ),
+  );
 
 
 
@@ -370,7 +586,7 @@ class _SetRepayCompState extends State<SetRepayComp> {
     isLoading=true;
     int limit=10;
 
-    var resultData=(await StockQuery().orderViewCount(Topups(startlimit:limit,endlimit:_page))).data;
+    var resultData=(await StockQuery().viewBorrowBalance(Topups(startlimit:limit,endlimit:_page))).data;
 
 
     if(resultData["status"])
@@ -433,7 +649,7 @@ class _SetRepayCompState extends State<SetRepayComp> {
     int limit=10;
 
 
-    var resultData=(await StockQuery().orderViewByUid(Topups(uid:"${orderData[0]}",startlimit:limit,endlimit:_page))).data;
+    var resultData=(await StockQuery().viewSalesByUid(Topups(uid:"${orderData[0]}",startlimit:limit,endlimit:_page))).data;
     // var resultData=(await StockQuery().orderViewByUid(Topups(uid:"0s",startlimit:limit,endlimit:_page))).data;
     //print(resultData);
     if(resultData["status"])
@@ -453,10 +669,12 @@ class _SetRepayCompState extends State<SetRepayComp> {
   void viewThisOrder() {
 
     Get.bottomSheet(
+
       StatefulBuilder(
         builder: (BuildContext context, StateSetter setState) {
           return
             Container(
+
               padding:EdgeInsets.all(5.0),
               height: 600,
               decoration: BoxDecoration(
@@ -492,12 +710,12 @@ class _SetRepayCompState extends State<SetRepayComp> {
                           return Container(
                             margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
                             child: Card(
-                              elevation:0,
+                              elevation:0.5,
                               //margin: EdgeInsets.symmetric(vertical:1,horizontal:5),
                               //color:Colors.white,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(9.0),
-                                // side: BorderSide(color:_data[index]["color_var"]??true?Colors.white:Colors.green, width: 2),
+                                borderRadius: BorderRadius.circular(7),
+                                //side: BorderSide(color:_data[index]["color_var"]??true?Colors.white:Colors.green, width: 2),
                               ),
 
                               child: Column(
@@ -728,37 +946,330 @@ class _SetRepayCompState extends State<SetRepayComp> {
 
   }
 
-  stockCount(indexData)async
-  {
+  void getDebtWidget() async{
+
+    Get.bottomSheet(
+      StatefulBuilder(
+        builder: (BuildContext context, StateSetter setState) {
+          return
+            Stack(
+              children: [
+                Container(
+                  padding:EdgeInsets.all(2.0),
+                  height: 600,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(30),
+                      topRight: Radius.circular(30),
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+
+                      // (result!=null)?Text("barcode Type ${describeEnum(result!.format)} Data ${result!.code}"): const Text("Scan Code"),
+
+                      GetBuilder<StockQuery>(
+                        builder: (_controller) {
+                          //return Text('Data: ${_controller.data}');
+                          return Column(
+                            children: [
+                              Padding(
+                                padding:EdgeInsets.fromLTRB(8,5,8,0),
+                                child: Card(
+                                  elevation:0,
+                                  margin: EdgeInsets.symmetric(vertical:1,horizontal:5),
+                                  //color:Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15.0),
+                                    //side: BorderSide(color:_data[0]["color_var"]??true?Colors.white:Colors.green, width: 2),
+                                  ),
+
+                                  child: ListTile(
+                                      leading: CircleAvatar(
+                                        child: Icon(_getRandomIcon()),
+                                        backgroundColor:getRandomColor(),
+                                      ),
+                                      title:Row(
+                                        children: [
 
 
-    (Get.put(HideShowState())).isChangeDelivery(thisListOrder[indexData],indexData,qty_product);
+                                          Expanded(
+                                            flex: 1,
+                                            child: Stack(
+                                              children: [
+
+                                                Column(
+                                                  children: [
+
+                                                    Center(
+                                                      child: RichText(
+                                                        text: TextSpan(
+                                                          text: "${(Get.put(StockQuery()).clientDebt)["name"]}",
+                                                          style: DefaultTextStyle.of(context).style,
+                                                          children: <TextSpan>[
 
 
-    // print((Get.put(HideShowState()).delivery)[indexData]);
-    //print(thisListOrder[indexData]);
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+
+
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+
+                                      subtitle: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Column(
+
+                                            children: [
+                                              Wrap(
+                                                crossAxisAlignment: WrapCrossAlignment.center,
+                                                children: [
+
+                                                  Text("DEPT",style:GoogleFonts.odorMeanChey(fontSize:16,color: Colors.green,fontWeight: FontWeight.w700)),
+
+
+                                                ],
+                                              ),
+                                              Wrap(
+                                                crossAxisAlignment: WrapCrossAlignment.center,
+                                                children: [
+
+                                                  Icon(Icons.segment,color:Colors.orange,size:13,),
+                                                  Text("${(Get.put(StockQuery()).clientDebt)["debt"]}",style:GoogleFonts.pacifico(fontSize:15,color: Colors.orange,fontWeight: FontWeight.w700)),
+
+
+                                                ],
+                                              ),
 
 
 
 
 
-    /*var resultData=(await StockQuery().stockCount(Topups(uid:"${orderData[0]}"),QuickBonus(uid:"${productCode}",qty:"${qty_product}",subscriber:"StockName",status:"status",description:"Delivered"), User(uid: "UidTransport",name:"refName"))).data;
+
+
+
+                                            ],
+                                          ),
+
+                                        ],
+                                      ),
+                                      trailing:Container(child:
+                                      GestureDetector(
+                                          onTap: () async{
+
+                                            getDebtWidget();
+
+                                          },
+                                          child:Icon(Icons.grid_view,color:Colors.orange)
+                                      )
+
+
+                                      )
+
+                                    //trailing: Text()
+                                  ),
+                                ),
+                              ),
+
+                            ],
+                          );
+                        },
+                      ),
+                      if((Get.put(StockQuery()).paidDeptScanHide))
+                        Container(
+
+
+                          padding:EdgeInsets.fromLTRB(5,0,10,0),
+
+
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(30),
+                              topRight: Radius.circular(30),
+                            ),
+                          ),
+                          child: SingleChildScrollView(
+                            child: Column(
+                              children: [
+                                SizedBox(height: 5.0,),
+
+                                TextField(
+                                  // controller: uidEdit,
+
+                                  keyboardType: TextInputType.number,
+                                  //obscureText: true,
+                                  decoration: InputDecoration(
+                                    contentPadding: const EdgeInsets.symmetric(vertical: 3,horizontal: 3),
+                                    border: OutlineInputBorder(),
+                                    labelText: 'Enter Amount',
+                                    hintText: 'Enter Amount',
+                                    hintStyle: TextStyle(
+                                      color: Colors.grey,
+                                    ),
+
+                                  ),
+                                  onChanged: (value){
+                                    if((num.tryParse(value) != null)){
+                                      setState((){
+                                        inputData=num.parse(value);
+
+                                        //print(value);
+                                      });
+
+
+
+                                    }
+
+
+
+
+                                  },
+
+
+                                ),
+
+
+                                SizedBox(height: 2.0,),
+
+                                FloatingActionButton.extended(
+                                    label: Text('Paid Dept'), // <-- Text
+                                    backgroundColor: Colors.black,
+                                    icon: Icon( // <-- Icon
+                                      Icons.thumb_up,
+                                      size: 24.0,
+                                    ),
+                                    onPressed: () =>{
+                                      paidDebt()
+
+                                    }),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                      SizedBox(height:2.0,),
+                      //if(!(Get.put(StockQuery()).paidDeptScanHide))
+                      Expanded(
+                          flex: 5,
+                          child:Stack(
+                            alignment:Alignment.bottomCenter,
+                            children: [
+                              QRView(key: qrkey,onQRViewCreated: _onQRViewCreated,
+                                overlay: QrScannerOverlayShape(
+                                  borderColor: Colors.pink,
+                                  borderRadius: 10,
+                                  borderLength: 30,
+                                  borderWidth: 10,
+                                  cutOutSize: 300,
+                                  // Add the laser effect
+
+                                ),
+                              ),
+
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+
+                                      cameraSwitch(),
+                                      //SizedBox(width: 10.0,),
+
+                                      // SizedBox(width: 10.0,),
+                                      flashSwitch(),
+                                      Image.asset(
+                                        flashValue ? 'images/on.png' : 'images/off.png',
+                                        height: 30,
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+
+                            ],
+                          )
+
+                      )
+
+
+
+
+                    ],
+                  ),
+                ),
+                GetBuilder<StockQuery>(
+                  builder: (myLoadercontroller) {
+                    //return Text('Data: ${_controller.data}');
+                    return
+                      (myLoadercontroller.hideLoader)?
+                      Text(""):
+                      Positioned.fill(
+                        child: Center(
+                          child: Container(
+                            alignment: Alignment.center,
+                            color: Colors.white70,
+                            child: CircularProgressIndicator(),
+                          ),
+                        ),
+                      );
+                  },
+                ),
+
+              ],
+            );
+
+        },
+      ),
+    ).whenComplete(() {
+      qrDebt.clear();
+    });
+
+  }
+  editSpendingMethod() async{
+
+    if(isLoading) return;
+    isLoading=true;
+    int limit=10;
+
+    var resultData=(await StockQuery().editSpending(Topups(amount:"${balance}",purpose:"${purpose}",desc:"${commentData}"))).data;
 
 
     if(resultData["status"])
     {
-      Quickdata();
-      thisOrder2();
 
-    }*/
+      setState(() {
+        isLoading=false;
+        hasMoreData=false;
+
+        if(resultData["result"]!=0)
+        {
+          _data.clear();
+          _data.addAll(resultData["result"]);
+
+        }
 
 
-
-
-
-
-
+      });
+      return true;
+    }
+    else{
+      return false;
+    }
   }
+
+
+
 
 
 

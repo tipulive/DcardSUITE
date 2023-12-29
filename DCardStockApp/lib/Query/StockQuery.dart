@@ -16,12 +16,18 @@ import '../models/QuickBonus.dart';
 
 
 class StockQuery extends GetxController{
+
+  bool paidDeptScanHide=true;
+  updatePaidDeptScanHide(valdata)
+  {
+    hideProductList=valdata;
+    update();
+  }
   Map<String, dynamic> userProfile=
     {
-      /*"uid": "kebineericMuna_1674160265",
-      "name": "unknown",*/
-      "uid": "test",
-      "name": "testName",
+      "uid": "kebineericMuna_1674160265",
+      "name": "unknown",
+
       "email": "on@gmail.com",
       "phone": "782389359",
       "Ccode": "+250",
@@ -43,16 +49,15 @@ class StockQuery extends GetxController{
    dataSearch=valdata;
    update();
  }
- var clientDebt = [
+  Map<String, dynamic> clientDebt=
    {
      "debt":0,
      "uidUser":"none",
      "name":"none"
-   }
- ];
- updateClientDebt(valdata)
+   };
+ updateClientDebt(valData)
  {
-   clientDebt=valdata;
+   clientDebt=valData;
    update();
  }
  String textMessage="";
@@ -1020,12 +1025,12 @@ dynamic dataTest=[];
 
         //"options": [1,2,3],
       };
-      String Authtoken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
+      String authtoken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
       var url="${ConstantClassUtil.urlLink}/PaidDept";
       var response = await Dio().post(url,
         options: Options(headers: {
           HttpHeaders.contentTypeHeader: "application/json",
-          HttpHeaders.authorizationHeader:"Bearer $Authtoken"
+          HttpHeaders.authorizationHeader:"Bearer $authtoken"
         }),
         data: jsonEncode(params),
       );
@@ -1223,15 +1228,13 @@ dynamic dataTest=[];
 
     }
   }//
-  viewBorrowBalance(Topups topupData,User userData) async{//balance and Bonus Widthdraw History
+  viewBorrowBalance(Topups topupData) async{//balance and Bonus Widthdraw History
     try {
 
       var params =  {
 
         "LimitStart":topupData.endlimit,  //page
         "LimitEnd":topupData.startlimit,//limit
-        "uid":userData.uid,//userid
-        "optionCase":topupData.optionCase//optionCase
 
       };
 

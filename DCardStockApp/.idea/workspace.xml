@@ -14,19 +14,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fe13c1e5-b7ca-4b84-a854-5c4e0fd95bcb" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/lib/Pages/SetPaidDeptPage.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/Pages/components/SetPaidDeptComp.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../CardStocKBackend/ARestapi/Company.rest" beforeDir="false" afterPath="$PROJECT_DIR$/../CardStocKBackend/ARestapi/Company.rest" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../CardStocKBackend/app/Http/Controllers/CompanyController.php" beforeDir="false" afterPath="$PROJECT_DIR$/../CardStocKBackend/app/Http/Controllers/CompanyController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../CardStocKBackend/app/Http/Controllers/StockController.php" beforeDir="false" afterPath="$PROJECT_DIR$/../CardStocKBackend/app/Http/Controllers/StockController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../CardStocKBackend/routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/../CardStocKBackend/routes/api.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/Pages/Homepage.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/Homepage.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/Pages/SetSpendingPage.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/SetSpendingPage.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Pages/Login.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/Login.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/Pages/components/SetOrderComp.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/components/SetOrderComp.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/Pages/components/SettingComp.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/components/SettingComp.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Pages/components/SetPaidDeptComp.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/components/SetPaidDeptComp.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Pages/components/SetRepayComp.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/components/SetRepayComp.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Pages/routes.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/routes.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/Query/StockQuery.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Query/StockQuery.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/Utilconfig/ConstantClassUtil.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Utilconfig/ConstantClassUtil.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/models/User.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/models/User.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -115,12 +109,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
           <url>file://$PROJECT_DIR$/lib/Pages/Login.dart</url>
-          <line>255</line>
+          <line>256</line>
           <option name="timeStamp" value="6" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
           <url>file://$PROJECT_DIR$/lib/Query/StockQuery.dart</url>
-          <line>705</line>
+          <line>710</line>
           <option name="timeStamp" value="7" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
@@ -130,23 +124,23 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
           <url>file://$PROJECT_DIR$/lib/Query/StockQuery.dart</url>
-          <line>831</line>
+          <line>836</line>
           <option name="timeStamp" value="9" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
-          <url>file://$PROJECT_DIR$/lib/Pages/components/SetOrderComp.dart</url>
-          <line>561</line>
-          <option name="timeStamp" value="10" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
           <url>file://$PROJECT_DIR$/lib/Pages/Homepage.dart</url>
-          <line>559</line>
+          <line>595</line>
           <option name="timeStamp" value="12" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
           <url>file://$PROJECT_DIR$/lib/Pages/Homepage.dart</url>
-          <line>444</line>
+          <line>445</line>
           <option name="timeStamp" value="13" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
+          <url>file://$PROJECT_DIR$/lib/Pages/components/SetOrderComp.dart</url>
+          <line>497</line>
+          <option name="timeStamp" value="14" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

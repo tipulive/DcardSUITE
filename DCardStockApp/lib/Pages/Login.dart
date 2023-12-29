@@ -244,7 +244,8 @@ setState(() {
           //Get.to(() => Homepage());
           Get.put(HideShowState()).isCameraVisible(true);
           await adminStatedata.auth();
-          Get.to(() => Homepage());
+          //Get.to(() => Homepage());
+          Get.toNamed('/home');
           //print(await SyncService().SyncDownloadCard());
         }
         else{
