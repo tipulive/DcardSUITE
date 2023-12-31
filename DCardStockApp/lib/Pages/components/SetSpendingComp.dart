@@ -1,7 +1,6 @@
 import 'dart:math';
 
 
-import '../../../Query/ParticipatedQuery.dart';
 import '../../../Utilconfig/HideShowState.dart';
 import '../../../models/QuickBonus.dart';
 
@@ -10,7 +9,6 @@ import '../../../models/User.dart';
 import 'package:get/get.dart';
 
 import '../../Query/StockQuery.dart';
-import '../../models/BonusModel.dart';
 import 'package:flutter/material.dart';
 
 import 'package:google_fonts/google_fonts.dart';
@@ -28,8 +26,8 @@ class SetSpendingComp extends StatefulWidget {
 
 class _SetSpendingCompState extends State<SetSpendingComp> {
 
-  ScrollController _scrollController = ScrollController();// detect scroll
-  List<dynamic> _data = [];
+  final ScrollController _scrollController = ScrollController();// detect scroll
+  final List<dynamic> _data = [];
   List<dynamic> thisListOrder = [];
   List<dynamic> orderData = [];
 
@@ -42,12 +40,12 @@ class _SetSpendingCompState extends State<SetSpendingComp> {
   int limit=0;
   bool hasMoreData=true;
   bool isLoading=false;
-  num qty_product=1;
+  num qtyProduct=1;
   String productCode="";
 
 
   String clientOrder="";
-  String OrderId="";
+  String orderId="";
   bool btnExpenseHide=false;
   bool btnExpenseEditHide=false;
   TextEditingController balance=TextEditingController();
@@ -58,6 +56,14 @@ class _SetSpendingCompState extends State<SetSpendingComp> {
   TextEditingController balanceEdit=TextEditingController();
   TextEditingController purposeEdit=TextEditingController();
   TextEditingController commentDataEdit=TextEditingController();
+  String safariId="none";
+  String safariName="SafariName";
+  String options="others";
+  num inputData=0;
+  int maxLength = 15; // Set your desired maximum length
+
+
+
 
 
 
@@ -87,7 +93,7 @@ class _SetSpendingCompState extends State<SetSpendingComp> {
               child: Container(
                 alignment: Alignment.center,
                 color: Colors.white70,
-                child: CircularProgressIndicator(),
+                child: const CircularProgressIndicator(),
               ),
             ),
           ),
@@ -105,10 +111,10 @@ class _SetSpendingCompState extends State<SetSpendingComp> {
         //ProfilePic().profile(),
 
         Padding(
-          padding:EdgeInsets.fromLTRB(8,10,8,0),
+          padding:const EdgeInsets.fromLTRB(8,10,8,0),
           child: Card(
             elevation:0,
-            margin: EdgeInsets.symmetric(vertical:1,horizontal:5),
+            margin: const EdgeInsets.symmetric(vertical:1,horizontal:5),
             //color:Colors.white,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15.0),
@@ -117,8 +123,8 @@ class _SetSpendingCompState extends State<SetSpendingComp> {
 
             child: ListTile(
                 leading: CircleAvatar(
-                  child: Icon(_getRandomIcon()),
                   backgroundColor:getRandomColor(),
+                  child: Icon(_getRandomIcon()),
                 ),
                 title:Row(
                   children: [
@@ -137,7 +143,7 @@ class _SetSpendingCompState extends State<SetSpendingComp> {
                                   text: TextSpan(
                                     text: "Total:",
                                     style: DefaultTextStyle.of(context).style,
-                                    children: <TextSpan>[
+                                    children: const <TextSpan>[
 
 
                                     ],
@@ -164,9 +170,8 @@ class _SetSpendingCompState extends State<SetSpendingComp> {
                           crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
 
-                            Icon(Icons.segment,color:Colors.orange,size:13,),
-                            Text("${(_data.length>0)?_data[0]['totSpending']:0}",style:GoogleFonts.pacifico(fontSize:15,color: Colors.orange,fontWeight: FontWeight.w700)),
-
+                            const Icon(Icons.segment,color:Colors.orange,size:13,),
+                            Text("${(_data.isNotEmpty)?_data[0]['totSpending']:0}",style:GoogleFonts.pacifico(fontSize:15,color: Colors.orange,fontWeight: FontWeight.w700)),
 
                           ],
                         ),
@@ -181,17 +186,13 @@ class _SetSpendingCompState extends State<SetSpendingComp> {
 
                   ],
                 ),
-                trailing:Container(child:
-                GestureDetector(
+                trailing:GestureDetector(
                     onTap: () async{
 
                       addSpending();
 
                     },
-                    child:Icon(Icons.grid_view,color:Colors.orange)
-                )
-
-
+                    child:const Icon(Icons.grid_view,color:Colors.orange)
                 )
 
               //trailing: Text()
@@ -204,7 +205,7 @@ class _SetSpendingCompState extends State<SetSpendingComp> {
         Container(
           height: 55,
           //padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-          margin: EdgeInsets.fromLTRB(10, 20, 10, 10),
+          margin: const EdgeInsets.fromLTRB(10, 20, 10, 10),
           child: TextField(
 
             decoration: InputDecoration(
@@ -215,29 +216,7 @@ class _SetSpendingCompState extends State<SetSpendingComp> {
             ),
             onChanged: (text) async{
 
-              try {
-
-                var resultData=(await ParticipatedQuery().getSearchAllStockOnline(Topups(startlimit:limit,endlimit:_page),BonusModel(uidUser:'',productName:text))).data;
-                if(resultData["status"])
-                {
-                  setState(() {
-                    //print(Resul);
-                    isLoading=false;
-                    hasMoreData=false;
-                    _data.clear();
-
-                    _data.addAll(resultData["result"]);
-                  });
-                }
-                else{
-                  _data.clear();
-                  Quickdata();
-                }
-
-
-              } catch (e) {
-                print('Error: $e');
-              }
+              viewData(text,true);
 
               //print(this._data[index]["total_var"]);
               // print("Text changed to: $text");
@@ -256,142 +235,234 @@ class _SetSpendingCompState extends State<SetSpendingComp> {
               {
                 FocusNode test=FocusNode() ;
 
-                this._data[index]['focusNode']=test;
-                return Card(
-                  elevation:0,
-                  //margin: EdgeInsets.symmetric(vertical:1,horizontal:5),
-                  //color:Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(9.0),
-                    side: BorderSide(color:_data[index]["color_var"]??true?Colors.white:Colors.green, width: 2),
-                  ),
-
-                  child: ListTile(
-                      leading: CircleAvatar(
-                        child: Icon(_getRandomIcon()),
-                        backgroundColor:getRandomColor(),
+                _data[index]['focusNode']=test;
+                return Stack(
+                  children: [
+                    Card(
+                      elevation:0,
+                      //margin: EdgeInsets.symmetric(vertical:1,horizontal:5),
+                      //color:Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(9.0),
+                        side: BorderSide(color:_data[index]["color_var"]??true?Colors.white:Colors.green, width: 2),
                       ),
-                      title:Row(
-                        children: [
+
+                      child: ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor:getRandomColor(),
+                          child: Icon(_getRandomIcon()),
+                        ),
+                        title:Row(
+
+                          children: [
+
+                            Expanded(
+                              flex: 1,
+                              child: Stack(
+                                children: [
+
+                                  Column(
+                                    children: [
+
+                                      Padding(
+                                        padding: const EdgeInsets.fromLTRB(0, 10, 0, 2),
+                                        child: RichText(
+                                          text: TextSpan(
+                                            text: "${_data[index]['purpose']}",
+                                            style: DefaultTextStyle.of(context).style,
+                                            children: const <TextSpan>[
 
 
-                          Expanded(
-                            flex: 1,
-                            child: Stack(
-                              children: [
-
-                                Column(
-                                  children: [
-
-                                    Padding(
-                                      padding: const EdgeInsets.fromLTRB(0, 10, 0, 2),
-                                      child: RichText(
-                                        text: TextSpan(
-                                          text: "${_data[index]['purpose']}",
-                                          style: DefaultTextStyle.of(context).style,
-                                          children: <TextSpan>[
-
-
-                                          ],
+                                            ],
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                ),
+                                    ],
+                                  ),
 
 
-                              ],
+                                ],
+                              ),
                             ),
+
+                          ],
+                        ),
+
+                        subtitle: Padding(
+                          padding: const EdgeInsets.fromLTRB(0, 5, 0,5),
+                          child: Row(
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Wrap(
+                                    crossAxisAlignment: WrapCrossAlignment.center,
+                                    children: [
+
+                                      const Icon(Icons.segment,color:Colors.orange,size:13,),
+                                     Text("${(_data[index]['spendId']).toLowerCase()}"),
+
+                                    ],
+                                  ),
+
+                                  Wrap(
+                                    crossAxisAlignment: WrapCrossAlignment.center,
+                                    children: [
+
+                                      const Icon(Icons.segment,color:Colors.orange,size:13,),
+                                      Text("Amount:${_data[index]['spending']}"),
+
+                                    ],
+                                  ),
+
+
+
+
+                                ],
+                              ),
+
+                            ],
                           ),
-                        ],
-                      ),
-
-                      subtitle: Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 5, 0, 10),
-                        child: Row(
+                        ),
+                        trailing: Stack(
                           children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
-                                Wrap(
-                                  crossAxisAlignment: WrapCrossAlignment.center,
-                                  children: [
+                                IconButton(
+                                  icon: Icon(Icons.edit),
+                                  onPressed: () {
+                                    // Handle the first icon tap
+                                    Get.dialog(
+                                      AlertDialog(
+                                        title: Text('Confirmation'),
+                                        content: Text('Do you want to Edit ${_data[index]['OrderId']} ?'),
+                                        actions: [
+                                          ElevatedButton(
+                                            style: ElevatedButton.styleFrom(
 
-                                    Icon(Icons.segment,color:Colors.orange,size:13,),
-                                    Text("UID:${_data[index]['spendId']}"),
+                                              //primary: Colors.grey[300],
+                                              backgroundColor: Colors.red,
+                                              elevation:0,
+                                            ),
+                                            onPressed: () async{
+                                              if(isLoading) return;
+                                              isLoading=true;
+                                              int limit=10;
 
-                                  ],
+                                              var resultData=(await StockQuery().editOrder(Topups(uid:_data[index]['OrderId']))).data;
+
+                                              if(resultData["status"])
+                                              {
+
+
+
+                                                if(resultData["result"]!=0)
+                                                {
+                                                  Get.toNamed('/home');
+                                                }
+                                                else{
+                                                  setState(() {
+                                                    isLoading=false;
+                                                    hasMoreData=false;
+                                                    _data.clear();
+
+
+                                                  });
+                                                }
+
+
+
+
+                                              }
+                                              else{
+                                                setState(() {
+                                                  isLoading=false;
+                                                  hasMoreData=false;
+                                                  _data.clear();
+
+
+                                                });
+                                              }
+
+
+                                            },
+                                            child: Text('Yes'),
+                                          ),
+                                          ElevatedButton(
+                                            onPressed: () {
+                                              Get.back(); // close the alert dialog
+                                            },
+                                            child: Text('Close'),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
                                 ),
 
-                                Wrap(
-                                  crossAxisAlignment: WrapCrossAlignment.center,
-                                  children: [
+                                IconButton(
+                                  icon: Icon(Icons.grid_view,color:Colors.orange),
+                                  onPressed: () async{
+                                    // This function will be called when the icon is tapped.
+                                    // thisOrder(_data[index],index);
 
-                                    Icon(Icons.segment,color:Colors.orange,size:13,),
-                                    Text("Amount:${_data[index]['spending']}"),
 
-                                  ],
+
+                                    orderData=_data[index].values.toList();
+                                    print(orderData);
+
+
+                                    //print((await thisOrder())["result"]);
+                                    var resultData=(await thisOrder());
+                                    //print(resultData);
+                                    if(resultData["status"]){
+
+
+                                      setState(() {
+                                        isLoading=false;
+                                        thisListOrder.clear();
+
+                                        thisListOrder.addAll(resultData["result"]);
+
+
+                                      });
+                                      viewThisOrder();
+                                    }
+                                  },
                                 ),
-
-
-
-
                               ],
                             ),
 
                           ],
                         ),
+
+                        //trailing: Text()
                       ),
-                      trailing:Container(child:
-                      GestureDetector(
-                          onTap: () async{
-                            // This function will be called when the icon is tapped.
-                            // thisOrder(_data[index],index);
+                    ),
+                    Positioned(
+                      top:10,
+                      right: 28,
 
 
-
-                            orderData=_data[index].values.toList();
-                            print(orderData);
-
-
-                            //print((await thisOrder())["result"]);
-                            var resultData=(await thisOrder());
-                            //print(resultData);
-                            if(resultData["status"]){
-
-
-                              setState(() {
-                                isLoading=false;
-                                thisListOrder.clear();
-
-                                thisListOrder.addAll(resultData["result"]);
-
-
-                              });
-                              viewThisOrder();
-                            }
-
-                            //
-
-
-                          },
-                          child:Icon(Icons.grid_view,color:Colors.orange)
-                      )
-
-
-                      )
-
-                    //trailing: Text()
-                  ),
+                      child: Center(
+                        child: Text(
+                          '${_data[index]['created_at']}',
+                          style: TextStyle(color: Colors.deepOrange,fontSize: 10),
+                        ),
+                      ),
+                    ),
+                  ],
                 );
 
               }
               else{
                 return  Padding(
-                  padding:EdgeInsets.symmetric(vertical: 32),
+                  padding:const EdgeInsets.symmetric(vertical: 32),
                   child:Center(
                       child:hasMoreData?
-                      CircularProgressIndicator()
+                      const CircularProgressIndicator()
                           :const Text("no more Data")
 
                   ),
@@ -404,12 +475,13 @@ class _SetSpendingCompState extends State<SetSpendingComp> {
       ],
     );
   }
+  @override
   void initState()
   {
     super.initState();
     //getapi();
 
-    Quickdata();
+    quickData();
     _scrollController.addListener(_scrollListener);
 
   }
@@ -418,11 +490,12 @@ class _SetSpendingCompState extends State<SetSpendingComp> {
         !_scrollController.position.outOfRange) {
       _page=_page+10;
 
-      Quickdata();
+      quickData();
     }
   }
 
 
+  @override
   void dispose() {
 
 
@@ -450,39 +523,58 @@ class _SetSpendingCompState extends State<SetSpendingComp> {
 
   //
 
-  Quickdata()async
+  quickData()
+  {
+    viewData('test',false);
+
+  }
+  viewData(nameVal,searchVal) async
   {
     if(isLoading) return;
     isLoading=true;
     int limit=10;
 
-    var resultData=(await StockQuery().viewSpending(Topups(startlimit:limit,endlimit:_page))).data;
-
+    var resultData=(await StockQuery().viewSpending(Topups(startlimit:limit,endlimit:_page,name:nameVal,searchOption:searchVal))).data;
 
     if(resultData["status"])
     {
 
-      setState(() {
-        isLoading=false;
-        hasMoreData=false;
 
-        if(resultData["result"]!=0)
-        {
+
+      if(resultData["result"]!=0)
+      {
+        setState(() {
+          isLoading=false;
+          hasMoreData=false;
           _data.clear();
           _data.addAll(resultData["result"]);
 
-        }
+        });
+      }
+      else{
+        setState(() {
+          isLoading=false;
+          hasMoreData=false;
+          _data.clear();
+
+
+        });
+      }
+
+
+
+
+    }
+    else{
+      setState(() {
+        isLoading=false;
+        hasMoreData=false;
+        _data.clear();
 
 
       });
-      return true;
     }
-    else{
-      return false;
-    }
-
   }
-
   thisOrder2()async
   {
     if(isLoading) return;
@@ -545,9 +637,9 @@ class _SetSpendingCompState extends State<SetSpendingComp> {
           return
             Container(
 
-              padding:EdgeInsets.all(5.0),
+              padding:const EdgeInsets.all(5.0),
               height: 600,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(30),
@@ -578,7 +670,7 @@ class _SetSpendingCompState extends State<SetSpendingComp> {
 
 
                           return Container(
-                            margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                            margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
                             child: Card(
                               elevation:0.5,
                               //margin: EdgeInsets.symmetric(vertical:1,horizontal:5),
@@ -593,8 +685,8 @@ class _SetSpendingCompState extends State<SetSpendingComp> {
                                   // Text("sum:${orderSum}"),
                                   ListTile(
                                       leading: CircleAvatar(
-                                        child: Icon(_getRandomIcon()),
                                         backgroundColor:getRandomColor(),
+                                        child: Icon(_getRandomIcon()),
                                       ),
                                       title:Row(
                                         children: [
@@ -608,7 +700,7 @@ class _SetSpendingCompState extends State<SetSpendingComp> {
                                                   text: TextSpan(
                                                     text:"${thisListOrder[index]["productName"]} (${thisListOrder[index]["pcs"]} pcs):",
                                                     style: DefaultTextStyle.of(context).style,
-                                                    children: <TextSpan>[
+                                                    children: const <TextSpan>[
 
 
                                                     ],
@@ -628,11 +720,12 @@ class _SetSpendingCompState extends State<SetSpendingComp> {
                                                           WidgetSpan(
 
                                                             child: IntrinsicWidth(
+                                                              stepWidth: 0.5,
                                                               child: TextField(
 
 
                                                                 keyboardType: TextInputType.number,
-                                                                decoration: InputDecoration(
+                                                                decoration: const InputDecoration(
                                                                   hintText: '-1-',
                                                                   // hintText: '   -${(((Get.put(HideShowState()).delivery)[index]["totalQty"])!=((Get.put(HideShowState()).delivery)[index]["totalCount"]))?(((Get.put(HideShowState()).delivery)[index]["totalQty"]-(Get.put(HideShowState()).delivery)[index]["totalCount"])):1}-',
                                                                   hintStyle: TextStyle(color: Colors.red),
@@ -642,7 +735,7 @@ class _SetSpendingCompState extends State<SetSpendingComp> {
 
 
                                                                 ),
-                                                                style: TextStyle(
+                                                                style: const TextStyle(
                                                                   color: Colors.blue, // Set the text color to red
 
                                                                 ),
@@ -654,7 +747,6 @@ class _SetSpendingCompState extends State<SetSpendingComp> {
 
                                                                     if(((Get.put(HideShowState()).delivery)[index]["totalQty"])>=(Get.put(HideShowState()).delivery)[index]["currentQty"])
                                                                     {
-                                                                      print((Get.put(HideShowState()).delivery)[index]["currentQty"]);
 
 
 
@@ -688,8 +780,7 @@ class _SetSpendingCompState extends State<SetSpendingComp> {
 
 
                                                                 },
-                                                              ),
-                                                              stepWidth: 0.5, // set minimum width to 100
+                                                              ), // set minimum width to 100
                                                             ),
                                                           ),
 
@@ -719,7 +810,7 @@ class _SetSpendingCompState extends State<SetSpendingComp> {
                                             children: <Widget>[
                                               if((Get.put(HideShowState()).delivery)[index]["hideAddCart"]==1)
                                                 IconButton(
-                                                  icon: Icon(Icons.add_shopping_cart,
+                                                  icon: const Icon(Icons.add_shopping_cart,
                                                       size: 23.0,
                                                       color: Colors.grey),
                                                   onPressed: () async{
@@ -732,11 +823,11 @@ class _SetSpendingCompState extends State<SetSpendingComp> {
                                                     num totCount=(((Get.put(HideShowState()).delivery)[index]["totalCount"]-(Get.put(HideShowState()).delivery)[index]["currentQty"])>=0)?(Get.put(HideShowState()).delivery)[index]["totalCount"]:0;
                                                     if(totCount>0)
                                                     {
-                                                      var resultData=(await StockQuery().stockCount(Topups(uid:"${orderData[0]}"),QuickBonus(uid:"${productCode}",qty:"${(Get.put(HideShowState()).delivery)[index]["currentQty"]}",subscriber:"StockName",status:"status",description:"Delivered"), User(uid: "UidTransport",name:"refName"))).data;
+                                                      var resultData=(await StockQuery().stockCount(Topups(uid:"${orderData[0]}"),QuickBonus(uid:productCode,qty:"${(Get.put(HideShowState()).delivery)[index]["currentQty"]}",subscriber:"StockName",status:"status",description:"Delivered"), User(uid: "UidTransport",name:"refName"))).data;
 
                                                       if(resultData["status"])
                                                       {
-                                                        Quickdata();
+                                                        quickData();
                                                         // thisOrder2();
                                                         setState(() {
 
@@ -760,7 +851,7 @@ class _SetSpendingCompState extends State<SetSpendingComp> {
 
 
                                               IconButton(
-                                                icon: Icon(
+                                                icon: const Icon(
                                                     Icons.delete,
                                                     size: 23.0,
                                                     color: Colors.red
@@ -817,146 +908,313 @@ class _SetSpendingCompState extends State<SetSpendingComp> {
   }
 addSpendingMethod() async{
 
-  if(isLoading) return;
-  isLoading=true;
-  int limit=10;
+  try {
+    (Get.put(StockQuery()).updateHideLoader(false));
+    var resultData=(await StockQuery().addSpending(Topups(uid:safariId,name:safariName,amount:"$inputData",purpose:"${purpose.text}",desc:"${commentData.text}",optionCase:options))).data;
+    print(resultData);
+    if(resultData["status"])
+    {
+      viewData('test',false);
+      (Get.put(StockQuery()).updateHideLoader(true));
 
-  var resultData=(await StockQuery().addSpending(Topups(amount:"${balance}",purpose:"${purpose}",desc:"${commentData}"))).data;
+      (Get.put(StockQuery()).updateClientDebt(resultData["result"]));
 
+    }
+    else{
+      //print(resultData);
+      (Get.put(StockQuery()).updateHideLoader(true));
 
-  if(resultData["status"])
-  {
-
-    setState(() {
-      isLoading=false;
-      hasMoreData=false;
-
-      if(resultData["result"]!=0)
-      {
-        _data.clear();
-        _data.addAll(resultData["result"]);
-
-      }
+    }
 
 
-    });
-    return true;
+  } catch (e) {
+    print(e);
+    (Get.put(StockQuery()).updateHideLoader(true));
   }
-  else{
-    return false;
-  }
-  }
-  void addSpending() {
+
+
+}
+
+  void addSpending() async{
 
     Get.bottomSheet(
-
       StatefulBuilder(
         builder: (BuildContext context, StateSetter setState) {
           return
-            Container(
+            Stack(
+              children: [
+                Container(
+                  padding:const EdgeInsets.all(2.0),
+                  height: 320,
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(30),
+                      topRight: Radius.circular(30),
+                    ),
+                  ),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
 
-              padding:EdgeInsets.all(5.0),
-              height: 300,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(30),
-                  topRight: Radius.circular(30),
-                ),
-              ),
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    children: [
-                      SizedBox(height: 10.0,),
-                      Center(child: Text("Add Spending")),
-                      SizedBox(height: 10.0,),
-                      TextField(
+                        // (result!=null)?Text("barcode Type ${describeEnum(result!.format)} Data ${result!.code}"): const Text("Scan Code"),
 
-                        controller: balance,
-                        keyboardType: TextInputType.number,
-                        //obscureText: true,
-                        decoration: InputDecoration(
-                          contentPadding: const EdgeInsets.symmetric(vertical: 3,horizontal: 3),
-                          border: OutlineInputBorder(),
-                          labelText: 'Enter Amount',
-                          hintText: 'Enter Amount',
-                          hintStyle: TextStyle(
-                            color: Colors.grey,
-                          ),
+                        GetBuilder<StockQuery>(
+                          builder: (controller) {
+                            //return Text('Data: ${_controller.data}');
+                            return Column(
+                              children: [
+                                Padding(
+                                  padding:const EdgeInsets.fromLTRB(8,5,8,0),
+                                  child: Card(
+                                    elevation:0,
+                                    margin: const EdgeInsets.symmetric(vertical:1,horizontal:5),
+                                    //color:Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(15.0),
+                                      //side: BorderSide(color:_data[0]["color_var"]??true?Colors.white:Colors.green, width: 2),
+                                    ),
 
+                                    child: ListTile(
+                                        leading: CircleAvatar(
+                                          backgroundColor:getRandomColor(),
+                                          child: Icon(_getRandomIcon()),
+                                        ),
+                                        title:Row(
+                                          children: [
+
+
+                                            Expanded(
+                                              flex: 1,
+                                              child: Stack(
+                                                children: [
+
+                                                  Column(
+                                                    children: [
+
+                                                      Center(
+                                                        child: RichText(
+                                                          text: TextSpan(
+                                                            text: "${(Get.put(StockQuery()).clientDebt)["name"]}",
+                                                            style: DefaultTextStyle.of(context).style,
+                                                            children: const <TextSpan>[
+
+
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+
+
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+
+                                        subtitle: Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Column(
+
+                                              children: [
+                                                Wrap(
+                                                  crossAxisAlignment: WrapCrossAlignment.center,
+                                                  children: [
+
+                                                    Text("DEPT",style:GoogleFonts.odorMeanChey(fontSize:16,color: Colors.green,fontWeight: FontWeight.w700)),
+
+
+                                                  ],
+                                                ),
+                                                Wrap(
+                                                  crossAxisAlignment: WrapCrossAlignment.center,
+                                                  children: [
+
+                                                    const Icon(Icons.segment,color:Colors.orange,size:13,),
+                                                    Text("${(Get.put(StockQuery()).clientDebt)["debt"]}",style:GoogleFonts.pacifico(fontSize:15,color: Colors.orange,fontWeight: FontWeight.w700)),
+
+
+                                                  ],
+                                                ),
+
+
+
+
+
+
+
+
+                                              ],
+                                            ),
+
+                                          ],
+                                        ),
+                                        trailing:GestureDetector(
+                                            onTap: () async{
+
+                                             // getDebtWidget();
+
+                                            },
+                                            child:const Icon(Icons.grid_view,color:Colors.orange)
+                                        )
+
+                                      //trailing: Text()
+                                    ),
+                                  ),
+                                ),
+
+                              ],
+                            );
+                          },
                         ),
-                        onChanged: (text) {
-    if((double.tryParse(text) != null)){
-balance.text=text.toString();
-btnExpenseHide=true;
-    }
-    else{
-      btnExpenseHide=false;
-    }
-                        }
-
-                      ),
-                      SizedBox(height: 10.0,),
-                      TextField(
-                        controller: purpose,
+                        if((Get.put(StockQuery()).paidDeptScanHide))
+                          Container(
 
 
-                        //obscureText: true,
-                        decoration: InputDecoration(
-                          contentPadding: const EdgeInsets.symmetric(vertical: 3,horizontal: 3),
-                          border: OutlineInputBorder(),
-                          labelText: 'Purpose',
-                          hintText: 'Purpose',
-                          hintStyle: TextStyle(
-                            color: Colors.grey,
+                            padding:const EdgeInsets.fromLTRB(5,0,10,0),
+
+
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(30),
+                                topRight: Radius.circular(30),
+                              ),
+                            ),
+                            child: SingleChildScrollView(
+                              child: Column(
+                                children: [
+                                  const SizedBox(height: 5.0,),
+
+                                  TextField(
+                                    // controller: uidEdit,
+
+                                    keyboardType: TextInputType.number,
+                                    //obscureText: true,
+                                    decoration: const InputDecoration(
+                                      contentPadding: EdgeInsets.symmetric(vertical: 3,horizontal: 3),
+                                      border: OutlineInputBorder(),
+                                      labelText: 'Enter Amount',
+                                      hintText: 'Enter Amount',
+
+                                      hintStyle: TextStyle(
+                                        color: Colors.grey,
+                                      ),
+
+                                    ),
+                                    onChanged: (value){
+                                      if((num.tryParse(value) != null)){
+                                        setState((){
+                                          inputData=num.parse(value);
+
+                                          //print(value);
+                                        });
+
+
+
+                                      }
+
+
+
+
+                                    },
+
+
+                                  ),
+                                  const SizedBox(height: 10.0,),
+                                  TextField(
+                                    controller: purpose,
+
+                                    maxLength: maxLength,
+                                    //obscureText: true,
+                                    decoration: const InputDecoration(
+                                      contentPadding: EdgeInsets.symmetric(vertical: 3,horizontal: 3),
+                                      border: OutlineInputBorder(),
+                                      labelText: 'Enter  purpose Maximum 15',
+                                      hintText: 'Purpose',
+                                      hintStyle: TextStyle(
+                                        color: Colors.grey,
+                                      ),
+
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10.0,),
+                                  TextField(
+
+                                    controller:commentData,
+                                    keyboardType: TextInputType.multiline,
+                                    maxLines: null,
+                                    //obscureText: true,
+                                    decoration: const InputDecoration(
+                                      contentPadding: EdgeInsets.symmetric(vertical: 3,horizontal: 3),
+                                      border: OutlineInputBorder(),
+                                      labelText: 'Comment',
+                                      hintText: 'Comment',
+                                      hintStyle: TextStyle(
+                                        color: Colors.grey,
+                                      ),
+
+                                    ),
+                                  ),
+
+                                  const SizedBox(height: 5.0,),
+
+                                  FloatingActionButton.extended(
+                                      label: const Text('Paid Dept'), // <-- Text
+                                      backgroundColor: Colors.black,
+                                      icon: const Icon( // <-- Icon
+                                        Icons.thumb_up,
+                                        size: 24.0,
+                                      ),
+                                      onPressed: () =>{
+                                        //paidDebt()
+                                        addSpendingMethod(),
+
+                                      }),
+                                ],
+                              ),
+                            ),
                           ),
 
-                        ),
-                      ),
-                      SizedBox(height: 10.0,),
-                      TextField(
+                        const SizedBox(height:2.0,),
+                        //if(!(Get.put(StockQuery()).paidDeptScanHide))
 
-                       controller:commentData,
-                        keyboardType: TextInputType.multiline,
-                        maxLines: null,
-                        //obscureText: true,
-                        decoration: InputDecoration(
-                          contentPadding: const EdgeInsets.symmetric(vertical: 3,horizontal: 3),
-                          border: OutlineInputBorder(),
-                          labelText: 'Comment',
-                          hintText: 'Comment',
-                          hintStyle: TextStyle(
-                            color: Colors.grey,
-                          ),
 
-                        ),
-                      ),
 
-                      SizedBox(height: 10.0,),
-                      if(btnExpenseHide)
-                        FloatingActionButton.extended(
-                          label: Text('Submit Expense'), // <-- Text
-                          backgroundColor: Colors.black,
-                          icon: Icon( // <-- Icon
-                            Icons.thumb_up,
-                            size: 24.0,
-                          ),
-                          onPressed: () =>{
-                            addSpendingMethod()
 
-                          }),
-                    ],
+
+                      ],
+                    ),
                   ),
                 ),
-              ),
+                GetBuilder<StockQuery>(
+                  builder: (myLoadercontroller) {
+                    //return Text('Data: ${_controller.data}');
+                    return
+                      (myLoadercontroller.hideLoader)?
+                      const Text(""):
+                      Positioned.fill(
+                        child: Center(
+                          child: Container(
+                            alignment: Alignment.center,
+                            color: Colors.white70,
+                            child: const CircularProgressIndicator(),
+                          ),
+                        ),
+                      );
+                  },
+                ),
+
+              ],
             );
+
         },
       ),
     ).whenComplete(() {
-      // Get.put(HideShowState()).isDelivery(0);
-      //do whatever you want after closing the bottom sheet
+
     });
 
   }
@@ -964,9 +1222,8 @@ btnExpenseHide=true;
 
     if(isLoading) return;
     isLoading=true;
-    int limit=10;
 
-    var resultData=(await StockQuery().editSpending(Topups(amount:"${balance}",purpose:"${purpose}",desc:"${commentData}"))).data;
+    var resultData=(await StockQuery().editSpending(Topups(amount:"$balance",purpose:"$purpose",desc:"$commentData"))).data;
 
 
     if(resultData["status"])
@@ -1003,9 +1260,9 @@ btnExpenseHide=true;
           return
             Container(
 
-              padding:EdgeInsets.all(5.0),
+              padding:const EdgeInsets.all(5.0),
               height: 300,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(30),
@@ -1017,17 +1274,17 @@ btnExpenseHide=true;
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
                     children: [
-                      SizedBox(height: 10.0,),
-                      Center(child: Text("Edit Spending")),
+                      const SizedBox(height: 10.0,),
+                      const Center(child: Text("Edit Spending")),
                       Center(child: Text("${indexData["spendId"]}")),
-                      SizedBox(height: 10.0,),
+                      const SizedBox(height: 10.0,),
                       TextField(
                           controller: uidEdit,
 
                           keyboardType: TextInputType.number,
                           //obscureText: true,
-                          decoration: InputDecoration(
-                            contentPadding: const EdgeInsets.symmetric(vertical: 3,horizontal: 3),
+                          decoration: const InputDecoration(
+                            contentPadding: EdgeInsets.symmetric(vertical: 3,horizontal: 3),
                             border: OutlineInputBorder(),
                             labelText: 'Enter Amount',
                             hintText: 'Enter Amount',
@@ -1044,8 +1301,8 @@ btnExpenseHide=true;
 
                           keyboardType: TextInputType.number,
                           //obscureText: true,
-                          decoration: InputDecoration(
-                            contentPadding: const EdgeInsets.symmetric(vertical: 3,horizontal: 3),
+                          decoration: const InputDecoration(
+                            contentPadding: EdgeInsets.symmetric(vertical: 3,horizontal: 3),
                             border: OutlineInputBorder(),
                             labelText: 'Enter Amount',
                             hintText: 'Enter Amount',
@@ -1068,14 +1325,14 @@ btnExpenseHide=true;
                           }
 
                       ),
-                      SizedBox(height: 10.0,),
+                      const SizedBox(height: 10.0,),
                       TextField(
                         controller: purposeEdit,
 
 
                         //obscureText: true,
-                        decoration: InputDecoration(
-                          contentPadding: const EdgeInsets.symmetric(vertical: 3,horizontal: 3),
+                        decoration: const InputDecoration(
+                          contentPadding: EdgeInsets.symmetric(vertical: 3,horizontal: 3),
                           border: OutlineInputBorder(),
                           labelText: 'Purpose',
                           hintText: 'Purpose',
@@ -1085,15 +1342,15 @@ btnExpenseHide=true;
 
                         ),
                       ),
-                      SizedBox(height: 10.0,),
+                      const SizedBox(height: 10.0,),
                       TextField(
 
                         controller:commentDataEdit,
                         keyboardType: TextInputType.multiline,
                         maxLines: null,
                         //obscureText: true,
-                        decoration: InputDecoration(
-                          contentPadding: const EdgeInsets.symmetric(vertical: 3,horizontal: 3),
+                        decoration: const InputDecoration(
+                          contentPadding: EdgeInsets.symmetric(vertical: 3,horizontal: 3),
                           border: OutlineInputBorder(),
                           labelText: 'Comment',
                           hintText: 'Comment',
@@ -1104,12 +1361,12 @@ btnExpenseHide=true;
                         ),
                       ),
 
-                      SizedBox(height: 10.0,),
+                      const SizedBox(height: 10.0,),
                       if(btnExpenseEditHide)
                         FloatingActionButton.extended(
-                          label: Text('Submit Expense'), // <-- Text
+                          label: const Text('Submit Expense'), // <-- Text
                           backgroundColor: Colors.black,
-                          icon: Icon( // <-- Icon
+                          icon: const Icon( // <-- Icon
                             Icons.thumb_up,
                             size: 24.0,
                           ),

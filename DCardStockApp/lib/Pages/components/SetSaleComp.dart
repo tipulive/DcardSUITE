@@ -1,16 +1,12 @@
 import 'dart:math';
 
 
-import '../../../Query/ParticipatedQuery.dart';
 import '../../../Utilconfig/HideShowState.dart';
-import '../../../models/QuickBonus.dart';
 
 import '../../../models/Topups.dart';
-import '../../../models/User.dart';
 import 'package:get/get.dart';
 
 import '../../Query/StockQuery.dart';
-import '../../models/BonusModel.dart';
 import 'package:flutter/material.dart';
 
 import 'package:google_fonts/google_fonts.dart';
@@ -28,8 +24,8 @@ class SetSaleComp extends StatefulWidget {
 
 class _SetSaleCompState extends State<SetSaleComp> {
 
-  ScrollController _scrollController = ScrollController();// detect scroll
-  List<dynamic> _data = [];
+  final ScrollController _scrollController = ScrollController();// detect scroll
+  final List<dynamic> _data = [];
   List<dynamic> thisListOrder = [];
   List<dynamic> orderData = [];
 
@@ -75,7 +71,7 @@ class _SetSaleCompState extends State<SetSaleComp> {
               child: Container(
                 alignment: Alignment.center,
                 color: Colors.white70,
-                child: CircularProgressIndicator(),
+                child: const CircularProgressIndicator(),
               ),
             ),
           ),
@@ -93,10 +89,10 @@ class _SetSaleCompState extends State<SetSaleComp> {
         //ProfilePic().profile(),
 
         Padding(
-          padding:EdgeInsets.fromLTRB(8,10,8,0),
+          padding:const EdgeInsets.fromLTRB(8,10,8,0),
           child: Card(
             elevation:0,
-            margin: EdgeInsets.symmetric(vertical:1,horizontal:5),
+            margin: const EdgeInsets.symmetric(vertical:1,horizontal:5),
             //color:Colors.white,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15.0),
@@ -105,8 +101,8 @@ class _SetSaleCompState extends State<SetSaleComp> {
 
             child: ListTile(
                 leading: CircleAvatar(
-                  child: Icon(_getRandomIcon()),
                   backgroundColor:getRandomColor(),
+                  child: Icon(_getRandomIcon()),
                 ),
                 title:Row(
                   children: [
@@ -125,7 +121,7 @@ class _SetSaleCompState extends State<SetSaleComp> {
                                   text: TextSpan(
                                     text: "Total:",
                                     style: DefaultTextStyle.of(context).style,
-                                    children: <TextSpan>[
+                                    children: const <TextSpan>[
 
 
                                     ],
@@ -152,8 +148,8 @@ class _SetSaleCompState extends State<SetSaleComp> {
                           crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
 
-                            Icon(Icons.segment,color:Colors.orange,size:13,),
-                            Text("${(_data.length>0)?_data[0]['saleBalance']:0}",style:GoogleFonts.pacifico(fontSize:15,color: Colors.orange,fontWeight: FontWeight.w700)),
+                            const Icon(Icons.segment,color:Colors.orange,size:13,),
+                            Text("${(_data.isNotEmpty)?_data[0]['saleBalance']:0}",style:GoogleFonts.pacifico(fontSize:15,color: Colors.orange,fontWeight: FontWeight.w700)),
 
 
                           ],
@@ -169,17 +165,13 @@ class _SetSaleCompState extends State<SetSaleComp> {
 
                   ],
                 ),
-                trailing:Container(child:
-                GestureDetector(
+                trailing:GestureDetector(
                     onTap: () async{
 
 
 
                     },
-                    child:Icon(Icons.grid_view,color:Colors.orange)
-                )
-
-
+                    child:const Icon(Icons.grid_view,color:Colors.orange)
                 )
 
               //trailing: Text()
@@ -192,7 +184,7 @@ class _SetSaleCompState extends State<SetSaleComp> {
         Container(
           height: 55,
           //padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-          margin: EdgeInsets.fromLTRB(10, 20, 10, 10),
+          margin: const EdgeInsets.fromLTRB(10, 20, 10, 10),
           child: TextField(
 
             decoration: InputDecoration(
@@ -203,29 +195,7 @@ class _SetSaleCompState extends State<SetSaleComp> {
             ),
             onChanged: (text) async{
 
-              try {
-
-                var resultData=(await ParticipatedQuery().getSearchAllStockOnline(Topups(startlimit:limit,endlimit:_page),BonusModel(uidUser:'',productName:text))).data;
-                if(resultData["status"])
-                {
-                  setState(() {
-                    //print(Resul);
-                    isLoading=false;
-                    hasMoreData=false;
-                    _data.clear();
-
-                    _data.addAll(resultData["result"]);
-                  });
-                }
-                else{
-                  _data.clear();
-                  Quickdata();
-                }
-
-
-              } catch (e) {
-                print('Error: $e');
-              }
+              viewData(text,true);
 
               //print(this._data[index]["total_var"]);
               // print("Text changed to: $text");
@@ -244,142 +214,234 @@ class _SetSaleCompState extends State<SetSaleComp> {
               {
                 FocusNode test=FocusNode() ;
 
-                this._data[index]['focusNode']=test;
-                return Card(
-                  elevation:0,
-                  //margin: EdgeInsets.symmetric(vertical:1,horizontal:5),
-                  //color:Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(9.0),
-                    side: BorderSide(color:_data[index]["color_var"]??true?Colors.white:Colors.green, width: 2),
-                  ),
-
-                  child: ListTile(
-                      leading: CircleAvatar(
-                        child: Icon(_getRandomIcon()),
-                        backgroundColor:getRandomColor(),
+                _data[index]['focusNode']=test;
+                return Stack(
+                  children: [
+                    Card(
+                      elevation:0,
+                      //margin: EdgeInsets.symmetric(vertical:1,horizontal:5),
+                      //color:Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(9.0),
+                        side: BorderSide(color:_data[index]["color_var"]??true?Colors.white:Colors.green, width: 2),
                       ),
-                      title:Row(
-                        children: [
+
+                      child: ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor:getRandomColor(),
+                          child: Icon(_getRandomIcon()),
+                        ),
+                        title:Row(
+
+                          children: [
+
+                            Expanded(
+                              flex: 1,
+                              child: Stack(
+                                children: [
+
+                                  Column(
+                                    children: [
+
+                                      Padding(
+                                        padding: const EdgeInsets.fromLTRB(0, 10, 0, 2),
+                                        child: RichText(
+                                          text: TextSpan(
+                                            text: "${_data[index]['name']}:",
+                                            style: DefaultTextStyle.of(context).style,
+                                            children: const <TextSpan>[
 
 
-                          Expanded(
-                            flex: 1,
-                            child: Stack(
-                              children: [
-
-                                Column(
-                                  children: [
-
-                                    Padding(
-                                      padding: const EdgeInsets.fromLTRB(0, 10, 0, 2),
-                                      child: RichText(
-                                        text: TextSpan(
-                                          text: "${_data[index]['name']}:",
-                                          style: DefaultTextStyle.of(context).style,
-                                          children: <TextSpan>[
-
-
-                                          ],
+                                            ],
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                ),
+                                    ],
+                                  ),
 
 
-                              ],
+                                ],
+                              ),
                             ),
+
+                          ],
+                        ),
+
+                        subtitle: Padding(
+                          padding: const EdgeInsets.fromLTRB(0, 5, 0,5),
+                          child: Row(
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Wrap(
+                                    crossAxisAlignment: WrapCrossAlignment.center,
+                                    children: [
+
+                                      const Icon(Icons.segment,color:Colors.orange,size:13,),
+                                      Text("${_data[index]['OrderId']}"),
+
+                                    ],
+                                  ),
+
+                                  Wrap(
+                                    crossAxisAlignment: WrapCrossAlignment.center,
+                                    children: [
+
+                                      const Icon(Icons.segment,color:Colors.orange,size:13,),
+                                      Text("Amount:${_data[index]['totalPaid']}"),
+
+                                    ],
+                                  ),
+
+
+
+
+                                ],
+                              ),
+
+                            ],
                           ),
-                        ],
-                      ),
-
-                      subtitle: Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 5, 0, 10),
-                        child: Row(
+                        ),
+                        trailing: Stack(
                           children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
-                                Wrap(
-                                  crossAxisAlignment: WrapCrossAlignment.center,
-                                  children: [
+                                IconButton(
+                                  icon: Icon(Icons.edit),
+                                  onPressed: () {
+                                    // Handle the first icon tap
+                                    Get.dialog(
+                                      AlertDialog(
+                                        title: Text('Confirmation'),
+                                        content: Text('Do you want to Edit ${_data[index]['OrderId']} ?'),
+                                        actions: [
+                                          ElevatedButton(
+                                            style: ElevatedButton.styleFrom(
 
-                                    Icon(Icons.segment,color:Colors.orange,size:13,),
-                                    Text("UID:${_data[index]['OrderId']}"),
+                                              //primary: Colors.grey[300],
+                                              backgroundColor: Colors.red,
+                                              elevation:0,
+                                            ),
+                                            onPressed: () async{
+                                              if(isLoading) return;
+                                              isLoading=true;
+                                              int limit=10;
 
-                                  ],
+                                              var resultData=(await StockQuery().editOrder(Topups(uid:_data[index]['OrderId']))).data;
+
+                                              if(resultData["status"])
+                                              {
+
+
+
+                                                if(resultData["result"]!=0)
+                                                {
+                                                  Get.toNamed('/home');
+                                                }
+                                                else{
+                                                  setState(() {
+                                                    isLoading=false;
+                                                    hasMoreData=false;
+                                                    _data.clear();
+
+
+                                                  });
+                                                }
+
+
+
+
+                                              }
+                                              else{
+                                                setState(() {
+                                                  isLoading=false;
+                                                  hasMoreData=false;
+                                                  _data.clear();
+
+
+                                                });
+                                              }
+
+
+                                            },
+                                            child: Text('Yes'),
+                                          ),
+                                          ElevatedButton(
+                                            onPressed: () {
+                                              Get.back(); // close the alert dialog
+                                            },
+                                            child: Text('Close'),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
                                 ),
 
-                                Wrap(
-                                  crossAxisAlignment: WrapCrossAlignment.center,
-                                  children: [
+                                IconButton(
+                                  icon: Icon(Icons.grid_view,color:Colors.orange),
+                                  onPressed: () async{
+                                    // This function will be called when the icon is tapped.
+                                    // thisOrder(_data[index],index);
 
-                                    Icon(Icons.segment,color:Colors.orange,size:13,),
-                                    Text("Amount:${_data[index]['totalPaid']}"),
 
-                                  ],
+
+                                    orderData=_data[index].values.toList();
+                                    print(orderData);
+
+
+                                    //print((await thisOrder())["result"]);
+                                    var resultData=(await thisOrder());
+                                    //print(resultData);
+                                    if(resultData["status"]){
+
+
+                                      setState(() {
+                                        isLoading=false;
+                                        thisListOrder.clear();
+
+                                        thisListOrder.addAll(resultData["result"]);
+
+
+                                      });
+                                      viewThisOrder();
+                                    }
+                                  },
                                 ),
-
-
-
-
                               ],
                             ),
 
                           ],
                         ),
+
+                        //trailing: Text()
                       ),
-                      trailing:Container(child:
-                      GestureDetector(
-                          onTap: () async{
-                            // This function will be called when the icon is tapped.
-                            // thisOrder(_data[index],index);
+                    ),
+                    Positioned(
+                      top:10,
+                      right: 28,
 
 
-
-                            orderData=_data[index].values.toList();
-                            print(orderData);
-
-
-                            //print((await thisOrder())["result"]);
-                            var resultData=(await thisOrder());
-                            //print(resultData);
-                            if(resultData["status"]){
-
-
-                              setState(() {
-                                isLoading=false;
-                                thisListOrder.clear();
-
-                                thisListOrder.addAll(resultData["result"]);
-
-
-                              });
-                              viewThisOrder();
-                            }
-
-                            //
-
-
-                          },
-                          child:Icon(Icons.grid_view,color:Colors.orange)
-                      )
-
-
-                      )
-
-                    //trailing: Text()
-                  ),
+                      child: Center(
+                        child: Text(
+                          '${_data[index]['created_at']}',
+                          style: TextStyle(color: Colors.deepOrange,fontSize: 10),
+                        ),
+                      ),
+                    ),
+                  ],
                 );
 
               }
               else{
                 return  Padding(
-                  padding:EdgeInsets.symmetric(vertical: 32),
+                  padding:const EdgeInsets.symmetric(vertical: 32),
                   child:Center(
                       child:hasMoreData?
-                      CircularProgressIndicator()
+                      const CircularProgressIndicator()
                           :const Text("no more Data")
 
                   ),
@@ -392,6 +454,7 @@ class _SetSaleCompState extends State<SetSaleComp> {
       ],
     );
   }
+  @override
   void initState()
   {
     super.initState();
@@ -411,6 +474,7 @@ class _SetSaleCompState extends State<SetSaleComp> {
   }
 
 
+  @override
   void dispose() {
 
 
@@ -440,37 +504,56 @@ class _SetSaleCompState extends State<SetSaleComp> {
 
   Quickdata()async
   {
+    viewData('test',false);
+
+  }
+  viewData(nameVal,searchVal) async{
     if(isLoading) return;
     isLoading=true;
     int limit=10;
 
-    var resultData=(await StockQuery().viewSales(Topups(startlimit:limit,endlimit:_page))).data;
-
+    var resultData=(await StockQuery().viewSales(Topups(startlimit:limit,endlimit:_page,name:nameVal,searchOption:searchVal))).data;
 
     if(resultData["status"])
     {
 
-      setState(() {
-        isLoading=false;
-        hasMoreData=false;
 
-        if(resultData["result"]!=0)
-        {
+
+      if(resultData["result"]!=0)
+      {
+        setState(() {
+          isLoading=false;
+          hasMoreData=false;
           _data.clear();
           _data.addAll(resultData["result"]);
 
-        }
+        });
+      }
+      else{
+        setState(() {
+          isLoading=false;
+          hasMoreData=false;
+          _data.clear();
+
+
+        });
+      }
+
+
+
+
+    }
+    else{
+      setState(() {
+        isLoading=false;
+        hasMoreData=false;
+        _data.clear();
 
 
       });
-      return true;
-    }
-    else{
-      return false;
     }
 
   }
-
   thisOrder2()async
   {
     if(isLoading) return;
@@ -533,9 +616,9 @@ class _SetSaleCompState extends State<SetSaleComp> {
           return
             Container(
 
-              padding:EdgeInsets.all(5.0),
+              padding:const EdgeInsets.all(5.0),
               height: 600,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(30),
@@ -566,7 +649,7 @@ class _SetSaleCompState extends State<SetSaleComp> {
 
 
                           return Container(
-                            margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                            margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
                             child: Card(
                               elevation:0.5,
                               //margin: EdgeInsets.symmetric(vertical:1,horizontal:5),
@@ -581,8 +664,8 @@ class _SetSaleCompState extends State<SetSaleComp> {
                                   // Text("sum:${orderSum}"),
                                   ListTile(
                                       leading: CircleAvatar(
-                                        child: Icon(_getRandomIcon()),
                                         backgroundColor:getRandomColor(),
+                                        child: Icon(_getRandomIcon()),
                                       ),
                                       title:Row(
                                         children: [
@@ -596,7 +679,7 @@ class _SetSaleCompState extends State<SetSaleComp> {
                                                   text: TextSpan(
                                                     text:"${thisListOrder[index]["productName"]} (${thisListOrder[index]["pcs"]} pcs):",
                                                     style: DefaultTextStyle.of(context).style,
-                                                    children: <TextSpan>[
+                                                    children: const <TextSpan>[
 
 
                                                     ],

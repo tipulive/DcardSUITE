@@ -12,7 +12,6 @@ import '../Query/AdminQuery.dart';
 import '../Utilconfig/HideShowState.dart';
 import '../models/Admin.dart';
 import '../Utilconfig/ConstantClassUtil.dart';
-import 'Homepage.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 
 
@@ -37,7 +36,7 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Center(child: Text('Login')),
+          title: const Center(child: Text('Login')),
         ),
         body: Stack(
           children: [
@@ -77,11 +76,10 @@ class _LoginState extends State<Login> {
                               borderRadius: BorderRadius.circular(5.0),
                             ),
                             //suffixIcon:Obx(() => Get.put(HideShowState()).isNumberValid.value?Icon(Icons.done,color:Colors.green,):Icon(Icons.dangerous,color:Colors.red,)),
-                            suffixIcon:isValid?Icon(Icons.done,color:Colors.green,):Icon(Icons.dangerous,color:Colors.red,)
+                            suffixIcon:isValid?const Icon(Icons.done,color:Colors.green,):const Icon(Icons.dangerous,color:Colors.red,)
 
                           ),
                           onChanged: (phone) {
-                            print(uidInput.text);
 
                             if((uidInput.text).isPhoneNumber)
                             {
@@ -104,7 +102,7 @@ class _LoginState extends State<Login> {
                           onCountryChanged: (country) {
 
 
-                            uidInput2.text="+"+country.dialCode;
+                            uidInput2.text="+${country.dialCode}";
                             if((uidInput.text).isPhoneNumber)
                             {
                               //Get.put(HideShowState()).isValid(true);
@@ -123,16 +121,13 @@ class _LoginState extends State<Login> {
                       ),
                       Visibility(
                         visible: false,
-                        child: Container(
-
-                          child: TextField(
-                            controller: uidInput2,
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(90.0),
-                              ),
-                              labelText: 'Ccode',
+                        child: TextField(
+                          controller: uidInput2,
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(90.0),
                             ),
+                            labelText: 'Ccode',
                           ),
                         ),
                       ),
@@ -172,7 +167,6 @@ class _LoginState extends State<Login> {
 
                       TextButton(
                         onPressed: () {
-                          print(uidInput.text);
                         },
                         child: Text(
                           'Forgot Password?',
@@ -193,7 +187,7 @@ class _LoginState extends State<Login> {
                 child: Container(
                   alignment: Alignment.center,
                   color: Colors.white70,
-                  child: CircularProgressIndicator(),
+                  child: const CircularProgressIndicator(),
                 ),
               ),
             ),
@@ -235,7 +229,6 @@ setState(() {
       if (response.statusCode == 200) {
         //print(params);
        // print("done");
-        print(response);
         //return response.data;
         //return response.data["User"]["name"];
         if((await AdminQuery().addData(Admin(uid:response.data["User"]["uid"],name:response.data["User"]["name"],subscriber:response.data["User"]["subscriber"],AuthToken: response.data["token"],email: response.data["User"]["email"],phone: response.data["User"]["tel"])))>0)
@@ -279,7 +272,7 @@ setState(() {
           alignment: Alignment.bottomCenter,
           children: [
             SingleChildScrollView(
-              child: Container(
+              child: SizedBox(
                 height: 200,
 
                 child: Column(
@@ -288,7 +281,7 @@ setState(() {
                     Container(
 
                       height: 200,
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(20),
@@ -297,7 +290,7 @@ setState(() {
                       ),
                       child: ListView(
                         children: [
-                          SizedBox(height: 10.0,),
+                          const SizedBox(height: 10.0,),
                           SingleChildScrollView(
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
@@ -307,11 +300,11 @@ setState(() {
                                 crossAxisAlignment:CrossAxisAlignment.start,
                                 children: <Widget> [
 
-                                  TextField(
+                                  const TextField(
 
                                     //obscureText: true,
                                     decoration: InputDecoration(
-                                      contentPadding: const EdgeInsets.symmetric(vertical: 3,horizontal: 3),
+                                      contentPadding: EdgeInsets.symmetric(vertical: 3,horizontal: 3),
                                       border: OutlineInputBorder(),
                                       labelText: 'Enter Balance',
                                       hintText: 'Enter Balance',
@@ -321,14 +314,14 @@ setState(() {
 
                                     ),
                                   ),
-                                  SizedBox(height: 10.0,),
-                                  TextField(
+                                  const SizedBox(height: 10.0,),
+                                  const TextField(
 
                                     keyboardType: TextInputType.multiline,
                                     maxLines: null,
                                     //obscureText: true,
                                     decoration: InputDecoration(
-                                      contentPadding: const EdgeInsets.symmetric(vertical: 3,horizontal: 3),
+                                      contentPadding: EdgeInsets.symmetric(vertical: 3,horizontal: 3),
                                       border: OutlineInputBorder(),
                                       labelText: 'Enter Description',
                                       hintText: 'Enter Description',
@@ -338,12 +331,12 @@ setState(() {
 
                                     ),
                                   ),
-                                  SizedBox(height: 10.0,),
+                                  const SizedBox(height: 10.0,),
                                   Center(
                                     child: FloatingActionButton.extended(
-                                      label: Text('Add Balance'), // <-- Text
+                                      label: const Text('Add Balance'), // <-- Text
                                       backgroundColor: Colors.black,
-                                      icon: Icon( // <-- Icon
+                                      icon: const Icon( // <-- Icon
                                         Icons.thumb_up,
                                         size: 24.0,
                                       ),
@@ -379,8 +372,8 @@ setState(() {
             Positioned(
 
               child: Container(
-                padding: EdgeInsets.all(16),
-                child: CircularProgressIndicator(),
+                padding: const EdgeInsets.all(16),
+                child: const CircularProgressIndicator(),
               ),
             ),
           ],
@@ -396,8 +389,8 @@ setState(() {
         children: [
           // your BottomSheet content goes here
           Container(
-            padding: EdgeInsets.all(16),
-            child: Text('BottomSheet Content'),
+            padding: const EdgeInsets.all(16),
+            child: const Text('BottomSheet Content'),
           ),
           Positioned.fill(
             child: Container(
@@ -409,8 +402,8 @@ setState(() {
             left: 0,
             right: 0,
             child: Container(
-              padding: EdgeInsets.all(16),
-              child: CircularProgressIndicator(),
+              padding: const EdgeInsets.all(16),
+              child: const CircularProgressIndicator(),
             ),
           ),
         ],

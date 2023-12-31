@@ -1,7 +1,6 @@
 import 'dart:math';
 
 
-import '../../../Query/ParticipatedQuery.dart';
 import '../../../Utilconfig/HideShowState.dart';
 import '../../../models/QuickBonus.dart';
 
@@ -10,7 +9,6 @@ import '../../../models/User.dart';
 import 'package:get/get.dart';
 
 import '../../Query/StockQuery.dart';
-import '../../models/BonusModel.dart';
 import 'package:flutter/material.dart';
 
 import 'package:google_fonts/google_fonts.dart';
@@ -28,8 +26,8 @@ class SetDeptComp extends StatefulWidget {
 
 class _SetDeptCompState extends State<SetDeptComp> {
 
-  ScrollController _scrollController = ScrollController();// detect scroll
-  List<dynamic> _data = [];
+  final ScrollController _scrollController = ScrollController();// detect scroll
+  final List<dynamic> _data = [];
   List<dynamic> thisListOrder = [];
   List<dynamic> orderData = [];
 
@@ -41,11 +39,11 @@ class _SetDeptCompState extends State<SetDeptComp> {
   int limit=0;
   bool hasMoreData=true;
   bool isLoading=false;
-  num qty_product=1;
+  num qtyProduct=1;
   String productCode="";
 
   String clientOrder="";
-  String OrderId="";
+  String orderId="";
 
 
 
@@ -75,7 +73,7 @@ class _SetDeptCompState extends State<SetDeptComp> {
               child: Container(
                 alignment: Alignment.center,
                 color: Colors.white70,
-                child: CircularProgressIndicator(),
+                child: const CircularProgressIndicator(),
               ),
             ),
           ),
@@ -93,10 +91,10 @@ class _SetDeptCompState extends State<SetDeptComp> {
         //ProfilePic().profile(),
 
         Padding(
-          padding:EdgeInsets.fromLTRB(8,10,8,0),
+          padding:const EdgeInsets.fromLTRB(8,10,8,0),
           child: Card(
             elevation:0,
-            margin: EdgeInsets.symmetric(vertical:1,horizontal:5),
+            margin: const EdgeInsets.symmetric(vertical:1,horizontal:5),
             //color:Colors.white,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15.0),
@@ -105,8 +103,8 @@ class _SetDeptCompState extends State<SetDeptComp> {
 
             child: ListTile(
                 leading: CircleAvatar(
-                  child: Icon(_getRandomIcon()),
                   backgroundColor:getRandomColor(),
+                  child: Icon(_getRandomIcon()),
                 ),
                 title:Row(
                   children: [
@@ -125,7 +123,7 @@ class _SetDeptCompState extends State<SetDeptComp> {
                                   text: TextSpan(
                                     text: "Total:",
                                     style: DefaultTextStyle.of(context).style,
-                                    children: <TextSpan>[
+                                    children: const <TextSpan>[
 
 
                                     ],
@@ -152,8 +150,8 @@ class _SetDeptCompState extends State<SetDeptComp> {
                           crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
 
-                            Icon(Icons.segment,color:Colors.orange,size:13,),
-                            Text("${(_data.length>0)?_data[0]['totDept']:0}",style:GoogleFonts.pacifico(fontSize:15,color: Colors.orange,fontWeight: FontWeight.w700)),
+                            const Icon(Icons.segment,color:Colors.orange,size:13,),
+                            Text("${(_data.isNotEmpty)?_data[0]['totDept']:0}",style:GoogleFonts.pacifico(fontSize:15,color: Colors.orange,fontWeight: FontWeight.w700)),
 
 
 
@@ -170,17 +168,13 @@ class _SetDeptCompState extends State<SetDeptComp> {
 
                   ],
                 ),
-                trailing:Container(child:
-                GestureDetector(
+                trailing:GestureDetector(
                     onTap: () async{
 
 
 
                     },
-                    child:Icon(Icons.grid_view,color:Colors.orange)
-                )
-
-
+                    child:const Icon(Icons.grid_view,color:Colors.orange)
                 )
 
               //trailing: Text()
@@ -192,7 +186,7 @@ class _SetDeptCompState extends State<SetDeptComp> {
         Container(
           height: 55,
           //padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-          margin: EdgeInsets.fromLTRB(10, 20, 10, 10),
+          margin: const EdgeInsets.fromLTRB(10, 20, 10, 10),
           child: TextField(
 
             decoration: InputDecoration(
@@ -203,29 +197,7 @@ class _SetDeptCompState extends State<SetDeptComp> {
             ),
             onChanged: (text) async{
 
-              try {
-
-                var resultData=(await ParticipatedQuery().getSearchAllStockOnline(Topups(startlimit:limit,endlimit:_page),BonusModel(uidUser:'',productName:text))).data;
-                if(resultData["status"])
-                {
-                  setState(() {
-                    //print(Resul);
-                    isLoading=false;
-                    hasMoreData=false;
-                    _data.clear();
-
-                    _data.addAll(resultData["result"]);
-                  });
-                }
-                else{
-                  _data.clear();
-                  Quickdata();
-                }
-
-
-              } catch (e) {
-                print('Error: $e');
-              }
+              viewData(text,true);
 
               //print(this._data[index]["total_var"]);
               // print("Text changed to: $text");
@@ -244,7 +216,7 @@ class _SetDeptCompState extends State<SetDeptComp> {
               {
                 FocusNode test=FocusNode() ;
 
-                this._data[index]['focusNode']=test;
+                _data[index]['focusNode']=test;
                 return Card(
                   elevation:0,
                   //margin: EdgeInsets.symmetric(vertical:1,horizontal:5),
@@ -256,8 +228,8 @@ class _SetDeptCompState extends State<SetDeptComp> {
 
                   child: ListTile(
                       leading: CircleAvatar(
-                        child: Icon(_getRandomIcon()),
                         backgroundColor:getRandomColor(),
+                        child: Icon(_getRandomIcon()),
                       ),
                       title:Row(
                         children: [
@@ -277,7 +249,7 @@ class _SetDeptCompState extends State<SetDeptComp> {
                                         text: TextSpan(
                                           text: "${_data[index]['name']}:",
                                           style: DefaultTextStyle.of(context).style,
-                                          children: <TextSpan>[
+                                          children: const <TextSpan>[
 
 
                                           ],
@@ -301,20 +273,12 @@ class _SetDeptCompState extends State<SetDeptComp> {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
+
                                 Wrap(
                                   crossAxisAlignment: WrapCrossAlignment.center,
                                   children: [
 
-                                    Icon(Icons.segment,color:Colors.orange,size:13,),
-                                    Text("UID:${_data[index]['OrderId']}"),
-
-                                  ],
-                                ),
-                                Wrap(
-                                  crossAxisAlignment: WrapCrossAlignment.center,
-                                  children: [
-
-                                    Icon(Icons.segment,color:Colors.orange,size:13,),
+                                    const Icon(Icons.segment,color:Colors.orange,size:13,),
                                     Text("Dept:${_data[index]['debt']}"),
 
                                   ],
@@ -326,8 +290,7 @@ class _SetDeptCompState extends State<SetDeptComp> {
                           ],
                         ),
                       ),
-                      trailing:Container(child:
-                      GestureDetector(
+                      trailing:GestureDetector(
                           onTap: () async{
                             // This function will be called when the icon is tapped.
                             // thisOrder(_data[index],index);
@@ -358,10 +321,7 @@ class _SetDeptCompState extends State<SetDeptComp> {
 
 
                           },
-                          child:Icon(Icons.grid_view,color:Colors.orange)
-                      )
-
-
+                          child:const Icon(Icons.grid_view,color:Colors.orange)
                       )
 
                     //trailing: Text()
@@ -371,10 +331,10 @@ class _SetDeptCompState extends State<SetDeptComp> {
               }
               else{
                 return  Padding(
-                  padding:EdgeInsets.symmetric(vertical: 32),
+                  padding:const EdgeInsets.symmetric(vertical: 32),
                   child:Center(
                       child:hasMoreData?
-                      CircularProgressIndicator()
+                      const CircularProgressIndicator()
                           :const Text("no more Data")
 
                   ),
@@ -387,12 +347,13 @@ class _SetDeptCompState extends State<SetDeptComp> {
       ],
     );
   }
+  @override
   void initState()
   {
     super.initState();
     //getapi();
 
-    Quickdata();
+    quickData();
     _scrollController.addListener(_scrollListener);
 
   }
@@ -401,11 +362,12 @@ class _SetDeptCompState extends State<SetDeptComp> {
         !_scrollController.position.outOfRange) {
       _page=_page+10;
 
-      Quickdata();
+      quickData();
     }
   }
 
 
+  @override
   void dispose() {
 
 
@@ -433,39 +395,57 @@ class _SetDeptCompState extends State<SetDeptComp> {
 
   //
 
-  Quickdata()async
+  quickData()
   {
+    viewData('test',false);
+
+  }
+  viewData(nameVal,searchVal) async{
     if(isLoading) return;
     isLoading=true;
     int limit=10;
 
-    var resultData=(await StockQuery().viewDept(Topups(startlimit:limit,endlimit:_page))).data;
-
+    var resultData=(await StockQuery().viewDept(Topups(startlimit:limit,endlimit:_page,name:nameVal,searchOption:searchVal))).data;
 
     if(resultData["status"])
     {
 
-      setState(() {
-        isLoading=false;
-        hasMoreData=false;
 
-        if(resultData["result"]!=0)
-        {
+
+      if(resultData["result"]!=0)
+      {
+        setState(() {
+          isLoading=false;
+          hasMoreData=false;
           _data.clear();
           _data.addAll(resultData["result"]);
 
-        }
+        });
+      }
+      else{
+        setState(() {
+          isLoading=false;
+          hasMoreData=false;
+          _data.clear();
+
+
+        });
+      }
+
+
+
+
+    }
+    else{
+      setState(() {
+        isLoading=false;
+        hasMoreData=false;
+        _data.clear();
 
 
       });
-      return true;
     }
-    else{
-      return false;
-    }
-
   }
-
   thisOrder2()async
   {
     if(isLoading) return;
@@ -526,9 +506,9 @@ class _SetDeptCompState extends State<SetDeptComp> {
         builder: (BuildContext context, StateSetter setState) {
           return
             Container(
-              padding:EdgeInsets.all(5.0),
+              padding:const EdgeInsets.all(5.0),
               height: 600,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(30),
@@ -559,7 +539,7 @@ class _SetDeptCompState extends State<SetDeptComp> {
 
 
                           return Container(
-                            margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                            margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
                             child: Card(
                               elevation:0,
                               //margin: EdgeInsets.symmetric(vertical:1,horizontal:5),
@@ -574,8 +554,8 @@ class _SetDeptCompState extends State<SetDeptComp> {
                                   // Text("sum:${orderSum}"),
                                   ListTile(
                                       leading: CircleAvatar(
-                                        child: Icon(_getRandomIcon()),
                                         backgroundColor:getRandomColor(),
+                                        child: Icon(_getRandomIcon()),
                                       ),
                                       title:Row(
                                         children: [
@@ -589,7 +569,7 @@ class _SetDeptCompState extends State<SetDeptComp> {
                                                   text: TextSpan(
                                                     text:"${thisListOrder[index]["productName"]} (${thisListOrder[index]["pcs"]} pcs):",
                                                     style: DefaultTextStyle.of(context).style,
-                                                    children: <TextSpan>[
+                                                    children: const <TextSpan>[
 
 
                                                     ],
@@ -609,11 +589,12 @@ class _SetDeptCompState extends State<SetDeptComp> {
                                                           WidgetSpan(
 
                                                             child: IntrinsicWidth(
+                                                              stepWidth: 0.5,
                                                               child: TextField(
 
 
                                                                 keyboardType: TextInputType.number,
-                                                                decoration: InputDecoration(
+                                                                decoration: const InputDecoration(
                                                                   hintText: '-1-',
                                                                   // hintText: '   -${(((Get.put(HideShowState()).delivery)[index]["totalQty"])!=((Get.put(HideShowState()).delivery)[index]["totalCount"]))?(((Get.put(HideShowState()).delivery)[index]["totalQty"]-(Get.put(HideShowState()).delivery)[index]["totalCount"])):1}-',
                                                                   hintStyle: TextStyle(color: Colors.red),
@@ -623,7 +604,7 @@ class _SetDeptCompState extends State<SetDeptComp> {
 
 
                                                                 ),
-                                                                style: TextStyle(
+                                                                style: const TextStyle(
                                                                   color: Colors.blue, // Set the text color to red
 
                                                                 ),
@@ -635,7 +616,6 @@ class _SetDeptCompState extends State<SetDeptComp> {
 
                                                                     if(((Get.put(HideShowState()).delivery)[index]["totalQty"])>=(Get.put(HideShowState()).delivery)[index]["currentQty"])
                                                                     {
-                                                                      print((Get.put(HideShowState()).delivery)[index]["currentQty"]);
 
 
 
@@ -669,8 +649,7 @@ class _SetDeptCompState extends State<SetDeptComp> {
 
 
                                                                 },
-                                                              ),
-                                                              stepWidth: 0.5, // set minimum width to 100
+                                                              ), // set minimum width to 100
                                                             ),
                                                           ),
 
@@ -700,7 +679,7 @@ class _SetDeptCompState extends State<SetDeptComp> {
                                             children: <Widget>[
                                               if((Get.put(HideShowState()).delivery)[index]["hideAddCart"]==1)
                                                 IconButton(
-                                                  icon: Icon(Icons.add_shopping_cart,
+                                                  icon: const Icon(Icons.add_shopping_cart,
                                                       size: 23.0,
                                                       color: Colors.grey),
                                                   onPressed: () async{
@@ -713,11 +692,11 @@ class _SetDeptCompState extends State<SetDeptComp> {
                                                     num totCount=(((Get.put(HideShowState()).delivery)[index]["totalCount"]-(Get.put(HideShowState()).delivery)[index]["currentQty"])>=0)?(Get.put(HideShowState()).delivery)[index]["totalCount"]:0;
                                                     if(totCount>0)
                                                     {
-                                                      var resultData=(await StockQuery().stockCount(Topups(uid:"${orderData[0]}"),QuickBonus(uid:"${productCode}",qty:"${(Get.put(HideShowState()).delivery)[index]["currentQty"]}",subscriber:"StockName",status:"status",description:"Delivered"), User(uid: "UidTransport",name:"refName"))).data;
+                                                      var resultData=(await StockQuery().stockCount(Topups(uid:"${orderData[0]}"),QuickBonus(uid:productCode,qty:"${(Get.put(HideShowState()).delivery)[index]["currentQty"]}",subscriber:"StockName",status:"status",description:"Delivered"), User(uid: "UidTransport",name:"refName"))).data;
 
                                                       if(resultData["status"])
                                                       {
-                                                        Quickdata();
+                                                        quickData();
                                                         // thisOrder2();
                                                         setState(() {
 
@@ -741,7 +720,7 @@ class _SetDeptCompState extends State<SetDeptComp> {
 
 
                                               IconButton(
-                                                icon: Icon(
+                                                icon: const Icon(
                                                     Icons.delete,
                                                     size: 23.0,
                                                     color: Colors.red
@@ -801,7 +780,7 @@ class _SetDeptCompState extends State<SetDeptComp> {
   {
 
 
-    (Get.put(HideShowState())).isChangeDelivery(thisListOrder[indexData],indexData,qty_product);
+    (Get.put(HideShowState())).isChangeDelivery(thisListOrder[indexData],indexData,qtyProduct);
 
 
     // print((Get.put(HideShowState()).delivery)[indexData]);

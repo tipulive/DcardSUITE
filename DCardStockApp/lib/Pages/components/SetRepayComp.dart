@@ -1,7 +1,6 @@
 import 'dart:math';
 
 
-import 'package:dStock/models/Participated.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 import '../../../Query/ParticipatedQuery.dart';
@@ -31,8 +30,8 @@ class SetRepayComp extends StatefulWidget {
 
 class _SetRepayCompState extends State<SetRepayComp> {
 
-  ScrollController _scrollController = ScrollController();// detect scroll
-  List<dynamic> _data = [];
+  final ScrollController _scrollController = ScrollController();// detect scroll
+  final List<dynamic> _data = [];
   List<dynamic> thisListOrder = [];
   List<dynamic> orderData = [];
   List<dynamic>qrDebt = [];
@@ -46,7 +45,7 @@ class _SetRepayCompState extends State<SetRepayComp> {
   int limit=0;
   bool hasMoreData=true;
   bool isLoading=false;
-  num qty_product=1;
+  num qtyProduct=1;
   String productCode="";
   num inputData=0;
 
@@ -95,7 +94,7 @@ class _SetRepayCompState extends State<SetRepayComp> {
               child: Container(
                 alignment: Alignment.center,
                 color: Colors.white70,
-                child: CircularProgressIndicator(),
+                child: const CircularProgressIndicator(),
               ),
             ),
           ),
@@ -113,10 +112,10 @@ class _SetRepayCompState extends State<SetRepayComp> {
         //ProfilePic().profile(),
 
         Padding(
-          padding:EdgeInsets.fromLTRB(8,10,8,0),
+          padding:const EdgeInsets.fromLTRB(8,10,8,0),
           child: Card(
             elevation:0,
-            margin: EdgeInsets.symmetric(vertical:1,horizontal:5),
+            margin: const EdgeInsets.symmetric(vertical:1,horizontal:5),
             //color:Colors.white,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15.0),
@@ -125,8 +124,8 @@ class _SetRepayCompState extends State<SetRepayComp> {
 
             child: ListTile(
                 leading: CircleAvatar(
-                  child: Icon(_getRandomIcon()),
                   backgroundColor:getRandomColor(),
+                  child: Icon(_getRandomIcon()),
                 ),
                 title:Row(
                   children: [
@@ -145,7 +144,7 @@ class _SetRepayCompState extends State<SetRepayComp> {
                                   text: TextSpan(
                                     text: "Repay Dept:",
                                     style: DefaultTextStyle.of(context).style,
-                                    children: <TextSpan>[
+                                    children: const <TextSpan>[
 
 
                                     ],
@@ -172,8 +171,8 @@ class _SetRepayCompState extends State<SetRepayComp> {
                           crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
 
-                            Icon(Icons.segment,color:Colors.orange,size:13,),
-                            Text("${(_data.length>0)?_data[0]['borrowBalance']:0}",style:GoogleFonts.pacifico(fontSize:15,color: Colors.orange,fontWeight: FontWeight.w700)),
+                            const Icon(Icons.segment,color:Colors.orange,size:13,),
+                            Text("${(_data.isNotEmpty)?_data[0]['borrowBalance']:0}",style:GoogleFonts.pacifico(fontSize:15,color: Colors.orange,fontWeight: FontWeight.w700)),
 
 
                           ],
@@ -189,17 +188,13 @@ class _SetRepayCompState extends State<SetRepayComp> {
 
                   ],
                 ),
-                trailing:Container(child:
-                GestureDetector(
+                trailing:GestureDetector(
                     onTap: () async{
 
                       getDebtWidget();
 
                     },
-                    child:Icon(Icons.grid_view,color:Colors.orange)
-                )
-
-
+                    child:const Icon(Icons.grid_view,color:Colors.orange)
                 )
 
               //trailing: Text()
@@ -212,7 +207,7 @@ class _SetRepayCompState extends State<SetRepayComp> {
         Container(
           height: 55,
           //padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-          margin: EdgeInsets.fromLTRB(10, 20, 10, 10),
+          margin: const EdgeInsets.fromLTRB(10, 20, 10, 10),
           child: TextField(
 
             decoration: InputDecoration(
@@ -239,12 +234,12 @@ class _SetRepayCompState extends State<SetRepayComp> {
                 }
                 else{
                   _data.clear();
-                  Quickdata();
+                  quickData();
                 }
 
 
               } catch (e) {
-                print('Error: $e');
+
               }
 
               //print(this._data[index]["total_var"]);
@@ -264,7 +259,7 @@ class _SetRepayCompState extends State<SetRepayComp> {
               {
                 FocusNode test=FocusNode() ;
 
-                this._data[index]['focusNode']=test;
+                _data[index]['focusNode']=test;
                 return Card(
                   elevation:0,
                   //margin: EdgeInsets.symmetric(vertical:1,horizontal:5),
@@ -276,8 +271,8 @@ class _SetRepayCompState extends State<SetRepayComp> {
 
                   child: ListTile(
                       leading: CircleAvatar(
-                        child: Icon(_getRandomIcon()),
                         backgroundColor:getRandomColor(),
+                        child: Icon(_getRandomIcon()),
                       ),
                       title:Row(
                         children: [
@@ -297,7 +292,7 @@ class _SetRepayCompState extends State<SetRepayComp> {
                                         text: TextSpan(
                                           text: "${_data[index]['AmountOwner']}",
                                           style: DefaultTextStyle.of(context).style,
-                                          children: <TextSpan>[
+                                          children: const <TextSpan>[
 
 
                                           ],
@@ -325,7 +320,7 @@ class _SetRepayCompState extends State<SetRepayComp> {
                                   crossAxisAlignment: WrapCrossAlignment.center,
                                   children: [
 
-                                    Icon(Icons.segment,color:Colors.orange,size:13,),
+                                    const Icon(Icons.segment,color:Colors.orange,size:13,),
                                     Text("Amount:${_data[index]['amount']}"),
 
                                   ],
@@ -341,8 +336,7 @@ class _SetRepayCompState extends State<SetRepayComp> {
                           ],
                         ),
                       ),
-                      trailing:Container(child:
-                      GestureDetector(
+                      trailing:GestureDetector(
                           onTap: () async{
                             // This function will be called when the icon is tapped.
                             // thisOrder(_data[index],index);
@@ -350,7 +344,6 @@ class _SetRepayCompState extends State<SetRepayComp> {
 
 
                             orderData=_data[index].values.toList();
-                            print(orderData);
 
 
                             //print((await thisOrder())["result"]);
@@ -374,10 +367,7 @@ class _SetRepayCompState extends State<SetRepayComp> {
 
 
                           },
-                          child:Icon(Icons.grid_view,color:Colors.orange)
-                      )
-
-
+                          child:const Icon(Icons.grid_view,color:Colors.orange)
                       )
 
                     //trailing: Text()
@@ -387,10 +377,10 @@ class _SetRepayCompState extends State<SetRepayComp> {
               }
               else{
                 return  Padding(
-                  padding:EdgeInsets.symmetric(vertical: 32),
+                  padding:const EdgeInsets.symmetric(vertical: 32),
                   child:Center(
                       child:hasMoreData?
-                      CircularProgressIndicator()
+                      const CircularProgressIndicator()
                           :const Text("no more Data")
 
                   ),
@@ -403,12 +393,13 @@ class _SetRepayCompState extends State<SetRepayComp> {
       ],
     );
   }
+  @override
   void initState()
   {
     super.initState();
     //getapi();
 
-    Quickdata();
+    quickData();
     _scrollController.addListener(_scrollListener);
 
   }
@@ -417,11 +408,12 @@ class _SetRepayCompState extends State<SetRepayComp> {
         !_scrollController.position.outOfRange) {
       _page=_page+10;
 
-      Quickdata();
+      quickData();
     }
   }
 
 
+  @override
   void dispose() {
 
 
@@ -432,7 +424,7 @@ class _SetRepayCompState extends State<SetRepayComp> {
   void _onQRViewCreated(QRViewController controller)
   {
     this.controller=controller;
-    controller!.resumeCamera();
+    controller.resumeCamera();
     controller.scannedDataStream.listen((scanData) async{
       setState((){
         result=scanData;
@@ -447,7 +439,6 @@ class _SetRepayCompState extends State<SetRepayComp> {
         if(containsProductCode)
         {
           //data already scaned
-          print("already exist");
 
         }
         else{
@@ -473,7 +464,6 @@ class _SetRepayCompState extends State<SetRepayComp> {
       //print(resultData);
       if(resultData["status"])
       {
-        print(resultData["result"][0]);
         (Get.put(StockQuery()).updateHideLoader(true));
         (Get.put(StockQuery()).updatePaidDeptScanHide(false));
         (Get.put(StockQuery()).updateClientDebt(resultData["result"][0]));
@@ -483,7 +473,6 @@ class _SetRepayCompState extends State<SetRepayComp> {
 
       });*/
 
-        print("${(Get.put(StockQuery()).clientDebt)}");
 
 
 
@@ -532,7 +521,7 @@ class _SetRepayCompState extends State<SetRepayComp> {
         value: cameraValue,
         onChanged:(value)async{
           setState((){
-            this.cameraValue=value;
+            cameraValue=value;
 
             //print(value);
           });
@@ -580,36 +569,52 @@ class _SetRepayCompState extends State<SetRepayComp> {
 
   //
 
-  Quickdata()async
+  quickData()async
   {
     if(isLoading) return;
     isLoading=true;
     int limit=10;
 
     var resultData=(await StockQuery().viewBorrowBalance(Topups(startlimit:limit,endlimit:_page))).data;
-
-
     if(resultData["status"])
     {
 
-      setState(() {
-        isLoading=false;
-        hasMoreData=false;
 
-        if(resultData["result"]!=0)
-        {
+
+      if(resultData["result"]!=0)
+      {
+        setState(() {
+          isLoading=false;
+          hasMoreData=false;
           _data.clear();
           _data.addAll(resultData["result"]);
 
-        }
+        });
+      }
+      else{
+        setState(() {
+          isLoading=false;
+          hasMoreData=false;
+          _data.clear();
+
+
+        });
+      }
+
+
+
+
+    }
+    else{
+      setState(() {
+        isLoading=false;
+        hasMoreData=false;
+        _data.clear();
 
 
       });
-      return true;
     }
-    else{
-      return false;
-    }
+
 
   }
 
@@ -675,9 +680,9 @@ class _SetRepayCompState extends State<SetRepayComp> {
           return
             Container(
 
-              padding:EdgeInsets.all(5.0),
+              padding:const EdgeInsets.all(5.0),
               height: 600,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(30),
@@ -708,7 +713,7 @@ class _SetRepayCompState extends State<SetRepayComp> {
 
 
                           return Container(
-                            margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                            margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
                             child: Card(
                               elevation:0.5,
                               //margin: EdgeInsets.symmetric(vertical:1,horizontal:5),
@@ -723,8 +728,8 @@ class _SetRepayCompState extends State<SetRepayComp> {
                                   // Text("sum:${orderSum}"),
                                   ListTile(
                                       leading: CircleAvatar(
-                                        child: Icon(_getRandomIcon()),
                                         backgroundColor:getRandomColor(),
+                                        child: Icon(_getRandomIcon()),
                                       ),
                                       title:Row(
                                         children: [
@@ -738,7 +743,7 @@ class _SetRepayCompState extends State<SetRepayComp> {
                                                   text: TextSpan(
                                                     text:"${thisListOrder[index]["productName"]} (${thisListOrder[index]["pcs"]} pcs):",
                                                     style: DefaultTextStyle.of(context).style,
-                                                    children: <TextSpan>[
+                                                    children: const <TextSpan>[
 
 
                                                     ],
@@ -758,11 +763,12 @@ class _SetRepayCompState extends State<SetRepayComp> {
                                                           WidgetSpan(
 
                                                             child: IntrinsicWidth(
+                                                              stepWidth: 0.5,
                                                               child: TextField(
 
 
                                                                 keyboardType: TextInputType.number,
-                                                                decoration: InputDecoration(
+                                                                decoration: const InputDecoration(
                                                                   hintText: '-1-',
                                                                   // hintText: '   -${(((Get.put(HideShowState()).delivery)[index]["totalQty"])!=((Get.put(HideShowState()).delivery)[index]["totalCount"]))?(((Get.put(HideShowState()).delivery)[index]["totalQty"]-(Get.put(HideShowState()).delivery)[index]["totalCount"])):1}-',
                                                                   hintStyle: TextStyle(color: Colors.red),
@@ -772,7 +778,7 @@ class _SetRepayCompState extends State<SetRepayComp> {
 
 
                                                                 ),
-                                                                style: TextStyle(
+                                                                style: const TextStyle(
                                                                   color: Colors.blue, // Set the text color to red
 
                                                                 ),
@@ -784,7 +790,6 @@ class _SetRepayCompState extends State<SetRepayComp> {
 
                                                                     if(((Get.put(HideShowState()).delivery)[index]["totalQty"])>=(Get.put(HideShowState()).delivery)[index]["currentQty"])
                                                                     {
-                                                                      print((Get.put(HideShowState()).delivery)[index]["currentQty"]);
 
 
 
@@ -818,8 +823,7 @@ class _SetRepayCompState extends State<SetRepayComp> {
 
 
                                                                 },
-                                                              ),
-                                                              stepWidth: 0.5, // set minimum width to 100
+                                                              ), // set minimum width to 100
                                                             ),
                                                           ),
 
@@ -849,7 +853,7 @@ class _SetRepayCompState extends State<SetRepayComp> {
                                             children: <Widget>[
                                               if((Get.put(HideShowState()).delivery)[index]["hideAddCart"]==1)
                                                 IconButton(
-                                                  icon: Icon(Icons.add_shopping_cart,
+                                                  icon: const Icon(Icons.add_shopping_cart,
                                                       size: 23.0,
                                                       color: Colors.grey),
                                                   onPressed: () async{
@@ -862,11 +866,11 @@ class _SetRepayCompState extends State<SetRepayComp> {
                                                     num totCount=(((Get.put(HideShowState()).delivery)[index]["totalCount"]-(Get.put(HideShowState()).delivery)[index]["currentQty"])>=0)?(Get.put(HideShowState()).delivery)[index]["totalCount"]:0;
                                                     if(totCount>0)
                                                     {
-                                                      var resultData=(await StockQuery().stockCount(Topups(uid:"${orderData[0]}"),QuickBonus(uid:"${productCode}",qty:"${(Get.put(HideShowState()).delivery)[index]["currentQty"]}",subscriber:"StockName",status:"status",description:"Delivered"), User(uid: "UidTransport",name:"refName"))).data;
+                                                      var resultData=(await StockQuery().stockCount(Topups(uid:"${orderData[0]}"),QuickBonus(uid:productCode,qty:"${(Get.put(HideShowState()).delivery)[index]["currentQty"]}",subscriber:"StockName",status:"status",description:"Delivered"), User(uid: "UidTransport",name:"refName"))).data;
 
                                                       if(resultData["status"])
                                                       {
-                                                        Quickdata();
+                                                        quickData();
                                                         // thisOrder2();
                                                         setState(() {
 
@@ -890,7 +894,7 @@ class _SetRepayCompState extends State<SetRepayComp> {
 
 
                                               IconButton(
-                                                icon: Icon(
+                                                icon: const Icon(
                                                     Icons.delete,
                                                     size: 23.0,
                                                     color: Colors.red
@@ -955,9 +959,9 @@ class _SetRepayCompState extends State<SetRepayComp> {
             Stack(
               children: [
                 Container(
-                  padding:EdgeInsets.all(2.0),
+                  padding:const EdgeInsets.all(2.0),
                   height: 600,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(30),
@@ -970,15 +974,15 @@ class _SetRepayCompState extends State<SetRepayComp> {
                       // (result!=null)?Text("barcode Type ${describeEnum(result!.format)} Data ${result!.code}"): const Text("Scan Code"),
 
                       GetBuilder<StockQuery>(
-                        builder: (_controller) {
+                        builder: (controller) {
                           //return Text('Data: ${_controller.data}');
                           return Column(
                             children: [
                               Padding(
-                                padding:EdgeInsets.fromLTRB(8,5,8,0),
+                                padding:const EdgeInsets.fromLTRB(8,5,8,0),
                                 child: Card(
                                   elevation:0,
-                                  margin: EdgeInsets.symmetric(vertical:1,horizontal:5),
+                                  margin: const EdgeInsets.symmetric(vertical:1,horizontal:5),
                                   //color:Colors.white,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(15.0),
@@ -987,8 +991,8 @@ class _SetRepayCompState extends State<SetRepayComp> {
 
                                   child: ListTile(
                                       leading: CircleAvatar(
-                                        child: Icon(_getRandomIcon()),
                                         backgroundColor:getRandomColor(),
+                                        child: Icon(_getRandomIcon()),
                                       ),
                                       title:Row(
                                         children: [
@@ -1007,7 +1011,7 @@ class _SetRepayCompState extends State<SetRepayComp> {
                                                         text: TextSpan(
                                                           text: "${(Get.put(StockQuery()).clientDebt)["name"]}",
                                                           style: DefaultTextStyle.of(context).style,
-                                                          children: <TextSpan>[
+                                                          children: const <TextSpan>[
 
 
                                                           ],
@@ -1043,7 +1047,7 @@ class _SetRepayCompState extends State<SetRepayComp> {
                                                 crossAxisAlignment: WrapCrossAlignment.center,
                                                 children: [
 
-                                                  Icon(Icons.segment,color:Colors.orange,size:13,),
+                                                  const Icon(Icons.segment,color:Colors.orange,size:13,),
                                                   Text("${(Get.put(StockQuery()).clientDebt)["debt"]}",style:GoogleFonts.pacifico(fontSize:15,color: Colors.orange,fontWeight: FontWeight.w700)),
 
 
@@ -1062,17 +1066,13 @@ class _SetRepayCompState extends State<SetRepayComp> {
 
                                         ],
                                       ),
-                                      trailing:Container(child:
-                                      GestureDetector(
+                                      trailing:GestureDetector(
                                           onTap: () async{
 
                                             getDebtWidget();
 
                                           },
-                                          child:Icon(Icons.grid_view,color:Colors.orange)
-                                      )
-
-
+                                          child:const Icon(Icons.grid_view,color:Colors.orange)
                                       )
 
                                     //trailing: Text()
@@ -1088,10 +1088,10 @@ class _SetRepayCompState extends State<SetRepayComp> {
                         Container(
 
 
-                          padding:EdgeInsets.fromLTRB(5,0,10,0),
+                          padding:const EdgeInsets.fromLTRB(5,0,10,0),
 
 
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(30),
@@ -1101,15 +1101,15 @@ class _SetRepayCompState extends State<SetRepayComp> {
                           child: SingleChildScrollView(
                             child: Column(
                               children: [
-                                SizedBox(height: 5.0,),
+                                const SizedBox(height: 5.0,),
 
                                 TextField(
                                   // controller: uidEdit,
 
                                   keyboardType: TextInputType.number,
                                   //obscureText: true,
-                                  decoration: InputDecoration(
-                                    contentPadding: const EdgeInsets.symmetric(vertical: 3,horizontal: 3),
+                                  decoration: const InputDecoration(
+                                    contentPadding: EdgeInsets.symmetric(vertical: 3,horizontal: 3),
                                     border: OutlineInputBorder(),
                                     labelText: 'Enter Amount',
                                     hintText: 'Enter Amount',
@@ -1139,12 +1139,12 @@ class _SetRepayCompState extends State<SetRepayComp> {
                                 ),
 
 
-                                SizedBox(height: 2.0,),
+                                const SizedBox(height: 2.0,),
 
                                 FloatingActionButton.extended(
-                                    label: Text('Paid Dept'), // <-- Text
+                                    label: const Text('Paid Dept'), // <-- Text
                                     backgroundColor: Colors.black,
-                                    icon: Icon( // <-- Icon
+                                    icon: const Icon( // <-- Icon
                                       Icons.thumb_up,
                                       size: 24.0,
                                     ),
@@ -1157,7 +1157,7 @@ class _SetRepayCompState extends State<SetRepayComp> {
                           ),
                         ),
 
-                      SizedBox(height:2.0,),
+                      const SizedBox(height:2.0,),
                       //if(!(Get.put(StockQuery()).paidDeptScanHide))
                       Expanded(
                           flex: 5,
@@ -1213,13 +1213,13 @@ class _SetRepayCompState extends State<SetRepayComp> {
                     //return Text('Data: ${_controller.data}');
                     return
                       (myLoadercontroller.hideLoader)?
-                      Text(""):
+                      const Text(""):
                       Positioned.fill(
                         child: Center(
                           child: Container(
                             alignment: Alignment.center,
                             color: Colors.white70,
-                            child: CircularProgressIndicator(),
+                            child: const CircularProgressIndicator(),
                           ),
                         ),
                       );
@@ -1240,9 +1240,9 @@ class _SetRepayCompState extends State<SetRepayComp> {
 
     if(isLoading) return;
     isLoading=true;
-    int limit=10;
+    //int limit=10;
 
-    var resultData=(await StockQuery().editSpending(Topups(amount:"${balance}",purpose:"${purpose}",desc:"${commentData}"))).data;
+    var resultData=(await StockQuery().editSpending(Topups(amount:"$balance",purpose:"$purpose",desc:"$commentData"))).data;
 
 
     if(resultData["status"])

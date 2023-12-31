@@ -27,12 +27,13 @@ class AuthUserRegisterController extends Controller
 
     public function UserCreatedByCompany($input)
     {
+
         $uid=preg_replace('/[^A-Za-z0-9-]/','',$input['name']);//generated on production
         //echo $this->today;
         $uid=$uid.""."_".date(time());
                 $check=DB::table("users")
                 ->insert([
-                    'name'=>$input['name'],
+                    'name'=>strtolower($input['name']),
 
                     //'fname'=>$input['fname'],
                     //'lname'=>$input['lname'],
@@ -111,7 +112,7 @@ class AuthUserRegisterController extends Controller
                 $uid=$uid.""."_".date(time());
                         $check=DB::table("users")
                         ->insert([
-                            'name'=>$input['name'],
+                            'name'=>strtolower($input['name']),
 
                             //'fname'=>$input['fname'],
                             //'lname'=>$input['lname'],
@@ -229,7 +230,7 @@ class AuthUserRegisterController extends Controller
         $email=$input['email'];
         $check2=DB::update("update users set phone=:phone,PhoneNumber=:PhoneNumber,name=:name,email=:email,Ccode=:Ccode,password=:password,country=:country,initCountry=:initCountry,updated_at=:updated_at $queryCard where uid=:uid limit 1",array(
             "uid"=>$input["uid"],
-            'name'=>$input['name'],
+            'name'=>strtolower($input['name']),
             'email'=>$email,
             'Ccode'=>$input['Ccode'],//country code
             'phone'=>$input['phone']??'none',
@@ -275,7 +276,7 @@ class AuthUserRegisterController extends Controller
         $uid=$uid.""."_".date(time());
                 $check=DB::table("users")
                 ->insert([
-                    'name'=>$input['name'],
+                    'name'=>strtolower($input['name']),
                     //'fname'=>$input['fname'],
                     //'lname'=>$input['lname'],
                     'email'=>$input['email'],

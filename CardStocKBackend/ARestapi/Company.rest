@@ -697,7 +697,7 @@ content-type: application/json;charset=UTF-8
 Authorization: Bearer {{Auth_token}}
 
 {
-"productCode":"veve_1697829456",
+"productCode":"vimba_1703856879",
 "price":"40"
 
 }
@@ -811,9 +811,9 @@ Authorization: Bearer {{Auth_token}}
 {
 "uid":"Nyota_1672353378",
 "uidUser":"kebineericMuna_1674160265",
-"OrderId":"UID_vD_1703534924",
-"inputData":"100",
-"all_total":"150",
+"OrderId":"UID_T5_1703935830",
+"inputData":"30",
+"all_total":"250",
 "reach":"1200",
 "gain":"350",
 "systemUid":"PointSales1"
@@ -827,7 +827,8 @@ Content-Type: application/json
 Authorization: Bearer {{Auth_token}}
 
 {
-
+"searchOption":false,
+"name":"b"
 
 }
 ### View Order When Someone Submit
@@ -1027,14 +1028,15 @@ Authorization: Bearer {{Auth_token}}
 
 
 }
-### done but not by SystemUid
+### done make sure
 
 GET  {{baseUrl}}/viewDept
 Content-Type: application/json
 Authorization: Bearer {{Auth_token}}
 
 {
-
+"searchOption":true,
+"name":"m"
 }
 ### done but not by SystemUid
 
@@ -1043,7 +1045,8 @@ Content-Type: application/json
 Authorization: Bearer {{Auth_token}}
 
 {
-
+"searchOption":true,
+"name":"b"
 }
 ### done but not by SystemUid
 
@@ -1186,6 +1189,8 @@ content-type: application/json;charset=UTF-8
 Authorization: Bearer {{Auth_token}}
 
 {
+"searchOption":true,
+"name":"b"
 
 }
 
