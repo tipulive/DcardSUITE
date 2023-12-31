@@ -2,16 +2,11 @@ import 'dart:math';
 
 
 import '../../../Query/CardQuery.dart';
-import '../../../Query/TopupQuery.dart';
 import '../../../Query/StockQuery.dart';
 import '../../../models/CardModel.dart';
 import '../../../models/QuickBonus.dart';
-import '../../../models/Topups.dart';
 
-import '../models/BonusModel.dart';
 
-import '../Pages/ProfilePage.dart';
-import '../Pages/QuickBonusPage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -29,13 +24,10 @@ import '../Query/AdminQuery.dart';
 import '../Pages/components/BottomNavigator/HomeNavigator.dart';
 
 
-import 'package:cool_alert/cool_alert.dart';
 
 
 import '../../../Query/PromotionQuery.dart';
-import '../Query/ParticipatedQuery.dart';
 
-import '../Utilconfig/HideShowState.dart';
 import '../models/User.dart';
 
 
@@ -62,30 +54,29 @@ class _HomepageState extends State<Homepage> {
   String searchText = '';
   TextEditingController inputDataDept=TextEditingController();
   TextEditingController searchContro=TextEditingController();
-  TextEditingController PromoName=TextEditingController();
+  TextEditingController promoName=TextEditingController();
   TextEditingController uidInput=TextEditingController();//uid promo
   TextEditingController uidInput2=TextEditingController(text:'kebineericMuna_1668935593');//userid of user that will be available after qr scan
   TextEditingController uidInput3=TextEditingController();//input data to submit
   TextEditingController uidInput4=TextEditingController();
   TextEditingController uidInput5=TextEditingController();
-  TextEditingController ClientName=TextEditingController();
-  String PromoMsg="none";
-  bool showprofile=false;
-  bool showOveray=false;
-  bool IsSubmitted=false;
+  TextEditingController clientName=TextEditingController();
+  String promoMsg="none";
+  bool showProfile=false;
+  bool showOver=false;
+  bool isSubmitted=false;
   bool productSearch=false;
   bool  productSearchPopup=true;
-  final GlobalKey qrkey = GlobalKey(debugLabel: 'QR');
+  final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   Barcode?result;
   QRViewController?controller;
-  var _groupVal ="male";
 
   bool optionVal=true;
   List items=["male","female","others","Keb2"];
 
-  bool Cameravalue=false;
-  bool Flashvalue=false;
-  var ResultDatas;
+  bool cameraValue=false;
+  bool flashValue=false;
+  dynamic resultDataValue;
   GlobalKey userBottomSheetKey = GlobalKey();
 
   @override
@@ -125,7 +116,7 @@ class _HomepageState extends State<Homepage> {
             children: [
               //Qr Code
 
-              SizedBox(height: 20,),
+              const SizedBox(height: 20,),
               // SearchBarField(search: _data,searchController:searchContro,PerformSearch:,),
               SearchBarField(
                 // Correct: explicitly assigning null
@@ -137,7 +128,6 @@ class _HomepageState extends State<Homepage> {
                   }else{
 
 
-                    print("no search");
 
                   }
 
@@ -160,11 +150,12 @@ class _HomepageState extends State<Homepage> {
                 onTap: ()  {
                   // Handle tap event here
                  // print('Icon tapped!');
+
                   scanUser();
                 },
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
-                  children: [
+                  children: const [
                     Icon(Icons.star, color: Colors.yellow), // Replace with your desired icon
                     SizedBox(width: 8.0), // Adjust the space between icon and text
                     Text('Favorite', style: TextStyle(fontSize: 16.0)),
@@ -194,13 +185,12 @@ class _HomepageState extends State<Homepage> {
                         onTap: () {
                           // Perform an action when the "Delete" button is tapped
 
-                          print('Delete Tapped. Entered Text: ');
                         },
                         child: Visibility(
                           visible: true,
                           child: Container(
-                            padding: EdgeInsets.all(10.0),
-                            decoration: BoxDecoration(
+                            padding: const EdgeInsets.all(10.0),
+                            decoration: const BoxDecoration(
                               color: Colors.red,
                               borderRadius: BorderRadius.only(
                                 //topLeft: Radius.circular(10.0),
@@ -209,7 +199,7 @@ class _HomepageState extends State<Homepage> {
                             ),
                             child: Text(
                               'Dept ${(Get.put(StockQuery()).dept)}',
-                              style: TextStyle(color: Colors.white),
+                              style: const TextStyle(color: Colors.white),
                             ),
                           ),
                         ),
@@ -219,7 +209,7 @@ class _HomepageState extends State<Homepage> {
                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
                           child: TextField(
                             keyboardType: TextInputType.number,
-                            decoration: InputDecoration(
+                            decoration: const InputDecoration(
                               hintText: 'Enter Amount...',
                               border: InputBorder.none,
                             ),
@@ -247,7 +237,7 @@ class _HomepageState extends State<Homepage> {
                           // Perform an action when the "Confirm" button is tapped
                           setState(() {
 
-                            showOveray=true;
+                            showOver=true;
                             // dataSearch.clear();
 
 
@@ -257,7 +247,7 @@ class _HomepageState extends State<Homepage> {
                            var inputDataText=(inputDataDept.text=="")?"0":inputDataDept.text;
 
                             var resultData=(await StockQuery().submitOrder(Participated(uid:"Nyota_1672353378"
-                                ,uidUser:"${(Get.put(StockQuery()).userProfile)["uid"]}",subscriber:"${(Get.put(StockQuery()).order["resultData"][0]["uid"])}",inputData:"${inputDataText}"),Promotions(
+                                ,uidUser:"${(Get.put(StockQuery()).userProfile)["uid"]}",subscriber:"${(Get.put(StockQuery()).order["resultData"][0]["uid"])}",inputData:inputDataText),Promotions(
                               token:"${(Get.put(StockQuery())).orderSum }",reach:"1200",gain:"350",uid:"PointSales1"
                             ))).data;
                           if(resultData["status"])
@@ -275,7 +265,7 @@ class _HomepageState extends State<Homepage> {
                           (Get.put(StockQuery()).updateSumOrder(totalVal));
 
                           setState(() {
-                          showOveray=false;
+                          showOver=false;
                           cartData.clear();
                           (Get.put(StockQuery()).updateOrder(orderVal));
                           (Get.put(StockQuery()).updateDeptOrder(0));
@@ -289,7 +279,7 @@ class _HomepageState extends State<Homepage> {
 
                           setState(() {
 
-                          showOveray=false;
+                          showOver=false;
 
 
 
@@ -298,7 +288,7 @@ class _HomepageState extends State<Homepage> {
                           } catch (e) {
                            setState(() {
 
-                             showOveray=false;
+                             showOver=false;
 
 
 
@@ -307,15 +297,15 @@ class _HomepageState extends State<Homepage> {
 
                         },
                         child: Container(
-                          padding: EdgeInsets.all(10.0),
-                          decoration: BoxDecoration(
+                          padding: const EdgeInsets.all(10.0),
+                          decoration: const BoxDecoration(
                             color: Colors.green,
                             borderRadius: BorderRadius.only(
                               topRight: Radius.circular(10.0),
                               bottomRight: Radius.circular(10.0),
                             ),
                           ),
-                          child: Text(
+                          child: const Text(
                             'Confirm',
                             style: TextStyle(color: Colors.white),
                           ),
@@ -327,13 +317,12 @@ class _HomepageState extends State<Homepage> {
               ),
 
               Expanded(child: CheckoutPage(chekoutResult:cartData,changeQtyCheckout:(index,price,valueData,checkHide){
-                ChangeQtyMethod(index,price,valueData,checkHide);
+                changeQtyMethod(index,price,valueData,checkHide);
 
               },saveChangeQtyCheckout:(productCode,indexData){
                 saveChangeQtyMethod(productCode,indexData);
               },deleteCheckout:(productCode) async{
 
-               print(await (Get.put(StockQuery()).order)["resultData"][0]["uid"]);
 
                try {
 
@@ -349,13 +338,13 @@ class _HomepageState extends State<Homepage> {
                      }
                    ];
                    setState(() {
-                     showOveray=false;
+                     showOver=false;
                      setState(() {
                        cartData.removeWhere((item) => item['productCode'] == productCode);
                        num totalVal = cartData.fold(0, (previousValue, element) => previousValue + element['totalAmount']);
                        (Get.put(StockQuery()).updateSumOrder(totalVal));
 
-                       if(cartData.length<=0)
+                       if(cartData.isEmpty)
                          {
                            (Get.put(StockQuery()).updateOrder(orderVal));
                          }
@@ -369,13 +358,20 @@ class _HomepageState extends State<Homepage> {
 
                    setState(() {
 
-                     showOveray=false;
+                     showOver=false;
                      dataSearch.clear();
 
 
                    });
                  }
                } catch (e) {
+                /* showDialog(
+                   context: context,
+                   builder: (context) => AlertDialog(
+                     title: const Text("Error"),
+                     content: Text(e.toString()),
+                   ),
+                 );*/
 
                }
 
@@ -420,20 +416,20 @@ class _HomepageState extends State<Homepage> {
               ),
             ],
           ),
-          if(showOveray)
+          if(showOver)
             Positioned.fill(
               child: Center(
                 child: Container(
                   alignment: Alignment.center,
                   color: Colors.white70,
-                  child: CircularProgressIndicator(),
+                  child: const CircularProgressIndicator(),
                 ),
               ),
             ),
 
         ],
       ) ,
-      bottomNavigationBar:HomeNavigator(),
+      bottomNavigationBar:const HomeNavigator(),
 
       // This trailing comma makes auto-formatting nicer for build methods.
 
@@ -444,6 +440,7 @@ class _HomepageState extends State<Homepage> {
   void _onQRViewCreated(QRViewController controller)
   {
     this.controller=controller;
+    controller.resumeCamera();
     controller.scannedDataStream.listen((scanData) async{
       setState((){
         result=scanData;
@@ -483,6 +480,8 @@ class _HomepageState extends State<Homepage> {
   void _onUserQRViewCreated(QRViewController controller)
   {
     this.controller=controller;
+    // Start scanning when the bottom sheet is opened
+    controller.resumeCamera();
     controller.scannedDataStream.listen((scanData) async{
       setState((){
         result=scanData;
@@ -514,22 +513,66 @@ class _HomepageState extends State<Homepage> {
     var resultData=(await CardQuery().GetDetailCardOnline(CardModel(uid:"$resultCode"))).data;
     if(resultData["status"])
     {
-      Get.close(1);
-      (Get.put(StockQuery()).updateHideLoader(true));
-      setState(() {
-        //(Get.put(StockQuery()).updateUserProfile(resultData["UserDetail"]));
-       // (Get.put(StockQuery()).order)["resultData"][0]["name"]=resultData["UserDetail"]["name"];
-      });
+      if (controller!= null) {
+        controller!.pauseCamera();
+        //controller!.stopCamera();
+        try {
+        (Get.put(StockQuery()).updateHideLoader(true));
+        setState(() {
+          (Get.put(StockQuery()).updateUserProfile(resultData["UserDetail"]));
+          (Get.put(StockQuery()).order)["resultData"][0]["name"]=resultData["UserDetail"]["name"];
+        });
+        } finally {
+          // Pop the route in the next microtask
+          Future.microtask(() {
+            Navigator.of(context).pop();
+          });
+        }
+        //Get.close(1);
+
+      }
 
       //print("result ${resultData["UserDetail"]}");
 
 
     }
     else{
-      (Get.put(StockQuery()).updateHideLoader(true));
-      Get.close(1);
+     // controller!.stopCamera();
+      if (controller!= null) {
+        controller!.pauseCamera();
+        try {
+        (Get.put(StockQuery()).updateHideLoader(true));
+        var userProfile =
+        {
+          "uid": "kebineericMuna_1674160265",
+          "name": "unknown",
+
+          "email": "on@gmail.com",
+          "phone": "782389359",
+          "Ccode": "+250",
+          "country": "Rwanda",
+          "initCountry": "none",
+          "PhoneNumber": "+250782389359",
+          "carduid": "TEALTD_7hEnj_1672352175"
+        }
+        ;
+        setState(() {
+          (Get.put(StockQuery()).updateUserProfile(userProfile));
+          (Get
+              .put(StockQuery())
+              .order)["resultData"][0]["name"] = userProfile["name"];
+        });
+        // print("${(Get.put(StockQuery()).userProfile)}");
+      } finally {
+    // Pop the route in the next microtask
+    Future.microtask(() {
+    Navigator.of(context).pop();
+    });
     }
-    //Get.close(1);
+        //Get.close(1);
+      }
+    }
+    //
 
   }
 
@@ -538,7 +581,7 @@ class _HomepageState extends State<Homepage> {
     controller?.dispose();
     super.dispose();
   }
-  Widget CameraSwitch()=>Transform.scale(
+  Widget cameraSwitch()=>Transform.scale(
     scale: 1,
     child: Switch.adaptive(
         activeColor: Colors.red,
@@ -546,10 +589,10 @@ class _HomepageState extends State<Homepage> {
         inactiveThumbColor: Colors.orange,
         inactiveTrackColor: Colors.blueAccent,
 
-        value: Cameravalue,
+        value: cameraValue,
         onChanged:(value)async{
           setState((){
-            this.Cameravalue=value;
+            cameraValue=value;
 
             //print(value);
           });
@@ -557,7 +600,7 @@ class _HomepageState extends State<Homepage> {
         }
     ),
   );
-  Widget FlashSwitch()=>Transform.scale(
+  Widget flashSwitch()=>Transform.scale(
     scale: 1,
     child: Switch.adaptive(
         activeColor: Colors.red,
@@ -565,10 +608,10 @@ class _HomepageState extends State<Homepage> {
         inactiveThumbColor: Colors.orange,
         inactiveTrackColor: Colors.blueAccent,
 
-        value:Flashvalue,
+        value:flashValue,
         onChanged:(value)async{
           setState((){
-            this.Flashvalue=value;
+            flashValue=value;
 
             //print(value);
           });
@@ -577,13 +620,14 @@ class _HomepageState extends State<Homepage> {
     ),
   );
 
+  @override
   void initState()
   {
     super.initState();
     //getapi();
     cartDisplay();
     setState(() {
-      showOveray=false;
+      showOver=false;
     });
   }
 
@@ -640,7 +684,13 @@ class _HomepageState extends State<Homepage> {
 
 
     } catch (e) {
-
+     /* showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("Error"),
+          content: Text(e.toString()),
+        ),
+      );*/
     }
 
 
@@ -682,13 +732,19 @@ class _HomepageState extends State<Homepage> {
 
 
     } catch (e) {
-
+      /*showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("Error"),
+          content: Text(e.toString()),
+        ),
+      )*/
     }
 
 
 
   }
-  void ChangeQtyMethod(indexData,price,valueData,checkHide) {
+  void changeQtyMethod(indexData,price,valueData,checkHide) {
 
 if(checkHide)
   {
@@ -704,7 +760,6 @@ else{
     cartData[indexData]["totalAmount"]=price*valueData;
     cartData[indexData]["totalQty"]=valueData;
 
-    num totalVal = cartData.fold(0, (previousValue, element) => previousValue + element['totalAmount']);
     //(Get.put(StockQuery()).updateSumOrder(totalVal));
   });
 
@@ -723,13 +778,13 @@ else{
    // cartData[indexData]["totalQty"]=valueData;
     //print("${cartData[indexData]["totalQty"]}");
     try {
-    var resultData=(await StockQuery().editTOrder(QuickBonus(productName:"${productCode}",qty:"${cartData[indexData]["totalQty"]}",uid:(Get.put(StockQuery()).order)["resultData"][0]["uid"]), User(uid:"kebineericMuna_1674160265"))).data;
+    var resultData=(await StockQuery().editTOrder(QuickBonus(productName:"$productCode",qty:"${cartData[indexData]["totalQty"]}",uid:(Get.put(StockQuery()).order)["resultData"][0]["uid"]), User(uid:"kebineericMuna_1674160265"))).data;
 
     if(resultData["status"])
     {
 
       setState(() {
-        showOveray=false;
+        showOver=false;
 
 
         cartData[indexData]["saveChangeBtn"]=true;
@@ -747,7 +802,7 @@ else{
 
       setState(() {
 
-        showOveray=false;
+        showOver=false;
         dataSearch.clear();
         (Get.put(StockQuery()).updatedataSearch(dataSearch));
 
@@ -756,7 +811,13 @@ else{
       });
     }
     } catch (e) {
-
+      /*showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("Error"),
+          content: Text(e.toString()),
+        ),
+      );*/
     }
 
 
@@ -765,7 +826,6 @@ else{
     (Get.put(StockQuery()).updateHideLoader(false));
     bool containsProductCode = cartData.any((item) => item['productCode'] == dynamicData["productCode"]);
 
-    num b=2;
    if(containsProductCode)
      {
        (Get.put(StockQuery()).updateHideLoader(true));
@@ -780,7 +840,7 @@ else{
 
     setState(() {
 
-       showOveray=true;
+       showOver=true;
 
       // productSearchPopup=false;
       // dataSearch.clear();
@@ -813,7 +873,7 @@ else{
 
          //print(resultData);
          setState(() {
-           showOveray=false;
+           showOver=false;
 
            (Get.put(StockQuery()).updateOrder(orderVal));
            (Get.put(StockQuery()).updateSumOrder(totalVal));
@@ -836,7 +896,7 @@ else{
 
          setState(() {
 
-           showOveray=false;
+           showOver=false;
            dataSearch.clear();
            (Get.put(StockQuery()).updatedataSearch(dataSearch));
 
@@ -846,7 +906,13 @@ else{
          });
        }
      } catch (e) {
-
+      /* showDialog(
+         context: context,
+         builder: (context) => AlertDialog(
+           title: const Text("Error"),
+           content: Text(e.toString()),
+         ),
+       );*/
      }
 
 
@@ -872,9 +938,9 @@ else{
           Stack(
             children: [
               Container(
-                padding:EdgeInsets.all(5.0),
+                padding:const EdgeInsets.all(5.0),
                 height: 600,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(30),
@@ -885,7 +951,7 @@ else{
                   children: [
 
                     // (result!=null)?Text("barcode Type ${describeEnum(result!.format)} Data ${result!.code}"): const Text("Scan Code"),
-                    Center(child: Text("Text")),
+                    const Center(child: Text("Text")),
                     GetBuilder<StockQuery>(
                       builder: (myController) {
                         //return Text('Data: ${(_controller.dataSearch).toString()}');
@@ -904,13 +970,24 @@ else{
                       },
                     ),
                     //if(productSearchPopup)
-                    SizedBox(height: 20,),
+                    const SizedBox(height: 20,),
                     Expanded(
                         flex: 5,
                         child:Stack(
                           alignment:Alignment.bottomCenter,
                           children: [
-                            QRView(key: qrkey,onQRViewCreated: _onQRViewCreated,),
+                            QRView(key: qrKey,onQRViewCreated: _onQRViewCreated,
+                              overlay: QrScannerOverlayShape(
+                                borderColor: Colors.yellow,
+                                borderRadius: 10,
+                                borderLength: 30,
+                                borderWidth: 10,
+                                cutOutSize: 300,
+                                // Add the laser effect
+
+                              ),
+
+                            ),
 
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -919,13 +996,13 @@ else{
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
 
-                                    CameraSwitch(),
+                                    cameraSwitch(),
                                     //SizedBox(width: 10.0,),
 
                                     // SizedBox(width: 10.0,),
-                                    FlashSwitch(),
+                                    flashSwitch(),
                                     Image.asset(
-                                      Flashvalue ? 'images/on.png' : 'images/off.png',
+                                      flashValue ? 'images/on.png' : 'images/off.png',
                                       height: 30,
                                     ),
                                   ],
@@ -949,13 +1026,13 @@ else{
                   //return Text('Data: ${_controller.data}');
                   return
                     (myLoadercontroller.hideLoader)?
-                        Text(""):
+                        const Text(""):
                     Positioned.fill(
                     child: Center(
                       child: Container(
                         alignment: Alignment.center,
                         color: Colors.white70,
-                        child: CircularProgressIndicator(),
+                        child: const CircularProgressIndicator(),
                       ),
                     ),
                   );
@@ -974,6 +1051,7 @@ else{
   }
   void scanUser() async{//not finished User
 
+
     Get.bottomSheet(
 
       StatefulBuilder(
@@ -984,9 +1062,9 @@ else{
               children: [
                 Container(
 
-                  padding:EdgeInsets.all(5.0),
-                  height: 600,
-                  decoration: BoxDecoration(
+                  padding:const EdgeInsets.all(5.0),
+
+                  decoration: const BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(30),
@@ -996,13 +1074,26 @@ else{
                   child: Column(
                     children: [
 
-                      SizedBox(height: 20,),
+                      const SizedBox(height: 20,),
                       Expanded(
                           flex: 5,
                           child:Stack(
                             alignment:Alignment.bottomCenter,
                             children: [
-                              QRView(key: qrkey,onQRViewCreated: _onUserQRViewCreated,),
+                              QRView(key: qrKey,
+                                onQRViewCreated:
+                                _onUserQRViewCreated,
+                                overlay: QrScannerOverlayShape(
+                                  borderColor: Colors.white,
+                                  borderRadius: 10,
+                                  borderLength: 30,
+                                  borderWidth: 10,
+                                  cutOutSize: 300,
+                                  // Add the laser effect
+
+                                ),
+                              ),
+
 
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -1011,13 +1102,13 @@ else{
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
 
-                                      CameraSwitch(),
+                                      cameraSwitch(),
                                       //SizedBox(width: 10.0,),
 
                                       // SizedBox(width: 10.0,),
-                                      FlashSwitch(),
+                                      flashSwitch(),
                                       Image.asset(
-                                        Flashvalue ? 'images/on.png' : 'images/off.png',
+                                        flashValue ? 'images/on.png' : 'images/off.png',
                                         height: 30,
                                       ),
                                     ],
@@ -1041,13 +1132,13 @@ else{
                     //return Text('Data: ${_controller.data}');
                     return
                       (myLoadercontroller.hideLoader)?
-                      Text(""):
+                      const Text(""):
                       Positioned.fill(
                         child: Center(
                           child: Container(
                             alignment: Alignment.center,
                             color: Colors.white70,
-                            child: CircularProgressIndicator(),
+                            child: const CircularProgressIndicator(),
                           ),
                         ),
                       );
@@ -1110,7 +1201,7 @@ class SearchBarField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.fromLTRB(5, 20, 5, 0),
+      margin: const EdgeInsets.fromLTRB(5, 20, 5, 0),
       child: TextField(
         controller: searchController,
         decoration: InputDecoration(
@@ -1119,7 +1210,7 @@ class SearchBarField extends StatelessWidget {
           ),
           labelText: 'Search',
           suffixIcon: IconButton(
-            icon: Icon(Icons.camera_alt),
+            icon: const Icon(Icons.camera_alt),
             onPressed: () async {
               try {
 
@@ -1129,7 +1220,13 @@ class SearchBarField extends StatelessWidget {
 
 
               } catch (e) {
-                print(e);
+               /* showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text("Error"),
+                    content: Text(e.toString()),
+                  ),
+                );*/
 
               }
               // Handle scan button press
@@ -1176,7 +1273,7 @@ class ProductSearchList extends StatelessWidget {
 
 
           return Container(
-            margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
+            margin: const EdgeInsets.fromLTRB(0, 5, 0, 0),
             child: Card(
               elevation:0,
               //margin: EdgeInsets.symmetric(vertical:1,horizontal:5),
@@ -1190,8 +1287,8 @@ class ProductSearchList extends StatelessWidget {
                 children: [
                   ListTile(
                       leading: CircleAvatar(
-                        child: Icon(_getRandomIcon()),
                         backgroundColor:getRandomColor(),
+                        child: Icon(_getRandomIcon()),
                       ),
                       title:Row(
                         children: [
@@ -1208,7 +1305,7 @@ class ProductSearchList extends StatelessWidget {
                                     children: <TextSpan>[
                                       TextSpan(
                                         text: " 1X${searchResult[index]["price"]}",
-                                        style: TextStyle(color: Colors.blue),
+                                        style: const TextStyle(color: Colors.blue),
 
 
                                       ),
@@ -1219,7 +1316,7 @@ class ProductSearchList extends StatelessWidget {
                                 Text.rich(
                                     TextSpan(
                                         children: [
-                                          TextSpan(
+                                          const TextSpan(
                                             text: 'Qty :',
 
                                           ),
@@ -1227,11 +1324,12 @@ class ProductSearchList extends StatelessWidget {
                                           WidgetSpan(
 
                                             child: IntrinsicWidth(
+                                              stepWidth: 0.5,
                                               child: TextField(
                                                 //controller: TextEditingController(text:"${_data[index]["textchange_var"]??_data[index]["qty"]}"),
 
                                                 keyboardType: TextInputType.number,
-                                                decoration: InputDecoration(
+                                                decoration: const InputDecoration(
                                                   hintText: '-1-',
                                                   hintStyle: TextStyle(color: Colors.blue),
                                                   contentPadding: EdgeInsets.all(0),
@@ -1240,7 +1338,7 @@ class ProductSearchList extends StatelessWidget {
 
 
                                                 ),
-                                                style: TextStyle(
+                                                style: const TextStyle(
                                                   color: Colors.blue, // Set the text color to red
 
                                                 ),
@@ -1261,15 +1359,14 @@ class ProductSearchList extends StatelessWidget {
 
 
                                                 },
-                                              ),
-                                              stepWidth: 0.5, // set minimum width to 100
+                                              ), // set minimum width to 100
                                             ),
                                           ),
 
                                         ]
                                     )
                                 ),
-                                SizedBox(height: 5,),
+                                const SizedBox(height: 5,),
                                 Text("Qty left:${num.parse(searchResult[index]["qty"])-num.parse(searchResult[index]["qty_sold"])}"),
 
 
@@ -1289,7 +1386,7 @@ class ProductSearchList extends StatelessWidget {
                         //crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
 
-                          Icon(Icons.segment,color:Colors.orange,size:13,),
+                          const Icon(Icons.segment,color:Colors.orange,size:13,),
                           Text("tags:${searchResult[index]["tags"]} "),
 
 
@@ -1304,17 +1401,17 @@ class ProductSearchList extends StatelessWidget {
 
 
                               IconButton(
-                                icon: Icon(Icons.add_shopping_cart,
+                                icon: const Icon(Icons.add_shopping_cart,
                                     size: 23.0,
                                     color: Colors.grey),
                                 onPressed: () async{
                                   addCartMethod(searchResult[index]);
                                 },
-                              ) ,Visibility(
+                              ) ,const Visibility(
                                   visible:true,
                                   child: Text("")),
                               IconButton(
-                                icon: Icon(
+                                icon: const Icon(
                                     Icons.grid_view,
                                     size: 23.0,
                                     color: Colors.orange
@@ -1338,7 +1435,7 @@ class ProductSearchList extends StatelessWidget {
                       padding: const EdgeInsets.fromLTRB(8,0,8,8),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
+                        children: const [
                           Text("1088888880808  8766"),
                         ],
                       ),
@@ -1392,7 +1489,7 @@ class CheckoutPage extends StatelessWidget {
 
 
           return Container(
-            margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
+            margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
             child: Card(
               elevation:0,
               //margin: EdgeInsets.symmetric(vertical:1,horizontal:5),
@@ -1407,8 +1504,8 @@ class CheckoutPage extends StatelessWidget {
                   // Text("sum:${orderSum}"),
                   ListTile(
                       leading: CircleAvatar(
-                        child: Icon(_getRandomIcon()),
                         backgroundColor:getRandomColor(),
+                        child: Icon(_getRandomIcon()),
                       ),
                       title:Row(
                         children: [
@@ -1425,7 +1522,7 @@ class CheckoutPage extends StatelessWidget {
                                     children: <TextSpan>[
                                       TextSpan(
                                         text: "${chekoutResult[index]["totalQty"]}X${chekoutResult[index]["price"]}",
-                                        style: TextStyle(color: Colors.blue),
+                                        style: const TextStyle(color: Colors.blue),
 
 
                                       ),
@@ -1436,7 +1533,7 @@ class CheckoutPage extends StatelessWidget {
                                 Text.rich(
                                     TextSpan(
                                         children: [
-                                          TextSpan(
+                                          const TextSpan(
                                             text: 'Qty :',
 
                                           ),
@@ -1444,20 +1541,21 @@ class CheckoutPage extends StatelessWidget {
                                           WidgetSpan(
 
                                             child: IntrinsicWidth(
+                                              stepWidth: 0.5,
                                               child: TextField(
                                                 //controller: TextEditingController(text:"${_data[index]["textchange_var"]??_data[index]["qty"]}"),
 
                                                 keyboardType: TextInputType.number,
                                                 decoration: InputDecoration(
                                                   hintText: '-${chekoutResult[index]["totalQty"]}-',
-                                                  hintStyle: TextStyle(color: Colors.blue),
-                                                  contentPadding: EdgeInsets.all(0),
+                                                  hintStyle: const TextStyle(color: Colors.blue),
+                                                  contentPadding: const EdgeInsets.all(0),
                                                   isDense: true,
 
 
 
                                                 ),
-                                                style: TextStyle(
+                                                style: const TextStyle(
                                                   color: Colors.blue, // Set the text color to red
 
                                                 ),
@@ -1478,8 +1576,7 @@ class CheckoutPage extends StatelessWidget {
                                                   //print(this._data[index]["total_var"]);
                                                   // print("Text changed to: $text");
                                                 },
-                                              ),
-                                              stepWidth: 0.5, // set minimum width to 100
+                                              ), // set minimum width to 100
                                             ),
                                           ),
 
@@ -1509,7 +1606,7 @@ class CheckoutPage extends StatelessWidget {
 
                                if((chekoutResult[index]["saveChangeBtn"])??false)
                                   IconButton(
-                                   icon: Icon(Icons.add_shopping_cart,
+                                   icon: const Icon(Icons.add_shopping_cart,
                                     size: 23.0,
                                     color: Colors.grey),
                                 onPressed: () async{
@@ -1517,7 +1614,7 @@ class CheckoutPage extends StatelessWidget {
                                     },
                                    ) ,
                               IconButton(
-                                icon: Icon(
+                                icon: const Icon(
                                     Icons.delete,
                                     size: 23.0,
                                     color: Colors.red

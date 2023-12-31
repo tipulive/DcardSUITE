@@ -10,6 +10,8 @@ class Topups {
   final int ?startlimit;
   final int ?endlimit;
   final String?optionCase;
+  final String?name;
+  final bool?searchOption;
 
 
   final String ?created_at;
@@ -28,6 +30,8 @@ class Topups {
     this.startlimit,
     this.endlimit,
     this.optionCase,
+    this.name,
+    this.searchOption,
 
     this.created_at,
     this.updated_at
@@ -46,6 +50,8 @@ class Topups {
       startlimit:json['startlimit'],
       endlimit:json['endlimit'],
       optionCase:json['optionCase'],
+      name:json['name'],
+      searchOption:json['searchOption'],
 
       created_at:json['created_at'],
       updated_at:json['updated_at']

@@ -23,9 +23,9 @@ class SetPartComp extends StatefulWidget {
 }
 
 class _SetPartCompState extends State<SetPartComp> {
-  ScrollController _scrollController = ScrollController();// detect scroll
+  final ScrollController _scrollController = ScrollController();// detect scroll
   TextEditingController inputData=TextEditingController();
-  List<dynamic> _data = [];
+  final List<dynamic> _data = [];
   int _page=0;
   bool hasMoreData=true;
   bool isLoading=false;
@@ -108,7 +108,7 @@ class _SetPartCompState extends State<SetPartComp> {
 
 
               } catch (e) {
-                print('Error: $e');
+               print(e);
               }
 
               //print(this._data[index]["total_var"]);
@@ -129,7 +129,7 @@ class _SetPartCompState extends State<SetPartComp> {
                       // Handle card click event here
                       //Get.put(HideShowState()).isVisible(true);
 
-                      EditParticipatePopup(_data[index]);
+                      editParticipatePopup(_data[index]);
                     },
                     child:Card(
                       elevation:0,
@@ -138,13 +138,13 @@ class _SetPartCompState extends State<SetPartComp> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20.0),
                         //side: BorderSide(color:((_data[index]["actionName"])=="reverse")?Colors.white:Colors.red, width: 1),
-                        side: BorderSide(color:Colors.white, width: 1),
+                        side: const BorderSide(color:Colors.white, width: 1),
                       ),
 
                       child: ListTile(
                         leading: CircleAvatar(
-                          child: Icon(_getRandomIcon()),
                           backgroundColor:getRandomColor(),
+                          child: Icon(_getRandomIcon()),
                         ),
                         title:Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -191,11 +191,11 @@ class _SetPartCompState extends State<SetPartComp> {
               }
               else{
                 return  Padding(
-                  padding:EdgeInsets.symmetric(vertical: 32),
+                  padding:const EdgeInsets.symmetric(vertical: 32),
                   child:Center(
                       child:hasMoreData?
-                      CircularProgressIndicator()
-                          :Text("no more Data")
+                      const CircularProgressIndicator()
+                          :const Text("no more Data")
 
                   ),
                 );
@@ -207,6 +207,7 @@ class _SetPartCompState extends State<SetPartComp> {
       ],
     );
   }
+  @override
   void initState()
   {
     super.initState();
@@ -259,7 +260,7 @@ class _SetPartCompState extends State<SetPartComp> {
   }
   //popup
 
-  EditParticipatePopup(data){
+  editParticipatePopup(data){
 
     Get.bottomSheet(
       StatefulBuilder(
@@ -269,7 +270,7 @@ class _SetPartCompState extends State<SetPartComp> {
             Stack(
               alignment: Alignment.bottomCenter,
               children: [
-                Container(
+                SizedBox(
                   height:200,
 
                   child: Column(
@@ -277,7 +278,7 @@ class _SetPartCompState extends State<SetPartComp> {
                       Container(
 
                         height: 200,
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(16),
@@ -285,7 +286,7 @@ class _SetPartCompState extends State<SetPartComp> {
                           ),
                         ),
                         child: ListView(
-                          padding: EdgeInsets.all(10),
+                          padding: const EdgeInsets.all(10),
                           children: [
                             Center(child: Text(data["name"])),
                             Center(child: Text("Promotion:${data["promoName"]}")),
@@ -293,8 +294,8 @@ class _SetPartCompState extends State<SetPartComp> {
                               controller:inputData,
                               keyboardType: TextInputType.number,
 
-                              decoration: InputDecoration(
-                                contentPadding: const EdgeInsets.symmetric(vertical: 3,horizontal: 3),
+                              decoration: const InputDecoration(
+                                contentPadding: EdgeInsets.symmetric(vertical: 3,horizontal: 3),
                                 border: OutlineInputBorder(),
                                 labelText: 'Enter Value',
                                 hintText: 'Enter Value',
@@ -304,13 +305,13 @@ class _SetPartCompState extends State<SetPartComp> {
 
                               ),
                             ),
-                            SizedBox(height: 10.0,),
-                            SizedBox(height: 10.0,),
+                            const SizedBox(height: 10.0,),
+                            const SizedBox(height: 10.0,),
                             Center(
                               child: FloatingActionButton.extended(
-                                label: Text('Edit'), // <-- Text
-                                backgroundColor: Color(0xff010a0e),
-                                icon: Icon( // <-- Icon
+                                label: const Text('Edit'), // <-- Text
+                                backgroundColor: const Color(0xff010a0e),
+                                icon: const Icon( // <-- Icon
                                   Icons.redeem,
                                   size: 24.0,
                                 ),
@@ -322,26 +323,26 @@ class _SetPartCompState extends State<SetPartComp> {
                                   if(resultDatas["status"])
                                     {
                                       Get.put(HideShowState()).isVisible(false),
-                                      Get.snackbar("Success", "Successfully Edited ",backgroundColor: Color(0xff9a1c55),
-                                          colorText: Color(0xffffffff),
+                                      Get.snackbar("Success", "Successfully Edited ",backgroundColor: const Color(0xff9a1c55),
+                                          colorText: const Color(0xffffffff),
                                           titleText: const Text("Events",style:TextStyle(color:Color(
                                               0xffffffff),fontSize:18,fontWeight:FontWeight.w500,fontStyle: FontStyle.normal),),
 
-                                          icon: Icon(Icons.access_alarm),
-                                          duration: Duration(seconds: 4)),
+                                          icon: const Icon(Icons.access_alarm),
+                                          duration: const Duration(seconds: 4)),
 
 
                                     }else{
                                     Get.put(HideShowState()).isVisible(false),
 
-                                    Get.snackbar("Error", "something wrong",backgroundColor: Color(
+                                    Get.snackbar("Error", "something wrong",backgroundColor: const Color(
                                         0xffdc2323),
-                                        colorText: Color(0xffffffff),
+                                        colorText: const Color(0xffffffff),
                                         titleText: const Text("Events",style:TextStyle(color:Color(
                                             0xffffffff),fontSize:18,fontWeight:FontWeight.w500,fontStyle: FontStyle.normal),),
 
-                                        icon: Icon(Icons.access_alarm),
-                                        duration: Duration(seconds: 4))
+                                        icon: const Icon(Icons.access_alarm),
+                                        duration: const Duration(seconds: 4))
                                   }
 
 
@@ -383,10 +384,7 @@ class _SetPartCompState extends State<SetPartComp> {
                     child:  Obx(
                           () =>Visibility(
                         visible: Get.put(HideShowState()).isVisible.value,
-                        child: Container(
-                          //padding: EdgeInsets.all(16),
-                          child: CircularProgressIndicator(),
-                        ),
+                        child: const CircularProgressIndicator(),
                       ),
                     )
                 ),
@@ -440,15 +438,15 @@ Widget divLine(){
   );
 }
 
-Widget detailsProfile(IconText,icon,IconDescr,listBackground,IconrightText,iconright,IconDescrRight,listBackgroundRight){
+Widget detailsProfile(iconText,icon,iconDescr,listBackground,iconRightText,iconright,iconDescrRight,listBackgroundRight){
 
 
   return ClipRRect(
     //borderRadius: BorderRadius.circular(32),
     child: Container(
-      padding: EdgeInsets.all(8),
+      padding: const EdgeInsets.all(8),
       //margin: const EdgeInsets.all(8),
-      margin: EdgeInsets.fromLTRB(8,0,8,0),
+      margin: const EdgeInsets.fromLTRB(8,0,8,0),
       width: 400,
       height: 50,
       //color:Color(0xffffffff),
@@ -473,13 +471,13 @@ Widget detailsProfile(IconText,icon,IconDescr,listBackground,IconrightText,iconr
             Colors.amber,size: 22,),
 
           ),
-          SizedBox(width:3,),
-          Text("${IconText}:",style:GoogleFonts.pacifico(fontSize:15,color: Colors.teal,fontWeight: FontWeight.w700)),
-          SizedBox(width:5,),
+          const SizedBox(width:3,),
+          Text("$iconText:",style:GoogleFonts.pacifico(fontSize:15,color: Colors.teal,fontWeight: FontWeight.w700)),
+          const SizedBox(width:5,),
           Expanded(
             child: Container(
-              padding: EdgeInsets.only(top: 3.9),
-              child: Text("${IconDescr}",style:GoogleFonts.pacifico(fontSize: 15)),
+              padding: const EdgeInsets.only(top: 3.9),
+              child: Text("$iconDescr",style:GoogleFonts.pacifico(fontSize: 15)),
             ),
           ),
 
@@ -487,7 +485,7 @@ Widget detailsProfile(IconText,icon,IconDescr,listBackground,IconrightText,iconr
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Container(
+                SizedBox(
 
                     width: 30,
                     height: 30,
