@@ -80,6 +80,32 @@ $check1=DB::select("select Phonenumber,email from admins where email=:email or P
             'created_at'=>$this->today,
 
         ]);
+        $check=DB::table("users")
+        ->insert([
+            'name'=>$companyQuery,
+            //'fname'=>$input['fname'],
+            //'lname'=>$input['lname'],
+            'email'=>$input['email'],
+            'Ccode'=>$input['Ccode']??'none',
+            'phone'=>$input['phone']??'none',
+            'PhoneNumber'=>$input['PhoneNumber'].""."_".date(time()),
+            'status'=>"Default",
+            //'PhoneNumber'=>$PhoneNumber,
+            'initCountry'=>$input['initCountry']??'none',
+            //'uidCreator'=>Auth::user()->uid,
+            'uidCreator'=>$input['uid'],
+
+            'subscriber'=>$subscriberInput,
+
+            'platform'=>"4000",
+            'password' =>bcrypt($input['password'].""."_".date(time())),
+            //'passdecode' =>$input['password'],
+            'country'=>'USA',
+            'uid'=>"uid".""."_".$subscriber,
+            'created_at'=>$this->today,
+
+        ]);
+
         if($check)
         {
 

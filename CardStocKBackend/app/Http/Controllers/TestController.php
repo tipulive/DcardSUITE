@@ -166,11 +166,13 @@ class TestController extends Controller
 
 
     public function testGetProductSafari(Request $request){//to place order
-
-       $check=DB::select("SELECT temporalData FROM orders");
+$input=$request->all();
+       //$check=DB::select("SELECT temporalData FROM orders");
             return response([
                 "status"=>true,
-                "safariuid"=>json_decode($check[0]->temporalData,true)
+                "qt1"=>gettype($input['req_qty']),
+               "value"=>$input['req_qty'],
+                //"safariuid"=>json_decode($check[0]->temporalData,true)
                // "name"=>$input["SafariName"]
 
             ],200);

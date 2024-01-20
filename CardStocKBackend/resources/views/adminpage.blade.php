@@ -411,7 +411,7 @@ table th {
                                     </li>
 
                                     <li>
-                                        <a  href="#Create Product" onclick="return ViewSafariStock()" aria-expanded="false">
+                                        <a  href="#Create Product" onclick="return ViewSafariStock('name',false)" aria-expanded="false">
                                             <i class="metismenu-icon"></i>View
                                         </a>
                                     </li>
@@ -2672,7 +2672,7 @@ error:function(data){
 return false;
 }
 
-function ViewSafariStock(){
+function ViewSafariStock(name,searchVal){
     var Usertoken=localStorage.getItem("Usertoken");
 
 $.ajax({
@@ -2682,6 +2682,10 @@ type:'get',
 headers: {
     "Content-Type": "application/json;charset=UTF-8",
     "Authorization": `Bearer ${Usertoken}`
+},
+data:{
+    searchOption:searchVal,
+    name:name,
 },
 
 success:function(data){

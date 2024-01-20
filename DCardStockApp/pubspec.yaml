@@ -48,11 +48,15 @@ dependencies:
   #intl_phone_number_input: ^0.7.2
   intl_phone_field: ^3.1.0
   intl: ^0.17.0
-  dio: ^4.0.6
+  dio: ^5.4.0
   google_fonts: ^3.0.1
   cool_alert: ^1.1.0
   dotted_line: ^3.1.0
   auto_size_text_field: ^1.0.0
+  firebase_core: ^2.24.2
+  firebase_auth: ^4.15.3
+  firebase_messaging: ^14.7.9
+  http: ^0.13.5
 
 
   #mobile_scanner: ^2.0.0

@@ -3,6 +3,7 @@ import 'dart:io';
 
 
 import 'package:dio/dio.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 import 'package:flutter/material.dart';
 import 'Pages/routes.dart';
@@ -13,13 +14,20 @@ import 'package:get/get.dart';
 
 
 import 'Query/AdminQuery.dart';
+//import 'api/firebaseApi.dart';
+//import 'firebase_options.dart';
 
 
 
-void main() {
+void main() async{
   /*this will make apps not going to sleep Mode*/
 
   WidgetsFlutterBinding.ensureInitialized();
+ /* await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+ await FirebaseApi().initialize();*/
+
   Wakelock.enable();
   //i may add  Wakelock.disable(); // to make apps to go on sleep mode
   /*this will make apps not going to sleep Mode*/
@@ -93,6 +101,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
 
 
+  @override
   Widget build(BuildContext context)
   {
 
@@ -107,7 +116,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child:Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text("Welcome TO Our Shop"),
+            const Text("Welcome TO Our Shop"),
             Container(
               decoration: BoxDecoration(
                 color: Colors.white, // set background color
@@ -127,12 +136,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
 
   }
+  @override
   void initState()
   {
     super.initState();
     //getapi();
     checkAuth();
   }
+  @override
   void dispose() {
     //WidgetsFlutterBinding.ensureInitialized();
     checkAuth();
@@ -140,7 +151,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   checkAuth() async{
-    await Future.delayed(Duration(seconds: 5));
+    await Future.delayed(const Duration(seconds: 3));
     if(await Get.put(AdminQuery()).auth()==0)//no data in localDb
       {
       //i will add full screen pics with delay

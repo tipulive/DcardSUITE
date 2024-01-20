@@ -19,14 +19,14 @@ import 'package:google_fonts/google_fonts.dart';
 
 
 
-class SetDeptComp extends StatefulWidget {
-  const SetDeptComp({Key? key}) : super(key: key);
+class ProductComp extends StatefulWidget {
+  const ProductComp({Key? key}) : super(key: key);
 
   @override
-  State<SetDeptComp> createState() => _SetDeptCompState();
+  State<ProductComp> createState() => _ProductCompState();
 }
 
-class _SetDeptCompState extends State<SetDeptComp> {
+class _ProductCompState extends State<ProductComp> {
 
   final ScrollController _scrollController = ScrollController();// detect scroll
   final List<dynamic> _data = [];
@@ -43,6 +43,9 @@ class _SetDeptCompState extends State<SetDeptComp> {
   bool isLoading=false;
   num qtyProduct=1;
   String productCode="";
+  String productName="";
+  String qrSearch="none";
+  String isProductAction="viewProduct";
   num inputData=0;
   bool cameraValue=false;
   bool flashValue=false;
@@ -113,172 +116,172 @@ class _SetDeptCompState extends State<SetDeptComp> {
             ),
 
             child: ListTile(
-                leading: GestureDetector(
-                  onTap: (){
-                    getDebtWidget();
-                  },
-                  child: CircleAvatar(
-                    backgroundColor:getRandomColor(),
-                    child: Icon(_getRandomIcon()),
-                  ),
+              leading: GestureDetector(
+                onTap: (){
+                  getDebtWidget();
+                },
+                child: CircleAvatar(
+                  backgroundColor:getRandomColor(),
+                  child: Icon(_getRandomIcon()),
                 ),
-                title:Row(
-                  children: [
+              ),
+              title:Row(
+                children: [
 
 
-                    Expanded(
-                      flex: 1,
-                      child: Stack(
-                        children: [
-
-                          Column(
-                            children: [
-
-                              Center(
-                                child: RichText(
-                                  text: TextSpan(
-                                    text: "Total:",
-                                    style: DefaultTextStyle.of(context).style,
-                                    children: const <TextSpan>[
-
-
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-
-
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-
-                subtitle: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Column(
-
+                  Expanded(
+                    flex: 1,
+                    child: Stack(
                       children: [
-                        Wrap(
-                          crossAxisAlignment: WrapCrossAlignment.center,
+
+                        Column(
                           children: [
 
-                            const Icon(Icons.segment,color:Colors.orange,size:13,),
-                            Text("${(_data.isNotEmpty)?_data[0]['totDept']:0}",style:GoogleFonts.pacifico(fontSize:15,color: Colors.orange,fontWeight: FontWeight.w700)),
+                            Center(
+                              child: RichText(
+                                text: TextSpan(
+                                  text: "Total:",
+                                  style: DefaultTextStyle.of(context).style,
+                                  children: const <TextSpan>[
 
 
-
+                                  ],
+                                ),
+                              ),
+                            ),
                           ],
                         ),
 
 
-
-
-
-
                       ],
                     ),
+                  ),
+                ],
+              ),
 
-                  ],
-                ),
-                trailing:PopupMenuButton(
-                  itemBuilder:(container)=>[
-                    PopupMenuItem(
-                        child: GestureDetector(
-                          onTap: (){
-                            setState(() {
-                              viewOption="false";
-                            });
-                            viewData('test',false);
-                          },
-                          child: Column(
-                            children: [
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              Row(
-                                children: const [
-                                  Icon(
-                                    Icons.person,
-                                    color: Colors.blue,
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.only(left:10.0),
-                                    child: Text("View"),
-                                  ),
+              subtitle: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Column(
 
-                                ],
-                              ),
-                              const Divider(
-                                height: 20, // Adjust the height as needed
-                                thickness: 0.2, // Adjust the thickness as needed
-                                color: Colors.grey,
-                              ),
+                    children: [
+                      Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
 
-                            ],
-                          ),
-                        )
-                    ),
-                    PopupMenuItem(
-                        child: GestureDetector(
-                          onTap: (){
-                            //print("type All");
-                            setState(() {
-                              viewOption="true";
-                            });
-                            viewData('test',false);
+                          const Icon(Icons.segment,color:Colors.orange,size:13,),
+                          Text("${(_data.isNotEmpty)?_data[0]['totDept']:0}",style:GoogleFonts.pacifico(fontSize:15,color: Colors.orange,fontWeight: FontWeight.w700)),
 
-                          },
-                          child: Column(
-                            children: [
-                              Row(
-                                children: const [
-                                  Icon(
-                                    Icons.apartment,
-                                    color: Colors.orange,
-                                  ),
 
-                                  Padding(
-                                    padding: EdgeInsets.only(left:10.0),
-                                    child: Text("Company"),
-                                  ),
 
-                                ],
-                              ),
-                              const Divider(
-                                height: 20, // Adjust the height as needed
-                                thickness: 0.2, // Adjust the thickness as needed
-                                color: Colors.grey,
-                              ),
-
-                            ],
-                          ),
-                        )
-                    ),
-
-                  ],
-                  offset: const Offset(0, 40),
-                  child:InkWell(
-
-                    child: Ink(
-                      decoration: ShapeDecoration(
-                        color: Colors.grey.withOpacity(0.2),
-                        shape: const CircleBorder(),
+                        ],
                       ),
-                      child: const Padding(
-                        padding: EdgeInsets.all(5.0),
-                        child: Icon(
 
-                          Icons.visibility, // Replace with your desired icon
-                          color: Colors.pink,
+
+
+
+
+
+                    ],
+                  ),
+
+                ],
+              ),
+              trailing:PopupMenuButton(
+                itemBuilder:(container)=>[
+                  PopupMenuItem(
+                      child: GestureDetector(
+                        onTap: (){
+                          setState(() {
+                            viewOption="false";
+                          });
+                          viewData('test',false);
+                        },
+                        child: Column(
+                          children: [
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Row(
+                              children: const [
+                                Icon(
+                                  Icons.person,
+                                  color: Colors.blue,
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.only(left:10.0),
+                                  child: Text("View"),
+                                ),
+
+                              ],
+                            ),
+                            const Divider(
+                              height: 20, // Adjust the height as needed
+                              thickness: 0.2, // Adjust the thickness as needed
+                              color: Colors.grey,
+                            ),
+
+                          ],
                         ),
+                      )
+                  ),
+                  PopupMenuItem(
+                      child: GestureDetector(
+                        onTap: (){
+                          //print("type All");
+                          setState(() {
+                            viewOption="true";
+                          });
+                          viewData('test',false);
+
+                        },
+                        child: Column(
+                          children: [
+                            Row(
+                              children: const [
+                                Icon(
+                                  Icons.apartment,
+                                  color: Colors.orange,
+                                ),
+
+                                Padding(
+                                  padding: EdgeInsets.only(left:10.0),
+                                  child: Text("Company"),
+                                ),
+
+                              ],
+                            ),
+                            const Divider(
+                              height: 20, // Adjust the height as needed
+                              thickness: 0.2, // Adjust the thickness as needed
+                              color: Colors.grey,
+                            ),
+
+                          ],
+                        ),
+                      )
+                  ),
+
+                ],
+                offset: const Offset(0, 40),
+                child:InkWell(
+
+                  child: Ink(
+                    decoration: ShapeDecoration(
+                      color: Colors.grey.withOpacity(0.2),
+                      shape: const CircleBorder(),
+                    ),
+                    child: const Padding(
+                      padding: EdgeInsets.all(5.0),
+                      child: Icon(
+
+                        Icons.visibility, // Replace with your desired icon
+                        color: Colors.pink,
                       ),
                     ),
                   ),
                 ),
+              ),
 
               //trailing: Text()
             ),
@@ -300,7 +303,7 @@ class _SetDeptCompState extends State<SetDeptComp> {
             ),
             onChanged: (text) async{
 
-              viewData(text,true);
+              viewData(text,'search');
 
               //print(this._data[index]["total_var"]);
               // print("Text changed to: $text");
@@ -319,7 +322,7 @@ class _SetDeptCompState extends State<SetDeptComp> {
               {
                 FocusNode test=FocusNode() ;
 
-                _data[index]['focusNode']=test;
+                this._data[index]['focusNode']=test;
                 return Card(
                   elevation:0,
                   //margin: EdgeInsets.symmetric(vertical:1,horizontal:5),
@@ -331,97 +334,71 @@ class _SetDeptCompState extends State<SetDeptComp> {
 
                   child: ListTile(
                       leading: CircleAvatar(
-                        backgroundColor:getRandomColor(),
                         child: Icon(_getRandomIcon()),
+                        backgroundColor:getRandomColor(),
                       ),
                       title:Row(
                         children: [
-
-
                           Expanded(
                             flex: 1,
                             child: Stack(
                               children: [
 
-                                Column(
-                                  children: [
+                                Padding(
+                                  padding: const EdgeInsets.fromLTRB(0, 10, 0, 2),
+                                  child: RichText(
+                                    text: TextSpan(
+                                      text: "${_data[index]['productCode']}(${(_data[index]['pcs']=='none')?'0':_data[index]['pcs']} Pcs):",
+                                      style: DefaultTextStyle.of(context).style,
+                                      children: <TextSpan>[
+                                        TextSpan(
+                                          text: " 1X${_data[index]["price"]}",
+                                          style: TextStyle(color: Colors.blue),
 
-                                    Padding(
-                                      padding: const EdgeInsets.fromLTRB(0, 10, 0, 2),
-                                      child: RichText(
-                                        text: TextSpan(
-                                          text: "${_data[index]['name']}:",
-                                          style: DefaultTextStyle.of(context).style,
-                                          children: const <TextSpan>[
 
-
-                                          ],
                                         ),
-                                      ),
+
+                                      ],
                                     ),
-                                  ],
+                                  ),
                                 ),
 
 
                               ],
                             ),
-                          ),
+                          )
+
+
+
+
+
+
                         ],
                       ),
 
                       subtitle: Padding(
                         padding: const EdgeInsets.fromLTRB(0, 5, 0, 10),
-                        child: Row(
+                        child: Wrap(
+                          crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
 
-                                Wrap(
-                                  crossAxisAlignment: WrapCrossAlignment.center,
-                                  children: [
-
-                                    const Icon(Icons.segment,color:Colors.orange,size:13,),
-                                    Text("Dept:${_data[index]['debt']}"),
-
-                                  ],
-                                ),
-                                if(viewOption=='true')
-                                   Wrap(
-                                    crossAxisAlignment: WrapCrossAlignment.center,
-                                    children: [
-
-                                    const Icon(Icons.segment,color:Colors.orange,size:13,),
-                                    Text("By:${_data[index]['adminName']}"),
-
-                                    ],
-                                  ),
-
-                              ],
-                            ),
-
+                            Icon(Icons.segment,color:Colors.orange,size:13,),
+                            Text("tags:${_data[index]['tags']}"),
 
                           ],
                         ),
                       ),
-                      trailing:GestureDetector(
+                      trailing:Container(child:
+                      GestureDetector(
                           onTap: () async{
-
-
-                            Map<String, dynamic> clientDebt=
-                            {
-                              "debt":_data[index]['debt'],
-                              "uidUser":_data[index]['myDeptId'],
-                              "name":_data[index]['name']
-                            };
-                            (Get.put(StockQuery()).updateClientDebt(clientDebt));
-                            (Get.put(StockQuery()).updatehideComp(false));
-
-                            getDebtWidget();
+                            // This function will be called when the icon is tapped.
 
 
                           },
-                          child:const Icon(Icons.grid_view,color:Colors.orange)
+                          child:Icon(Icons.grid_view,color:Colors.orange)
+                      )
+
+
                       )
 
                     //trailing: Text()
@@ -431,11 +408,11 @@ class _SetDeptCompState extends State<SetDeptComp> {
               }
               else{
                 return  Padding(
-                  padding:const EdgeInsets.symmetric(vertical: 32),
+                  padding:EdgeInsets.symmetric(vertical: 32),
                   child:Center(
                       child:hasMoreData?
-                      const CircularProgressIndicator()
-                          :const Text("no more Data")
+                      CircularProgressIndicator()
+                          :Text("no more Data")
 
                   ),
                 );
@@ -538,7 +515,7 @@ class _SetDeptCompState extends State<SetDeptComp> {
 
 
     } catch (e) {
-    return e;
+      return e;
     }
   }
   paidDebt() async{
@@ -554,9 +531,9 @@ class _SetDeptCompState extends State<SetDeptComp> {
 
         (Get.put(StockQuery()).updateClientDebt(resultData["result"]));
         if((Get.put(StockQuery()).hideComp))
-          {
+        {
 
-          }
+        }
         else{
           Future.microtask(() {
             Navigator.of(context).pop();
@@ -632,15 +609,16 @@ class _SetDeptCompState extends State<SetDeptComp> {
 
   quickData()
   {
-    viewData('test',false);
+    viewData('test',"ViewProduct");
 
   }
-  viewData(nameVal,searchVal) async{
+  viewData(nameVal,isProductAction) async{
     if(isLoading) return;
     isLoading=true;
     int limit=10;
 
-    var resultData=(await StockQuery().viewDept(Topups(startlimit:limit,endlimit:_page,name:nameVal,searchOption:searchVal,optionCase:viewOption))).data;
+    var resultData=(await StockQuery().product(QuickBonus(uid:nameVal,productName:productName,status:qrSearch),Topups(optionCase:isProductAction,startlimit:limit,endlimit:_page))).data;
+
 
     if(resultData["status"])
     {
@@ -780,7 +758,7 @@ class _SetDeptCompState extends State<SetDeptComp> {
                                                 children: [
 
                                                   const Icon(Icons.segment,color:Colors.orange,size:13,),
-                                                  Text("${(Get.put(StockQuery()).clientDebt)["debt"]}",style:GoogleFonts.pacifico(fontSize:15,color: Colors.orange,fontWeight: FontWeight.w700)),
+
 
 
                                                 ],
@@ -887,10 +865,10 @@ class _SetDeptCompState extends State<SetDeptComp> {
                             ),
                           ),
                         ),
-                    if((Get.put(StockQuery()).hideComp))
-                         const SizedBox(height:2.0,),
+                      if((Get.put(StockQuery()).hideComp))
+                        const SizedBox(height:2.0,),
                       //if(!(Get.put(StockQuery()).paidDeptScanHide))
-                          Expanded(
+                      Expanded(
                           flex: 5,
                           child:Stack(
                             alignment:Alignment.bottomCenter,
@@ -931,14 +909,14 @@ class _SetDeptCompState extends State<SetDeptComp> {
                             ],
                           )
 
-                         )
+                      )
 
 
 
 
-                        ],
-                       ),
-                      ),
+                    ],
+                  ),
+                ),
                 GetBuilder<StockQuery>(
                   builder: (myLoadercontroller) {
                     //return Text('Data: ${_controller.data}');
@@ -968,34 +946,7 @@ class _SetDeptCompState extends State<SetDeptComp> {
     });
 
   }
-  thisOrder2()async
-  {
-    if(isLoading) return;
-    isLoading=true;
-    int limit=10;
 
-    var resultData=(await StockQuery().orderViewByUid(Topups(uid:"${orderData[0]}",startlimit:limit,endlimit:_page))).data;
-
-
-    if(resultData["status"])
-    {
-      setState(() {
-        isLoading=false;
-        hasMoreData=false;
-
-
-        thisListOrder.clear();
-        thisListOrder.addAll(resultData["result"]);
-
-
-      });
-      return true;
-    }
-    else{
-      return false;
-    }
-
-  }
 
   thisOrder()async
   {

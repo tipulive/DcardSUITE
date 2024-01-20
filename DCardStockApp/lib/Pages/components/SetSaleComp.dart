@@ -326,9 +326,7 @@ class _SetSaleCompState extends State<SetSaleComp> {
                                               elevation:0,
                                             ),
                                             onPressed: () async{
-                                              if(isLoading) return;
-                                              isLoading=true;
-                                              int limit=10;
+
 
                                               var resultData=(await StockQuery().editOrder(Topups(uid:_data[index]['OrderId']))).data;
 
@@ -606,7 +604,24 @@ class _SetSaleCompState extends State<SetSaleComp> {
 
 
   }
+  void viewComment(commentData){
+    Get.bottomSheet(
+      Container(
+        height: 200,
+        padding: EdgeInsets.all(16),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('${commentData}'),
+            SizedBox(height: 20),
 
+          ],
+        ),
+      ),
+      barrierColor: Colors.transparent,
+      backgroundColor: Colors.white,
+    );
+  }
   void viewThisOrder() {
 
     Get.bottomSheet(

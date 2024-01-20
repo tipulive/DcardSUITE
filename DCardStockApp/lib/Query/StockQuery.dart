@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-
+import 'package:http/http.dart' as http;
 import '../../../Query/AdminQuery.dart';
 import '../../../models/Participated.dart';
 import '../../../models/Promotions.dart';
@@ -31,12 +31,31 @@ class StockQuery extends GetxController{
   bool paidDeptScanHide=true;
   updatePaidDeptScanHide(valdata)
   {
-    hideProductList=valdata;
+    paidDeptScanHide=valdata;
+    update();
+  }
+  bool hideComp=true;
+  updatehideComp(valdata)
+  {
+    hideComp=valdata;
+    update();
+  }
+  bool hideaddCart=false;
+  updateHideaddCart(valdata)
+  {
+    hideaddCart=valdata;
+    update();
+  }
+  bool hidePickClick=true;
+  updateHidePickClick(valdata)
+  {
+    hidePickClick=valdata;
     update();
   }
   Map<String, dynamic> userProfile=
     {
-      "uid": "kebineericMuna_1674160265",
+      //"uid": "kebineericMuna_1674160265",
+      "uid": "none",
       "name": "unknown",
 
       "email": "on@gmail.com",
@@ -105,7 +124,7 @@ class StockQuery extends GetxController{
     "resultData":[
       {
         "name":"Unknown",
-        "uid":""
+        "uid":"none"
       }
     ],
   };
@@ -201,6 +220,7 @@ dynamic dataTest=[];
 
         //"options": [1,2,3],
       };
+      print(params);
       String authToken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
       var url="${ConstantClassUtil.urlLink}/placeOrder";
       var response = await Dio().post(url,
@@ -213,7 +233,8 @@ dynamic dataTest=[];
       if (response.statusCode == 200) {
 
         //updateParticipateState(response.data);
-        return response;
+       return response;
+
 
 
 
@@ -226,21 +247,66 @@ dynamic dataTest=[];
     }
 
   }//not done Spending as depense
+  searchUser(User user,Topups topData) async{
+    try {
 
-  searchProduct(QuickBonus product) async{
+      var params =  {
+
+        "name":user.name,
+        "phoneNumber":user.phone,
+        "platform":user.platform,
+        "isStatus":user.status,//offNotPick means gonna pick any
+        "isAdmin":topData.optionCase,
+        "limitData":topData.startlimit,
+        "searchOption":topData.searchOption
+
+
+      };
+
+      String authToken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
+      var url="${ConstantClassUtil.urlLink}/SearchUser";
+      var response = await Dio().get(url,
+        options: Options(headers: {
+          HttpHeaders.contentTypeHeader: "application/json",
+          HttpHeaders.authorizationHeader:"Bearer $authToken"
+        }),
+        queryParameters: params,
+      );
+      if (response.statusCode == 200) {
+
+
+
+
+        return response;
+
+
+
+      } else {
+        return false;
+        //print(false);
+      }
+    } catch (e) {
+      //return false;
+
+    }
+  }
+  product(QuickBonus product,Topups topupData) async{//this is all about Products
     try {
 
       var params =  {
 
         "productCode":product.uid,
         "productName":product.productName,
-        "productQr":product.status
+        "productQr":product.status,
+        "isProductAction":topupData.optionCase,//product get Action(search,edit,view)
+      "LimitStart":topupData.endlimit,  //page
+      "LimitEnd":topupData.startlimit,
 
 
       };
 
       String authToken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
-      var url="${ConstantClassUtil.urlLink}/SearchProduct";
+      var url="${ConstantClassUtil.urlLink}/Products";
       var response = await Dio().get(url,
         options: Options(headers: {
           HttpHeaders.contentTypeHeader: "application/json",
@@ -305,14 +371,63 @@ dynamic dataTest=[];
       //return false;
     }
   } //Search all product based on Qr Code not done
+  updateInOrder(QuickBonus quickData,Participated user) async{//balance and Bonus Widthdraw History
+    try {
+
+      var params =  {
+
+
+        "uid":"${quickData.uid}",
+        "productCode":"${quickData.productName}",
+        "commentData":"${quickData.description}",
+        "isCommentData":"${quickData.status}",
+        'newUidUser':"${user.uidUser}",
+        'isStatus':"${user.status}"
+
+
+      };
+print(params);
+      String authToken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
+      var url="${ConstantClassUtil.urlLink}/updateDataOrder";
+      var response = await Dio().get(url,
+        options: Options(headers: {
+          HttpHeaders.contentTypeHeader: "application/json",
+          HttpHeaders.authorizationHeader:"Bearer $authToken"
+        }),
+        queryParameters: params,
+      );
+      if (response.statusCode == 200) {
+
+
+        // return (response.data).length;
+        //updateEventState(response.data);
+        //return "hello";
+
+        //updateBalanceHistState(response.data);
+        //return response.data;
+
+        return response;
+
+
+      } else {
+        return false;
+        //print(false);
+      }
+    } catch (e) {
+
+      //return false;
+
+    }
+  }//calculate safari Interet
+
   placeOrder(QuickBonus product,User user) async{
 
     try {
 
       var params =  {
-        "uidclient":user.uid,
+        "uidClient":user.uid,
         "productCode":product.uid,
-        "req_qty":num.parse("${product.qty}"),
+        "req_qty":product.reqQty,
 
         "ref":"test",
         "comment":"ok",
@@ -364,7 +479,8 @@ dynamic dataTest=[];
 
         //"options": [1,2,3],
       };
-   //print(params);
+   print(params);
+      //return false;
       String authToken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
       var url="${ConstantClassUtil.urlLink}/SubmitOrder";
       var response = await Dio().post(url,
@@ -397,6 +513,7 @@ dynamic dataTest=[];
 //optionCase
 
         "uid":topData.uid,
+        "orderAction":"EditOrder"
 
 
       };
@@ -503,42 +620,41 @@ dynamic dataTest=[];
   }
 
   editTOrder(QuickBonus product,User userData) async{//balance and Bonus Widthdraw History
-    try {
-
-      var params =  {
-//optionCase
-
-        "productCode":product.productName,
-        "req_qty":num.parse("${product.qty}"),
-        "uid":product.uid,
-        "uidclient":userData.uid,
-        "statusForm":"editOrder"
-
-      };
-
-      String authToken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
-      var url="${ConstantClassUtil.urlLink}/EditTOrder";
-      var response = await Dio().get(url,
-        options: Options(headers: {
-          HttpHeaders.contentTypeHeader: "application/json",
-          HttpHeaders.authorizationHeader:"Bearer $authToken"
-        }),
-        queryParameters: params,
-      );
-      if (response.statusCode == 200) {
+    String authToken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
+    var url="${ConstantClassUtil.urlLink}/EditTOrder";
 
 
+    var headers = {
+      'Content-Type': 'application/json',
+      'Authorization':'Bearer ${authToken}'
+    };
 
 
-        return response;
+    var request = http.Request('GET', Uri.parse('${ConstantClassUtil.urlLink}/EditTOrder'));
+    request.body = '''
+{
+  "productCode":"${product.productName}",
+  "req_qty":${product.reqQty},
+  "currentQtyEdit":${product.reqQty},
+  "uid": "${product.uid}",
+  "uidClient": "${userData.uid}",
+  "statusForm": "editOrder"
+}
+''';
 
+    request.headers.addAll(headers);
 
-      } else {
-        return false;
-        //print(false);
-      }
-    } catch (e) {
-      //return false;
+    http.StreamedResponse response = await request.send();
+
+    if (response.statusCode == 200) {
+      String responseBody = await response.stream.bytesToString();
+      dynamic jsonResponse = jsonDecode(responseBody); // Parse JSON response
+      return jsonResponse;
+      // Return the response body as a string
+    } else {
+      print(response.reasonPhrase);
+      // Handle non-200 status codes appropriately, potentially throwing an error
+      throw Exception('HTTP request failed with status code ${response.statusCode}');
     }
   }
   deleteTSingleOrder(QuickBonus product) async{//balance and Bonus Widthdraw History
@@ -550,7 +666,7 @@ dynamic dataTest=[];
         "uid":product.uid
 
       };
-
+      print("delete Single ${params}");
       String authToken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
       var url="${ConstantClassUtil.urlLink}/deleteTSingleOrder";
       var response = await Dio().get(url,
@@ -576,19 +692,14 @@ dynamic dataTest=[];
       //return false;
     }
   }
-  deleteTOrder(Topups topupData,User userData) async{//balance and Bonus Widthdraw History
+  deleteTOrder(Topups topupData) async{//balance and Bonus Widthdraw History
     try {
 
       var params =  {
 
-        "LimitStart":topupData.endlimit,  //page
-        "LimitEnd":topupData.startlimit,//limit
-        "uid":userData.uid,//userid
-        "optionCase":topupData.optionCase,//optionCase
 
-        "productCode":"bido_1698592481",
-        "req_qty":2,
-        "current_qty":10,
+        "uid":topupData.uid,//userid
+
 
 
       };
@@ -928,7 +1039,7 @@ dynamic dataTest=[];
 
         //"options": [1,2,3],
       };
-      print(params);
+
       String authToken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
       var url="${ConstantClassUtil.urlLink}/addSpending";
       var response = await Dio().post(url,
@@ -1006,6 +1117,8 @@ dynamic dataTest=[];
         "LimitStart":topupData.endlimit,  //page
         "LimitEnd":topupData.startlimit,//limit
         "name":topupData.name,
+        "options":topupData.optionCase,
+        "safariId":topupData.uid,
         "searchOption":topupData.searchOption
 
 
@@ -1137,6 +1250,7 @@ dynamic dataTest=[];
     }
 
   }
+
   viewDept(Topups topupData) async{//balance and Bonus Widthdraw History
     try {
 
@@ -1145,6 +1259,7 @@ dynamic dataTest=[];
         "LimitStart":topupData.endlimit,  //page
         "LimitEnd":topupData.startlimit,//limit
         "name":topupData.name,
+        'viewAll':topupData.optionCase??'false',
         "searchOption":topupData.searchOption
 
 
@@ -1181,6 +1296,7 @@ dynamic dataTest=[];
 
     }
   }//calculate safari Interet
+
   viewPaidDept(Topups topupData) async{//balance and Bonus Widthdraw History
     try {
 
@@ -1310,16 +1426,194 @@ dynamic dataTest=[];
       //return false;
 
     }
-  }//
-  getSafaris(Topups topupData,User userData) async{//balance and Bonus Widthdraw History
+  }
+  viewSafeBorrow(Topups topupData) async{//balance and Bonus Widthdraw History
     try {
 
       var params =  {
 
         "LimitStart":topupData.endlimit,  //page
         "LimitEnd":topupData.startlimit,//limit
+        "uid":topupData.uid,
+        "isSafe":topupData.optionCase,
+        "searchOption":topupData.searchOption,
+        "name":topupData.name
+
+      };
+
+      String authToken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
+      var url="${ConstantClassUtil.urlLink}/viewSafeBorrow";
+      var response = await Dio().get(url,
+        options: Options(headers: {
+          HttpHeaders.contentTypeHeader: "application/json",
+          HttpHeaders.authorizationHeader:"Bearer $authToken"
+        }),
+        queryParameters: params,
+      );
+      if (response.statusCode == 200) {
+
+
+        // return (response.data).length;
+        //updateEventState(response.data);
+        //return "hello";
+
+        //updateBalanceHistState(response.data);
+        //return response.data;
+
+        return response;
+
+
+      } else {
+        return false;
+        //print(false);
+      }
+    } catch (e) {
+      //return false;
+
+    }
+  }
+  repaidBack(Topups topupData) async{
+
+    try {
+
+      var params =  {
+
+
+        "uidReceiver":topupData.uid,
+
+        "amount":topupData.amountBalance,
+        //"amount":5,
+        "commentData":topupData.desc,
+        "systemUid":"PointSales1"
+
+        //"options": [1,2,3],
+      };
+     // print(params);
+      String authtoken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
+      var url="${ConstantClassUtil.urlLink}/repaidBack";
+      var response = await Dio().post(url,
+        options: Options(headers: {
+          HttpHeaders.contentTypeHeader: "application/json",
+          HttpHeaders.authorizationHeader:"Bearer $authtoken"
+        }),
+        data: jsonEncode(params),
+      );
+      if (response.statusCode == 200) {
+
+        //updateParticipateState(response.data);
+        return response;
+
+
+
+
+      } else {
+        return false;
+        //print(false);
+      }
+    } catch (e) {
+      //return false;
+
+    }
+
+  }
+  confirmRepaidBack(User userData) async{
+
+    try {
+
+      var params =  {
+
+
+        "uid":userData.uid //uid of paidDette
+
+        //"options": [1,2,3],
+      };
+      String authtoken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
+      var url="${ConstantClassUtil.urlLink}/confirmRepaidBack";
+      var response = await Dio().post(url,
+        options: Options(headers: {
+          HttpHeaders.contentTypeHeader: "application/json",
+          HttpHeaders.authorizationHeader:"Bearer $authtoken"
+        }),
+        data: jsonEncode(params),
+      );
+      if (response.statusCode == 200) {
+
+        //updateParticipateState(response.data);
+        return response;
+
+
+
+
+      } else {
+        return false;
+        //print(false);
+      }
+    } catch (e) {
+      //return false;
+
+    }
+
+  }
+  viewRepay(Topups topupData) async{//balance and Bonus Widthdraw History
+    try {
+
+      var params =  {
+
+        "LimitStart":topupData.endlimit,  //page
+        "LimitEnd":topupData.startlimit,//limit
+        "uid":topupData.uid,
+        "IsReceiver":topupData.optionCase,//true for safe false for borrower
+        "searchOption":topupData.searchOption,
+        "name":topupData.name
+
+      };
+
+      String authToken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
+      var url="${ConstantClassUtil.urlLink}/viewRepay";
+      var response = await Dio().get(url,
+        options: Options(headers: {
+          HttpHeaders.contentTypeHeader: "application/json",
+          HttpHeaders.authorizationHeader:"Bearer $authToken"
+        }),
+        queryParameters: params,
+      );
+      if (response.statusCode == 200) {
+
+
+        // return (response.data).length;
+        //updateEventState(response.data);
+        //return "hello";
+
+        //updateBalanceHistState(response.data);
+        //return response.data;
+
+        return response;
+
+
+      } else {
+        return false;
+        //print(false);
+      }
+    } catch (e) {
+      //return false;
+
+    }
+  }
+  //
+  getSafaris(Topups topupData) async{//balance and Bonus Widthdraw History
+    try {
+
+      var params =  {
+
+       /* "LimitStart":topupData.endlimit,  //page
+        "LimitEnd":topupData.startlimit,//limit
         "uid":userData.uid,//userid
         "optionCase":topupData.optionCase//optionCase
+*/
+        "LimitStart":topupData.endlimit,  //page
+        "LimitEnd":topupData.startlimit,//limit
+        "name":topupData.name,
+        "searchOption":topupData.searchOption
 
       };
 

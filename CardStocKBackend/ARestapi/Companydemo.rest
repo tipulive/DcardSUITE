@@ -2,7 +2,7 @@
 @email=kopa@gmail.com
 @PhoneNumber=ceke@gmail.com
 @password=1
-@Auth_token=419|RvwedLDSkFY7TBnqdDPmbqtV9ZXqSUD5H9EmKbEl
+@Auth_token=431|aZYthavpHxXhak6Q3vbFAVCZmrC6gUzEVA3M4UXK
 
 ### Company Login with email
 POST  {{baseUrl}}/AdminLoginEmail/
@@ -732,9 +732,9 @@ content-type: application/json;charset=UTF-8
 Authorization: Bearer {{Auth_token}}
 
 {
-"productCode":"bido_1698592481",
+"productCode":"cuyi_1703849876",
 "uidclient":"kebineericMuna_1674160265",
-"req_qty":4,
+"req_qty":5.0,
 "ref":"test",
 "comment":"ok",
 "statusForm":"none",
@@ -972,8 +972,8 @@ Authorization: Bearer {{Auth_token}}
 {
 
 "uidUser":"kebineericMuna_1674160265",
-"inputData":100,
-"all_total":"215",
+"inputData":30,
+"all_total":"220",
 "ref":"Eric",
 "reach":"1200",
 "gain":"350",
@@ -992,7 +992,7 @@ Authorization: Bearer {{Auth_token}}
 {
 
 "uidUser":"kebineericMuna_1674160265",
-"inputData":100,
+"inputData":20,
 "all_total":"215",
 "ref":"Eric",
 "reach":"1200",
@@ -1010,7 +1010,9 @@ Content-Type: application/json
 Authorization: Bearer {{Auth_token}}
 
 {
-
+"viewAll":"fa",
+"searchOption":false,
+"name":"m"
 }
 ### done but not by SystemUid
 
@@ -1019,8 +1021,20 @@ Content-Type: application/json
 Authorization: Bearer {{Auth_token}}
 
 {
-
+"searchOption":false
 }
+### done uidReceiver is Admin Owner of Dept
+
+PoST  {{baseUrl}}/repaidBack
+Content-Type: application/json
+Authorization: Bearer {{Auth_token}}
+
+{
+"uidReceiver":"kebineericMuna_1668935525",
+"amount":150,
+"systemUid":"PointSales1"
+}
+
 ### done but not by SystemUid
 
 GET  {{baseUrl}}/viewBorrowBalance
@@ -1028,7 +1042,20 @@ Content-Type: application/json
 Authorization: Bearer {{Auth_token}}
 
 {
+"searchOption":false,
+"name":"w"
+}
+### this is to view in Details IsSafe true when it on SafeBalance
 
+GET  {{baseUrl}}/viewSafeBorrow
+Content-Type: application/json
+Authorization: Bearer {{Auth_token}}
+
+{
+"uid":"veki_1687463785",
+"isSafe":"false",
+"searchOption":false,
+"name":"be"
 }
 ### done and tested
 PoST  {{baseUrl}}/repaidBack
@@ -1053,21 +1080,18 @@ Authorization: Bearer {{Auth_token}}
 
 
 }
-###
+### done even in Testing ,isReceiver true,means Safe User View How much They Pay him,Then he can Confirm Payments
+
 GET  {{baseUrl}}/viewRepay
 Content-Type: application/json
 Authorization: Bearer {{Auth_token}}
 
 {
+"IsReceiver":"false",
+"uid":"kebineericMuna_1668935525",
+"searchOption":false,
+"name":""
 
-"uidUser":"kebineericMuna_1674160265",
-"inputData":100,
-"all_total":"215",
-"ref":"Eric",
-"reach":"1200",
-"gain":"350",
-"systemUid":"PointSales1",
-"commentData":"karera"
 
 
 

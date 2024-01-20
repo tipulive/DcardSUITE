@@ -609,10 +609,8 @@ content-type: application/json;charset=UTF-8
 Authorization: Bearer {{Auth_token}}
 
 {
-
-"safariuid":"amakarito_47lvw_1670704037",
-"name":"safari"
-
+"name":"mbo",
+"searchOption":false
 }
 
 ###Create Safari  testdone temp record Missing
@@ -638,19 +636,39 @@ Authorization: Bearer {{Auth_token}}
 
 }
 
+###Search User either by phoneNumber or by name,when Phonenumber is equal None then search name
+### limitData is number of result
+### platform for instance here 4000 is client
+GET  {{baseUrl}}/SearchUser
+content-type: application/json;charset=UTF-8
+Authorization: Bearer {{Auth_token}}
 
+{
+"phoneNumber":"+250",
+"name":"gogo",
+"limitData":10,
+"platform":"4000",
+"searchOption":"true"
+
+
+
+}
 
 ###Search productCode or productName  done or i may search both productCode and productName together
 ### either productCode equal none or productName equal none
 ### when $productQr is available means Search By Qr
-GET  {{baseUrl}}/SearchProduct
+GET  {{baseUrl}}/Products
 content-type: application/json;charset=UTF-8
 Authorization: Bearer {{Auth_token}}
 
 {
 "productCode":"bido_1698592481",
 "productName":"none",
-"productQr":"n"
+"productQr":"n",
+"isProductAction":"action here search or other",
+"LimitStart":1,  //page
+"LimitEnd":10
+
 
 
 }
@@ -740,7 +758,26 @@ Authorization: Bearer {{Auth_token}}
 "price":"40"
 
 }
+### isCommentStatus=to define if is going update comment or not
+GET  {{baseUrl}}/updateInOrder/
+content-type: application/json;charset=UTF-8
+Authorization: Bearer {{Auth_token}}
 
+{
+
+"uid":"UID_vE_1705220510",
+"productCode":"bido_1698592481",
+"commentData":"peza",
+"isCommentStatus":"CommentIn",
+
+"newUidUser":"test",
+"isStatus":"offNotPick"
+
+
+
+}
+
+###
 ###place order ,this oTher ref after req_qty are after sales not allowed negative value
 ### more order i need to Add orderId value to orderIdFromEdit to track my Order
 ### req_qty must be number
@@ -749,8 +786,8 @@ content-type: application/json;charset=UTF-8
 Authorization: Bearer {{Auth_token}}
 
 {
-"productCode":"bido_1698592481",
-"uidclient":"kebineericMuna_1674160265",
+"productCode":"webcam_1700726985",
+"uidClient":"kebineericMuna_1674160265",
 "req_qty":5,
 "ref":"test",
 "comment":"ok",
@@ -764,15 +801,16 @@ Authorization: Bearer {{Auth_token}}
 ###Edit temporary Order edit order done not allowed negative Value 100% tested and working perfect
 ### req_qty must be number,uid is orderId
 
-POST  {{baseUrl}}/EditTOrder/
+GET  {{baseUrl}}/EditTOrder/
 content-type: application/json;charset=UTF-8
 Authorization: Bearer {{Auth_token}}
 
 {
-"productCode":"",
-"req_qty":7,
-"uid":"orderId",
-"uidclient":"useridClient",
+"productCode":"webcam_1700726985",
+"req_qty":9.6,
+"currentQtyEdit":5.6,
+"uid":"UID_En_1705562807",
+"uidClient":"kebineericMuna_1674160265",
 "statusForm":"editOrder"
 
 
@@ -811,7 +849,7 @@ Authorization: Bearer {{Auth_token}}
 {
 "uid":"Nyota_1672353378",
 "uidUser":"kebineericMuna_1674160265",
-"OrderId":"UID_T5_1703935830",
+"OrderId":"UID_vE_1705220510",
 "inputData":"30",
 "all_total":"250",
 "reach":"1200",
@@ -1035,7 +1073,8 @@ Content-Type: application/json
 Authorization: Bearer {{Auth_token}}
 
 {
-"searchOption":true,
+"viewAll":"fa",
+"searchOption":false,
 "name":"m"
 }
 ### done but not by SystemUid
@@ -1055,7 +1094,8 @@ Content-Type: application/json
 Authorization: Bearer {{Auth_token}}
 
 {
-
+"searchOption":true,
+"name":"k"
 }
 ### done but not by SystemUid
 
@@ -1064,7 +1104,19 @@ Content-Type: application/json
 Authorization: Bearer {{Auth_token}}
 
 {
+"searchOption":false
+}
+### done IsSafe true when it on SafeBalance,when search is true,then name=
 
+GET  {{baseUrl}}/viewSafeBorrow
+Content-Type: application/json
+Authorization: Bearer {{Auth_token}}
+
+{
+"uid":"veki_1687463785",
+"isSafe":"true",
+"searchOption":false,
+"name":"be"
 }
 
 ### done uidReceiver is Admin Owner of Dept
@@ -1085,7 +1137,7 @@ Authorization: Bearer {{Auth_token}}
 
 {
 
-"uid":"PID_SG_1703526591"
+"uid":"PID_j7_1704746516"
 
 
 
@@ -1094,22 +1146,18 @@ Authorization: Bearer {{Auth_token}}
 ###
 
 
-### not done
+### done even in Testing ,isReceiver true,means Safe User View How much They Pay him,Then he can Confirm Payments
 
 GET  {{baseUrl}}/viewRepay
 Content-Type: application/json
 Authorization: Bearer {{Auth_token}}
 
 {
+"IsReceiver":"true",
+"uid":"mn_1681494921",
+"searchOption":false,
+"name":""
 
-"uidUser":"kebineericMuna_1674160265",
-"inputData":100,
-"all_total":"215",
-"ref":"Eric",
-"reach":"1200",
-"gain":"350",
-"systemUid":"PointSales1",
-"commentData":"karera"
 
 
 
@@ -1183,14 +1231,16 @@ Authorization: Bearer {{Auth_token}}
 "commentData":"testViko",
 "systemUid":"PointSales1"
 }
-#### View Depense
+#### View Depense options is determine if is safari or others,searchoption is describe if is gonna search or not
 GET  {{baseUrl}}/viewSpending
 content-type: application/json;charset=UTF-8
 Authorization: Bearer {{Auth_token}}
 
 {
+"options":"othersp",
 "searchOption":true,
-"name":"b"
+"name":"t",
+"safariId":"GeneralSpend"
 
 }
 

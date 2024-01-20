@@ -4,6 +4,7 @@ class Topups {
 
   final String ?uidCreator;
   final String? amount;
+  final num? amountBalance;
   final String ?subscriber;
   final String ?purpose;
   final String ?desc;
@@ -24,6 +25,7 @@ class Topups {
 
     this.uidCreator,
     this.amount,
+    this.amountBalance,
     this.subscriber,
     this.purpose,
     this.desc,
@@ -44,6 +46,7 @@ class Topups {
 
       uidCreator:json['uidCreator'],
       amount:json['amount'],
+      amountBalance:json['amountBalance'],
       subscriber:json['subscriber'],
       purpose:json['purpose'],
       desc:json['desc'],

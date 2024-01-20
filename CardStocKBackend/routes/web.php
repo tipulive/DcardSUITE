@@ -18,7 +18,7 @@ use App\Http\Controllers\CompanyController;
 Route::get('/testphone', function () {
     return view('testphone');
 });
-Route::get('admin/{uid}', function ($uid) {
+Route::get('admin/{uid}', function ($uid) {//create Company
     $user=DB::select("select subscriber,CompanyName,uid from admins where uid=:uid",array(
         "uid"=>$uid
     ));
@@ -28,7 +28,7 @@ Route::get('admin/{uid}', function ($uid) {
     }
 
 });
-Route::get('company/{subscriber}', function ($subscriber) {
+Route::get('company/{subscriber}', function ($subscriber) {//create User Under Company
     $user=DB::select("select subscriber,CompanyName,uid from admins where subscriber=:subscriber",array(
         "subscriber"=>$subscriber
     ));

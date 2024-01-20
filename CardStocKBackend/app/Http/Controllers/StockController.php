@@ -27,9 +27,39 @@ class StockController extends Controller
         $this->platform1=env('PLATFORM3');
     }
 
+
+    public function SearchSafari($input){
+        $item = strtolower($input["name"]);
+        $itemSearch='%'.$item.'%';
+        $check=DB::select("select *from safaristocks where subscriber=:subscriber and name LIKE :Name
+        LIMIT 10",array(
+            "subscriber"=>Auth::user()->subscriber,
+            'Name'=>$itemSearch
+        ));
+        if($check)
+        {
+            return response([
+                // "allinput"=>$input,
+                // "data2"=>$input["item"],
+                "status"=>true,
+
+                "result"=>$check//safari UId
+
+             ]);
+        }
+        else{
+            return response([
+                // "allinput"=>$input,
+                // "data2"=>$input["item"],
+                "status"=>false,
+
+
+             ]);
+        }
+    }
     public function GetSafaris($input)
     {
-
+        if($input["searchOption"]=='true') return $this->SearchSafari($input);
         $check=DB::select("select *from safaristocks where subscriber=:subscriber ORDER BY id DESC
         LIMIT 100",array(
             "subscriber"=>Auth::user()->subscriber
@@ -55,6 +85,7 @@ class StockController extends Controller
              ]);
         }
     }
+
     public function create($input)
     {
         $uid=$input["name"].""."_".Str::random(5).""."_".date(time());
@@ -188,9 +219,166 @@ class StockController extends Controller
 
     }
 
+    public function SearchUser($input){
+        if(strtolower($input["isAdmin"])=='true')
+        {
+            return $this->IsAdmin($input);
+        }
+        else{
+            if(strtolower($input["isStatus"])!=strtolower('offNotPick'))
+            {
+                return $this->IsPickUser($input);
+            }
+            else{
+                return $this->IsUser($input);
+            }
 
-    public function SearchProduct($input)
+        }
+
+
+    }
+    public function IsPickUser($input){
+        $limitData=$input['limitData'];
+        $check=DB::select("select name,uid,PhoneNumber,platform from users where subscriber=:subscriber and status=:status LIMIT $limitData", array(
+            "status"=>$input['isStatus'],
+            "subscriber" => Auth::user()->subscriber
+        ));
+        if($check) {
+            return response([
+                "status" => true,
+
+                "result" => $check
+            ]);
+        } else {
+            return response([
+                "status" => false,
+
+                "result" => $check
+            ]);
+        }
+    }
+    public function IsUser($input)
     {
+        $platform=$input['platform'];
+        $limitData=$input["limitData"];
+        $name=strtolower($input["name"] ?? 'none');
+        $phoneNumber=strtolower($input["phoneNumber"] ??'none');
+
+        list($queryData, $itemName) = ($input["phoneNumber"]!='none')
+        ? (['PhoneNumber', '%' . $phoneNumber . '%'])
+        : (['name', '%' . $name . '%']);
+
+
+        if(strtolower($input["searchOption"])=='true')
+        {
+            $check1=DB::select("select name,uid,PhoneNumber,platform from users where subscriber=:subscriber and platform=:platform and $queryData LIKE :itemName LIMIT $limitData", array(
+                "itemName" => $itemName,
+                "platform"=>$platform,
+                "subscriber" => Auth::user()->subscriber
+            ));
+            if($check1) {
+                return response([
+                    "status" => true,
+
+                    "result" => $check1
+                ]);
+            } else {
+                return response([
+                    "status" => false,
+
+                    "result" => $check1
+                ]);
+            }
+        }
+        else{
+            $check=DB::select("select name,uid,PhoneNumber,platform from users where subscriber=:subscriber and platform=:platform LIMIT $limitData", array(
+                "platform"=>$platform,
+                "subscriber" => Auth::user()->subscriber
+            ));
+            if($check) {
+                return response([
+                    "status" => true,
+
+                    "result" => $check
+                ]);
+            } else {
+                return response([
+                    "status" => false,
+
+                    "result" => $check
+                ]);
+            }
+        }
+    }
+    public function IsAdmin($input)
+    {
+        $platform=$input['platform'];
+        $limitData=$input["limitData"];
+        $name=strtolower($input["name"] ?? 'none');
+        $phoneNumber=strtolower($input["phoneNumber"] ??'none');
+
+        list($queryData, $itemName) = ($input["phoneNumber"]!='none')
+        ? (['PhoneNumber', '%' . $phoneNumber . '%'])
+        : (['name', '%' . $name . '%']);
+
+
+        if(strtolower($input["searchOption"])=='true')
+        {
+            $check1=DB::select("select name,uid,PhoneNumber,platform from admins where subscriber=:subscriber and platform=:platform and $queryData LIKE :itemName LIMIT $limitData", array(
+                "itemName" => $itemName,
+                "platform"=>$platform,
+                "subscriber" => Auth::user()->subscriber
+            ));
+            if($check1) {
+                return response([
+                    "status" => true,
+
+                    "result" => $check1
+                ]);
+            } else {
+                return response([
+                    "status" => false,
+
+                    "result" => $check1
+                ]);
+            }
+        }
+        else{
+            $check=DB::select("select name,uid,PhoneNumber,platform from admins where subscriber=:subscriber and platform=:platform LIMIT $limitData", array(
+                "platform"=>$platform,
+                "subscriber" => Auth::user()->subscriber
+            ));
+            if($check) {
+                return response([
+                    "status" => true,
+
+                    "result" => $check
+                ]);
+            } else {
+                return response([
+                    "status" => false,
+
+                    "result" => $check
+                ]);
+            }
+        }
+    }
+
+
+    public function Products($input)
+    {
+        if(strtolower($input["isProductAction"])=='search')
+        {
+            return $this->isSearchProduct($input);
+        }
+        else{
+            return $this->isViewProduct($input);
+        }
+
+
+    }
+
+    public function isSearchProduct($input){
         try {
             // Code...
             $productName = strtolower($input["productName"] ?? 'none');
@@ -247,10 +435,28 @@ class StockController extends Controller
                 'errorCode' => $e->getLine(),
             ], 500);
         }
-
-
     }
+    public function isViewProduct($input){
+        $check = DB::select("select *from products where subscriber=:subscriber LIMIT :perPage OFFSET :offset", array(
+            "subscriber" => Auth::user()->subscriber,
+            "perPage"=>$input["LimitEnd"]??0,
+            "offset"=>$input["LimitStart"]??10
+        ));
 
+        if ($check) {
+            return response([
+                "status" => true,
+
+                "result" => $check
+            ]);
+        } else {
+            return response([
+                "status" => false,
+
+                "result" => $check
+            ]);
+        }
+    }
     public function AddItem($input)//Add product in Product and SafariProduct too ,this require me to add transaction
     {
         //Ndakora check if product exist in products and in safariProducts mbere yo gushyiramo Products
@@ -1019,12 +1225,99 @@ else{
 
     public function productPlaceOrder($input){//to place order
 
+
         $productCode =$input['productCode'];
-       // $input=$request->all();
+
              return $this->placeOrder($input);
 
-            //$myArray = [100, 20, 5, 2, 1];
+            /*return response([
+                        "status"=>true,
+                        "safariuid"=>$input["req_qty"],
+                        "reqType"=>gettype($input["req_qty"]),
+                       // "name"=>$input["SafariName"]
 
+                    ],200);*/
+
+    }
+
+    public function updateDataOrder($input)
+    {
+
+        if(strtolower($input["isCommentData"])==strtolower('CommentInOrder'))
+        {
+            return $this->updateCommentInOrder($input);
+        }
+        else{
+
+            return $this->updateUserInOrder($input);
+        }
+
+    }
+    public function updateCommentInOrder($input){
+
+
+        $check=DB::update("update orderhistories set description=:commentData where uid=:uid and productCode=:productCode limit 20",[
+            "uid"=>$input['uid'],
+            "productCode"=>$input['productCode'],
+            "commentData"=>$input['commentData']
+        ]);
+        if($check){
+            return response([
+                "status"=>true,
+                "result"=>$check
+
+            ],200);
+        }
+        else{
+            return response([
+                "status"=>false,
+                "result"=>$check
+
+            ],200);
+        }
+    }
+    public function updateUserInOrder($input){
+
+        if(strtolower($input["isStatus"])==strtolower('offNotPick'))
+        {
+            $input['limitData']=1;
+            $input['isStatus']="Default";
+
+         $newUserId=($this->IsPickUser($input));
+
+
+
+         $input["newUidUser"]=($newUserId->original["result"][0]->uid);
+         return $this->updateUserIN($input);
+        }
+        else{
+
+            return $this->updateUserIN($input);
+        }
+
+
+    }
+    function updateUserIN($input){
+        $check=DB::update("update orderhistories set userid=:userid,order_creator=:uidCreator where uid=:uid and subscriber=:subscriber limit 500",[
+            "userid"=>$input["newUidUser"],
+            "uidCreator"=>Auth::user()->uid,
+            "uid"=>$input["uid"],
+            "subscriber"=>Auth::user()->subscriber
+          ]);
+          if($check){
+              return response([
+                  "status"=>true,
+                  "result"=>$check
+
+              ],200);
+          }
+          else{
+              return response([
+                  "status"=>false,
+                  "result"=>$check
+
+              ],200);
+          }
     }
 
     public function placeOrder($input){
@@ -1100,7 +1393,7 @@ else{
             $data[] = [
                 //'uid' =>$input["orderIdFromEdit"]??$uid,
                 'uid' =>$uid,
-                'userid'=>$input['uidclient'],
+                'userid'=>$input['uidClient'],
                 'safariId'=>$results[$i]->safariId,
                 "order_creator"=>Auth::user()->uid,
                 "subscriber"=>Auth::user()->subscriber,
@@ -1155,44 +1448,40 @@ else{
     }
     public function productEditOrder($input){//idea behind this is first to reset cart (orderhistory),and start as new one
 
-        $req_qty=$input['req_qty'];
-        $productCode=$input['productCode'];
-       // $current_qty=$input['current_qty'];
-        $uid=$input['uid'];
-        $subscriber=Auth::user()->subscriber;
-        $results=DB::select("select *FROM
-        orderhistories
-    WHERE
-        productCode='$productCode' AND
-        uid='$uid' AND
-        subscriber='$subscriber'");
 
+        try {
+            $check=DB::transaction(function () use ($input) {
+                $req_qty=$input['req_qty'];
+                   $currentQtyEdit=abs($input['currentQtyEdit']);
+                   $productCode=$input['productCode'];
+            /* DB::select("select *from orderhistories where uid=:uid and productCode=:productCode and uidUser=:uidUser",[
+               "uid"=>
+               "uidClient"
+             ])*/
 
-        $data=[];
-        $ids=[];
-        $orderId="OrderId";
-          $limitData=count($results);
-             $totalQty=0;
-        for($i=0;$i<$limitData;$i++)
-        {
-            $totalQty+=$results[$i]->qty;
-            $id=$results[$i]->id;
-            $ids[]=$results[$i]->id;
-            $orderId=$results[$i]->uid;
-            /*$data[] = [
-                'uid' =>$uid,
-                'userid'=>$input['uidclient'],
-                'safariId'=>$results[$i]->SafariId,
-                'ProductCode'=>$productCode,
-                'price'=>$results[$i]->price,
-                'qty'=>$results[$i]->qty,
-                'total'=>$results[$i]->qty*$results[$i]->price
+             $checkProduct=DB::select("select productCode,subscriber,price from products where subscriber=:subscriber and productCode=:productCode and qty>=(qty_sold-:currentQtyEdit)+:req_qty limit 1",array(
+               "productCode"=>$productCode,
+               "req_qty"=>$input['req_qty'],
+               "currentQtyEdit"=>abs($input['currentQtyEdit']),
+               "subscriber"=>Auth::user()->subscriber
+            ));
+            if($checkProduct)
+            {
+           $results= DB::select("select *from orderhistories where uid=:uid and productCode=:productCode ",[
+               "uid"=>$input['uid'],
+               "productCode"=>$input['productCode'],
 
+           ]);
+           $limitData=count($results);
+           $totalQty=0;
+           $countLoop=0;
+           for($i=0;$i<$limitData;$i++)
+           {
 
-                // Add more rows here if needed
-            ];*/
-            //reset all
-           DB::update("update safariproducts set qty=qty+:qty,SoldOut=SoldOut-:SoldOut,TotSoldAmount=TotSoldAmount-:TotSoldAmout where safariId=:safariId and productCode=:productCode limit 100 ",array(
+               $id=$results[$i]->id;
+               $ids[]=$results[$i]->id;
+               $orderId=$results[$i]->uid;
+               DB::update("update safariproducts set qty=qty+:qty,SoldOut=SoldOut-:SoldOut,TotSoldAmount=TotSoldAmount-:TotSoldAmout where safariId=:safariId and productCode=:productCode limit 100 ",array(
                    "qty"=>$results[$i]->qty,
                    "SoldOut"=>$results[$i]->qty,
                    "TotSoldAmout"=>$results[$i]->total,
@@ -1200,92 +1489,213 @@ else{
                    "productCode"=>$results[$i]->productCode
 
             ));
-            DB::delete("delete from orderhistories where uid=:uid and productCode=:productCode limit 50",array(
-                "uid"=>$input['uid'],
-                "productCode"=>$results[$i]->productCode
+            $countLoop=$i+1;
+           $totalQty+=$results[$i]->qty;
 
 
-                ));
+
+
+           }
+           if($results){
+              //echo $limitData;
+               if($countLoop>=$limitData){
+
+                   DB::delete("delete from orderhistories where uid=:uid and productCode=:productCode limit 50",array(
+                       "uid"=>$input['uid'],
+                       "productCode"=>$input['productCode']
+
+                       ));
+                       $checkUpdate=DB::update("update products set qty_sold=(qty_sold-:currentQty)+:req_qty where productCode=:productCode limit 1",[
+                           "currentQty"=>$totalQty,
+                           "req_qty"=>$input['req_qty'],
+                           "productCode"=>$input['productCode']
+                       ]);
+                       $subscriber=Auth::user()->subscriber;
+                       $productCode=$input['productCode'];
+                       DB::select("SET @requested_qty = ?",[$req_qty]);
+
+                       $searchResult = DB::select("
+                           SELECT
+                               id,
+                               safariId,
+                               CASE
+                                   WHEN @requested_qty >= qty THEN qty
+                                   ELSE @requested_qty
+                               END AS qty,
+                               CASE
+                                   WHEN @requested_qty >= qty THEN 0
+                                   ELSE @requested_qty - qty
+                               END AS remaining,
+                               @requested_qty := GREATEST(@requested_qty - qty, 0) AS updated_requested_qty
+                           FROM
+                           safariproducts
+                           WHERE
+                               subscriber='$subscriber' and
+                               productCode='$productCode' AND
+                               qty != 0 AND
+                               @requested_qty > 0
+                           ORDER BY
+                               id;
+                       ");
+
+                       $searchLimitData=count($searchResult);
+                       for($i=0;$i<$searchLimitData;$i++)
+                       {
+                           $id=$searchResult[$i]->id;
+                           $ids[]=$searchResult[$i]->id;
+                           $data[] = [
+                               //'uid' =>$input["orderIdFromEdit"]??$uid,
+                               'uid' =>$input['uid'],
+                               'userid'=>$input['uidClient'],
+                               'safariId'=>$searchResult[$i]->safariId,
+                               "order_creator"=>Auth::user()->uid,
+                               "subscriber"=>Auth::user()->subscriber,
+                               'productCode'=>$productCode,
+                               'price'=>$checkProduct[0]->price,
+                               'qty'=>$searchResult[$i]->qty,
+                               'qty_count'=>$searchResult[$i]->qty,
+                               'total'=>$searchResult[$i]->qty*$checkProduct[0]->price,
+                               'OrderData'=>json_encode([]),
+                               'comment_count'=>json_encode([]),
+                               "created_at"=>$this->today,
+                               "updated_at"=>$this->today
+
+
+                               // Add more rows here if needed
+                           ];
+
+                           $SoldOut=$searchResult[$i]->qty;
+                           $totAm=$SoldOut*$checkProduct[0]->price;
+                           $qtyData=abs($searchResult[$i]->remaining);
+                          DB::update("update safariproducts set qty=:qty,SoldOut=SoldOut+$SoldOut,TotSoldAmount=TotSoldAmount+$totAm where safariId=:safariId and productCode=:productCode and subscriber=:subscriber limit $searchLimitData",array(
+                          "qty"=>$qtyData,
+                          "subscriber"=>Auth::user()->subscriber,
+                          "safariId"=>$searchResult[$i]->safariId,
+                          "productCode"=>$productCode,
+
+                          ));
+
+                       }
+
+
+                       DB::table("orderhistories")
+                       ->insert($data);
+                       return array(
+                        "status"=>true,
+                        "message"=>"testDa enough"
+                    );
+
+               }
+
+           }
+
+            }
+            else{
+                return array(
+                    "status"=>false,
+                    "message"=>"Not Enough Qty in Stock"
+                );
+               //not enough product to edit
+            }
+
+            });
+            return response($check,200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json([
+                'error' => 'An error occurred',
+                'errorPrint' => $e->getMessage(),
+                'errorCode' => $e->getLine(),
+            ], 500);
         }
-       // $input['uidComeFromOrderEdit']=$input['uid'];
-       // $current_qty=totalqty
-       $input['currentQtyOfOrder']=$totalQty;
-       $input["orderIdFromEdit"]=$orderId;
-       $input['statusForm']="editOrder";
 
-if($results){
-    if($input['currentQtyOfOrder']>0){
-        return $this->placeOrder($input);
-    }
 
-}
 
-}
+
+        }
 public function deleteTSingleOrder($input){
     //$req_qty=$input['req_qty'];
-    $productCode=$input['productCode'];
-   // $current_qty=$input['current_qty'];
-    $uid=$input['uid'];
-    $subscriber=Auth::user()->subscriber;
-    $results=DB::select("select *FROM
-    orderhistories
-WHERE
-    productCode='$productCode' AND
-    uid='$uid' AND
-    subscriber='$subscriber'");
+    try {
+        $check=DB::transaction(function () use ($input) {
+            $productCode=$input['productCode'];
+              // $current_qty=$input['current_qty'];
+               $uid=$input['uid'];
+               $subscriber=Auth::user()->subscriber;
+               $results=DB::select("select *FROM
+               orderhistories
+           WHERE
+               productCode='$productCode' AND
+               uid='$uid' AND
+               subscriber='$subscriber'");
 
 
-    $data=[];
-    $ids=[];
-    $orderId="OrderId";
-      $limitData=count($results);
-         $totalQty=0;
-    for($i=0;$i<$limitData;$i++)
-    {
-        $totalQty+=$results[$i]->qty;
-        $id=$results[$i]->id;
-        $ids[]=$results[$i]->id;
-        $orderId=$results[$i]->uid;
+               $data=[];
+               $ids=[];
+               $orderId="OrderId";
+                 $limitData=count($results);
+                    $totalQty=0;
+                    $countLoop=0;
+               for($i=0;$i<$limitData;$i++)
+               {
 
-       DB::update("update safariproducts set qty=qty+:qty,SoldOut=SoldOut-:SoldOut,TotSoldAmount=TotSoldAmount-:TotSoldAmout where safariId=:safariId and productCode=:productCode limit 100 ",array(
-               "qty"=>$results[$i]->qty,
-               "SoldOut"=>$results[$i]->qty,
-               "TotSoldAmout"=>$results[$i]->total,
-               "safariId"=>$results[$i]->SafariId,
-               "productCode"=>$results[$i]->productCode
+                   $id=$results[$i]->id;
+                   $ids[]=$results[$i]->id;
+                   $orderId=$results[$i]->uid;
 
-        ));
-        DB::delete("delete from orderhistories where uid=:uid and productCode=:productCode limit 50",array(
-            "uid"=>$input['uid'],
-            "productCode"=>$results[$i]->productCode
+                  DB::update("update safariproducts set qty=qty+:qty,SoldOut=SoldOut-:SoldOut,TotSoldAmount=TotSoldAmount-:TotSoldAmout where safariId=:safariId and productCode=:productCode limit 100 ",array(
+                          "qty"=>$results[$i]->qty,
+                          "SoldOut"=>$results[$i]->qty,
+                          "TotSoldAmout"=>$results[$i]->total,
+                          "safariId"=>$results[$i]->SafariId,
+                          "productCode"=>$results[$i]->productCode
+
+                   ));
 
 
-            ));
-    }
-    $input['currentQtyOfOrder']=$totalQty;
-    if($results){
-        if($input['currentQtyOfOrder']>0){
-            $checkProduct=DB::update("update products set qty_sold=qty_sold-$totalQty where subscriber=:subscriber and productCode=:productCode  limit 1",array(
-                "productCode"=>$productCode,
-                "subscriber"=>Auth::user()->subscriber
-             ));
-             if($checkProduct)
-             {
-                return response([
-                    "status"=>true,
-                    "result"=> $checkProduct,
+                       $countLoop=$i+1;
+   $totalQty+=$results[$i]->qty;
+               }
+               $input['currentQtyOfOrder']=$totalQty;
+               if($results){
+                if($countLoop>=$limitData){
+                    DB::delete("delete from orderhistories where uid=:uid and productCode=:productCode limit 50",array(
+                        "uid"=>$input['uid'],
+                        "productCode"=>$input['productCode']
 
-                ],200);
-             }
-             else{
-                return response([
-                    "status"=>false,
-                    "result"=>$checkProduct,
 
-                ],200);
-             }
-        }
+                        ));
+                       $checkProduct=DB::update("update products set qty_sold=qty_sold-$totalQty where subscriber=:subscriber and productCode=:productCode  limit 1",array(
+                           "productCode"=>$productCode,
+                           "subscriber"=>Auth::user()->subscriber
+                        ));
+                        if($checkProduct)
+                        {
 
+                           return array(
+                            "status"=>true,
+                            "result"=> $checkProduct,
+                        );
+
+                        }
+                        else{
+                            return array(
+                                "status"=>true,
+                                "result"=> $checkProduct,
+                            );
+                        }
+                   }
+
+               }
+
+            });
+        return response($check,200);
+    } catch (\Exception $e) {
+        DB::rollback();
+        return response()->json([
+            'error' => 'An error occurred',
+            'errorPrint' => $e->getMessage(),
+            'errorCode' => $e->getLine(),
+        ], 500);
     }
 
 }
@@ -1419,8 +1829,8 @@ $check1 = DB::select("
         AND orders.uidCreator=:uidCreator
         AND (orders.paidStatus='dettes' OR orders.paidStatus='paid' OR orders.paidStatus='paidReturn')
 ", [
-    "orderId" => $input["uid"],
-    "uidCreator" => Auth::user()->uid
+    "orderId" =>$input["uid"],
+    "uidCreator" =>Auth::user()->uid
 ]);
 
 
@@ -1447,8 +1857,9 @@ $isBackup=DB::table("orderhistories_backup")
         "balance"=>$check1[0]->all_total,
          "dettes"=>$check1[0]->orderDebt
         ]);
-       DB::update("update orderhistories set paidStatus='none' where uid=:uid",[
-           "uid"=>$input["uid"]
+       DB::update("update orderhistories set paidStatus='none',permission='false',orderDebt=:orderDebt where uid=:uid",[
+           "uid"=>$input["uid"],
+           "orderDebt"=>$check1[0]->orderDebt
        ]);
      }
 
@@ -1624,6 +2035,10 @@ public function ViewUserTempOrder($input){//make sure order must not be more tha
             SELECT
                 MAX(users.name) AS name,
                 MAX(orderhistories.uid) AS uid,
+                MAX(orderhistories.userid) AS userid,
+                MAX(orderhistories.orderDebt) AS orderDebt,
+                MAX(orderhistories.permission) AS permission,
+                MAX(orderhistories.description) AS commentData,
                 orderhistories.productCode,
                 MAX(products.productName) AS productName,
                 MAX(orderhistories.price) AS price,
@@ -1634,24 +2049,16 @@ public function ViewUserTempOrder($input){//make sure order must not be more tha
             FROM orderhistories
             INNER JOIN products ON orderhistories.productCode = products.productCode
             INNER JOIN users ON orderhistories.userid = users.uid
-            WHERE orderhistories.order_creator = :orderCreator
-                AND orderhistories.subscriber = :subscriber
+            WHERE orderhistories.order_creator=:orderCreator
+                AND orderhistories.subscriber=:subscriber
                 AND orderhistories.paidStatus='none'
             GROUP BY orderhistories.productCode order by orderhistories.id desc
-            LIMIT 100
+
         ", [
 
             'orderCreator' => Auth::user()->uid,
             'subscriber' => Auth::user()->subscriber,
         ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'error' => 'An error occurred',
-                'errorPrint' => $e->getMessage(),
-                'errorCode' => $e->getLine(),
-            ], 500);
-        }
-
         if($check)
         {
            return response([
@@ -1662,11 +2069,20 @@ public function ViewUserTempOrder($input){//make sure order must not be more tha
         }
         else{
            return response([
-               "status"=>true,
+               "status"=>false,
                "result"=>0,
 
            ],200);
         }
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'An error occurred',
+                'errorPrint' => $e->getMessage(),
+                'errorCode' => $e->getLine(),
+            ], 500);
+        }
+
+
 
     } catch (\Exception $e) {
         return response()->json(['error' => 'An error occurred', 'errorPrint' => $e->getMessage(), 'errorCode' => $e->getLine()], 500);
@@ -1741,10 +2157,11 @@ public function admin_record($input){
     DB::update("update orderhistories set
 
     all_total=:all_total,custom_price=:custom_price,
-    paidStatus ='checked'
+    paidStatus ='checked',orderDebt=:orderDebt
     where uid=:uid and userid=:userid limit 100",array(
         "uid"=>$input["OrderId"],
         "userid"=>$input["uidUser"],
+        "orderDebt"=>$input['all_total']-$input['inputData'],
         "all_total"=>$input['all_total'],
         "custom_price"=>$input['inputData']
 
@@ -2108,9 +2525,9 @@ public function admin_record($input){
              $uidUser=$input['uidUser'];
 
              $inputData=$input['inputData'];
-             $all_total=$input['all_total'];
+             $all_total=$input['all_total']??'none';
              $ref=$input['ref']??'none';
-             $systemUid=$input['systemUid'];
+             $systemUid=$input['systemUid']??'none';
              $uidCreator=Auth::user()->uid;
              $subscriber=Auth::user()->subscriber;
              $commentData=$input["commentData"]??'none';
@@ -2224,7 +2641,7 @@ public function admin_record($input){
         "safeBalance"=>$inputData,
         "dettes"=>$inputData
      );
-    $Query3="update admnin_records set borrowBalance=+:borrowBalance";
+    $Query3="update admnin_records set borrowBalance=borrowBalance+:borrowBalance";
     $QueryArray3=[
         "uid"=>Auth::user()->uid,
         "subscriber"=>Auth::user()->subscriber,
@@ -2234,7 +2651,7 @@ public function admin_record($input){
     ];
 
 
-        $updateAdmin='DB::select("update admnin_records set borrowBalance=+:borrowBalance where uid=:uid and status=:status and systemUid=:systemUid and subscriber=:subscriber", $QueryArray3)';
+        $updateAdmin='DB::select("update admnin_records set borrowBalance=borrowBalance+:borrowBalance where uid=:uid and status=:status and systemUid=:systemUid and subscriber=:subscriber", $QueryArray3)';
 
         list($Query,$QueryArray,$lastQuery)=($data[$i]->uidCreator==$uidCreator)?[$Query1,$QueryArray1,""]:[$Query2,$QueryArray2,eval('return ' . $updateAdmin . ';')];
 
@@ -2262,11 +2679,29 @@ public function admin_record($input){
                      return response()->json(['error' => 'An error occurred',
                  'errorPrint'=>$e->getMessage(),"errorCode"=>$e->getLine()], 500); // Return an error JSON response
                  }
+
     }
     public function EditPaidDept($input){
 
     }
-    public function SearchDept($input)
+
+    public function viewDept($input){
+       $viewAll=$input["viewAll"]??'false';
+       if(strtolower($viewAll)=='false')
+       {
+
+        return $this->viewSingleDept($input);
+       }
+       else{
+
+        return $this->viewAllDept($input);
+       }
+
+
+    }
+
+
+    public function SearchSingleDept($input)
     {
         $item = strtolower($input["name"]);
         $itemSearch='%'.$item.'%';
@@ -2284,11 +2719,12 @@ public function admin_record($input){
             AND admnin_records.status ='Sales'
             AND admnin_records.subscriber=:adminSubscriber
             AND orders.paidStatus='dettes'
+            AND orders.debt>0
             AND users.name LIKE :Name
             GROUP BY orders.uidUser
             ORDER BY orders.id DESC
 
-        LIMIT 10
+
     ", [
         'subscriber' => Auth::user()->subscriber,
         'adminSubscriber' => Auth::user()->subscriber,
@@ -2314,8 +2750,9 @@ public function admin_record($input){
        ],200);
     }
     }
-    public function viewDept($input){
-       if($input["searchOption"]=='true') return $this->SearchDept($input);
+
+    public function viewSingleDept($input){
+        if($input["searchOption"]=='true') return $this->SearchSingleDept($input);
         $check = DB::select("
         SELECT
             Max(orders.uidUser) as myDeptId,
@@ -2330,10 +2767,10 @@ public function admin_record($input){
             AND admnin_records.status ='Sales'
             AND admnin_records.subscriber=:adminSubscriber
             AND orders.paidStatus='dettes'
+            AND orders.debt>0
             GROUP BY orders.uidUser
             ORDER BY orders.id DESC
 
-        LIMIT 100
     ", [
         'subscriber' => Auth::user()->subscriber,
         'adminSubscriber' => Auth::user()->subscriber,
@@ -2356,8 +2793,103 @@ public function admin_record($input){
 
        ],200);
     }
-
     }
+
+    public function SearchAllDept($input){
+        $item = strtolower($input["name"]);
+        $itemSearch='%'.$item.'%';
+        $check = DB::select("
+        SELECT
+        Max(orders.uidUser) as myDeptId,
+        MAX(users.name) AS name,
+        MAX(admins.name) AS adminName,
+        SUM(admnin_records.dettes) AS totDept,
+        SUM(orders.debt) AS debt
+        FROM orders
+        INNER JOIN admnin_records ON orders.uidCreator =admnin_records.uid
+        INNER JOIN users ON orders.uidUser = users.uid
+        INNER JOIN admins ON orders.uidCreator = admins.uid
+        WHERE orders.subscriber = :subscriber
+            AND admnin_records.status ='Sales'
+            AND admnin_records.subscriber=:adminSubscriber
+            AND orders.paidStatus='dettes'
+            AND orders.debt>0
+            AND users.name LIKE :Name
+            GROUP BY orders.uidUser
+            ORDER BY orders.id DESC
+
+
+    ", [
+        'subscriber' => Auth::user()->subscriber,
+        'adminSubscriber' => Auth::user()->subscriber,
+
+        'Name'=>$itemSearch
+    ]);
+
+    if($check)
+    {
+
+       return response([
+           "status"=>true,
+           "result"=>$check,
+           "search"=>true
+
+       ],200);
+    }
+    else{
+       return response([
+           "status"=>true,
+           "result"=>0,
+
+       ],200);
+    }
+    }
+    public function viewAllDept($input){
+        if($input["searchOption"]=='true') return $this->SearchAllDept($input);
+         $check = DB::select("
+         SELECT
+             Max(orders.uidUser) as myDeptId,
+             MAX(users.name) AS name,
+             MAX(admins.name) AS adminName,
+             SUM(admnin_records.dettes) AS totDept,
+             SUM(orders.debt) AS debt
+         FROM orders
+         INNER JOIN admnin_records ON orders.uidCreator =admnin_records.uid
+         INNER JOIN users ON orders.uidUser=users.uid
+         INNER JOIN admins ON orders.uidCreator=admins.uid
+         WHERE orders.subscriber = :subscriber
+             AND admnin_records.status ='Sales'
+             AND admnin_records.subscriber=:adminSubscriber
+             AND orders.paidStatus='dettes'
+             AND orders.debt>0
+             GROUP BY orders.uidUser
+             ORDER BY orders.id DESC
+
+
+     ", [
+         'subscriber' => Auth::user()->subscriber,
+         'adminSubscriber' => Auth::user()->subscriber
+
+     ]);
+
+     if($check)
+     {
+
+        return response([
+            "status"=>true,
+            "result"=>$check,
+
+        ],200);
+     }
+     else{
+        return response([
+            "status"=>true,
+            "result"=>0,
+
+        ],200);
+     }
+
+     }
 
     public function viewDeptDetails($input){
    if($input["searchOption"]=='true') return $this->SearchDeptDetails($input);
@@ -2365,11 +2897,13 @@ public function admin_record($input){
         SELECT
             Max(orders.uid) as OrderId,
             MAX(users.name) AS name,
+            MAX(admins.CompanyName) AS CompanyName,
             Max(admnin_records.dettes) AS totDept,
             MAX(orders.debt) AS debt
         FROM orders
         INNER JOIN admnin_records ON orders.uidCreator =admnin_records.uid
         INNER JOIN users ON orders.uidUser = users.uid
+        INNER JOIN admins ON orders.uidCreator=admins.uid
         WHERE orders.subscriber = :subscriber
             AND orders.uidCreator = :uidCreator
             AND admnin_records.status ='Sales'
@@ -2382,7 +2916,7 @@ public function admin_record($input){
     ", [
         'subscriber' => Auth::user()->subscriber,
         'adminSubscriber' => Auth::user()->subscriber,
-        'uidCreator' => Auth::user()->uid,
+        'uidCreator' =>Auth::user()->uid,
     ]);
 
     if($check)
@@ -2509,14 +3043,12 @@ public function admin_record($input){
         $check = DB::select("
         SELECT
             Max(paid_dettes.uidCreator) as recipientId,
-            MAX(users.name) AS name,
             Max(admnin_records.safeBalance) AS safeBalance,
             sum(paid_dettes.safeAmount) AS amount,
             MAX(admins.name) AS Recipient,
             MAX(paid_dettes.paidStatus) as paidStatus
         FROM paid_dettes
         INNER JOIN admnin_records ON paid_dettes.uidReceiver=admnin_records.uid
-        INNER JOIN users ON paid_dettes.uidUser = users.uid
         INNER JOIN admins ON paid_dettes.uidCreator = admins.uid
         WHERE paid_dettes.subscriber =:subscriber
             AND paid_dettes.safeAmount>0
@@ -2524,7 +3056,7 @@ public function admin_record($input){
             AND admnin_records.status='Sales'
             AND admnin_records.subscriber=:adminSubscriber
             AND paid_dettes.paidStatus='PaidAdminNotReceived'
-            AND users.name LIKE :Name
+            AND admins.name LIKE :Name
             GROUP BY paid_dettes.uidCreator
             ORDER BY paid_dettes.id DESC
 
@@ -2560,14 +3092,12 @@ public function admin_record($input){
         $check = DB::select("
         SELECT
             Max(paid_dettes.uidCreator) as recipientId,
-            MAX(users.name) AS name,
             Max(admnin_records.safeBalance) AS safeBalance,
             sum(paid_dettes.safeAmount) AS amount,
             MAX(admins.name) AS Recipient,
             MAX(paid_dettes.paidStatus) as paidStatus
         FROM paid_dettes
         INNER JOIN admnin_records ON paid_dettes.uidReceiver=admnin_records.uid
-        INNER JOIN users ON paid_dettes.uidUser = users.uid
         INNER JOIN admins ON paid_dettes.uidCreator = admins.uid
         WHERE paid_dettes.subscriber =:subscriber
             AND paid_dettes.safeAmount>0
@@ -2611,14 +3141,13 @@ public function admin_record($input){
         $check = DB::select("
         SELECT
         Max(paid_dettes.uidReceiver) as OwnerDept,
-            MAX(users.name) AS name,
+
             Max(admnin_records.borrowBalance) AS borrowBalance,
             sum(paid_dettes.safeAmount) AS amount,
             MAX(admins.name) AS AmountOwner,
             MAX(paid_dettes.paidStatus) as paidStatus
         FROM paid_dettes
         INNER JOIN admnin_records ON paid_dettes.uidCreator=admnin_records.uid
-        INNER JOIN users ON paid_dettes.uidUser = users.uid
         INNER JOIN admins ON paid_dettes.uidReceiver = admins.uid
         WHERE paid_dettes.subscriber =:subscriber
            AND paid_dettes.safeAmount>0
@@ -2626,7 +3155,7 @@ public function admin_record($input){
             AND admnin_records.status='Sales'
             AND admnin_records.subscriber=:adminSubscriber
             AND paid_dettes.paidStatus='PaidAdminNotReceived'
-            AND users.name LIKE :Name
+            AND admins.name LIKE :Name
             GROUP BY paid_dettes.uidReceiver
             ORDER BY paid_dettes.id DESC
 
@@ -2660,14 +3189,13 @@ public function admin_record($input){
         $check = DB::select("
         SELECT
         Max(paid_dettes.uidReceiver) as OwnerDept,
-            MAX(users.name) AS name,
+
             Max(admnin_records.borrowBalance) AS borrowBalance,
             sum(paid_dettes.safeAmount) AS amount,
             MAX(admins.name) AS AmountOwner,
             MAX(paid_dettes.paidStatus) as paidStatus
         FROM paid_dettes
         INNER JOIN admnin_records ON paid_dettes.uidCreator=admnin_records.uid
-        INNER JOIN users ON paid_dettes.uidUser = users.uid
         INNER JOIN admins ON paid_dettes.uidReceiver = admins.uid
         WHERE paid_dettes.subscriber =:subscriber
            AND paid_dettes.safeAmount>0
@@ -2683,6 +3211,238 @@ public function admin_record($input){
         'subscriber'=>Auth::user()->subscriber,
         'adminSubscriber'=>Auth::user()->subscriber,
         'uidCreator'=>Auth::user()->uid
+    ]);
+    if($check)
+    {
+
+       return response([
+           "status"=>true,
+           "result"=>$check,
+           "uid"=>Auth::user()->uid
+
+       ],200);
+    }
+    else{
+       return response([
+           "status"=>true,
+           "result"=>0,
+
+       ],200);
+    }
+    }
+
+
+    public function viewSafeBorrow($input){
+        if(strtolower($input["isSafe"])=='true')
+        {
+            return $this->viewSafeBalById($input);
+        }
+        else{
+            return $this->viewBorrowBalById($input);
+        }
+    }
+    public function SearchNameSafeBal($input){
+        $item = strtolower($input["name"]);
+        $itemSearch='%'.$item.'%';
+        $check = DB::select("
+        SELECT
+            Max(paid_dettes.uidCreator) as recipientId,
+            MAX(users.name) AS name,
+            Max(admnin_records.safeBalance) AS safeBalance,
+            Max(paid_dettes.created_at) AS created_at,
+            Max(paid_dettes.safeAmount) AS amount,
+            MAX(admins.name) AS Recipient,
+            MAX(paid_dettes.paidStatus) as paidStatus
+        FROM paid_dettes
+        INNER JOIN admnin_records ON paid_dettes.uidReceiver=admnin_records.uid
+        INNER JOIN users ON paid_dettes.uidUser = users.uid
+        INNER JOIN admins ON  admins.uid=:uidCreator
+        WHERE paid_dettes.subscriber =:subscriber
+            AND paid_dettes.safeAmount>0
+            AND paid_dettes.uidCreator=:uidBorrower
+            AND paid_dettes.uidReceiver=:uidReceiver
+            AND admnin_records.status='Sales'
+            AND admnin_records.subscriber=:adminSubscriber
+            AND paid_dettes.paidStatus='PaidAdminNotReceived'
+            AND users.name LIKE :name
+
+            GROUP BY paid_dettes.id
+
+            Limit 10
+
+
+    ", [
+        'subscriber'=>Auth::user()->subscriber,
+        'adminSubscriber'=>Auth::user()->subscriber,
+        'uidReceiver'=>Auth::user()->uid,
+        'uidCreator'=>$input['uid'],
+        'uidBorrower'=>$input['uid'],
+        'name'=>$itemSearch
+
+    ]);
+
+    if($check)
+    {
+
+       return response([
+           "status"=>true,
+           "result"=>$check,
+           "uid"=>Auth::user()->uid
+
+       ],200);
+    }
+    else{
+       return response([
+           "status"=>true,
+           "result"=>0,
+
+       ],200);
+    }
+
+    }
+    public function viewSafeBalById($input){//to check admin who received my Amount
+        if($input["searchOption"]=='true') return $this->SearchNameSafeBal($input);
+        $check = DB::select("
+        SELECT
+            Max(paid_dettes.uidCreator) as recipientId,
+            MAX(users.name) AS name,
+            Max(admnin_records.safeBalance) AS safeBalance,
+            Max(paid_dettes.created_at) AS created_at,
+            Max(paid_dettes.safeAmount) AS amount,
+            MAX(admins.name) AS Recipient,
+            MAX(paid_dettes.paidStatus) as paidStatus
+        FROM paid_dettes
+        INNER JOIN admnin_records ON paid_dettes.uidReceiver=admnin_records.uid
+        INNER JOIN users ON paid_dettes.uidUser = users.uid
+        INNER JOIN admins ON  admins.uid=:uidCreator
+        WHERE paid_dettes.subscriber =:subscriber
+            AND paid_dettes.safeAmount>0
+            AND paid_dettes.uidCreator=:uidBorrower
+            AND paid_dettes.uidReceiver=:uidReceiver
+            AND admnin_records.status='Sales'
+            AND admnin_records.subscriber=:adminSubscriber
+            AND paid_dettes.paidStatus='PaidAdminNotReceived'
+
+            GROUP BY paid_dettes.id
+            ORDER BY paid_dettes.id DESC
+
+
+    ", [
+        'subscriber'=>Auth::user()->subscriber,
+        'adminSubscriber'=>Auth::user()->subscriber,
+        'uidReceiver'=>Auth::user()->uid,
+        'uidCreator'=>$input['uid'],
+        'uidBorrower'=>$input['uid']
+
+    ]);
+
+    if($check)
+    {
+
+       return response([
+           "status"=>true,
+           "result"=>$check,
+           "uid"=>Auth::user()->uid
+
+       ],200);
+    }
+    else{
+       return response([
+           "status"=>true,
+           "result"=>0,
+
+       ],200);
+    }
+    }
+    public function SearchBorrowBal($input){
+        $item = strtolower($input["name"]);
+        $itemSearch='%'.$item.'%';
+        $check = DB::select("
+        SELECT
+        Max(paid_dettes.uidReceiver) as OwnerDept,
+            MAX(users.name) AS name,
+            Max(admnin_records.borrowBalance) AS borrowBalance,
+            Max(paid_dettes.safeAmount) AS amount,
+            Max(paid_dettes.created_at) AS created_at,
+            MAX(admins.name) AS AmountOwner,
+            MAX(paid_dettes.paidStatus) as paidStatus
+        FROM paid_dettes
+        INNER JOIN admnin_records ON paid_dettes.uidCreator=admnin_records.uid
+        INNER JOIN users ON paid_dettes.uidUser = users.uid
+        INNER JOIN admins ON admins.uid= :uidReceiver
+        WHERE paid_dettes.subscriber =:subscriber
+           AND paid_dettes.safeAmount>0
+            AND paid_dettes.uidCreator=:uidCreator
+            AND paid_dettes.uidReceiver=:uidOwnerDept
+            AND admnin_records.status='Sales'
+            AND admnin_records.subscriber=:adminSubscriber
+            AND paid_dettes.paidStatus='PaidAdminNotReceived'
+            AND users.name LIKE :name
+            GROUP BY paid_dettes.id
+
+            Limit 10
+
+
+    ", [
+        'subscriber'=>Auth::user()->subscriber,
+        'adminSubscriber'=>Auth::user()->subscriber,
+        'uidCreator'=>Auth::user()->uid,
+        'uidReceiver'=>$input['uid'],
+        'uidOwnerDept'=>$input['uid'],
+        'name'=>$itemSearch
+
+    ]);
+    if($check)
+    {
+
+       return response([
+           "status"=>true,
+           "result"=>$check,
+           "uid"=>Auth::user()->uid
+
+       ],200);
+    }
+    else{
+       return response([
+           "status"=>true,
+           "result"=>0,
+
+       ],200);
+    }
+    }
+    public function viewBorrowBalById($input){ //to check Money of Others I am having
+        if($input["searchOption"]=='true') return $this->SearchBorrowBal($input);
+        $check = DB::select("
+        SELECT
+        Max(paid_dettes.uidReceiver) as OwnerDept,
+            MAX(users.name) AS name,
+            Max(admnin_records.borrowBalance) AS borrowBalance,
+            Max(paid_dettes.safeAmount) AS amount,
+            Max(paid_dettes.created_at) AS created_at,
+            MAX(admins.name) AS AmountOwner,
+            MAX(paid_dettes.paidStatus) as paidStatus
+        FROM paid_dettes
+        INNER JOIN admnin_records ON paid_dettes.uidCreator=admnin_records.uid
+        INNER JOIN users ON paid_dettes.uidUser = users.uid
+        INNER JOIN admins ON admins.uid= :uidReceiver
+        WHERE paid_dettes.subscriber =:subscriber
+           AND paid_dettes.safeAmount>0
+            AND paid_dettes.uidCreator=:uidCreator
+            AND paid_dettes.uidReceiver=:uidOwnerDept
+            AND admnin_records.status='Sales'
+            AND admnin_records.subscriber=:adminSubscriber
+            AND paid_dettes.paidStatus='PaidAdminNotReceived'
+            GROUP BY paid_dettes.id
+            ORDER BY paid_dettes.id DESC
+
+
+    ", [
+        'subscriber'=>Auth::user()->subscriber,
+        'adminSubscriber'=>Auth::user()->subscriber,
+        'uidCreator'=>Auth::user()->uid,
+        'uidReceiver'=>$input['uid'],
+        'uidOwnerDept'=>$input['uid']
+
     ]);
     if($check)
     {
@@ -2722,10 +3482,10 @@ public function admin_record($input){
                 INNER JOIN users ON orderhistories.userid = users.uid
                 WHERE orderhistories.subscriber=:subscriber
                     AND orderhistories.paidStatus='checked'
-                    AND orderhistories.status = 'Open'
+                    AND orderhistories.status ='Open'
                 GROUP BY orderhistories.uid
                 ORDER BY orderhistories.id DESC
-                LIMIT 100
+
             ", [
                 'subscriber'=>Auth::user()->subscriber,
             ]);
@@ -2767,6 +3527,7 @@ public function admin_record($input){
                 SELECT
 
                     MAX(orderhistories.uid) AS uid,
+                    MAX(orderhistories.description) AS commentData,
                     MAX(1) AS hideAddCart,
                     MAX(1) AS currentQty,
                     orderhistories.productCode,
@@ -3096,7 +3857,205 @@ return $results;
 
     }
     public function viewRepay($input){
+        if(strtolower($input["IsReceiver"])=='true')
+        {
+            return $this->receivedHistory($input);//owner to see Payment History Safe
+        }
+        else{
+            return $this->repaidHistory($input);//Who paid Means Borrower
+        }
+    }
+    public function searchReceivedHistory($input){
+        $item = strtolower($input["name"]);
+        $itemSearch='%'.$item.'%';
+        $check=DB::select("
+        SELECT
+            Max(repaid_users.uid) as uid,
+            Max(repaid_users.status) as status,
+            Max(repaid_users.amount) as amount,
+            Max(repaid_users.created_at) as created_at,
+            Max(repaid_users.commentData) as commentData,
+            MAX(admins.name) AS borrowerName
 
+        FROM repaid_users
+
+        INNER JOIN admins ON repaid_users.uidPaid=admins.uid
+        WHERE repaid_users.uidReceiver=:uidReceiver
+             AND repaid_users.uidPaid=:uidPaid
+            AND repaid_users.subscriber =:subscriber
+            AND admins.name LIKE :name
+
+            GROUP BY repaid_users.id
+            LIMIT 10
+
+
+    ", [
+        'subscriber'=>Auth::user()->subscriber,
+
+        'uidPaid'=>$input['uid'],
+        'uidReceiver'=>Auth::user()->uid,
+        'name'=>$itemSearch
+    ]);
+
+    if($check)
+    {
+
+       return response([
+           "status"=>true,
+           "result"=>$check,
+
+       ],200);
+    }
+    else{
+       return response([
+           "status"=>true,
+           "result"=>0,
+
+       ],200);
+    }
+    }
+    public function receivedHistory($input)
+    {
+       if($input["searchOption"]=='true') return $this->searchReceivedHistory($input);
+        $check=DB::select("
+        SELECT
+            Max(repaid_users.uid) as uid,
+            Max(repaid_users.status) as status,
+            Max(repaid_users.amount) as amount,
+            Max(repaid_users.created_at) as created_at,
+            Max(repaid_users.commentData) as commentData,
+            MAX(admins.name) AS borrowerName
+
+        FROM repaid_users
+
+        INNER JOIN admins ON repaid_users.uidPaid=admins.uid
+        WHERE repaid_users.uidReceiver=:uidReceiver
+        AND repaid_users.uidPaid=:uidPaid
+            AND repaid_users.subscriber =:subscriber
+
+            GROUP BY repaid_users.id
+            ORDER BY repaid_users.id DESC
+
+
+    ", [
+        'subscriber'=>Auth::user()->subscriber,
+        'uidPaid'=>$input['uid'],
+
+        'uidReceiver'=>Auth::user()->uid
+    ]);
+
+    if($check)
+    {
+
+       return response([
+           "status"=>true,
+           "result"=>$check,
+
+       ],200);
+    }
+    else{
+       return response([
+           "status"=>false,
+           "result"=>0,
+
+       ],200);
+    }
+    }
+    public function SearchrepaidHistory($input){
+        $item = strtolower($input["name"]);
+        $itemSearch='%'.$item.'%';
+        $check=DB::select("
+        SELECT
+            Max(repaid_users.uid) as uid,
+            Max(repaid_users.status) as status,
+            Max(repaid_users.amount) as amount,
+            Max(repaid_users.updated_at) as updated_at,
+            Max(repaid_users.commentData) as commentData,
+            MAX(admins.name) AS OwnerDeptName
+
+        FROM repaid_users
+
+        INNER JOIN admins ON repaid_users.uidReceiver=admins.uid
+        WHERE repaid_users.uidPaid=:uidPaid
+        AND repaid_users.uidReceiver=:uidReceiver
+            AND repaid_users.subscriber =:subscriber
+            AND admins.name LIKE :name
+
+            GROUP BY repaid_users.id
+
+            LIMIT 10
+
+
+    ", [
+        'subscriber'=>Auth::user()->subscriber,
+
+        'uidPaid'=>Auth::user()->uid,
+        'uidReceiver'=>$input['uid'],
+        'name'=>$itemSearch
+    ]);
+
+    if($check)
+    {
+
+       return response([
+           "status"=>true,
+           "result"=>$check,
+
+       ],200);
+    }
+    else{
+       return response([
+           "status"=>false,
+           "result"=>0,
+
+       ],200);
+    }
+    }
+    public function repaidHistory($input){
+        if($input["searchOption"]=='true') return $this->SearchrepaidHistory($input);
+        $check=DB::select("
+        SELECT
+            Max(repaid_users.uid) as uid,
+            Max(repaid_users.status) as status,
+            Max(repaid_users.amount) as amount,
+            Max(repaid_users.updated_at) as updated_at,
+            Max(repaid_users.commentData) as commentData,
+            MAX(admins.name) AS OwnerDeptName
+
+        FROM repaid_users
+
+        INNER JOIN admins ON repaid_users.uidReceiver=admins.uid
+        WHERE repaid_users.uidPaid=:uidPaid
+            AND repaid_users.uidReceiver=:uidReceiver
+            AND repaid_users.subscriber =:subscriber
+
+            GROUP BY repaid_users.id
+            ORDER BY repaid_users.id DESC
+
+
+    ", [
+        'subscriber'=>Auth::user()->subscriber,
+
+        'uidPaid'=>Auth::user()->uid,
+        'uidReceiver'=>$input['uid']
+    ]);
+
+    if($check)
+    {
+
+       return response([
+           "status"=>true,
+           "result"=>$check,
+
+       ],200);
+    }
+    else{
+       return response([
+           "status"=>false,
+           "result"=>0,
+
+       ],200);
+    }
     }
     public function addSpending($input){
         if(strtolower($input["options"])=='others')
@@ -3284,12 +4243,13 @@ return $results;
         INNER JOIN admnin_records ON depenses.uidCreator=admnin_records.uid
        WHERE depenses.subscriber=:subscriber
             AND depenses.uidCreator=:uidCreator
+            AND depenses.status!='spendSafaris'
             AND admnin_records.status ='GeneralSpend'
             AND admnin_records.subscriber=:adminSubscriber
             AND depenses.purpose LIKE :purpose
 
             GROUP BY depenses.id
-            ORDER BY depenses.id DESC
+
 
         LIMIT 10
     ", [
@@ -3316,8 +4276,8 @@ return $results;
        ],200);
     }
     }
-    public function viewSpending($input){//General Spending
-        if($input["searchOption"]=='true') return $this->SearchSpending($input);
+    public function view_OtherSpending($input){//not Safari Spending
+    if($input["searchOption"]=='true') return $this->SearchSpending($input);
         $check=DB::select("
         SELECT
             Max(depenses.uid) as spendId,
@@ -3331,6 +4291,7 @@ return $results;
         INNER JOIN admnin_records ON depenses.uidCreator=admnin_records.uid
        WHERE depenses.subscriber=:subscriber
             AND depenses.uidCreator=:uidCreator
+            AND depenses.status!='spendSafaris'
             AND admnin_records.status ='GeneralSpend'
             AND admnin_records.subscriber=:adminSubscriber
 
@@ -3341,6 +4302,113 @@ return $results;
     ", [
         'subscriber'=>Auth::user()->subscriber,
         'adminSubscriber'=>Auth::user()->subscriber,
+       'uidCreator'=>Auth::user()->uid,
+    ]);
+
+    if($check)
+    {
+
+       return response([
+           "status"=>true,
+           "result"=>$check,
+
+       ],200);
+    }
+    else{
+       return response([
+           "status"=>true,
+           "result"=>0,
+
+       ],200);
+    }
+    }
+    public function viewSpending($input){//General Spending
+
+        if(strtolower($input["options"])=='others')
+        {
+
+            return $this->view_OtherSpending($input);
+        }
+        else{
+            return $this->view_SafariSpending($input);
+        }
+    }
+
+
+    public function SearchSafariSpending($input){
+        $item = strtolower($input["name"]);
+        $itemSearch='%'.$item.'%';
+        $check=DB::select("
+        SELECT
+            Max(depenses.uid) as spendId,
+            MAX(depenses.purpose) AS purpose,
+            MAX(depenses.commentData) AS commentData,
+            Max(safariproducts.TotBuyAmount) AS totSpending,
+            MAX(depenses.amount) AS spending,
+            MAX(depenses.created_at) AS created_at
+
+        FROM depenses
+        INNER JOIN safariproducts ON depenses.safariId=safariproducts.safariId
+       WHERE depenses.subscriber=:subscriber
+            AND safariproducts.status='spendSafaris'
+            AND depenses.uidCreator=:uidCreator
+            AND depenses.safariId=:safariId
+            AND depenses.purpose LIKE :purpose
+            GROUP BY depenses.id
+
+
+        LIMIT 10
+    ", [
+        'subscriber'=>Auth::user()->subscriber,
+        'safariId'=>$input['safariId'],
+
+       'uidCreator'=>Auth::user()->uid,
+       'purpose'=>$itemSearch
+    ]);
+
+    if($check)
+    {
+
+       return response([
+           "status"=>true,
+           "result"=>$check,
+
+       ],200);
+    }
+    else{
+       return response([
+           "status"=>true,
+           "result"=>0,
+
+       ],200);
+    }
+    }
+    public function view_SafariSpending($input)
+    {
+        if($input["searchOption"]=='true') return $this->SearchSafariSpending($input);
+        $check=DB::select("
+        SELECT
+            Max(depenses.uid) as spendId,
+            MAX(depenses.purpose) AS purpose,
+            MAX(depenses.commentData) AS commentData,
+            Max(safariproducts.TotBuyAmount) AS totSpending,
+            MAX(depenses.amount) AS spending,
+            MAX(depenses.created_at) AS created_at
+
+        FROM depenses
+        INNER JOIN safariproducts ON depenses.safariId=safariproducts.safariId
+       WHERE depenses.subscriber=:subscriber
+            AND safariproducts.status='spendSafaris'
+            AND depenses.uidCreator=:uidCreator
+            AND depenses.safariId=:safariId
+
+            GROUP BY depenses.id
+            ORDER BY depenses.id DESC
+
+        LIMIT 10
+    ", [
+        'subscriber'=>Auth::user()->subscriber,
+        'safariId'=>$input['safariId'],
        'uidCreator'=>Auth::user()->uid,
     ]);
 
@@ -3396,18 +4464,7 @@ return $results;
 
         if($check5){
 
-           $check1=DB::update("update admnin_records set balance=balance+:balance where uid=:uid and status=:status and subscriber=:subscriber and systemUid=:systemUid limit 1",array(
-            "balance"=>$input['balance'],
-            "uid"=>$uidUser,
-            "status"=>"GeneralSpend",
-
-            "systemUid"=>$input["systemUid"]??'PointSales1',
-            "subscriber"=>Auth::user()->subscriber
-           ));
-
-           if($check1){
-
-           $check2=DB::update("update safariproducts set TotBuyAmount=TotBuyAmount+:TotBuyAmount,updated_at=:updated_at where safariId=:safariId and status='spendSafaris' and subscriber=:subscriber limit 1",[
+         $check2=DB::update("update safariproducts set TotBuyAmount=TotBuyAmount+:TotBuyAmount,updated_at=:updated_at where safariId=:safariId and status='spendSafaris' and subscriber=:subscriber limit 1",[
             "TotBuyAmount"=>$input['balance'],
             "updated_at"=>$this->today,
             "safariId"=>$input['safariId'],
@@ -3450,6 +4507,74 @@ return $results;
             }
            }
 
+
+
+           return array(
+            "status"=>true,
+            "message"=>"Finish add New admnin_records"
+        );
+         }
+         else{
+           return array(
+               "message"=>"Something went Wrong"
+           );
+         }
+        //
+    });
+
+
+    return response($check,200);
+
+
+                } catch (\Exception $e) {
+                    DB::rollback();
+                   // throw $e;
+                    return response()->json(['error' => 'An error occurred',
+                'errorPrint'=>$e->getMessage()], 500); // Return an error JSON response
+                }
+    }
+public function addFunding($input){//General Funding
+
+    try{
+
+
+        $check=DB::transaction(function () use ($input) {
+            $uidUser=Auth::user()->uid;
+
+            $uid="SUID"."_".Str::random(2).""."_".date(time());//SUID means Spend UID
+            $check=DB::table("depenses")
+            ->insert([
+                "uid"=>$uid,
+                "Funded"=>$input['uidUser']??Auth::user()->uid,
+                "amount"=>$input['balance'],
+                "uidCreator"=>Auth::user()->uid,
+
+                "status"=>$input['status'],
+                "systemUid"=>$input["systemUid"],
+                "subscriber"=>Auth::user()->subscriber,
+
+                "purpose"=>$input['purpose']??'none',
+                "commentData"=>$input['commentData'],
+                "created_at"=>$this->today
+
+            ]);
+
+        if($check){
+
+           $check=DB::update("update admnin_records set balance=balance+:balance where uid=:uid and status=:status and subscriber=:subscriber and systemUid=:systemUid limit 1",array(
+            "balance"=>$input['balance'],
+            "uid"=>$uidUser,
+            "status"=>$input["status"],
+
+            "systemUid"=>$input["systemUid"],
+            "subscriber"=>Auth::user()->subscriber
+           ));
+
+           if($check){
+            return array(
+                "status"=>true,
+                "message"=>"Finish update records"
+            );
            }
            else{
             DB::table("admnin_records")
@@ -3478,7 +4603,11 @@ return $results;
     });
 
 
-    return response($check,200);
+    return response([
+       "status"=>true,
+       "result"=>$check,
+
+   ],200);
 
 
                 } catch (\Exception $e) {
@@ -3487,8 +4616,13 @@ return $results;
                     return response()->json(['error' => 'An error occurred',
                 'errorPrint'=>$e->getMessage()], 500); // Return an error JSON response
                 }
-    }
+}
+public function editFunding($input){
 
+}
+public function deleteFunding($input){
+
+}
 
     //workers Code  Not to avoid slow app when view Worker it is where it may calculate everything
     public function AddWorker($input){
