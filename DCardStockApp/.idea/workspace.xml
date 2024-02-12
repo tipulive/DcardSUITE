@@ -14,8 +14,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fe13c1e5-b7ca-4b84-a854-5c4e0fd95bcb" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/lib/Pages/HomepageBackup.dart" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/lib/Pages/SetPage.dart" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/lib/Pages/SetPage2.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/Pages/components/ContactComp.dart" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/lib/Pages/components/ProductComp.dart" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/lib/Pages/components/SetAdminPaymentComp.dart" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/lib/Pages/components/Spendings/GenSpendingComp.dart" afterDir="false" />
@@ -29,23 +31,33 @@
       <change afterPath="$PROJECT_DIR$/lib/Pages/components/adminPayments/ViewRepaySafeUidComp.dart" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/lib/api/firebaseApi.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../CardStocKBackend/ARestapi/Company.rest" beforeDir="false" afterPath="$PROJECT_DIR$/../CardStocKBackend/ARestapi/Company.rest" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../CardStocKBackend/ARestapi/Companydemo.rest" beforeDir="false" afterPath="$PROJECT_DIR$/../CardStocKBackend/ARestapi/Companydemo.rest" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../CardStocKBackend/app/Http/Controllers/Auth/AuthAdminRegisterController.php" beforeDir="false" afterPath="$PROJECT_DIR$/../CardStocKBackend/app/Http/Controllers/Auth/AuthAdminRegisterController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../CardStocKBackend/app/Http/Controllers/Auth/AuthUserRegisterController.php" beforeDir="false" afterPath="$PROJECT_DIR$/../CardStocKBackend/app/Http/Controllers/Auth/AuthUserRegisterController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../CardStocKBackend/app/Http/Controllers/CompanyController.php" beforeDir="false" afterPath="$PROJECT_DIR$/../CardStocKBackend/app/Http/Controllers/CompanyController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../CardStocKBackend/app/Http/Controllers/Controllers.zip" beforeDir="false" afterPath="$PROJECT_DIR$/../CardStocKBackend/app/Http/Controllers/Controllers.zip" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../CardStocKBackend/app/Http/Controllers/StockController.php" beforeDir="false" afterPath="$PROJECT_DIR$/../CardStocKBackend/app/Http/Controllers/StockController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../CardStocKBackend/app/Http/Controllers/TestController.php" beforeDir="false" afterPath="$PROJECT_DIR$/../CardStocKBackend/app/Http/Controllers/TestController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../CardStocKBackend/resources/resources.zip" beforeDir="false" afterPath="$PROJECT_DIR$/../CardStocKBackend/resources/resources.zip" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../CardStocKBackend/resources/views/Search.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/../CardStocKBackend/resources/views/Search.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../CardStocKBackend/resources/views/adminpage.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/../CardStocKBackend/resources/views/adminpage.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../CardStocKBackend/resources/views/components/Footerjs/footerjs.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/../CardStocKBackend/resources/views/components/Footerjs/footerjs.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../CardStocKBackend/routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/../CardStocKBackend/routes/api.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/android/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/AndroidManifest.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/android/app/src/profile/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/profile/AndroidManifest.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/Pages/Homepage.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/Homepage.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/Pages/SetSpendingPage.dart" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/Pages/components/SetDeptComp.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/components/SetDeptComp.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Pages/components/SetEditCardNoComp.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/components/SetEditCardNoComp.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/Pages/components/SetOrderComp.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/components/SetOrderComp.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Pages/components/SetPaidDeptComp.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/components/SetPaidDeptComp.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Pages/components/SetRepayComp.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/components/SetRepayComp.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/Pages/components/SetSaleComp.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/components/SetSaleComp.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/Pages/components/SetSpendingComp.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/components/SetSpendingComp.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Pages/components/SetStockComp.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/components/SetStockComp.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/Pages/components/SettingComp.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/components/SettingComp.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Query/CardQuery.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Query/CardQuery.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/Query/StockQuery.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Query/StockQuery.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Utilconfig/ConstantClassUtil.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Utilconfig/ConstantClassUtil.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Utilconfig/HideShowState.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Utilconfig/HideShowState.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/main.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/models/QuickBonus.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/models/QuickBonus.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/models/Topups.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/models/Topups.dart" afterDir="false" />
@@ -132,6 +144,18 @@
     </task>
     <servers />
   </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
@@ -147,7 +171,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
           <url>file://$PROJECT_DIR$/lib/Query/StockQuery.dart</url>
-          <line>853</line>
+          <line>907</line>
           <option name="timeStamp" value="7" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
@@ -157,17 +181,17 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
           <url>file://$PROJECT_DIR$/lib/Query/StockQuery.dart</url>
-          <line>976</line>
+          <line>1030</line>
           <option name="timeStamp" value="9" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
           <url>file://$PROJECT_DIR$/lib/Pages/Homepage.dart</url>
-          <line>795</line>
+          <line>806</line>
           <option name="timeStamp" value="12" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
           <url>file://$PROJECT_DIR$/lib/Pages/Homepage.dart</url>
-          <line>633</line>
+          <line>644</line>
           <option name="timeStamp" value="13" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
@@ -182,18 +206,33 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
           <url>file://$PROJECT_DIR$/lib/Pages/components/Spendings/SafariComp.dart</url>
-          <line>585</line>
+          <line>507</line>
           <option name="timeStamp" value="17" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
           <url>file://$PROJECT_DIR$/lib/Pages/Homepage.dart</url>
-          <line>561</line>
+          <line>571</line>
           <option name="timeStamp" value="18" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
           <url>file://$PROJECT_DIR$/lib/Pages/components/SetDeptComp.dart</url>
-          <line>798</line>
+          <line>797</line>
           <option name="timeStamp" value="19" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
+          <url>file://$PROJECT_DIR$/lib/Pages/Card/AddCardPage.dart</url>
+          <line>393</line>
+          <option name="timeStamp" value="21" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
+          <url>file://$PROJECT_DIR$/lib/Pages/Card/AddCardPage.dart</url>
+          <line>470</line>
+          <option name="timeStamp" value="22" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
+          <url>file://$PROJECT_DIR$/lib/Pages/components/SetEditCardNoComp.dart</url>
+          <line>269</line>
+          <option name="timeStamp" value="23" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

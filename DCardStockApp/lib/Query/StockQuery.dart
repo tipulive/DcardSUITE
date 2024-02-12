@@ -17,6 +17,13 @@ import '../models/QuickBonus.dart';
 
 class StockQuery extends GetxController{
 
+bool resizable=true;
+updateResizable(valData)
+{
+  resizable=false;
+  update();
+}
+
   List<dynamic> dispatchOrder = [];
   updateDispatchOrder(valData){
     dispatchOrder.clear();
@@ -40,6 +47,7 @@ class StockQuery extends GetxController{
     hideComp=valdata;
     update();
   }
+
   bool hideaddCart=false;
   updateHideaddCart(valdata)
   {
@@ -258,11 +266,12 @@ dynamic dataTest=[];
         "isStatus":user.status,//offNotPick means gonna pick any
         "isAdmin":topData.optionCase,
         "limitData":topData.startlimit,
-        "searchOption":topData.searchOption
+        "searchOption":topData.searchOption,
+        "sortOrder":topData.sortOrder??'ASC'
 
 
       };
-
+print(params);
       String authToken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
       var url="${ConstantClassUtil.urlLink}/SearchUser";
       var response = await Dio().get(url,
@@ -299,11 +308,13 @@ dynamic dataTest=[];
         "productName":product.productName,
         "productQr":product.status,
         "isProductAction":topupData.optionCase,//product get Action(search,edit,view)
-      "LimitStart":topupData.endlimit,  //page
-      "LimitEnd":topupData.startlimit,
+        "LimitStart":topupData.endlimit,  //page
+        "LimitEnd":topupData.startlimit,
+        "withTotal":topupData.purpose??false,
 
 
       };
+      //print(params);
 
       String authToken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
       var url="${ConstantClassUtil.urlLink}/Products";
@@ -332,6 +343,49 @@ dynamic dataTest=[];
 
     }
   } //Search all product based on name or ProductCode
+  updateProducts(QuickBonus product) async{//this is all about Products
+    try {
+
+      var params =  {
+
+        "productCode":product.uid,
+        "productName":product.productName,
+        "price":product.price,
+        "pcs":product.giftPcs,
+        "actionStatus":product.status
+
+
+
+      };
+
+      print(params);
+      String authToken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
+      var url="${ConstantClassUtil.urlLink}/updateProducts";
+      var response = await Dio().get(url,
+        options: Options(headers: {
+          HttpHeaders.contentTypeHeader: "application/json",
+          HttpHeaders.authorizationHeader:"Bearer $authToken"
+        }),
+        queryParameters: params,
+      );
+      if (response.statusCode == 200) {
+
+
+
+
+        return response;
+
+
+
+      } else {
+        return false;
+        //print(false);
+      }
+    } catch (e) {
+      //return false;
+
+    }
+  } //Search all prod
   searchProductQr(Topups topupData) async{
     try {
 
@@ -626,7 +680,7 @@ print(params);
 
     var headers = {
       'Content-Type': 'application/json',
-      'Authorization':'Bearer ${authToken}'
+      'Authorization':'Bearer $authToken'
     };
 
 
@@ -666,7 +720,7 @@ print(params);
         "uid":product.uid
 
       };
-      print("delete Single ${params}");
+      print("delete Single $params");
       String authToken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
       var url="${ConstantClassUtil.urlLink}/deleteTSingleOrder";
       var response = await Dio().get(url,
@@ -1067,43 +1121,51 @@ print(params);
     }
 
   }
-  editSpending(Topups topupData) async{
+  updateSpending(Topups topupData) async{
 
-    try {
+  try {
 
-      var params =  {
-        "balance":topupData.amount,
-        "purpose":topupData.purpose,
-        "status":"GeneralSpend",
-        "commentData":topupData.desc,
-        "systemUid":"PointSales1"
+    var params =  {
+      "safariId":topupData.safariId,
+      "uid":topupData.uid,
+      "amount":"${topupData.amount}",
+      "purpose":topupData.purpose,
+      "actionStatus":topupData.optionCase,//action delete,edit both safari and others
+      "status":"GeneralSpend",
+      "commentData":topupData.desc,
+      "systemUid":"PointSales1"
 
-        //"options": [1,2,3],
-      };
-      String authToken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
-      var url="${ConstantClassUtil.urlLink}/editSpending";
-      var response = await Dio().post(url,
-        options: Options(headers: {
-          HttpHeaders.contentTypeHeader: "application/json",
-          HttpHeaders.authorizationHeader:"Bearer $authToken"
-        }),
-        data: jsonEncode(params),
-      );
-      if (response.statusCode == 200) {
-
-        //updateParticipateState(response.data);
-        return response;
+      //"options": [1,2,3],
+    };
+print(params);
+    String authToken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
+    var url="${ConstantClassUtil.urlLink}/updateSpending";
+    var response = await Dio().get(url,
+    options: Options(headers: {
+    HttpHeaders.contentTypeHeader: "application/json",
+    HttpHeaders.authorizationHeader:"Bearer $authToken"
+    }),
+    queryParameters: params,
+    );
+    if (response.statusCode == 200) {
 
 
+    // return (response.data).length;
+    //updateEventState(response.data);
+    //return "hello";
+
+    //updateBalanceHistState(response.data);
+    //return response.data;
+
+    return response;
 
 
-      } else {
-        return false;
-        //print(false);
-      }
+    } else {
+    return false;
+    //print(false);
+    }
     } catch (e) {
-      //return false;
-
+    //return false;
     }
 
   }

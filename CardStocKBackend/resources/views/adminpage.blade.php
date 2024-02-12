@@ -346,6 +346,47 @@ table th {
 
 
                                     </ul>
+                                    <li class="mm-active">
+                                <a href="#" aria-expanded="true">
+                                    <i class="metismenu-icon pe-7s-rocket"></i>items Safari
+                                    <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
+                                </a>
+                            </li>
+                            <li class="app-sidebar__heading">Stock</li>
+
+                                <ul class="mm-collapse mm-show" style="">
+                                    <li>
+                                        <a href="#View All Products" onclick="return CheckSafariStock()" aria-expanded="false">
+                                            <i class="metismenu-icon"></i>Create Safari
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a  href="#Create Product" onclick="return ViewSafariStock('name',false)" aria-expanded="false">
+                                            <i class="metismenu-icon"></i>View
+                                        </a>
+                                    </li>
+                                    <!--Combine Create Safari and View Safari -->
+                                   <!-- <li>
+                                        <a  href="#Create Product" onclick="return ViewSafari()" aria-expanded="false">
+                                            <i class="metismenu-icon"></i>Safari
+                                        </a>
+                                    </li>-->
+                                    <!--here you can edit Products Price -->
+                                    <!--Sell your Stock -->
+                                    <!--<li>
+                                        <a  href="#Create Product" onclick="return ViewSafari()" aria-expanded="false">
+                                            <i class="metismenu-icon"></i>Products
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a  href="#Create Product" onclick="return ViewSafari()" aria-expanded="false">
+                                            <i class="metismenu-icon"></i>Sell
+                                        </a>
+                                    </li>-->
+
+
+                                    </ul>
 
                                     <li class="app-sidebar__heading">Promotion</li>
                             <li class="mm-active">
@@ -354,6 +395,7 @@ table th {
                                     <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
                                 </a>
                             </li>
+
                                 <ul class="mm-collapse mm-show" style="">
                                     <li>
                                         <a href="#View All Products" onclick="return CreatePromotionEventMenu()" aria-expanded="false">
@@ -396,47 +438,10 @@ table th {
 
                                     <!--CardCode-->
                             <!--Safarinew and Code-->
-                           <li class="app-sidebar__heading">Stock</li>
-                            <li class="mm-active">
-                                <a href="#" aria-expanded="true">
-                                    <i class="metismenu-icon pe-7s-rocket"></i>items Safari
-                                    <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
-                                </a>
-                            </li>
-                                <ul class="mm-collapse mm-show" style="">
-                                    <li>
-                                        <a href="#View All Products" onclick="return CheckSafariStock()" aria-expanded="false">
-                                            <i class="metismenu-icon"></i>Create Safari
-                                        </a>
-                                    </li>
-
-                                    <li>
-                                        <a  href="#Create Product" onclick="return ViewSafariStock('name',false)" aria-expanded="false">
-                                            <i class="metismenu-icon"></i>View
-                                        </a>
-                                    </li>
-                                    <li><!--Combine Create Safari and View Safari -->
-                                        <a  href="#Create Product" onclick="return ViewSafari()" aria-expanded="false">
-                                            <i class="metismenu-icon"></i>Safari
-                                        </a>
-                                    </li>
-                                    <li><!--here you can edit Products Price -->
-                                        <a  href="#Create Product" onclick="return ViewSafari()" aria-expanded="false">
-                                            <i class="metismenu-icon"></i>Products
-                                        </a>
-                                    </li>
-                                    <li><!--Sell your Stock -->
-                                        <a  href="#Create Product" onclick="return ViewSafari()" aria-expanded="false">
-                                            <i class="metismenu-icon"></i>Sell
-                                        </a>
-                                    </li>
-
-
-                                    </ul>
 
                                     <!--SafariCode-->
                                       <!--SafariCode-->
-                                 <li class="app-sidebar__heading">Safari</li>
+                              <!--   <li class="app-sidebar__heading">Safari</li>
                             <li class="mm-active">
                                 <a href="#" aria-expanded="true">
                                     <i class="metismenu-icon pe-7s-rocket"></i>items Safari
@@ -454,7 +459,7 @@ table th {
                                         <a  href="#Create Product" onclick="return ViewSafari()" aria-expanded="false">
                                             <i class="metismenu-icon"></i>View
                                         </a>
-                                    </li>
+                                    </li>-->
 
 
                                     </ul>
@@ -1265,7 +1270,7 @@ var Usertoken=localStorage.getItem("Usertoken");
    //search products
    $.ajax({
 
-url:`./api/SearchProduct`,
+url:`./api/Products`,
 type:'get',
 headers: {
         "Content-Type": "application/json;charset=UTF-8",
@@ -1277,6 +1282,11 @@ headers: {
 },
 data:{
     productCode:thisdata.value,
+    productName:"none",
+    productQr:"none",
+    isProductAction:"search",//product get Action(search,edit,view)
+    LimitStart:1,  //page
+    LimitEnd:10,
 },
 success:function(data){
 if(data.status){//return data as true
@@ -1289,8 +1299,8 @@ var data=data.result;
      console.log(data);
 
     getdata+=`
-    <li class="list-group-item d-flex justify-content-between align-items-center mylogout myhover" onclick="return addItemStock('${data[i].productCode}','${data[i].price}')">
-    ${data[i].productCode}=>${data[i].tags}
+    <li class="list-group-item d-flex justify-content-between align-items-center mylogout myhover" onclick="return addItemStock('${btoa(data[i].productCode)}','${btoa(data[i].price)}')">
+    ${data[i].productCode}=>${data[i].ProductName}${data[i].pcs} Pcs=>${data[i].tags}
     <span class="badge "></span>
   </li>
     `;
@@ -1308,8 +1318,8 @@ var data=data.result;
 }
 else{
     isAvailable=true;
-    $('.productCodePopup').val("0");
-    $('.isProductExist').hide();
+
+    $('.isProductExist').show();
     $('.isProductNotExist').show();
     /*$('.autoCompleteTopItem').html("");
     $('.autoCompleteTopItem').hide();*/
@@ -1361,7 +1371,7 @@ var data=data.result;
      console.log(data);
 
     getdata+=`
-    <li class="list-group-item d-flex justify-content-between align-items-center mylogout myhover" onclick="return addItemStock('${data[i].productCode}','${data[i].price}')">
+    <li class="list-group-item d-flex justify-content-between align-items-center mylogout myhover" onclick="return addItemStock('${btoa(data[i].productCode)}','${btoa(data[i].price)}')">
     ${data[i].purpose}=>${data[i].amount}
     <span class="badge "></span>
   </li>
@@ -1380,7 +1390,7 @@ var data=data.result;
 }
 else{
     isAvailable=true;
-    $('.productCodePopup').val("0");
+    $('.productCodePopup').val("productDataExistandCode");
     $('.isProductExist').hide();
     $('.isProductNotExist').show();
     /*$('.autoCompleteTopItem').html("");
@@ -1407,14 +1417,57 @@ function addItemQuickBonus(itemName,itemPrice){
 }
 function addItemStock(itemName,itemPrice){
 
-    $('.productCodeClass').val(itemName);
-    $('.productCodePriceClass').val(itemPrice);
+console.log(data.safariuid);
+    var Usertoken=localStorage.getItem("Usertoken");
+   //search products
+   $.ajax({
+
+url:`./api/IsProductExist`,
+type:'get',
+headers: {
+        "Content-Type": "application/json;charset=UTF-8",
+        //"Authorization": `Bearer ${Usertoken}`
+    },
+    headers: {
+    "Content-Type": "application/json;charset=UTF-8",
+    "Authorization": `Bearer ${Usertoken}`
+},
+data:{
+   "safariId":data.safariuid,
+   "productCode":atob(itemName)
+},
+success:function(data){
+if(data.status){//return data as true
+
+
+alert("product is already exist in this safari");
+
+
+}
+else{
+
+    $('.productCodeClass').val(atob(itemName));
+    $('.productCodePriceClass').val(atob(itemPrice));
+    $('.productCodePopup').val("productDataExistandCode");
     $('.autoCompleteTopItem').html("");
     $('.autoCompleteTopItem').hide();
     $('.autocompleteIcon').html(`<i class="fas fa-check text-success"></i>`);
-    $('.isProductExist').show();
+    $('.isProductExist').hide();
     $('.isProductNotExist').hide();
+
 }
+
+
+
+},
+error:function(data){
+//alert("errors occured please retry this process again or contact system Admin");
+//window.location.href = "./login";
+}
+});
+    return false;
+}
+
 
 function autoCompleteGiftQuickBonus(thisdata)
 {
@@ -1667,6 +1720,7 @@ console.log(data);
 
 $('.MainbigTitle').html(`
 <h5 class="text-center d-none"> <button type="button" class="btn btn-danger" onclick="return FormCloseStockSafari('${data.safariuid}')">Close Safari</button></h5>
+
 `);
 $('.MyRequest_table').html("");
 
@@ -1674,11 +1728,11 @@ $('.MyRequest_table').html("");
 
 getData=`
 <h6 class="text-center"><span class="text-primary">${atob(safariName)}</span></h6>
-<h6 class="text-right"><span class="text-primary">Total Buyout:</span>${data.interest[0].buyout} $</h6>
+<h6 class="text-right ${(data.interest[0].buyout==null?"d-none":"")}"><span class="text-primary">Total Buyout:</span>${data.interest[0].buyout} $</h6>
 
-<h6 class="text-right"><span class="text-primary">Tot SoldOut Price:</span><span>${data.interest[0].Soldout} $</span></h6>
+<h6 class="text-right ${(data.interest[0].Soldout==null?"d-none":"")}"><span class="text-primary">Tot SoldOut Price:</span><span>${data.interest[0].Soldout} $</span></h6>
 <h6 class="text-right"><hr></h6>
-<h6 class="text-right"><span class="text-danger">Profit</span>:<span >${data.interest[0].interest}</span></h6>
+<h6 class="text-right ${(data.interest[0].interest==null?"d-none":"")}"><span class="text-danger">Profit</span>:<span >${data.interest[0].interest}</span></h6>
 <div class="flex-center">
 
 
@@ -1686,12 +1740,12 @@ getData=`
 <label>Safari Name:${atob(safariName)}</label>
 
 </div>
-<div class="form-group">
+<div class="form-group ${(data.interest[0].TotQty==null?"d-none":"")}">
 <label title="Total Qty">Total Qty:${data.interest[0].TotQty}</label>
 
 </div>
 
-<div class="form-group">
+<div class="form-group  ${(data.interest[0].QtySoldOut==null?"d-none":"")}">
 <label title="Total Qty SoldOUT">SoldOut:<span>${data.interest[0].QtySoldOut} </span></label>
 
 </div>
@@ -1706,7 +1760,7 @@ getData=`
 <div class="pb-2">
 <button type="button" class="btn btn-dark" onclick="return FormCalcItemSafariStock('${btoa(JSON.stringify(data))}','spendProduct')">Products</button>
 
-<button type="button" class="btn btn-danger" onclick="return FormAddItemSafariStockSpent('${btoa(JSON.stringify(data))}','spendSafari')">Others</button>
+<button type="button" class="btn btn-danger d-none" onclick="return FormAddItemSafariStockSpent('${btoa(JSON.stringify(data))}','spendSafari')">Others</button>
 </div>
 <div class="pb-2 d-none">
 <button type="button" class="btn btn-danger" onclick="return spendButton('${btoa(JSON.stringify(data))}')">Spending</button>
@@ -1717,7 +1771,17 @@ getData=`
 
 </div>
 
+<div class="input-group mb-3">
+  <div class="input-group-prepend">
+    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">By</button>
+    <div class="dropdown-menu">
+    <a class="dropdown-item" href="#SearchByCode" onclick="return chooseSearchStock('${chooseSearchStock}')">Code</a>
+      <a class="dropdown-item" href="#SearchByName" onclick="return chooseSearchStock('${chooseSearchStock}')">name</a>
+    </div>
+  </div>
 
+  <input type="text" class="form-control searchProductTable" aria-label="Text input with dropdown button" placeholder="Search by Code" onkeyup="return SeachProductStock('${safariName}','${data.safariuid}',this)">
+</div>
 `;
 //console.log(data);
 
@@ -1735,7 +1799,7 @@ getData+=`
 <th scope="col">SoldOut Qty</th>
 <th scope="col">SoldOut $</th>
 <th scope="col">updated_at</th>
-<th scope="col">Action</th>
+
 
 
 </tr>
@@ -1749,19 +1813,19 @@ var resultObject=resultData[i];
  getData+=`
 
  <tr>
-  <td data-label="#">${i+1}</td>
+  <td data-label="#"><i class="fas fa-trash text-danger mylogout " title="Delete This Product in Safari" onclick="return deleteStockQty('${btoa(JSON.stringify(resultObject))}',this,'${safariName}')"></i>  ${i+1}</td>
   <td data-label="Name">${resultData[i].productCode}</td>
   <td data-label="Fact Price $">
-  ${(resultData[i].status!='spendSafaris')?`<span class="Formchange" id="CustomPrice_Add_1" onchange="return  OnChangeFactPrice('${btoa(JSON.stringify(resultObject))}',this,'${safariName}')" onkeyup="return OnChangeFactPrice('${btoa(JSON.stringify(resultObject))}',this,'${safariName}')" contenteditable="true">${resultData[i].price}</span><span class="${"Price_"+resultData[i].productCode}"></span>`:'Spending'}
+  ${(resultData[i].status!='spendSafaris')?`<span class="Formchange" id="CustomPrice_Add_1" onchange="return  OnChangeFactPrice('${btoa(JSON.stringify(resultObject))}',this,'${safariName}')" onkeyup="return OnChangeFactPrice('${btoa(JSON.stringify(resultObject))}',this,'${safariName}')" contenteditable="true">${resultData[i].price}</span><span class="${"Price_"+(resultData[i].productCode).replace(/[.\s'`]/g, '')}"></span>`:'Spending'}
   </td>
   <td data-label="Init qty">
-  ${(resultData[i].status!='spendSafaris')?`<span class="Formchange" id="CustomPrice_Add_1" onchange="return  OnChangeInitQty('${btoa(JSON.stringify(resultObject))}',this,'${safariName}')" onkeyup="return OnChangeInitQty('${btoa(JSON.stringify(resultObject))}',this,'${safariName}')" contenteditable="true">${resultData[i].totQty}</span><span class="${"Qty_"+resultData[i].productCode}"></span>`:'Spending'}
+  ${(resultData[i].status!='spendSafaris')?`<span class="Formchange" id="CustomPrice_Add_1 test" onchange="return  OnChangeInitQty('${btoa(JSON.stringify(resultObject))}',this,'${safariName}')" onkeyup="return OnChangeInitQty('${btoa(JSON.stringify(resultObject))}',this,'${safariName}')" contenteditable="true">${resultData[i].totQty}</span><span class="${"Qty_"+(resultData[i].productCode).replace(/[.\s'`]/g, '')}"></span>`:'Spending'}
  </td>
   <td data-label="Spending">${resultData[i].TotBuyAmount}</td>
   <td data-label="SoldOut Qty">${resultData[i].SoldOut}</td>
   <td data-label="SoldOut $">${resultData[i].TotSoldAmount}</td>
   <td data-label="updated_at">${resultData[i].updated_at}</td>
-  <td data-label="Action">action</td>
+
 
 
 </tr>`;
@@ -1776,18 +1840,105 @@ $('.MainForm').html(getData);
 
     //
 }
+
+function chooseSearchStock(optionsearch)
+{
+    if(optionsearch==="1")
+    {
+        chooseSearchStock=optionsearch;
+
+        $(".searchProductTable").attr("placeholder", "Search By Code");
+
+    }
+    else{
+        chooseSearchStock=optionsearch;
+
+        $(".searchProductTable").attr("placeholder", "Search By Product Name");
+    }
+}
+function SeachProductStock(safariName,safariId,thisData)
+{
+    console.log(safariId);
+   var searchProductTable=$('.searchProductTable').val();
+var Usertoken=localStorage.getItem("Usertoken");
+$.ajax({
+
+url:`./api/displayCalculate`,
+type:'get',
+beforeSend: function (xhr) {
+xhr.setRequestHeader('Authorization', `Bearer ${Usertoken}`);
+},
+//dataType: "json",
+data:{
+"safariId":safariId,
+"name":"Mbona",
+"actionStatus":"Search",
+"productSearch":thisData.value,
+"isproductCode":(chooseSearchStock===1)?"true":"false"
+
+
+},
+success:function(data){
+if(data.status){//return data as true
+$('.cover-spin').hide();
+
+ getData="";
+var resultData=data["result"];
+ for(var i=0;i<resultData.length;i++){
+ var resultObject=resultData[i];
+     getData+=`  <tr>
+  <td data-label="#"><i class="fas fa-trash text-danger mylogout " title="Delete This Product in Safari" onclick="return deleteStockQty('${btoa(JSON.stringify(resultObject))}',this,'${safariName}')"></i>  ${i+1}</td>
+  <td data-label="Name">${resultData[i].productCode}</td>
+  <td data-label="Fact Price $">
+  ${(resultData[i].status!='spendSafaris')?`<span class="Formchange" id="CustomPrice_Add_1" onchange="return  OnChangeFactPrice('${btoa(JSON.stringify(resultObject))}',this,'${safariName}')" onkeyup="return OnChangeFactPrice('${btoa(JSON.stringify(resultObject))}',this,'${safariName}')" contenteditable="true">${resultData[i].price}</span><span class="${"Price_"+(resultData[i].productCode).replace(/[.\s'`]/g, '')}"></span>`:'Spending'}
+  </td>
+  <td data-label="Init qty">
+  ${(resultData[i].status!='spendSafaris')?`<span class="Formchange" id="CustomPrice_Add_1 test" onchange="return  OnChangeInitQty('${btoa(JSON.stringify(resultObject))}',this,'${safariName}')" onkeyup="return OnChangeInitQty('${btoa(JSON.stringify(resultObject))}',this,'${safariName}')" contenteditable="true">${resultData[i].totQty}</span><span class="${"Qty_"+(resultData[i].productCode).replace(/[.\s'`]/g, '')}"></span>`:'Spending'}
+ </td>
+  <td data-label="Spending">${resultData[i].TotBuyAmount}</td>
+  <td data-label="SoldOut Qty">${resultData[i].SoldOut}</td>
+  <td data-label="SoldOut $">${resultData[i].TotSoldAmount}</td>
+  <td data-label="updated_at">${resultData[i].updated_at}</td>
+
+
+
+</tr>`;
+
+ }
+ $('.viewReqTable tbody').html(getData);
+
+
+
+
+}
+else{
+    $('.cover-spin').hide();
+//alert("This Product has been used Please Contact System Admin if you want to edit this Quantity");
+
+}
+
+
+
+},
+error:function(data){
+     $('.cover-spin').hide();
+}
+});
+}
 function OnChangeInitQty(dataPass,thisdata,safari)
 {
 
 
 
     var initQty=Number(thisdata.innerText);
-    if (!(typeof(initQty) === "number" && initQty > 0)) return null;
+    if (!(typeof(initQty) === "number" && initQty >= 0)) return null;
     console.log(dataPass);
     data=atob(dataPass);
     data=JSON.parse(data);
     console.log(data);
-    var classData=data["productCode"];
+    var classData=(data["productCode"]).replace(/[.\s'`]/g, '');
+    console.log(classData);
+
     $(`.${"Qty_"+classData}`).html(`<i class="fas fa-check text-success mylogout" onclick="return EditStockQty('${dataPass}','${btoa(initQty)}','${safari}')"></i>`);
 
 }
@@ -1838,15 +1989,65 @@ error:function(data){
 }
 });
 }
+function deleteStockQty(dataPass,initQty,safari)
+{
+    dataV=atob(dataPass);
+   dataV=JSON.parse(dataV);
+    if(confirm(`Do you Want Delete ${dataV["ProductName"]} in this Safari?`))
+    {
+
+    $('.cover-spin').show();
+
+var Usertoken=localStorage.getItem("Usertoken");
+$.ajax({
+
+url:`./api/deleteStockQty`,
+type:'post',
+beforeSend: function (xhr) {
+xhr.setRequestHeader('Authorization', `Bearer ${Usertoken}`);
+},
+//dataType: "json",
+data:{
+productCode:dataV["productCode"],
+safariId:dataV["safariId"]
+
+
+
+},
+success:function(data){
+if(data.status){//return data as true
+$('.cover-spin').hide();
+
+var safariId=btoa(dataV["safariId"]);
+
+ViewItemSafariStock(safariId,safari);
+
+
+}
+else{
+    $('.cover-spin').hide();
+alert("This Product has been used Please Contact System Admin if you want to edit this Quantity");
+
+}
+
+
+
+},
+error:function(data){
+    $('.cover-spin').hide();
+}
+});
+}
+}
 function OnChangeFactPrice(dataPass,thisdata,safari)
 {
     var factPrice=Number(thisdata.innerText);
-    if (!(typeof(factPrice) === "number" && factPrice > 0)) return null;
+    if (!(typeof(factPrice) === "number" && factPrice >= 0)) return null;
     console.log(dataPass);
     data=atob(dataPass);
     data=JSON.parse(data);
     console.log(data);
-    var classData=data["productCode"];
+    var classData=(data["productCode"]).replace(/[.\s'`]/g, '');
     $(`.${"Price_"+classData}`).html(`<i class="fas fa-check text-success mylogout" onclick="return EditStockFactPrice('${dataPass}','${btoa(factPrice)}','${safari}')"></i>`);
 }
 function EditStockFactPrice(dataPass,factPrice,safari)
@@ -2204,7 +2405,8 @@ success:function(data){
 if(data.status){//return data as true
     $('.cover-spin').hide();
     $('.viewOrder').modal('hide');
-    LoadSafariStockItemTemplate(data);
+    ViewSafariStock('name',false);
+    //LoadSafariStockItemTemplate(data);
  //console.log(hashfunction);
 
 
@@ -2295,27 +2497,27 @@ $('.ModalPassword').html(`
 <div class="form-group d-none">
 <label>Safari Name</label>
 <input type="text" class="form-control" name="name" value="${data.name}"/>
-<input type="text" class="form-control" name="uid" value="${data.safariuid}"/>
+<input type="hidden" class="form-control" name="uid" value="${data.safariuid}"/>
 </div>
 <div class="form-group ">
 
-<input type="text" class="form-control" name="safariId" value="${data.safariuid}"/>
+<input type="hidden" class="form-control" name="safariId" value="${data.safariuid}"/>
 
-<input type="text" class="form-control" name="status" value="${status}"/>
+<input type="hidden" class="form-control" name="status" value="${status}"/>
 <input type="hidden" class="form-control" name="typeData" value="spend"/>
 
 </div>
 <div class="form-group right-inner-addon">
 <label>Search Product<span class="text-danger">*</span></label>
-<input type="text" class="form-control productCodeClass"  autocomplete="off" onkeyup="autoCompleteStock(this)" name="productName" required/>
+<input type="text" class="form-control productCodeClass"  autocomplete="off" onkeyup="autoCompleteStock(this)" name="productCode" placeholder="Enter Product Code" required/>
 <span class="autocompleteIcon" onclick="hidePopup()"><i class="fas fa-exclamation-triangle text-danger" ></i></span>
 </div>
 <ul class="list-group  autoCompleteTopItem">
 
 </ul>
-<div class="form-group d-none isProductExist">
+<div class="form-group isProductExist">
 <label>Product Name</label>
-<input type="text" class="form-control productCodeClass productCodePopup" name="productCode" value="0" readonly/>
+<input type="text" class="form-control productCodeClass productCodePopup" name="productName"  required/>
 </div>
 <div class="form-group ">
 <label>qty</label>
@@ -2371,10 +2573,12 @@ LoadSavedComeFrom();
 
 }
 function hidePopup(){
-    $('.productCodePopup').val("0");
+    $('.productCodePopup').val("");
     $('.autoCompleteTopItem').html("");
     $('.autoCompleteTopItem').hide();
     $('.autocompleteIcon').html(`<i class="fas fa-check text-success"></i>`);
+    $('.isProductExist').show();
+    $('.isProductNotExist').show()
 }
 
 function FormAddItemSafariStockSpent(dataPass,status)
@@ -2397,8 +2601,8 @@ $('.ModalPassword').html(`
 </div>
 <div class="form-group ">
 
-<input type="text" class="form-control" name="safariId" value="${data.safariuid}"/>
-<input type="text" class="form-control" name="options" value="spendSafari"/>
+<input type="hidden" class="form-control" name="safariId" value="${data.safariuid}"/>
+<input type="hidden" class="form-control" name="options" value="spendSafari"/>
 
 
 
@@ -2699,6 +2903,7 @@ var resultData=data.result;
 
 $('.MainbigTitle').html(`
 <h5 class="text-center"> Safaris</h5>
+
 `);
 $('.MyRequest_table').html("");
 getData=`
@@ -2811,7 +3016,7 @@ data:$('.formSafariStockEdit').serialize(),
 success:function(data){
 if(data.status){//return data as true
     $('.cover-spin').hide();
-    ViewSafari();
+    ViewSafariStock('name',false);
  //console.log(hashfunction);
 
 
@@ -2843,7 +3048,10 @@ url:`./api/displayCalculate`,
 type:'get',
 data: {
 safariId:atob(uid),
-name:atob(name)
+name:atob(name),
+actionStatus:"calculInterest",
+productSearch:"t",
+isproductCode:"false"
 },
 headers: {
     "Content-Type": "application/json;charset=UTF-8",
@@ -3831,7 +4039,7 @@ function ViewEditSafari(uid,name,comment,uidCreator,subscriber){
 
 $('.MyTitleModal').html(`<h5 class="text-center">  <strong>Edit Safari</strong></h5>`)
 $('.ModalPassword').html(`
-<form class="formSafariEdit" onsubmit="return SafariEdit()">
+<form class="formSafariStockEdit" onsubmit="return SafariStockEdit()">
 <div class="p-2">
 <div class="form-group ">
 <label>Name</label>
@@ -3895,14 +4103,14 @@ error:function(data){
 return false;
 }
 function DeleteSafari(uid,name,comment,uidCreator,subscriber){
-    if(confirm(`Do you Want to Delete this Safari that has this Plaque ${atob(name)}`))
+    if(confirm(`Do you Want to Delete this Safari ${atob(name)}`))
     {
 
         $('.cover-spin').show();
     var Usertoken=localStorage.getItem("Usertoken");
 $.ajax({
 
-url:`./api/SafariDelete`,
+url:`./api/DeleteSafariStock`,
 type:'post',
 beforeSend: function (xhr) {
 xhr.setRequestHeader('Authorization', `Bearer ${Usertoken}`);
@@ -3914,13 +4122,13 @@ data:{
 success:function(data){
 if(data.status){//return data as true
     $('.cover-spin').hide();
-    ViewSafari();
+    ViewSafariStock('name',false);
  //console.log(hashfunction);
 
 
 }
 else{
-    alert("something Went Wrong ");
+    alert("something Went Wrong contact Admins ");
     $('.cover-spin').hide();
 }
 

@@ -46,6 +46,7 @@ update();
   }
   isValid(valData){
     isNumberValid.value=valData;
+    update();
   }
   isNumberCorrect(valData){
     isNumber.value=valData;

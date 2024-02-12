@@ -57,10 +57,14 @@ class _GenSpendingCompState extends State<GenSpendingComp> {
   TextEditingController purposeEdit=TextEditingController();
   TextEditingController commentDataEdit=TextEditingController();
   String safariId="none";
+
+
   String safariName="SafariName";
   String options="others";
   num inputData=0;
   int maxLength = 15; // Set your desired maximum length
+
+  String actionStatus="";
 
 
 
@@ -105,6 +109,8 @@ class _GenSpendingCompState extends State<GenSpendingComp> {
 
 
   }
+
+
   Widget listdata(){
     return  Column(
       children: [
@@ -188,11 +194,11 @@ class _GenSpendingCompState extends State<GenSpendingComp> {
                 ),
                 trailing:GestureDetector(
                     onTap: () async{
-
+                    formReset();
                       addSpending();
 
                     },
-                    child:const Icon(Icons.grid_view,color:Colors.orange)
+                    child:const Icon(Icons.currency_exchange,size:35,color:Colors.orange)
                 )
 
               //trailing: Text()
@@ -333,11 +339,19 @@ class _GenSpendingCompState extends State<GenSpendingComp> {
                                 IconButton(
                                   icon: const Icon(Icons.edit),
                                   onPressed: () {
+                                    updateSpending(_data[index]);
                                     // Handle the first icon tap
+
+                                  },
+                                ),
+
+                                IconButton(
+                                  icon: const Icon(Icons.delete_forever,color:Colors.redAccent),
+                                  onPressed: () async{
                                     Get.dialog(
                                       AlertDialog(
-                                        title: const Text('Confirmation'),
-                                        content: Text('Do you want to Edit ${_data[index]['OrderId']} ?'),
+                                        title: const Text('Delete'),
+                                        content: Text('Do you want to Delete ${_data[index]['spendId']} ?'),
                                         actions: [
                                           ElevatedButton(
                                             style: ElevatedButton.styleFrom(
@@ -347,45 +361,17 @@ class _GenSpendingCompState extends State<GenSpendingComp> {
                                               elevation:0,
                                             ),
                                             onPressed: () async{
-                                              if(isLoading) return;
-                                              isLoading=true;
-
-                                              var resultData=(await StockQuery().editOrder(Topups(uid:_data[index]['OrderId']))).data;
-
-                                              if(resultData["status"])
-                                              {
-
-
-
-                                                if(resultData["result"]!=0)
-                                                {
-                                                  Get.toNamed('/home');
-                                                }
-                                                else{
-                                                  setState(() {
-                                                    isLoading=false;
-                                                    hasMoreData=false;
-                                                    _data.clear();
+                                              setState(() {
+                                                actionStatus="delete_OtherSpending";
+                                              });
+                                              uidEdit.text=_data[index]["spendId"];
+                                              balance.text=_data[index]["spending"];
+                                              purpose.text=_data[index]["purpose"];
+                                              commentData.text=_data[index]["commentData"];
 
 
-                                                  });
-                                                }
-
-
-
-
-                                              }
-                                              else{
-                                                setState(() {
-                                                  isLoading=false;
-                                                  hasMoreData=false;
-                                                  _data.clear();
-
-
-                                                });
-                                              }
-
-
+                                              updateSpendingMethod();
+                                             // Get.back();
                                             },
                                             child: const Text('Yes'),
                                           ),
@@ -398,36 +384,6 @@ class _GenSpendingCompState extends State<GenSpendingComp> {
                                         ],
                                       ),
                                     );
-                                  },
-                                ),
-
-                                IconButton(
-                                  icon: const Icon(Icons.grid_view,color:Colors.orange),
-                                  onPressed: () async{
-                                    // This function will be called when the icon is tapped.
-                                    // thisOrder(_data[index],index);
-
-
-
-                                    orderData=_data[index].values.toList();
-
-
-                                    //print((await thisOrder())["result"]);
-                                    var resultData=(await thisOrder());
-                                    //print(resultData);
-                                    if(resultData["status"]){
-
-
-                                      setState(() {
-                                        isLoading=false;
-                                        thisListOrder.clear();
-
-                                        thisListOrder.addAll(resultData["result"]);
-
-
-                                      });
-                                      viewThisOrder();
-                                    }
                                   },
                                 ),
                               ],
@@ -498,10 +454,23 @@ class _GenSpendingCompState extends State<GenSpendingComp> {
 
 
     _scrollController.dispose();
+    formDispose();
     super.dispose();
   }
 
+  void formReset(){
+    uidEdit.clear();
+    balance.clear();
+    commentData.clear();
+    purpose.clear();
+  }
+  void formDispose(){
+    uidEdit.dispose();
+    balance.dispose();
+    purpose.dispose();
+    commentData.dispose();
 
+  }
 
   Color getRandomColor() {
     Random random = Random();
@@ -915,7 +884,7 @@ class _GenSpendingCompState extends State<GenSpendingComp> {
         (Get.put(StockQuery()).updateHideLoader(true));
 
         (Get.put(StockQuery()).updateClientDebt(resultData["result"]));
-
+formReset();
       }
       else{
         //print(resultData);
@@ -985,23 +954,7 @@ class _GenSpendingCompState extends State<GenSpendingComp> {
                                               child: Stack(
                                                 children: [
 
-                                                  Column(
-                                                    children: [
-
-                                                      Center(
-                                                        child: RichText(
-                                                          text: TextSpan(
-                                                            text: "${(Get.put(StockQuery()).clientDebt)["name"]}",
-                                                            style: DefaultTextStyle.of(context).style,
-                                                            children: const <TextSpan>[
-
-
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
+                                              Text("Add Spending")
 
 
                                                 ],
@@ -1013,49 +966,11 @@ class _GenSpendingCompState extends State<GenSpendingComp> {
                                         subtitle: Row(
                                           mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
-                                            Column(
 
-                                              children: [
-                                                Wrap(
-                                                  crossAxisAlignment: WrapCrossAlignment.center,
-                                                  children: [
-
-                                                    Text("DEPT",style:GoogleFonts.odorMeanChey(fontSize:16,color: Colors.green,fontWeight: FontWeight.w700)),
-
-
-                                                  ],
-                                                ),
-                                                Wrap(
-                                                  crossAxisAlignment: WrapCrossAlignment.center,
-                                                  children: [
-
-                                                    const Icon(Icons.segment,color:Colors.orange,size:13,),
-                                                    Text("${(Get.put(StockQuery()).clientDebt)["debt"]}",style:GoogleFonts.pacifico(fontSize:15,color: Colors.orange,fontWeight: FontWeight.w700)),
-
-
-                                                  ],
-                                                ),
-
-
-
-
-
-
-
-
-                                              ],
-                                            ),
 
                                           ],
                                         ),
-                                        trailing:GestureDetector(
-                                            onTap: () async{
 
-                                              // getDebtWidget();
-
-                                            },
-                                            child:const Icon(Icons.grid_view,color:Colors.orange)
-                                        )
 
                                       //trailing: Text()
                                     ),
@@ -1168,6 +1083,8 @@ class _GenSpendingCompState extends State<GenSpendingComp> {
                                       onPressed: () =>{
                                         //paidDebt()
                                         addSpendingMethod(),
+                                        formReset(),
+
 
                                       }),
                                 ],
@@ -1214,86 +1131,70 @@ class _GenSpendingCompState extends State<GenSpendingComp> {
     });
 
   }
-  editSpendingMethod() async{
+  updateSpendingMethod() async{
+    try {
+      (Get.put(StockQuery()).updateHideLoader(false));
+      var resultData=(await StockQuery().updateSpending(Topups(safariId:safariId,uid:uidEdit.text,amount:balance.text,purpose:purpose.text,optionCase:actionStatus,desc:commentData.text))).data;
+      if(resultData["status"])
+      {
+        formReset();
+        Future.microtask(() {
+          Navigator.of(context).pop();
+        });
+        viewData('test',false);
+        (Get.put(StockQuery()).updateHideLoader(true));
 
-    if(isLoading) return;
-    isLoading=true;
+        (Get.put(StockQuery()).updateClientDebt(resultData["result"]));
 
-    var resultData=(await StockQuery().editSpending(Topups(amount:"$balance",purpose:"$purpose",desc:"$commentData"))).data;
+      }
+      else{
+        //print(resultData);
+        (Get.put(StockQuery()).updateHideLoader(true));
 
-
-    if(resultData["status"])
-    {
-
-      setState(() {
-        isLoading=false;
-        hasMoreData=false;
-
-        if(resultData["result"]!=0)
-        {
-          _data.clear();
-          _data.addAll(resultData["result"]);
-
-        }
+      }
 
 
-      });
-      return true;
+    } catch (e) {
+      (Get.put(StockQuery()).updateHideLoader(true));
     }
-    else{
-      return false;
-    }
+
   }
-  void editSpending(indexData) {
+  void updateSpending(indexData) {
+    print(indexData);
+    actionStatus="Edit_otherSpending";
     uidEdit.text=indexData["spendId"];
-    balanceEdit.text=indexData["spending"];
-    purposeEdit.text=indexData["purpose"];
-    commentDataEdit.text=indexData["commentData"];
+    balance.text=indexData["spending"];
+    purpose.text=indexData["purpose"];
+    commentData.text=indexData["commentData"];
     Get.bottomSheet(
 
       StatefulBuilder(
         builder: (BuildContext context, StateSetter setState) {
           return
-            Container(
+          Stack(
+            children: [
+              Container(
 
-              padding:const EdgeInsets.all(5.0),
-              height: 300,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(30),
-                  topRight: Radius.circular(30),
+                padding:const EdgeInsets.all(5.0),
+                height: 600,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(30),
+                    topRight: Radius.circular(30),
+                  ),
                 ),
-              ),
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 10.0,),
-                      const Center(child: Text("Edit Spending")),
-                      Center(child: Text("${indexData["spendId"]}")),
-                      const SizedBox(height: 10.0,),
-                      TextField(
-                        controller: uidEdit,
-
-                        keyboardType: TextInputType.number,
-                        //obscureText: true,
-                        decoration: const InputDecoration(
-                          contentPadding: EdgeInsets.symmetric(vertical: 3,horizontal: 3),
-                          border: OutlineInputBorder(),
-                          labelText: 'Enter Amount',
-                          hintText: 'Enter Amount',
-                          hintStyle: TextStyle(
-                            color: Colors.grey,
-                          ),
-
-                        ),
-
-
-                      ),
-                      TextField(
-                          controller: balanceEdit,
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 10.0,),
+                        const Center(child: Text("Edit Spending")),
+                        Center(child: Text("${indexData["spendId"]}")),
+                        const SizedBox(height: 10.0,),
+                        TextField(
+                          controller: uidEdit,
 
                           keyboardType: TextInputType.number,
                           //obscureText: true,
@@ -1307,74 +1208,119 @@ class _GenSpendingCompState extends State<GenSpendingComp> {
                             ),
 
                           ),
-                          onChanged: (text) {
-                            if((double.tryParse(text) != null)){
-                              balanceEdit.text=text.toString();
-                              setState(() {
-                                btnExpenseEditHide=true;
 
-                              });
-                            }
-                            else{
-                              btnExpenseEditHide=false;
-                            }
-                          }
-
-                      ),
-                      const SizedBox(height: 10.0,),
-                      TextField(
-                        controller: purposeEdit,
-
-
-                        //obscureText: true,
-                        decoration: const InputDecoration(
-                          contentPadding: EdgeInsets.symmetric(vertical: 3,horizontal: 3),
-                          border: OutlineInputBorder(),
-                          labelText: 'Purpose',
-                          hintText: 'Purpose',
-                          hintStyle: TextStyle(
-                            color: Colors.grey,
-                          ),
 
                         ),
-                      ),
-                      const SizedBox(height: 10.0,),
-                      TextField(
+                        const SizedBox(height: 10.0,),
 
-                        controller:commentDataEdit,
-                        keyboardType: TextInputType.multiline,
-                        maxLines: null,
-                        //obscureText: true,
-                        decoration: const InputDecoration(
-                          contentPadding: EdgeInsets.symmetric(vertical: 3,horizontal: 3),
-                          border: OutlineInputBorder(),
-                          labelText: 'Comment',
-                          hintText: 'Comment',
-                          hintStyle: TextStyle(
-                            color: Colors.grey,
+                        TextField(
+                          // controller: uidEdit,
+
+                          keyboardType: TextInputType.number,
+                          //obscureText: true,
+                          decoration: const InputDecoration(
+                            contentPadding: EdgeInsets.symmetric(vertical: 3,horizontal: 3),
+                            border: OutlineInputBorder(),
+                            labelText: 'Enter Amount',
+                            hintText: 'Enter Amount',
+                            hintStyle: TextStyle(
+                              color: Colors.grey,
+                            ),
+
                           ),
+                          controller: balance,
+                          onChanged: (value){
+                            if((num.tryParse(value) != null)){
+
+
+
+
+                            }
+
+
+
+
+                          },
+
 
                         ),
-                      ),
 
-                      const SizedBox(height: 10.0,),
-                      if(btnExpenseEditHide)
+                        const SizedBox(height: 10.0,),
+                        TextField(
+                          controller: purpose,
+
+
+                          //obscureText: true,
+                          decoration: const InputDecoration(
+                            contentPadding: EdgeInsets.symmetric(vertical: 3,horizontal: 3),
+                            border: OutlineInputBorder(),
+                            labelText: 'Purpose',
+                            hintText: 'Purpose',
+                            hintStyle: TextStyle(
+                              color: Colors.grey,
+                            ),
+
+                          ),
+                        ),
+                        const SizedBox(height: 10.0,),
+                        TextField(
+
+                          controller:commentData,
+                          keyboardType: TextInputType.multiline,
+                          maxLines: null,
+                          //obscureText: true,
+                          decoration: const InputDecoration(
+                            contentPadding: EdgeInsets.symmetric(vertical: 3,horizontal: 3),
+                            border: OutlineInputBorder(),
+                            labelText: 'Comment',
+                            hintText: 'Comment',
+                            hintStyle: TextStyle(
+                              color: Colors.grey,
+                            ),
+
+                          ),
+                        ),
+
+                        const SizedBox(height: 10.0,),
+                        //if(btnExpenseEditHide)
                         FloatingActionButton.extended(
-                            label: const Text('Submit Expense'), // <-- Text
+                            label: const Text('update'), // <-- Text
                             backgroundColor: Colors.black,
                             icon: const Icon( // <-- Icon
                               Icons.thumb_up,
                               size: 24.0,
                             ),
                             onPressed: () =>{
-                              editSpendingMethod()
+
+                              updateSpendingMethod(),
+
 
                             }),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
-            );
+              GetBuilder<StockQuery>(
+                builder: (myLoadercontroller) {
+                  //return Text('Data: ${_controller.data}');
+                  return
+                    (myLoadercontroller.hideLoader)?
+                    const Text(""):
+                    Positioned.fill(
+                      child: Center(
+                        child: Container(
+                          alignment: Alignment.center,
+                          color: Colors.white70,
+                          child: const CircularProgressIndicator(),
+                        ),
+                      ),
+                    );
+                },
+              ),
+            ],
+          )
+            ;
         },
       ),
     ).whenComplete(() {

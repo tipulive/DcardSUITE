@@ -39,6 +39,7 @@ class _SetStockCompState extends State<SetStockComp> {
 
 
 
+
   bool showOveray=false;
 
 

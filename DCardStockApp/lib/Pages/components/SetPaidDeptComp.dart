@@ -1234,36 +1234,7 @@ class _SetPaidDeptCompState extends State<SetPaidDeptComp> {
     });
 
   }
-  editSpendingMethod() async{
 
-    if(isLoading) return;
-    isLoading=true;
-
-    var resultData=(await StockQuery().editSpending(Topups(amount:"$balance",purpose:"$purpose",desc:"$commentData"))).data;
-
-
-    if(resultData["status"])
-    {
-
-      setState(() {
-        isLoading=false;
-        hasMoreData=false;
-
-        if(resultData["result"]!=0)
-        {
-          _data.clear();
-          _data.addAll(resultData["result"]);
-
-        }
-
-
-      });
-      return true;
-    }
-    else{
-      return false;
-    }
-  }
 
 
 

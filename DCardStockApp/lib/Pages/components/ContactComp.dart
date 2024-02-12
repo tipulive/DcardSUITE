@@ -13,25 +13,30 @@ import 'package:flutter/material.dart';
 
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../Query/CardQuery.dart';
+import '../../models/Admin.dart';
+import '../../models/CardModel.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
+import '../../../Utilconfig/ConstantClassUtil.dart';
 
 
 
 
-class StockSpendingComp extends StatefulWidget {
-  const StockSpendingComp({Key? key}) : super(key: key);
+class ContactComp extends StatefulWidget {
+  const ContactComp({Key? key}) : super(key: key);
 
   @override
-  State<StockSpendingComp> createState() => _StockSpendingCompState();
+  State<ContactComp> createState() => _ContactCompState();
 }
 
-class _StockSpendingCompState extends State<StockSpendingComp> {
+class _ContactCompState extends State<ContactComp> {
 
   final ScrollController _scrollController = ScrollController();// detect scroll
   final List<dynamic> _data = [];
   List<dynamic> thisListOrder = [];
   List<dynamic> orderData = [];
 
-
+  ConstantClassUtil constantUtil = ConstantClassUtil();
   var bottomResult=[];
   num countData=0;
   var resultData="";
@@ -57,13 +62,36 @@ class _StockSpendingCompState extends State<StockSpendingComp> {
   TextEditingController purposeEdit=TextEditingController();
   TextEditingController commentDataEdit=TextEditingController();
   String safariId="none";
+
+
   String safariName="SafariName";
-  String options="SafariSpending";
+  String options="others";
   num inputData=0;
   int maxLength = 15; // Set your desired maximum length
 
   String actionStatus="";
+  int limitData=10;
+  String sortOrderVal="ASC";
 
+  String phoneNumber="none";
+
+
+  TextEditingController uidData=TextEditingController();
+  TextEditingController name=TextEditingController();
+  TextEditingController email=TextEditingController();
+
+  TextEditingController uidInput=TextEditingController();
+
+  TextEditingController uidInput4=TextEditingController(text:"+243");
+  TextEditingController initCountry=TextEditingController(text:"CD");
+  TextEditingController uidInput5=TextEditingController(text:"Congo,Democratic Republic of the Congo");
+  TextEditingController password=TextEditingController();
+  TextEditingController status=TextEditingController(text:"card");
+  TextEditingController carduid=TextEditingController();
+
+  bool isValid = false;
+  bool isSubmit=false;
+  bool isQrShow=false;
 
 
 
@@ -105,6 +133,8 @@ class _StockSpendingCompState extends State<StockSpendingComp> {
 
 
   }
+
+
   Widget listdata(){
     return  Column(
       children: [
@@ -192,7 +222,7 @@ class _StockSpendingCompState extends State<StockSpendingComp> {
                       addSpending();
 
                     },
-                    child:const Icon(Icons.currency_exchange,color:Colors.red)
+                    child:const Icon(Icons.currency_exchange,size:35,color:Colors.orange)
                 )
 
               //trailing: Text()
@@ -216,7 +246,20 @@ class _StockSpendingCompState extends State<StockSpendingComp> {
             ),
             onChanged: (text) async{
 
-              viewData(text,true);
+    if((int.tryParse(text) != null)){
+      setState(() {
+        phoneNumber=text;
+      });
+      viewData(text,true);
+    }
+    else{
+
+      setState(() {
+        phoneNumber="none";
+      });
+      viewData(text,true);
+    }
+
 
               //print(this._data[index]["total_var"]);
               // print("Text changed to: $text");
@@ -268,7 +311,7 @@ class _StockSpendingCompState extends State<StockSpendingComp> {
                                         padding: const EdgeInsets.fromLTRB(0, 10, 0, 2),
                                         child: RichText(
                                           text: TextSpan(
-                                            text: "${_data[index]['purpose']}",
+                                            text: "${_data[index]['name']}",
                                             style: DefaultTextStyle.of(context).style,
                                             children: const <TextSpan>[
 
@@ -299,21 +342,13 @@ class _StockSpendingCompState extends State<StockSpendingComp> {
                                     crossAxisAlignment: WrapCrossAlignment.center,
                                     children: [
 
-                                      const Icon(Icons.segment,color:Colors.orange,size:13,),
-                                      Text("${(_data[index]['spendId']).toLowerCase()}"),
+
+                                      Text(constantUtil.truncateWithEllipsis("${(_data[index]['PhoneNumber']).toLowerCase()}", 15)),
 
                                     ],
                                   ),
 
-                                  Wrap(
-                                    crossAxisAlignment: WrapCrossAlignment.center,
-                                    children: [
 
-                                      const Icon(Icons.segment,color:Colors.orange,size:13,),
-                                      Text("Amount:${_data[index]['spending']}"),
-
-                                    ],
-                                  ),
 
 
 
@@ -333,16 +368,15 @@ class _StockSpendingCompState extends State<StockSpendingComp> {
                                 IconButton(
                                   icon: const Icon(Icons.edit),
                                   onPressed: () {
-                                    // Handle the first icon tap
                                     updateSpending(_data[index]);
+                                    // Handle the first icon tap
+
                                   },
                                 ),
 
                                 IconButton(
-                                  icon: const Icon(Icons.delete_forever,color:Colors.red),
+                                  icon: const Icon(Icons.delete_forever,color:Colors.redAccent),
                                   onPressed: () async{
-                                    // This function will be called when the icon is tapped.
-                                    // thisOrder(_data[index],index);
                                     Get.dialog(
                                       AlertDialog(
                                         title: const Text('Delete'),
@@ -357,8 +391,7 @@ class _StockSpendingCompState extends State<StockSpendingComp> {
                                             ),
                                             onPressed: () async{
                                               setState(() {
-                                                actionStatus="delete_SafariSpending";
-                                                safariId=_data[index]["safariId"];
+                                                actionStatus="delete_OtherSpending";
                                               });
                                               uidEdit.text=_data[index]["spendId"];
                                               balance.text=_data[index]["spending"];
@@ -367,7 +400,7 @@ class _StockSpendingCompState extends State<StockSpendingComp> {
 
 
                                               updateSpendingMethod();
-
+                                              // Get.back();
                                             },
                                             child: const Text('Yes'),
                                           ),
@@ -448,8 +481,9 @@ class _StockSpendingCompState extends State<StockSpendingComp> {
   @override
   void dispose() {
 
-    formDispose();
+
     _scrollController.dispose();
+    formDispose();
     super.dispose();
   }
 
@@ -466,7 +500,6 @@ class _StockSpendingCompState extends State<StockSpendingComp> {
     commentData.dispose();
 
   }
-
 
   Color getRandomColor() {
     Random random = Random();
@@ -488,9 +521,6 @@ class _StockSpendingCompState extends State<StockSpendingComp> {
 
   quickData()
   {
-    Map<String, dynamic> arguments = Get.arguments as Map<String, dynamic>;
-    safariId=arguments["safariId"];
-    safariName=arguments["safariName"];
     viewData('test',false);
 
   }
@@ -500,8 +530,9 @@ class _StockSpendingCompState extends State<StockSpendingComp> {
     isLoading=true;
     int limit=10;
 
+    var resultData=(await StockQuery().searchUser(User(uid:"",name:nameVal,phone:phoneNumber,platform:"4000",status:"offNotPick"),Topups(optionCase:"false",startlimit:limitData,searchOption:searchVal,sortOrder:sortOrderVal))).data;
 
-    var resultData=(await StockQuery().viewSpending(Topups(startlimit:limit,endlimit:_page,name:nameVal,searchOption:searchVal,optionCase:options,uid:safariId))).data;
+
 
     if(resultData["status"])
     {
@@ -873,13 +904,60 @@ class _StockSpendingCompState extends State<StockSpendingComp> {
     });
 
   }
-  addSpendingMethod() async{
+  getDataFromNo(phoneNumber) async{
+
+    uidData.text="";
+    name.text="";
+    email.text="";
+    //initCountry.text="";
+    password.text="";
+    setState(() {
+      isLoading=true;
+    });
+
+    var resultData=(await CardQuery().getNumberDetailCardOnline(Admin(uid: "tets", subscriber: "test",phone:phoneNumber,Ccode: uidInput4.text))).data;
+    print(resultData);
+    if(resultData["status"])
+    {
+      uidData.text=resultData["UserDetail"]["uid"];
+      name.text="${resultData["UserDetail"]["name"]} Exist";
+      email.text=resultData["UserDetail"]["email"];
+      initCountry.text=resultData["UserDetail"]["initCountry"];
+      password.text=resultData["UserDetail"]["password"]??'none';
+      Get.put(HideShowState()).isValid(false);
+      //print(resultData);
+      setState(() {
+        isValid=true;
+        isLoading=false;
+      });
+    }
+    else{
+      Get.put(HideShowState()).isValid(true);
+      uidData.text="";
+      name.text="";
+      email.text="";
+     // initCountry.text="";
+      password.text="";
+      setState(() {
+        isValid=false;
+        isLoading=false;
+      });
+
+
+
+    }
+  }
+  addUserMethod() async{
 
     try {
       (Get.put(StockQuery()).updateHideLoader(false));
-      var resultData=(await StockQuery().addSpending(Topups(uid:safariId,name:safariName,amount:"$inputData",purpose:purpose.text,desc:commentData.text,optionCase:options))).data;
+      var resultData=(await CardQuery().CreateAssignCardEventOnline(CardModel(uid:"none"),Admin(phone:uidInput.text,name:name.text,email:email.text,Ccode:uidInput4.text,initCountry:initCountry.text,country:uidInput5.text,password:password.text,uid: "no need", subscriber:"no need",status:"noCard"))).data;
+     //print(resultData);
       if(resultData["status"])
       {
+        setState(() {
+          sortOrderVal="DESC";
+        });
         viewData('test',false);
         (Get.put(StockQuery()).updateHideLoader(true));
 
@@ -941,69 +1019,36 @@ class _StockSpendingCompState extends State<StockSpendingComp> {
                                     ),
 
                                     child: ListTile(
-                                        leading: CircleAvatar(
-                                          backgroundColor:getRandomColor(),
-                                          child: Icon(_getRandomIcon()),
-                                        ),
-                                        title:Row(
-                                          children: [
+                                      leading: CircleAvatar(
+                                        backgroundColor:getRandomColor(),
+                                        child: Icon(_getRandomIcon()),
+                                      ),
+                                      title:Row(
+                                        children: [
 
 
-                                            Expanded(
-                                              flex: 1,
-                                              child: Stack(
-                                                children: [
-
-                                                  Column(
-                                                    children: [
-
-
-                                                    ],
-                                                  ),
-
-
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-
-                                        subtitle: Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            Column(
-
+                                          Expanded(
+                                            flex: 1,
+                                            child: Stack(
                                               children: [
-                                                Wrap(
-                                                  crossAxisAlignment: WrapCrossAlignment.center,
-                                                  children: [
 
-                                                    Text("Add Safari Spending",style:GoogleFonts.poppins(fontSize:14,color: Colors.green,fontWeight: FontWeight.w700)),
-
-
-                                                  ],
-                                                ),
-
-
-
-
-
-
+                                                Text("Add User")
 
 
                                               ],
                                             ),
+                                          ),
+                                        ],
+                                      ),
 
-                                          ],
-                                        ),
-                                        trailing:GestureDetector(
-                                            onTap: () async{
+                                      subtitle: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
 
-                                              // getDebtWidget();
 
-                                            },
-                                            child:const Icon(Icons.grid_view,color:Colors.orange)
-                                        )
+                                        ],
+                                      ),
+
 
                                       //trailing: Text()
                                     ),
@@ -1033,81 +1078,248 @@ class _StockSpendingCompState extends State<StockSpendingComp> {
                                 children: [
                                   const SizedBox(height: 5.0,),
 
-                                  TextField(
-                                    // controller: uidEdit,
+                                  Container(
+                                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                                    child:  IntlPhoneField(
+                                      initialCountryCode: 'CD',
+                                      controller: uidInput,
+                                      autofocus: true,
 
-                                    keyboardType: TextInputType.number,
-                                    //obscureText: true,
-                                    decoration: const InputDecoration(
-                                      contentPadding: EdgeInsets.symmetric(vertical: 3,horizontal: 3),
-                                      border: OutlineInputBorder(),
-                                      labelText: 'Enter Amount',
-                                      hintText: 'Enter Amount',
+                                      decoration: InputDecoration(
+                                        labelText: 'Phone Number',
+                                        border: OutlineInputBorder(
+                                          borderSide: BorderSide(),
+                                        ),
+                                        suffixIcon:Obx(() => Get.put(HideShowState()).isNumberValid.value?Icon(Icons.done,color:Colors.green,):Icon(Icons.dangerous,color:Colors.red,)),
 
-                                      hintStyle: TextStyle(
-                                        color: Colors.grey,
+
                                       ),
 
+
+                                      onChanged: (phone) async{
+
+                                        if((uidInput.text).isPhoneNumber)
+                                        {
+
+                                          getDataFromNo(phone.number);
+
+
+
+                                        }
+                                        else{
+                                          Get.put(HideShowState()).isValid(false);
+                                          uidData.text="";
+                                          name.text="";
+                                          email.text="";
+                                         // initCountry.text="";
+                                          password.text="";
+                                        }
+
+
+                                        //uidInput4.text=phone.countryCode;
+                                        //uidInput2.text=phone.number;
+                                        // uidInput2.text=phone.countryISOCode;
+                                        //print(phone.completeNumber);
+
+
+
+                                      },
+
+                                      onCountryChanged: (country) {
+
+                                        uidInput4.text="+"+country.dialCode;
+                                        uidInput5.text=country.name;
+                                        initCountry.text=country.code;
+
+                                        if((uidInput.text).isPhoneNumber)
+                                        {
+
+                                          getDataFromNo(uidInput.text);
+
+                                        }
+                                        else{
+                                          Get.put(HideShowState()).isValid(false);
+                                          uidData.text="";
+                                          name.text="";
+                                          email.text="";
+                                         // initCountry.text="";
+                                          password.text="";
+                                        }
+                                        // print('Country changed to: ' + country.name);
+                                        // print('Country changed to: ' + country.dialCode);
+                                      },
                                     ),
-                                    onChanged: (value){
-                                      if((num.tryParse(value) != null)){
-                                        setState((){
-                                          inputData=num.parse(value);
-
-                                          //print(value);
-                                        });
-
-
-
-                                      }
-
-
-
-
-                                    },
-
-
                                   ),
-                                  const SizedBox(height: 10.0,),
-                                  TextField(
-                                    controller: purpose,
+                                  Visibility(
+                                    visible: false,
+                                    child: TextField(
+                                      controller: uidData,
+                                      //obscureText: true,
+                                      decoration: InputDecoration(
+                                        contentPadding: const EdgeInsets.symmetric(vertical: 3,horizontal: 3),
+                                        border: OutlineInputBorder(),
+                                        labelText: 'uid',
+                                        hintText: 'uid',
+                                        hintStyle: TextStyle(
+                                          color: Colors.grey,
+                                        ),
 
-                                    maxLength: maxLength,
-                                    //obscureText: true,
-                                    decoration: const InputDecoration(
-                                      contentPadding: EdgeInsets.symmetric(vertical: 3,horizontal: 3),
-                                      border: OutlineInputBorder(),
-                                      labelText: 'Enter  purpose Maximum 15',
-                                      hintText: 'Purpose',
-                                      hintStyle: TextStyle(
-                                        color: Colors.grey,
                                       ),
-
                                     ),
                                   ),
-                                  const SizedBox(height: 10.0,),
-                                  TextField(
+                                  Container(
+                                    padding: EdgeInsets.fromLTRB(16,0, 16, 0),
+                                    child: TextField(
+                                      controller: name,
+                                      //obscureText: true,
+                                      decoration: InputDecoration(
+                                        contentPadding: const EdgeInsets.symmetric(vertical: 3,horizontal: 3),
+                                        border: OutlineInputBorder(),
 
-                                    controller:commentData,
-                                    keyboardType: TextInputType.multiline,
-                                    maxLines: null,
-                                    //obscureText: true,
-                                    decoration: const InputDecoration(
-                                      contentPadding: EdgeInsets.symmetric(vertical: 3,horizontal: 3),
-                                      border: OutlineInputBorder(),
-                                      labelText: 'Comment',
-                                      hintText: 'Comment',
-                                      hintStyle: TextStyle(
-                                        color: Colors.grey,
+                                        labelText: 'name',
+                                        hintText: 'name',
+                                        hintStyle: TextStyle(
+                                          color: Colors.grey,
+                                        ),
+
+
                                       ),
-
                                     ),
                                   ),
+                                  Visibility(
+                                    visible: false,
+                                    child: TextField(
+                                      controller: email,
+                                      //obscureText: true,
+                                      decoration: InputDecoration(
+                                        contentPadding: const EdgeInsets.symmetric(vertical: 3,horizontal: 3),
+                                        border: OutlineInputBorder(),
+                                        labelText: 'email',
+                                        hintText: 'email',
+                                        hintStyle: TextStyle(
+                                          color: Colors.grey,
+                                        ),
+
+                                      ),
+                                    ),
+                                  ),
+
+                                  Visibility(
+                                    visible:false,
+                                    child: TextField(
+                                      controller: uidInput4,
+                                      //obscureText: true,
+                                      decoration: InputDecoration(
+                                        contentPadding: const EdgeInsets.symmetric(vertical: 3,horizontal: 3),
+                                        border: OutlineInputBorder(),
+                                        labelText: 'Ccode',
+                                        hintText: 'Ccode',
+                                        hintStyle: TextStyle(
+                                          color: Colors.grey,
+                                        ),
+
+                                      ),
+                                    ),
+                                  ),
+                                  Visibility(
+                                    visible: false,
+                                    child: TextField(
+                                      controller: uidInput5,
+                                      //obscureText: true,
+                                      decoration: InputDecoration(
+                                        contentPadding: const EdgeInsets.symmetric(vertical: 3,horizontal: 3),
+                                        border: OutlineInputBorder(),
+                                        labelText: 'Country',
+                                        hintText: 'Enter Country',
+                                        hintStyle: TextStyle(
+                                          color: Colors.grey,
+                                        ),
+
+                                      ),
+                                    ),
+                                  ),
+                                  Visibility(
+                                    visible: false,
+                                    child: TextField(
+                                      controller: initCountry,
+                                      //obscureText: true,
+                                      decoration: InputDecoration(
+                                        contentPadding: const EdgeInsets.symmetric(vertical: 3,horizontal: 3),
+                                        border: OutlineInputBorder(),
+                                        labelText: 'Country',
+                                        hintText: 'Enter Country',
+                                        hintStyle: TextStyle(
+                                          color: Colors.grey,
+                                        ),
+
+                                      ),
+                                    ),
+                                  ),
+                                  Visibility(
+                                    visible:false,
+                                    child: TextField(
+                                      controller:password,
+                                      //obscureText: true,
+                                      decoration: InputDecoration(
+                                        contentPadding: const EdgeInsets.symmetric(vertical: 3,horizontal: 3),
+                                        border: OutlineInputBorder(),
+                                        labelText: 'password',
+                                        hintText: 'password',
+                                        hintStyle: TextStyle(
+                                          color: Colors.grey,
+                                        ),
+
+                                      ),
+                                    ),
+                                  ),
+                                  Visibility(
+                                    visible:false,
+                                    child: TextField(
+                                      controller:status,
+                                      //obscureText: true,
+                                      decoration: InputDecoration(
+                                        contentPadding: const EdgeInsets.symmetric(vertical: 3,horizontal: 3),
+                                        border: OutlineInputBorder(),
+                                        labelText: 'status',
+                                        hintText: 'status',
+                                        hintStyle: TextStyle(
+                                          color: Colors.grey,
+                                        ),
+
+                                      ),
+                                    ),
+                                  ),
+                                  Visibility(
+                                    visible: false,
+                                    child: Container(
+                                      padding: EdgeInsets.fromLTRB(16,16,16,0),
+                                      child: TextField(
+                                        controller:carduid,
+                                        //obscureText: true,
+                                        decoration: InputDecoration(
+                                          contentPadding: const EdgeInsets.symmetric(vertical: 3,horizontal: 3),
+                                          border: OutlineInputBorder(),
+                                          labelText: 'cardui',
+                                          hintText: 'cardui',
+                                          hintStyle: TextStyle(
+                                            color: Colors.grey,
+                                          ),
+
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  //Qr Show
+
+                                  //Qr Show
+
+
+
+
 
                                   const SizedBox(height: 5.0,),
-
-                                  FloatingActionButton.extended(
-                                      label: const Text('Paid Dept'), // <-- Text
+                                  Obx(() => Get.put(HideShowState()).isNumberValid.value?FloatingActionButton.extended(
+                                      label: const Text('Add User'), // <-- Text
                                       backgroundColor: Colors.black,
                                       icon: const Icon( // <-- Icon
                                         Icons.thumb_up,
@@ -1115,9 +1327,14 @@ class _StockSpendingCompState extends State<StockSpendingComp> {
                                       ),
                                       onPressed: () =>{
                                         //paidDebt()
-                                        addSpendingMethod(),
+                                        addUserMethod(),
+                                        formReset(),
 
-                                      }),
+
+                                      }):Text("")),
+
+
+
                                 ],
                               ),
                             ),
@@ -1191,8 +1408,8 @@ class _StockSpendingCompState extends State<StockSpendingComp> {
 
   }
   void updateSpending(indexData) {
-    actionStatus="Edit_SafariSpending";
-    safariId=indexData["safariId"];
+    print(indexData);
+    actionStatus="Edit_otherSpending";
     uidEdit.text=indexData["spendId"];
     balance.text=indexData["spending"];
     purpose.text=indexData["purpose"];
@@ -1360,8 +1577,6 @@ class _StockSpendingCompState extends State<StockSpendingComp> {
     });
 
   }
-
-
 
 
 

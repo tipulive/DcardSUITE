@@ -98,6 +98,55 @@ class AuthUserRegisterController extends Controller
          ],200);
         }
         else{
+            if($input["actionStatus"]==="noCard")
+            {
+                $uid=preg_replace('/[^A-Za-z0-9-]/','',$input['name']);//generated on production
+                //echo $this->today;
+                $uid=$uid.""."_".date(time());
+                        $check=DB::table("users")
+                        ->insert([
+                            'name'=>strtolower($input['name']),
+
+                            //'fname'=>$input['fname'],
+                            //'lname'=>$input['lname'],
+                            'email'=>$email??'none',
+                            'Ccode'=>$input['Ccode']??'none',//country code
+                            'phone'=>$input['phone']??'none',
+                            'PhoneNumber'=>$PhoneNumber,
+                            'uidCreator'=>Auth::user()->uid,
+
+                            'subscriber'=>Auth::user()->subscriber,
+                            'platform'=>env('PLATFORM4'),
+                            'password' =>bcrypt($input['password']),
+                            //'passdecode' =>$input['password'],
+                            'initCountry'=>$input['initCountry'],
+                            'country'=>$input['country'],
+                            "carduid"=>$input["carduid"]??'none',
+                            'uid'=>$uid,
+                            'created_at'=>$this->today,
+
+                        ]);
+                        if($check)
+                        {
+
+                            return response([
+                                "status"=>true,
+                                "result"=>$check
+
+
+                            ],200);
+
+
+                        }
+                        else{
+                         return response([
+                             "status"=>false,
+                             "result"=>$check,
+
+                         ],200);
+                        }
+            }
+            else{
 
             $carduid=$input["carduid"];
             $checkCard=DB::update("update cards set status='Assigned',updated_at=:updated_at where uid=:uid and status='none' limit 1",array(
@@ -159,6 +208,8 @@ class AuthUserRegisterController extends Controller
                     "result"=>"Card is Invalid or already Assigned",
 
                 ],200);
+            }
+
             }
 
 

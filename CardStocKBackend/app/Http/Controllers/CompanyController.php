@@ -163,6 +163,34 @@ class CompanyController extends Controller
             ],200);
         }
     }
+    public function DeleteSafariStock(Request $request) {
+        if(Auth::check())
+        {
+
+            if(Auth::user()->platform==$this->platform1)
+            {
+                $input=$request->all();
+
+                return (new StockController)->DeleteSafariStock($input);
+            }
+            else{
+                return response([
+                    "status"=>false,
+                    "result"=>$this->Admin_Auth_result_error,
+                    "error"=>$this->Admin_Auth_error,
+
+                ],200);
+            }
+        }
+        else{
+            return response([
+                "status"=>false,
+                "result"=>$this->Admin_Auth_result_error,
+                "error"=>$this->Admin_Auth_error,
+
+            ],200);
+        }
+    }
     public function printQrProduct(Request $request) {
         if(Auth::check())
         {
@@ -247,6 +275,35 @@ class CompanyController extends Controller
             ],200);
         }
     }
+    public function IsProductExist(Request $request) {
+        if(Auth::check())
+        {
+
+            if(Auth::user()->platform==$this->platform1)
+            {
+                $input=$request->all();
+
+                return (new StockController)->IsProductExist($input);
+            }
+            else{
+                return response([
+                    "status"=>false,
+                    "result"=>$this->Admin_Auth_result_error,
+                    "error"=>$this->Admin_Auth_error,
+
+                ],200);
+            }
+        }
+        else{
+            return response([
+                "status"=>false,
+                "result"=>$this->Admin_Auth_result_error,
+                "error"=>$this->Admin_Auth_error,
+
+            ],200);
+        }
+    }
+
     public function CreateStockProduct(Request $request) {
         if(Auth::check())
         {
@@ -276,7 +333,7 @@ class CompanyController extends Controller
         }
     }
 
-    public function EditProductPrice(Request $request) {
+    public function updateProducts(Request $request) {
         if(Auth::check())
         {
 
@@ -284,7 +341,7 @@ class CompanyController extends Controller
             {
                 $input=$request->all();
 
-                return (new StockController)->EditProductPrice($input);
+                return (new StockController)->updateProducts($input);
             }
             else{
                 return response([
@@ -341,6 +398,34 @@ class CompanyController extends Controller
                 $input=$request->all();
 
                 return (new StockController)->EditStockQty($input);
+            }
+            else{
+                return response([
+                    "status"=>false,
+                    "result"=>$this->Admin_Auth_result_error,
+                    "error"=>$this->Admin_Auth_error,
+
+                ],200);
+            }
+        }
+        else{
+            return response([
+                "status"=>false,
+                "result"=>$this->Admin_Auth_result_error,
+                "error"=>$this->Admin_Auth_error,
+
+            ],200);
+        }
+    }
+    public function deleteStockQty(Request $request) {
+        if(Auth::check())
+        {
+
+            if(Auth::user()->platform==$this->platform1)
+            {
+                $input=$request->all();
+
+                return (new StockController)->deleteStockQty($input);
             }
             else{
                 return response([
@@ -1382,7 +1467,7 @@ public function viewRepay(Request $request){
             ],200);
         }
     }
-    public function editSpending(Request $request){
+    public function updateSpending(Request $request){
         if(Auth::check())
         {
 
@@ -1390,7 +1475,7 @@ public function viewRepay(Request $request){
             {
                 $input=$request->all();
 
-                return (new StockController)->editSpending($input);
+                return (new StockController)->updateSpending($input);
             }
             else{
                 return response([

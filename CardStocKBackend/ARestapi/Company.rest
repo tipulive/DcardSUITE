@@ -46,14 +46,15 @@ content-type: application/json;charset=UTF-8
 Authorization: Bearer {{Auth_token}}
 
 {
-"name":"kebine eric Muna",
-"email":"on2@gmail.com",
-"Ccode":"+250",
-"phone":"7823893587",
-"initCountry":"US",
-"country":"Rwanda",
-"password":"1",
-"carduid":"TEALTD_7hEnj_1672352175"
+"name": "fh",
+  "email": "",
+  "Ccode": "+243",
+  "phone": "788888888",
+  "initCountry": "CD",
+  "country": "Congo,Democratic Republic of the Congo",
+  "password": "",
+  "carduid": "none",
+  "actionStatus": "noCard"
 
 }
 ###Edit User and Assign With Card iyi niyo nyayo ikora neza Auth User Register
@@ -648,12 +649,27 @@ Authorization: Bearer {{Auth_token}}
 "name":"gogo",
 "limitData":10,
 "platform":"4000",
-"searchOption":"true"
+"searchOption":"false",
+"isAdmin":"true",
+"isStatus":"true"
 
 
 
 }
+### Update ProductName,Update Product Price,Pcs
+GET  {{baseUrl}}/updateProducts
+content-type: application/json;charset=UTF-8
+Authorization: Bearer {{Auth_token}}
 
+{
+"productCode":"bibero4",
+"productName":"bibero2",
+"pcs":"56",
+"price":"40",
+
+"actionStatus":"updateProductName"
+
+}
 ###Search productCode or productName  done or i may search both productCode and productName together
 ### either productCode equal none or productName equal none
 ### when $productQr is available means Search By Qr
@@ -662,12 +678,13 @@ content-type: application/json;charset=UTF-8
 Authorization: Bearer {{Auth_token}}
 
 {
-"productCode":"bido_1698592481",
-"productName":"none",
-"productQr":"n",
-"isProductAction":"action here search or other",
-"LimitStart":1,  //page
-"LimitEnd":10
+"productCode":"none",
+"productName":"we",
+"productQr":"none",
+"LimitStart":1,
+"LimitEnd":10,
+"isProductAction":"totalStoc",
+"withTotal":"true"
 
 
 
@@ -680,6 +697,17 @@ Authorization: Bearer {{Auth_token}}
 
 {
 "productCode":"webcam_1700726985"
+
+
+}
+#### check if ProductName exist
+GET  {{baseUrl}}/IsProductExist
+content-type: application/json;charset=UTF-8
+Authorization: Bearer {{Auth_token}}
+
+{
+"safariId":"Mbona_tbSwL_1697829219",
+"productCode":"WebCam"
 
 
 }
@@ -696,12 +724,12 @@ Authorization: Bearer {{Auth_token}}
 "uid":"SafariUid",
 "cat":"1",
 "catName":"China",
-"productName":"WebCam",
-"productCode":"0",
+"productCode":"webcam",
+"productName":"0",
 "fact_price":"50",
 "status":"Spendproduct",
 "CommentStatus":"Inserting Product",
-"price":"60",
+"price":"45",
 "qty":"500",
 "pcs":"30",
 "tags":"Phone My Model",
@@ -786,7 +814,7 @@ content-type: application/json;charset=UTF-8
 Authorization: Bearer {{Auth_token}}
 
 {
-"productCode":"webcam_1700726985",
+"productCode":"nyota",
 "uidClient":"kebineericMuna_1674160265",
 "req_qty":5,
 "ref":"test",
@@ -922,7 +950,10 @@ Authorization: Bearer {{Auth_token}}
 
 {
 "safariId":"Mbona_tbSwL_1697829219",
-"name":"Mbona"
+"name":"Mbona",
+"actionStatus":"Search",
+"productSearch":"t",
+"isproductCode":"false"
 
 }
 
@@ -1208,27 +1239,28 @@ content-type: application/json;charset=UTF-8
 Authorization: Bearer {{Auth_token}}
 
 {
-"balance":"40",
+"balance":"44",
 "status":"GeneralSpend",
-"safariId":"GeneralSpend",
+"safariId":"Mbona_tbSwL_1697829219",
 "safariName":"mbona",
-"purpose":"testVikok",
-"commentData":"testViko",
+"purpose":"kibonke",
+"commentData":"beton",
 "systemUid":"PointSales1",
 "options":"pepe"
 
 }
 ###edit Spending not done must have temporary data
-POST  {{baseUrl}}/editSpending
+GET  {{baseUrl}}/updateSpending
 content-type: application/json;charset=UTF-8
 Authorization: Bearer {{Auth_token}}
 
 {
-"uid":"",
-"balance":"40",
-"status":"GeneralSpend",
-"purpose":"testViko",
-"commentData":"testViko",
+"safariId":"Mbona_tbSwL_1697829219",
+"uid":"SAFID_2I_1705801127",
+"amount":"22",
+"actionStatus":"Edit_SafariSpending",
+"purpose":"filipo",
+"commentData":"zuka",
 "systemUid":"PointSales1"
 }
 #### View Depense options is determine if is safari or others,searchoption is describe if is gonna search or not

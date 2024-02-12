@@ -770,8 +770,7 @@ class _SetDeptCompState extends State<SetDeptComp> {
                                                 crossAxisAlignment: WrapCrossAlignment.center,
                                                 children: [
 
-                                                  Text("DEPT",style:GoogleFonts.odorMeanChey(fontSize:16,color: Colors.green,fontWeight: FontWeight.w700)),
-
+                                                  Text("Dept",style:GoogleFonts.poppins(fontSize:14,color: Colors.green,fontWeight: FontWeight.w700)),
 
                                                 ],
                                               ),

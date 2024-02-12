@@ -10,6 +10,7 @@ import '../../../models/Topups.dart';
 import '../../../models/User.dart';
 import 'package:get/get.dart';
 
+import '../../Query/ParticipatedQuery.dart';
 import '../../Query/StockQuery.dart';
 import 'package:flutter/material.dart';
 
@@ -27,7 +28,7 @@ class ProductComp extends StatefulWidget {
 }
 
 class _ProductCompState extends State<ProductComp> {
-
+  double customFontSize=13.0;
   final ScrollController _scrollController = ScrollController();// detect scroll
   final List<dynamic> _data = [];
   List<dynamic> thisListOrder = [];
@@ -57,11 +58,19 @@ class _ProductCompState extends State<ProductComp> {
   final GlobalKey qrkey = GlobalKey(debugLabel: 'QR');
   Barcode?result;
   QRViewController?controller;
+  String productCode1="";
+  String productName1="";
+  String price1="";
+  String pcs="";
+  String actionStatus="updatePrice";
+  String withTotal="true";
+
 
 
 
   bool showOveray=false;
 
+final fontSizeData=13.0;
 
 
   @override
@@ -78,16 +87,23 @@ class _ProductCompState extends State<ProductComp> {
     return Stack(
       children: [
         listdata(),
-        if(showOveray)
-          Positioned.fill(
-            child: Center(
-              child: Container(
-                alignment: Alignment.center,
-                color: Colors.white70,
-                child: const CircularProgressIndicator(),
-              ),
-            ),
-          ),
+        GetBuilder<StockQuery>(
+          builder: (myLoadercontroller) {
+            //return Text('Data: ${_controller.data}');
+            return
+              (myLoadercontroller.hideLoader)?
+              const Text(""):
+              Positioned.fill(
+                child: Center(
+                  child: Container(
+                    alignment: Alignment.center,
+                    color: Colors.white70,
+                    child: const CircularProgressIndicator(),
+                  ),
+                ),
+              );
+          },
+        ),
       ],
     );
     //return Center(child: Text("hello"));
@@ -170,7 +186,7 @@ class _ProductCompState extends State<ProductComp> {
                         children: [
 
                           const Icon(Icons.segment,color:Colors.orange,size:13,),
-                          Text("${(_data.isNotEmpty)?_data[0]['totDept']:0}",style:GoogleFonts.pacifico(fontSize:15,color: Colors.orange,fontWeight: FontWeight.w700)),
+                          Text("${(_data.isNotEmpty)?_data[0]['totalStock']:0}",style:GoogleFonts.pacifico(fontSize:15,color: Colors.orange,fontWeight: FontWeight.w700)),
 
 
 
@@ -322,7 +338,8 @@ class _ProductCompState extends State<ProductComp> {
               {
                 FocusNode test=FocusNode() ;
 
-                this._data[index]['focusNode']=test;
+                _data[index]['focusNode']=test;
+
                 return Card(
                   elevation:0,
                   //margin: EdgeInsets.symmetric(vertical:1,horizontal:5),
@@ -333,73 +350,260 @@ class _ProductCompState extends State<ProductComp> {
                   ),
 
                   child: ListTile(
-                      leading: CircleAvatar(
-                        child: Icon(_getRandomIcon()),
-                        backgroundColor:getRandomColor(),
-                      ),
-                      title:Row(
-                        children: [
-                          Expanded(
-                            flex: 1,
-                            child: Stack(
-                              children: [
+                    leading: CircleAvatar(
+                      backgroundColor:getRandomColor(),
+                      child: Icon(_getRandomIcon()),
+                    ),
+                    title:Row(
+                      children: [
+                        Expanded(
+                          flex: 1,
+                          child: Stack(
+                            children: [
 
-                                Padding(
-                                  padding: const EdgeInsets.fromLTRB(0, 10, 0, 2),
-                                  child: RichText(
-                                    text: TextSpan(
-                                      text: "${_data[index]['productCode']}(${(_data[index]['pcs']=='none')?'0':_data[index]['pcs']} Pcs):",
-                                      style: DefaultTextStyle.of(context).style,
-                                      children: <TextSpan>[
-                                        TextSpan(
-                                          text: " 1X${_data[index]["price"]}",
-                                          style: TextStyle(color: Colors.blue),
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(0, 10, 0, 2),
+                                child:                   Text.rich(
+                                    style: DefaultTextStyle.of(context).style,
+                                    TextSpan(
+                                        children: [
 
 
-                                        ),
+                                          TextSpan(
+                                            style:TextStyle(
+                                                fontSize:fontSizeData
+                                              // color: Colors.blue, // Set the text color to red
 
-                                      ],
-                                    ),
-                                  ),
+                                            ),
+                                            text: '${_data[index]['productCode'].toUpperCase()}',
+
+                                          ),
+                                           TextSpan(
+                                            style:TextStyle(
+                                                fontSize:fontSizeData
+                                              // color: Colors.blue, // Set the text color to red
+
+                                            ),
+                                            text: '(',
+
+                                          ),
+                                          WidgetSpan(
+
+                                            child: IntrinsicWidth(
+
+                                              stepWidth: 0.5,
+                                              child: TextField(
+
+                                                controller: TextEditingController(text:"${(_data[index]['pcs']=='none')?'0':_data[index]['pcs']}"),
+
+                                                keyboardType: TextInputType.number,
+                                                decoration: const InputDecoration(
+                                                  hintText:"",
+                                                  hintStyle: TextStyle(color: Colors.blue),
+                                                  contentPadding: EdgeInsets.all(0),
+                                                  isDense: true,
+
+
+
+                                                ),
+                                                style:TextStyle(
+                                                  color: Colors.blue,
+                                                  fontSize:fontSizeData,
+                                                  // Set the text color to red
+
+                                                ),
+                                                onChanged: (text) {
+                                                  print(text);
+                                                  if((int.tryParse(text) != null)){
+
+                                                    pcs=text;
+                                                    productCode1=_data[index]["productCode"];
+                                                    actionStatus="updatePcs";
+
+                                                  }
+                                                  else{
+                                                    (Get.put(StockQuery()).updateHideaddCart(true));
+                                                  }
+
+
+
+
+                                                },
+                                              ), // set minimum width to 100
+                                            ),
+                                          ),
+                                          TextSpan(
+                                            style:TextStyle(
+                                                fontSize:fontSizeData
+                                              // color: Colors.blue, // Set the text color to red
+
+                                            ),
+                                            text: 'Pcs)',
+
+                                          ),
+
+                                           TextSpan(
+                                            style:TextStyle(
+                                                fontSize:fontSizeData
+                                              // color: Colors.blue, // Set the text color to red
+
+                                            ),
+                                            text: '1X',
+
+                                          ),
+                                          WidgetSpan(
+                                            style: DefaultTextStyle.of(context).style,
+                                            child: IntrinsicWidth(
+                                              stepWidth: 0.5,
+                                              child: TextField(
+                                                controller: TextEditingController(text:"${_data[index]["price"]}"),
+
+                                                keyboardType: TextInputType.number,
+                                                decoration: const InputDecoration(
+                                                  hintText:"",
+                                                  hintStyle: TextStyle(color: Colors.blue),
+                                                  contentPadding: EdgeInsets.all(0),
+                                                  isDense: true,
+
+
+
+                                                ),
+                                                style: TextStyle(
+                                                  color: Colors.blue,
+                                                    fontSize:fontSizeData// Set the text color to red
+
+                                                ),
+                                                onChanged: (text) {
+
+                                                  if((int.tryParse(text) != null)){
+                                                    price1=text;
+                                                    productCode1=_data[index]["productCode"];
+                                                    actionStatus="updatePrice";
+
+                                                  }
+                                                  else{
+
+
+                                                  }
+
+
+
+
+                                                },
+                                              ), // set minimum width to 100
+                                            ),
+                                          ),
+                                        ]
+                                    )
                                 ),
+                              ),
 
 
-                              ],
-                            ),
-                          )
+                            ],
+                          ),
+                        )
 
 
 
 
 
 
+                      ],
+                    ),
+
+                    subtitle: Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 5, 0, 10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+
+
+                              Text("Qty:${num.parse(_data[index]['qty'])-num.parse(_data[index]['qty_sold'])} X ${_data[index]['price']}=${(num.parse(_data[index]['qty'])-num.parse(_data[index]['qty_sold']))*num.parse(_data[index]['price'])}", style:TextStyle(
+                                  fontSize:fontSizeData
+                                // color: Colors.blue, // Set the text color to red
+
+                              ),),
+
+
+                            ],
+
+
+                          ),
+                          SizedBox(height: 5,),
+                          // Text("tags:${_data[index]['tags']}"),
+                          Text.rich(
+                              style: DefaultTextStyle.of(context).style,
+                              TextSpan(
+                                  children: [
+
+                                     TextSpan(
+                                      style:TextStyle(
+                                          fontSize:fontSizeData,
+                                         color: Colors.grey, // Set the text color to red
+
+                                      ),
+                                      text: 'Name:',
+
+                                    ),
+
+                                    WidgetSpan(
+                                      //style: DefaultTextStyle.of(context).style,
+                                      child: IntrinsicWidth(
+                                        //stepWidth: 0.5,
+                                        child:  TextField(
+                                          controller: TextEditingController(text:"${(_data[index]['ProductName']).toUpperCase()}"),
+
+
+                                          decoration: const InputDecoration(
+                                            hintText:"",
+                                            hintStyle: TextStyle(color: Colors.blue),
+                                            contentPadding: EdgeInsets.all(0),
+                                            isDense: true,
+
+
+
+                                          ),
+                                          style:  TextStyle(
+                                              fontSize: fontSizeData
+                                            // color: Colors.blue, // Set the text color to red
+
+                                          ),
+                                          onChanged: (text) {
+                                            print(text);
+
+
+
+                                            productName1=text;
+                                            productCode1=_data[index]["productCode"];
+                                            actionStatus="updateProductName";
+
+
+
+
+
+
+
+                                          },
+                                        ), // set minimum width to 100
+                                      ),
+                                    ),
+                                  ]
+                              )
+
+                          ),
                         ],
                       ),
-
-                      subtitle: Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 5, 0, 10),
-                        child: Wrap(
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          children: [
-
-                            Icon(Icons.segment,color:Colors.orange,size:13,),
-                            Text("tags:${_data[index]['tags']}"),
-
-                          ],
-                        ),
-                      ),
-                      trailing:Container(child:
-                      GestureDetector(
-                          onTap: () async{
-                            // This function will be called when the icon is tapped.
-
-
-                          },
-                          child:Icon(Icons.grid_view,color:Colors.orange)
-                      )
-
-
-                      )
+                    ),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.save,color:Colors.deepOrange), // Replace with your desired icon
+                      onPressed: () {
+                        // Add your button press logic here
+                        updateProducts();
+                      },
+                    ),
 
                     //trailing: Text()
                   ),
@@ -408,11 +612,11 @@ class _ProductCompState extends State<ProductComp> {
               }
               else{
                 return  Padding(
-                  padding:EdgeInsets.symmetric(vertical: 32),
+                  padding:const EdgeInsets.symmetric(vertical: 32),
                   child:Center(
                       child:hasMoreData?
-                      CircularProgressIndicator()
-                          :Text("no more Data")
+                      const CircularProgressIndicator()
+                          :const Text("no more Data")
 
                   ),
                 );
@@ -485,6 +689,73 @@ class _ProductCompState extends State<ProductComp> {
         //
       }
     });
+  }
+
+  resetForm(){
+    setState(() {
+       productCode1="";
+       productName1="";
+     price1="";
+     pcs="";
+     actionStatus="";
+    });
+  }
+  changeProduct(name,val){
+    setState(() {
+      productCode1="";
+      productName1="";
+      price1="";
+      pcs="";
+      actionStatus="";
+    });
+  }
+  updateProducts() async{
+
+
+    try {
+
+      (Get.put(StockQuery()).updateHideLoader(false));
+      var resultData=(await StockQuery().updateProducts(QuickBonus(uid:"${productCode1}",productName:"${productName1}",price:"${price1}",giftPcs:pcs,status:actionStatus))).data;
+      print(resultData);
+      if(resultData["status"])
+      {
+       // resetForm();
+        Get.snackbar("Success", "${productName1}",backgroundColor: Color(0xff9a1c55),
+            colorText: Color(0xffffffff),
+            titleText: Text("Updated Successfully",  style: TextStyle(
+              color: Colors.white, // Set the text color here
+
+            ),),
+
+            icon: Icon(Icons.access_alarm),
+            duration: Duration(seconds: 3));
+        if(actionStatus=="updatePrice")
+          {
+            //await stockTotal("test","totalStock");
+          }
+
+        (Get.put(StockQuery()).updateHideLoader(true));
+
+
+        /* setState(() {
+        (Get.put(StockQuery()).updateClientDebt(resultData["result"][0]));
+
+      });*/
+
+
+
+
+
+      }
+      else{
+        (Get.put(StockQuery()).updateHideLoader(true));
+
+      }
+
+
+    } catch (e) {
+      print(e);
+    }
   }
   getDebt(qrScanData) async{
     try {
@@ -617,7 +888,7 @@ class _ProductCompState extends State<ProductComp> {
     isLoading=true;
     int limit=10;
 
-    var resultData=(await StockQuery().product(QuickBonus(uid:nameVal,productName:productName,status:qrSearch),Topups(optionCase:isProductAction,startlimit:limit,endlimit:_page))).data;
+    var resultData=(await StockQuery().product(QuickBonus(uid:nameVal,productName:productName,status:qrSearch),Topups(optionCase:isProductAction,startlimit:limit,endlimit:_page,purpose:withTotal))).data;
 
 
     if(resultData["status"])
@@ -660,6 +931,38 @@ class _ProductCompState extends State<ProductComp> {
     }
   }
 
+  stockTotal(nameVal,isProductAction) async{
+
+
+    var resultData=(await StockQuery().product(QuickBonus(uid:nameVal,productName:productName,status:qrSearch),Topups(optionCase:isProductAction,startlimit:limit,endlimit:_page,purpose:withTotal))).data;
+
+
+    if(resultData["status"])
+    {
+
+
+
+      if(resultData["result"]!=0)
+      {
+        setState(() {
+
+
+          _data[0]['totalStock']=((resultData["result"])[0]['totalStock']);
+
+        });
+      }
+      else{
+
+      }
+
+
+
+
+    }
+    else{
+
+    }
+  }
   void getDebtWidget() async{
 
     Get.bottomSheet(
@@ -755,9 +1058,9 @@ class _ProductCompState extends State<ProductComp> {
                                               ),
                                               Wrap(
                                                 crossAxisAlignment: WrapCrossAlignment.center,
-                                                children: [
+                                                children: const [
 
-                                                  const Icon(Icons.segment,color:Colors.orange,size:13,),
+                                                  Icon(Icons.segment,color:Colors.orange,size:13,),
 
 
 
@@ -1052,6 +1355,7 @@ class _ProductCompState extends State<ProductComp> {
 
 
                                                 Text.rich(
+                                                    style: DefaultTextStyle.of(context).style,
                                                     TextSpan(
                                                         children: [
                                                           TextSpan(

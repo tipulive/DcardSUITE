@@ -106,14 +106,17 @@ Route::get('/CheckQuickBonus','CompanyController@CompanyPartCheckQuickBonus')->n
 /*new Safari Stocks Code */
 Route::get('/GetSafaris','CompanyController@GetSafaris')->name('GetSafaris');
 Route::post('/CreateSafari','CompanyController@CreateSafari')->name('CreateSafari');
-Route::get('/EditSafari','CompanyController@EditSafari')->name('EditSafari');
+Route::post('/EditSafari','CompanyController@EditSafari')->name('EditSafari');
+Route::post('/DeleteSafariStock','CompanyController@DeleteSafariStock')->name('DeleteSafariStock');
 Route::get('/printQrProduct','CompanyController@printQrProduct')->name('printQrProduct');
 Route::get('/SearchUser','CompanyController@SearchUser')->name('SearchUser');
 Route::get('/Products','CompanyController@Products')->name('Products');
+Route::get('/IsProductExist','CompanyController@IsProductExist')->name('IsProductExist');
 Route::post('/CreateStockProduct','CompanyController@CreateStockProduct')->name('CreateStockProduct');
-Route::post('/EditProductPrice','CompanyController@EditProductPrice')->name('EditProductPrice');
+Route::get('/updateProducts','CompanyController@updateProducts')->name('updateProducts');
 Route::post('/EditProducts','CompanyController@EditProducts')->name('EditProducts');
 Route::post('/EditStockQty','CompanyController@EditStockQty')->name('EditStockQty');
+Route::post('/deleteStockQty','CompanyController@deleteStockQty')->name('deleteStockQty');
 Route::post('/EditStockFactPrice','CompanyController@EditStockFactPrice')->name('EditStockFactPrice');
 Route::get('/updateDataOrder','CompanyController@updateDataOrder')->name('updateDataOrder');
 Route::post('/placeOrder','CompanyController@placeOrder')->name('placeOrder');
@@ -150,7 +153,7 @@ Route::get('/OrderViewCount','CompanyController@OrderViewCount')->name('OrderVie
 Route::get('/OrderViewByUid','CompanyController@OrderViewByUid')->name('OrderViewByUid');
 Route::get('/StockCount','CompanyController@StockCount')->name('StockCount');
 Route::post('/addSpending','CompanyController@addSpending')->name('addSpending');
-Route::post('/editSpending','CompanyController@editSpending')->name('editSpending');
+Route::get('/updateSpending','CompanyController@updateSpending')->name('updateSpending');
 Route::get('/viewSpending','CompanyController@viewSpending')->name('viewSpending');
 /*safari*/
 Route::get('/SafariGetAll','CompanyController@CompanySafariGetAll')->name('CompanySafariGetAll');

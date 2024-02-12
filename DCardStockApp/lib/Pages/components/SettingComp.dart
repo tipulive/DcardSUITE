@@ -31,6 +31,7 @@ import '../SetWithdrawBalancePage.dart';
 
 import '../employePage.dart';
 import '../components/SetSpendingComp.dart';
+import 'ContactComp.dart';
 
 
 
@@ -87,15 +88,17 @@ class _SettingCompState extends State<SettingComp> {
             const SizedBox(height:5,),
             GestureDetector(
                 onTap: (){
-                  dept();
+                  contactFunc();
                 },
-                child: detailsProfile("Dept",Icons.calendar_month_outlined,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,dept)),//Last Time Purchase
+                child: detailsProfile("Contacts",Icons.account_balance,"",0xbfebf1ef,"textright",Icons.arrow_forward,"200\$",0xffffffff,contactFunc)),
+
             const SizedBox(height:5,),
             GestureDetector(
                 onTap: (){
-                  paidDept();
+                  dept();
                 },
-                child: detailsProfile("Paid Dept",Icons.calendar_month_outlined,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,paidDept)),//Last Time Purchase
+                child: detailsProfile("Dept",Icons.calendar_month_outlined,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,dept)),//Last Time Purchase
+       //Last Time Purchase
             const SizedBox(height:5,),
             GestureDetector(
                 onTap: (){
@@ -105,9 +108,17 @@ class _SettingCompState extends State<SettingComp> {
             const SizedBox(height:5,),
             GestureDetector(
                 onTap: (){
+                  product();
+                },
+                child: detailsProfile("Products",Icons.calendar_month_outlined,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,product)),//Last Time Purchase
+            const SizedBox(height:5,),
+            GestureDetector(
+                onTap: (){
                   repay();
                 },
                 child: detailsProfile("Repay",Icons.calendar_month_outlined,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,repay)),
+
+
             const SizedBox(height:5,),
             GestureDetector(
                 onTap: (){
@@ -115,12 +126,7 @@ class _SettingCompState extends State<SettingComp> {
                 },
                 child: detailsProfile("Employee",Icons.calendar_month_outlined,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,employe)),//Last Time Purchase
             const SizedBox(height:5,),
-            GestureDetector(
-                onTap: (){
-                  product();
-                },
-                child: detailsProfile("Products",Icons.calendar_month_outlined,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,product)),//Last Time Purchase
-            const SizedBox(height:5,),
+
             GestureDetector(
                 onTap: (){
                   viewStock();
@@ -460,10 +466,17 @@ quickBoHistfunc() async{
   Get.to(() =>const SetQuickBoHistPage());
 
 }
-
+contactFunc() async{
+  Get.to(() =>SetPage(dynamicMethod: () {
+    return  const ContactComp();
+  }),arguments:{
+    "title":"Contacts",
+  });
+}
 editCardfunc() async{
   Get.to(() =>const SetEditCardNoPage());
 }
+
 logout() async{
   Get.dialog(
     AlertDialog(

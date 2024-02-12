@@ -154,27 +154,45 @@ class StockController extends Controller
         }
 
     }
-    public function Delete($input){//note this must hide to avoid delete all my tables
-        $check=DB::delete("delete from safaristocks where uid=:uid limit 1",array(
+    public function DeleteSafariStock($input){//note this must hide to avoid delete all my tables
 
-            "uid"=>$input["uid"]
-        ));
+        $check=DB::select("select safariId from safariproducts where safariId=:safariId  limit 1",[
+          "safariId"=>$input["uid"],
+         ]);
         if($check)
         {
-            return response([
-                "status"=>true,
-                "result"=>$check1,
 
-            ],200);
+                return response([
+                    "status"=>false,
+                    "result"=>$check,
+
+                ],200);
+
 
         }
         else{
-         return response([
-             "status"=>false,
-             "result"=>$check,
+            $check1=DB::delete("delete from safaristocks where uid=:uid limit 1",array(
 
-         ],201);
+                "uid"=>$input["uid"]
+            ));
+            if($check1)
+            {
+                return response([
+                    "status"=>true,
+                    "result"=>$check1,
+
+                ],200);
+
+            }
+            else{
+             return response([
+                 "status"=>false,
+                 "result"=>$check,
+
+             ],201);
+            }
         }
+
     }
 
     public function printQrProduct($input)
@@ -271,7 +289,7 @@ class StockController extends Controller
 
         if(strtolower($input["searchOption"])=='true')
         {
-            $check1=DB::select("select name,uid,PhoneNumber,platform from users where subscriber=:subscriber and platform=:platform and $queryData LIKE :itemName LIMIT $limitData", array(
+            $check1=DB::select("select name,uid,PhoneNumber,created_at,platform from users where subscriber=:subscriber and platform=:platform and $queryData LIKE :itemName LIMIT $limitData", array(
                 "itemName" => $itemName,
                 "platform"=>$platform,
                 "subscriber" => Auth::user()->subscriber
@@ -291,7 +309,8 @@ class StockController extends Controller
             }
         }
         else{
-            $check=DB::select("select name,uid,PhoneNumber,platform from users where subscriber=:subscriber and platform=:platform LIMIT $limitData", array(
+            $sortOrder=$input['sortOrder']??'ASC';
+            $check=DB::select("select name,uid,PhoneNumber,created_at,platform from users where subscriber=:subscriber and platform=:platform ORDER BY id $sortOrder LIMIT  $limitData", array(
                 "platform"=>$platform,
                 "subscriber" => Auth::user()->subscriber
             ));
@@ -367,15 +386,77 @@ class StockController extends Controller
 
     public function Products($input)
     {
-        if(strtolower($input["isProductAction"])=='search')
-        {
-            return $this->isSearchProduct($input);
-        }
-        else{
-            return $this->isViewProduct($input);
+        try {
+            $isProductAction=strtolower($input["isProductAction"]);
+            if($isProductAction=='search')
+            {
+                return $this->isSearchProduct($input);
+            }
+            else if($isProductAction==strtolower('searchInStock'))
+            {
+                $input["safariId"]=$input["productName"];
+                return $this->isSearchInStock($input);
+            }
+            else if(strtolower($isProductAction)==strtolower('searchProductStock'))
+            {
+                return $this->isSearchProductStock($input);
+            }
+            else if(strtolower($isProductAction)==strtolower('totalStock'))
+            {
+                $check=DB::select("SELECT sum(price *(qty-qty_sold)) as totalStock  FROM products where subscriber=:subscriber and qty>0",[
+                    "subscriber" =>Auth::user()->subscriber,
+                ]);
+                if ($check) {
+                    return response([
+                        "status" => true,
+
+                        "result" => $check
+                    ]);
+                } else {
+                    return response([
+                        "status" => false,
+
+                        "result" => $check
+                    ]);
+                }
+            }
+
+            else{
+                return $this->isViewProduct($input);
+            }
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json([
+                'error' => 'An error occurred',
+                'errorPrint' => $e->getMessage(),
+                'errorCode' => $e->getLine(),
+            ], 500);
         }
 
 
+
+    }
+    public function isSearchInStock($input){
+
+        $check = DB::select("select productCode,safariId from safariproducts where productCode=:productCode and safariId=:safariId limit 1", array(
+            "safariId"=>$input["safariId"],
+            "productCode"=>strtolower($input["productCode"])
+
+        ));
+
+        if ($check) {
+            return response([
+                "status" => true,
+
+                "result" => $check
+            ]);
+        } else {
+            return response([
+                "status" => false,
+
+                "result" => $check
+            ]);
+        }
     }
 
     public function isSearchProduct($input){
@@ -388,7 +469,7 @@ class StockController extends Controller
             if ($productQr == 'none') {
                 list($queryData, $itemName) = ($productCode != 'none')
                     ? (['productCode', '%' . $productCode . '%'])
-                    : (['productName', '%' . $productName . '%']);
+                    : (['ProductName', '%' . $productName . '%']);
 
                 $check = DB::select("select *from products where subscriber=:subscriber and $queryData LIKE :itemName LIMIT 20", array(
                     "itemName" => $itemName,
@@ -436,9 +517,97 @@ class StockController extends Controller
             ], 500);
         }
     }
+    public function isSearchProductStock($input)
+    {
+        try {
+            // Code...
+            $productName = strtolower($input["productName"] ?? 'none');
+            $productCode = strtolower($input["productCode"] ?? 'none');
+            $productQr = strtolower($input["productQr"] ?? 'none');
+
+            if ($productQr == 'none') {
+                list($queryData, $itemName) = ($productCode != 'none')
+                    ? (['products.productCode', '%' . $productCode . '%'])
+                    : (['products.ProductName', '%' . $productName . '%']);
+
+                /*$check = DB::select("select *from products where subscriber=:subscriber and $queryData LIKE :itemName LIMIT 20", array(
+                    "itemName" => $itemName,
+                    "subscriber" => Auth::user()->subscriber
+                ));*/
+                $check = DB::select("
+                SELECT
+                MAX(products.productCode) as productCode,
+                MAX(products.ProductName) as ProductName,
+                MAX(products.price) as price,
+                MAX(products.qty) as qty,
+                MAX(products.isQr) as isQr,
+                MAX(products.qty_sold) as qty_sold,
+                MAX(products.pcs) as pcs,
+                MAX(products.tags) as tags
+             FROM
+                products
+             INNER JOIN
+                safariproducts ON products.productCode = safariproducts.productCode
+             WHERE
+                products.subscriber = :subscriber
+                AND $queryData LIKE :itemName
+             GROUP BY
+                safariproducts.productCode
+             LIMIT
+                20
+
+              ", array(
+                    "itemName" => $itemName,
+                    "subscriber" => Auth::user()->subscriber
+                ));
+
+
+                if ($check) {
+                    return response([
+                        "status" => true,
+                        "searchType" => "NotQr",
+                        "result" => $check
+                    ]);
+                } else {
+                    return response([
+                        "status" => false,
+                        "searchType" => "NotQr",
+                        "result" => $check
+                    ]);
+                }
+            } else {
+                $check = DB::select("select *from products where productCode=:itemName and subscriber=:subscriber LIMIT 1", array(
+                    "itemName"=>$input['productCode'],
+                    "subscriber" => Auth::user()->subscriber
+                ));
+
+                if ($check) {
+                    return response([
+                        "status" => true,
+                        "searchType" => "Qr",
+                        "result" => $check
+                    ]);
+                } else {
+                    return response([
+                        "status" => false,
+                        "searchType" => "Qr",
+                        "result" => $check
+                    ]);
+                }
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'An error occurred',
+                'errorPrint' => $e->getMessage(),
+                'errorCode' => $e->getLine(),
+            ], 500);
+        }
+    }
     public function isViewProduct($input){
-        $check = DB::select("select *from products where subscriber=:subscriber LIMIT :perPage OFFSET :offset", array(
-            "subscriber" => Auth::user()->subscriber,
+          $subscriber=Auth::user()->subscriber;
+        $withTotal=($input["withTotal"]==="true")?",(SELECT sum(price *(qty-qty_sold)) from products where subscriber='$subscriber' and qty>0) as totalStock":"";
+        $check = DB::select("select productCode,ProductName,price,qty,qty_sold,pcs,tags $withTotal from products where subscriber=:subscriber LIMIT :perPage OFFSET :offset", array(
+            "subscriber" =>$subscriber,
             "perPage"=>$input["LimitEnd"]??0,
             "offset"=>$input["LimitStart"]??10
         ));
@@ -457,6 +626,41 @@ class StockController extends Controller
             ]);
         }
     }
+   public function IsProductExist($input)
+   {
+
+
+    // Remove special characters using a regular expression
+   // $productCode= str_replace(["'", '"', '`', '%', '_'], '', strtolower($input['productCode']));
+   $productCode= strtolower($input['productCode']);
+    $checkProduct=DB::select("select productCode from safariproducts where safariId=:safariId and productCode=:productCode and subscriber=:subscriber limit 1",array(
+        "safariId"=>$input["safariId"],
+        "productCode"=>$productCode,
+        "subscriber"=>Auth::user()->subscriber
+
+    ));
+    if($checkProduct)
+    {
+        return response([
+
+            "status"=>true,
+            "mydata"=> $productCode,
+            "result"=>"ProductExist ,please add another product or adjust"
+
+         ]);
+    }
+    else
+    {
+        return response([
+
+            "status"=>false,
+            "mydata"=> $productCode,
+            "result"=>"you May add This Product"
+
+         ]);
+    }
+
+   }
     public function AddItem($input)//Add product in Product and SafariProduct too ,this require me to add transaction
     {
         //Ndakora check if product exist in products and in safariProducts mbere yo gushyiramo Products
@@ -465,13 +669,23 @@ class StockController extends Controller
         /*$checkExist=DB::select("select productName from products where productName=:productName limit 1",array(
          "productName"=>strtolower($input["productName"])
         ));*/
-        $checkExist=($input['productCode']!='0')?true:false;//check if ProductCode Exist
+
+        $checkExist=($input['productName']=='productDataExistandCode')?true:false;//check if ProductCode Exist
+        /*$productCode= str_replace(["'", '"', '`', '%', '_'], '', strtolower($input['productCode']));
+        $productName= str_replace(["'", '"', '`', '%', '_'], '', strtolower($input['productName']));
+        $tags= str_replace(["'", '"', '`', '%', '_'], '', strtolower($input['tags']));*/
+
+        $productCode= strtolower($input['productCode']);
+        $productName= strtolower($input['productName']);
+        $tags= str_replace(["'", '"', '`', '%', '_'], '', strtolower($input['tags']));
+        $description= str_replace(["'", '"', '`', '%', '_'], '', strtolower($input['description']));
 
         if($checkExist)
         {
+
             $checkProduct=DB::select("select productCode from safariproducts where safariId=:safariId and productCode=:productCode and subscriber=:subscriber limit 1",array(
                 "safariId"=>$input["safariId"],
-                "productCode"=>$input['productCode'],
+                "productCode"=>$productCode,
                 "subscriber"=>Auth::user()->subscriber
 
             ));
@@ -487,7 +701,7 @@ class StockController extends Controller
             else{
                 $qty=$input['qty'];
                 $check=DB::update("update products set qty=qty+$qty where productCode=:productCode and subscriber=:subscriber limit 1",array(
-                        'productCode'=>$input['productCode'],//product id
+                        'productCode'=>$productCode,//product id
                         'subscriber'=>Auth::user()->subscriber
 
 
@@ -496,14 +710,17 @@ class StockController extends Controller
 
                 if($check)
                 {
-                    $productCode=$input['productCode'];
+
                     return $this->createInStockProduct($input,$productCode);
                 }
                 else{
                     return response([
 
                         "status"=>false,
-                        "result"=>$check
+                        "result"=>$check,
+                        "code"=>$productCode,
+
+                        "data"=>"noneim  "
 
                      ]);
                 }
@@ -512,15 +729,17 @@ class StockController extends Controller
 
         }
         else{
-            $uid=preg_replace('/[^A-Za-z0-9-]/','',strtolower($input["productName"]));//generated on production
-            //echo $this->today;
-            $productCode=$uid.""."_".date(time());
-            $check=DB::table("Products")
+
+            /*$uid=preg_replace('/[^A-Za-z0-9-]/','',strtolower($input["productName"]));//generated on production
+
+            $productCode=$uid.""."_".date(time());*/
+
+            $check=DB::table("products")
             ->insert([
         "cat"=>$input['cat']?:'none',//comeFrom
         "catName"=>$input['catName']?:'none',//comeFrom
-        'productCode'=>strtolower($productCode),//product id
-        'productName'=>strtolower($input["productName"]),//product id
+        'productCode'=>$productCode,//product id
+        'productName'=>$productName,//product id
 
         "subscriber"=>Auth::user()->subscriber,
  //owner of the products
@@ -533,9 +752,9 @@ class StockController extends Controller
   // "img_url"=>$mult_imgurl->att_url,
        "img_url"=>"none"?:'none',
 
-      "tags"=>(strtolower($input['tags']))?:NULL,
+      "tags"=>($tags)?:NULL,
       'active'=>$input['active']?:'none',
-      "description"=>$input['description']?:'none',
+      "description"=>$description?:'none',
         "created_at"=>$this->today,
             ]);
             if($check)
@@ -547,6 +766,7 @@ class StockController extends Controller
                 return response([
 
                     "status"=>false,
+                    "data"=>"none",
                     "result"=>$check
 
                  ]);
@@ -570,7 +790,7 @@ class StockController extends Controller
             $check=DB::table("safariproducts")
             ->insert([
                 "safariId"=>$input["safariId"],
-                "productCode"=>strtolower($productCode),//(it may be productCode or uid of spending)
+                "productCode"=>$productCode,//(it may be productCode or uid of spending)
                 "price"=>$input["fact_price"],
                 "qty"=>$input["qty"],
                 "totQty"=>$input["qty"],
@@ -600,7 +820,8 @@ class StockController extends Controller
                 return response([
 
                     "status"=>false,
-                    "result"=>$check
+                    "result"=>$check,
+                    "data"=>"noneins"
 
                  ]);
             }
@@ -615,56 +836,126 @@ class StockController extends Controller
 
     }
 
-    public function EditProductPrice($input){ //Edit only ProductPrice tempTable is missing
-        $check=DB::select("select price from products where productCode=:productCode and subscriber=:subscriber limit 1",[
-            "productCode"=>$input['productCode'],
-            "subscriber"=>Auth::user()->subscriber
-        ]);
-
-        if($check)
-        {
-            $json_array=[
-
-                "prev_Price"=>$check[0]->price,
-                "current_Price"=>$input['price'],
-                "uidCreator"=>Auth::user()->uid,
-                "created_at"=>$this->today
-
-             ];
-
-             $data=[
-                "tableName"=>"products",
-                "action"=>'EditProductPrice',
-                'tempData'=>json_encode($json_array),
-                'status'=>'edit'
-             ];
+    public function updateProducts($input){ //Edit only ProductPrice tempTable is missing
 
 
-           if($this->createBackupAction($data))
-           {
-            $checkDB=DB::update("update products set price=:price,updated_at=:updated_at where productCode=:productCode and subscriber=:subscriber limit 1",array(
-                'productCode'=>$input['productCode'],//product id
-                'price'=>$input['price'],
-                "subscriber"=>Auth::user()->subscriber,
-                'updated_at'=>$this->today
-                ));
-                return response([
-                    "status"=>true,
-                    "result"=>$check,
+        try {
+            $check=DB::select("select price,pcs,ProductName from products where productCode=:productCode and subscriber=:subscriber limit 1",[
+                "productCode"=>$input['productCode'],
+                "subscriber"=>Auth::user()->subscriber
+            ]);
 
-                ],200);
+            if($check)
+            {
+                $json_array=[
+
+                    "prev_Price"=>$check[0]->price,
+                    "current_Price"=>$input['price'],
+                    "prev_Pcs"=>$check[0]->pcs,
+                    "current_Pcs"=>$input['pcs'],
+                    "prev_ProductName"=>$check[0]->ProductName,
+                   /// "current_ProductName"=>str_replace(["'", '"', '`', '%', '_'], '', strtolower($input['productName'])),
+                    "current_ProductName"=>strtolower($input['productName']),
+                    "uidCreator"=>Auth::user()->uid,
+                    "created_at"=>$this->today
+
+                 ];
+
+                 $data=[
+                    "tableName"=>"products",
+                    "action"=>$input['actionStatus'],
+                    'tempData'=>json_encode($json_array),
+                    'status'=>'edit'
+                 ];
+
+
+               if($this->createBackupAction($data))
+               {
+                if(strtolower($input["actionStatus"])==strtolower('updatePrice'))
+                {
+                    return $this->isUpdatePrice($input);
+                }
+                else if(strtolower($input["actionStatus"])==strtolower('updatePcs')){
+                    return $this->isUpdatePcs($input);
+                }
+                else{
+                    return $this->isUpdateProductName($input);
+                }
+
+
+                }
+
+                else{
+                    return response([
+                        "status"=>false,
+                        "result"=>$check,
+
+                    ],200);
+                }
+
+
             }
-            else{
-                return response([
-                    "status"=>false,
-                    "result"=>$check,
-
-                ],200);
-            }
-
-
+            //code...
+        }  catch (\Exception $e) {
+            DB::rollback();
+           // throw $e;
+            return response()->json(['error' => 'An error occurred',
+        'errorPrint'=>$e->getMessage(),"errorCode"=>$e->getLine()], 500); // Return an error JSON response
         }
 
+
+
+
+    }
+    public function isUpdatePrice($input){
+        $checkDB=DB::update("update products set price=:price,updated_at=:updated_at where productCode=:productCode and subscriber=:subscriber limit 1",array(
+            'productCode'=>$input['productCode'],//product id
+            'price'=>$input['price'],
+            "subscriber"=>Auth::user()->subscriber,
+            'updated_at'=>$this->today
+            ));
+            return response([
+                "status"=>true,
+                "result"=>$checkDB,
+
+            ],200);
+    }
+    public function isUpdatePcs($input){
+        $checkDB=DB::update("update products set pcs=:pcs,updated_at=:updated_at where productCode=:productCode and subscriber=:subscriber limit 1",array(
+            'productCode'=>$input['productCode'],//product id
+            'pcs'=>$input['pcs'],
+            "subscriber"=>Auth::user()->subscriber,
+            'updated_at'=>$this->today
+            ));
+            return response([
+                "status"=>true,
+                "result"=>$checkDB,
+
+            ],200);
+    }
+    public function isUpdateProductName($input){
+        $checkDB=DB::update("update products set ProductName=:ProductName,updated_at=:updated_at where productCode=:productCode and subscriber=:subscriber limit 1",array(
+            'productCode'=>$input['productCode'],//product id
+            //'ProductName'=>str_replace(["'", '"', '`', '%', '_'], '', strtolower($input['productName'])),
+            'ProductName'=>strtolower($input['productName']),
+            "subscriber"=>Auth::user()->subscriber,
+            'updated_at'=>$this->today
+            ));
+           if($checkDB)
+           {
+            return response([
+                "status"=>true,
+                "result"=>$checkDB,
+
+            ],200);
+           }
+           else{
+            return response([
+                "status"=>false,
+                "result"=>$checkDB,
+
+            ],200);
+           }
 
     }
     public function createBackupAction($data){
@@ -702,6 +993,86 @@ class StockController extends Controller
             'updated_at'=>$this->today
             ));
     }
+    public function deleteStockQty($input) //Edit Stock Qty tempTable is missing
+    {
+
+
+
+        try {
+            $checkDB=DB::transaction(function () use ($input) {//
+                $stockInterest=$input['safariId']."_"."int";//interest
+                $stockDisplay=$input['safariId']."_"."dis";//display Stock
+
+                Cache::forget($stockInterest);
+                Cache::forget($stockDisplay);
+                $checkTotQty=DB::select("select productCode,totQty,TotSoldAmount from safariproducts where safariId=:safariId and productCode=:productCode limit 1",[
+                    "productCode"=>$input['productCode'],
+                    "safariId"=>$input["safariId"],
+                ]);
+                if($checkTotQty)
+                {
+
+                    if($checkTotQty[0]->TotSoldAmount==='0')
+                    {
+                        $check1=DB::update("update products set qty=qty-:prevQty,updated_at=:updated_at where productCode=:productCode and subscriber=:subscriber limit 1",array(
+                            'productCode'=>$input['productCode'],//product id
+
+                            'prevQty'=>$checkTotQty[0]->totQty,
+                            "subscriber"=>Auth::user()->subscriber,
+                            'updated_at'=>$this->today
+                            ));
+
+
+                            $check = DB::delete("
+                            Delete from safariproducts
+                            WHERE
+                                subscriber = :subscriber
+                                AND safariId = :safariId
+                                AND productCode = :productCode
+                            LIMIT 1",
+                            [
+                                "productCode" => $input['productCode'],
+                                "safariId" => $input["safariId"],
+                                "subscriber" => Auth::user()->subscriber
+
+                            ]
+                        );
+                        return array(
+                            "status"=>true,
+                            "datacount"=>"resulr"
+                         );
+
+                    }
+                    else{
+                        return array(
+                            "status"=>false,
+
+                         );
+                    }
+
+
+
+                }
+
+
+
+
+            });
+
+                return response($checkDB,200);
+
+
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            // throw $e;
+             return response()->json(['error' => 'An error occurred',
+         'errorPrint'=>$e->getMessage(),"errorCode"=>$e->getLine()], 500); // Return an error JSON response
+        }
+
+
+
+    }
     public function EditStockQty($input) //Edit Stock Qty tempTable is missing
     {
 
@@ -736,6 +1107,8 @@ class StockController extends Controller
                             UPDATE safariproducts
                             SET
                                 totQty = :totQty,
+                                qty = :qty,
+
                                 TotBuyAmount = price * :QtyCh,
                                 updated_at = :updated_at
                             WHERE
@@ -746,8 +1119,10 @@ class StockController extends Controller
                             [
                                 "productCode" => $input['productCode'],
                                 "safariId" => $input["safariId"],
+
                                 "subscriber" => Auth::user()->subscriber,
                                 "totQty" =>$input["qty"],
+                                "qty" =>$input["qty"],
                                 "QtyCh" =>$input["qty"],
                                 "updated_at" => $this->today
                             ]
@@ -910,41 +1285,127 @@ class StockController extends Controller
     //my code of buying and calculator
     public function displayCalculate($input){
 
+         if(strtolower($input["actionStatus"])==strtolower("Search"))
+         {
+         return $this->displayCalSearch($input);
+         }
+
+         else{
+            $stockInterest=$input['safariId']."_"."int";//interest
+            $stockDisplay=$input['safariId']."_"."dis";//display Stock
+
+           /* Cache::put($stockInterest,'',now()->addMinutes(0));
+            Cache::put($stockDisplay,'',now()->addMinutes(0));*/
+            if($this->interest_check($input))
+            {
 
 
-        $stockInterest=$input['safariId']."_"."int";//interest
-        $stockDisplay=$input['safariId']."_"."dis";//display Stock
+             return response([
+                    "status"=>true,
+                    "name"=>$input['name'],
+                    "safariuid"=>$input['safariId'],
+                    "result"=>Cache::get($stockDisplay),
 
-       /* Cache::put($stockInterest,'',now()->addMinutes(0));
-        Cache::put($stockDisplay,'',now()->addMinutes(0));*/
-        if($this->interest_check($input))
-        {
+                    "interest"=>Cache::get($stockInterest),
+               ],200);
+
+            }
+            else{
 
 
-         return response([
-                "status"=>true,
-                "name"=>$input['name'],
-                "safariuid"=>$input['safariId'],
-                "result"=>Cache::get($stockDisplay),
+                return response([
+                    "test"=>"go",
+                    "status"=>true,
+                    "name"=>$input['name'],
+                    "safariuid"=>$input['safariId'],
+                    "result"=>Cache::get($stockDisplay),
+                    "interest"=>Cache::get($stockInterest),
+                 ],200);
+            }
+            // End time
 
-                "interest"=>Cache::get($stockInterest),
-           ],200);
+         }
 
+
+
+    }
+    public function displayCalSearch($input)
+    {
+        try {
+            // Code...
+
+            $productSearch = strtolower($input["productSearch"] ?? 'none');
+
+
+
+
+                list($queryData, $itemName) = ($input['isproductCode']=='true')
+                    ? (['products.productCode', '%' . $productSearch . '%'])
+                    : (['products.ProductName', '%' . $productSearch . '%']);
+
+                /*$check = DB::select("select *from products where subscriber=:subscriber and $queryData LIKE :itemName LIMIT 20", array(
+                    "itemName" => $itemName,
+                    "subscriber" => Auth::user()->subscriber
+                ));*/
+                $check = DB::select("
+                SELECT
+                MAX(products.productCode) as productCode,
+                MAX(products.ProductName) as ProductName,
+                MAX(safariproducts.updated_at) as updated_at,
+                MAX(safariproducts.status) as status,
+                MAX(safariproducts.safariId) as safariId,
+                MAX(safariproducts.id) as id,
+                MAX(safariproducts.price) as price,
+                MAX(safariproducts.qty) as qty,
+                MAX(safariproducts.totQty) as totQty,
+                MAX(safariproducts.TotBuyAmount) as TotBuyAmount,
+                MAX(safariproducts.SoldOut) as SoldOut,
+
+                MAX(safariproducts.TotSoldAmount) as TotSoldAmount,
+                MAX(products.pcs) as pcs
+             FROM
+                products
+             INNER JOIN
+                safariproducts ON products.productCode = safariproducts.productCode
+             WHERE
+                products.subscriber = :subscriber
+                AND  safariproducts.safariId=:safariId
+                AND  safariproducts.status!='spendSafaris'
+
+                AND $queryData LIKE :itemName
+             GROUP BY
+                safariproducts.productCode
+             LIMIT
+                20
+
+              ", array(
+                    "itemName" =>$itemName,
+                    "safariId" =>$input['safariId'],
+                    "subscriber" => Auth::user()->subscriber
+                ));
+
+
+                if ($check) {
+                    return response([
+                        "status" => true,
+                        "searchType" => "NotQr",
+                        "result" => $check
+                    ]);
+                } else {
+                    return response([
+                        "status" => false,
+                        "searchType" => "NotQr",
+                        "result" => $check
+                    ]);
+                }
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'An error occurred',
+                'errorPrint' => $e->getMessage(),
+                'errorCode' => $e->getLine(),
+            ], 500);
         }
-        else{
-
-
-            return response([
-                "test"=>"go",
-                "status"=>true,
-                "name"=>$input['name'],
-                "safariuid"=>$input['safariId'],
-                "result"=>Cache::get($stockDisplay),
-                "interest"=>Cache::get($stockInterest),
-             ],200);
-        }
-        // End time
-
     }
       public function interest_check($input){
         $safariId=$input['safariId'];
@@ -956,18 +1417,30 @@ class StockController extends Controller
             return true;
         }
         else{
+
             $interest=DB::select("SELECT
             SUM(TotSoldAmount) AS Soldout,
             SUM(TotBuyAmount) AS buyout,
             SUM(totQty) AS TotQty,
             SUM(SoldOut) AS QtySoldOut,
             SUM(TotSoldAmount - TotBuyAmount) AS interest
-        FROM safariproducts where safariId=:safariId limit 1000",array(
+        FROM safariproducts where safariId=:safariId limit 10000",array(
                 "safariId"=>$safariId
              ));
-             $displayData=DB::select("select * from safariproducts where safariId=:safariId order by updated_at desc limit 1000 ",array(
-                 "safariId"=>$safariId
-              ));
+
+
+
+                /* $displayData=DB::select("select * from safariproducts where safariId=:safariId order by updated_at desc limit 10000 ",array(
+                    "safariId"=>$safariId
+                 ));*/
+
+                 $displayData=DB::select("select * from safariproducts where safariId=:safariId order by updated_at desc limit 10000 ",array(
+                    "safariId"=>$safariId
+                 ));
+
+
+
+
 
 
 
@@ -975,6 +1448,7 @@ class StockController extends Controller
              Cache::put($stockDisplay,$displayData,now()->addMinutes(7200));
         }
       }
+
     public function calculateAll($input){
 
 
@@ -1505,10 +1979,11 @@ else{
                        "productCode"=>$input['productCode']
 
                        ));
-                       $checkUpdate=DB::update("update products set qty_sold=(qty_sold-:currentQty)+:req_qty where productCode=:productCode limit 1",[
+                       $checkUpdate=DB::update("update products set qty_sold=(qty_sold-:currentQty)+:req_qty where subscriber=:subscriber and productCode=:productCode limit 1",[
                            "currentQty"=>$totalQty,
                            "req_qty"=>$input['req_qty'],
-                           "productCode"=>$input['productCode']
+                           "productCode"=>$input['productCode'],
+                           "subscriber" => Auth::user()->subscriber
                        ]);
                        $subscriber=Auth::user()->subscriber;
                        $productCode=$input['productCode'];
@@ -4150,81 +4625,241 @@ return $results;
                 'errorPrint'=>$e->getMessage()], 500); // Return an error JSON response
                 }
     }
-    public function editSpending($input){ //not done
+    public function updateSpending($input){ //not done
+       // DB::beginTransaction();
+        try {
+            $check=DB::select("select *from depenses where uid=:uid  and subscriber=:subscriber limit 1",[
+                "uid"=>$input['uid'],
+                "subscriber"=>Auth::user()->subscriber
+            ]);
 
-        try{
+
+            if($check)
+            {
+                $input["balance"]=(-$check[0]->amount+$input['amount']);
+                $json_array=[
+                    "uid"=>$check[0]->uid,
+                    "safariId"=>$check[0]->safariId,
+                    "prev_amount"=>$check[0]->amount,
+                    "current_amount"=>$input['amount'],
+                    "prev_purpose"=>$check[0]->purpose,
+                    "current_purpose"=>$input['purpose'],
+
+                    "prev_uidCreator"=>$check[0]->uidCreator,
+                    "current_uidCreator"=>Auth::user()->uid,
+                    "current__updated_at"=>$check[0]->updated_at,
+                    "updated_at"=>$this->today
+
+                 ];
+
+                 $data=[
+                    "tableName"=>"products",
+                    "action"=>$input['actionStatus'],
+                    'tempData'=>json_encode($json_array),
+                    'status'=>'edit'
+                 ];
 
 
-        $check=DB::transaction(function () use ($input) {
-            $uidUser=Auth::user()->uid;
+               if($this->createBackupAction($data))
+               {
+                if(strtolower($input["actionStatus"])==strtolower('Edit_otherSpending'))
+                {
 
-            $uid="SUID"."_".Str::random(2).""."_".date(time());//SUID means Spend UID
-            $check1=DB::update("update depenses set amount=:amount,purpose=:purpose,commentData=:commentData,updated_at=:updated_at where uid=:uid and uidCreator=:uidCreator and status=:status and subscriber=:subscriber and systemUid=:systemUid limit 1 ",array(
-                "uid"=>$uid,
+                    return $this->edit_OtherSpending($input);
+                }
+                else if(strtolower($input["actionStatus"])==strtolower('Edit_SafariSpending'))
+                {
 
-                "amount"=>$input['balance'],
+                    return $this->edit_SafariSpending($input);
+                }
+                else if(strtolower($input["actionStatus"])==strtolower('delete_OtherSpending'))
+                {
+                    $input["balance"]=(-$check[0]->amount);
+                    return $this->delete_OtherSpending($input);
+                }
+                else{
+                    $input["balance"]=(-$check[0]->amount);
+                    return $this->delete_SafariSpending($input);
+                }
+
+               }
+               else{
+                return response([
+                    "status"=>false,
+                    "result"=>$check,
+
+                ],200);
+            }
+
+
+            }
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json([
+                'error' => 'An error occurred',
+                'errorPrint' => $e->getMessage(),
+                'errorCode' => $e->getLine(),
+            ], 500);
+        }
+
+
+
+
+
+    }
+    public function edit_OtherSpending($input){
+        $check=DB::update("update depenses set amount=:amount,purpose=:purpose,commentData=:commentData,updated_at=:updated_at where uid=:uid and uidCreator=:uidCreator  and subscriber=:subscriber  limit 1 ",array(
+            "uid"=>$input['uid'],
+
+            "amount"=>$input['amount'],
+            "uidCreator"=>Auth::user()->uid,
+
+            "subscriber"=>Auth::user()->subscriber,
+
+            "purpose"=>$input['purpose']??'none',
+            "commentData"=>$input['commentData']??'none',
+            "updated_at"=>$this->today
+           ));
+           if($check){
+            $check1=DB::update("update admnin_records set balance=balance+:balance where uid=:uid and status=:status and subscriber=:subscriber and systemUid=:systemUid limit 1",array(
+                "balance"=>$input['balance'],
+                "uid"=>Auth::user()->uid,
+                "status"=>"GeneralSpend",
+
+                "systemUid"=>$input["systemUid"]??'PointSales1',
+                "subscriber"=>Auth::user()->subscriber
+               ));
+               if($check1){
+                return response([
+                    "status"=>true,
+                    "result"=>$check1
+
+                ],200);
+            }
+            else{
+                return response([
+                    "status"=>false,
+                    "result"=>$check1
+
+                ],200);
+            }
+           }
+
+    }
+    public function edit_SafariSpending($input){
+
+        if(($this->updateSafariSpending($input)->original["status"]))
+        {
+            $check=DB::update("update depenses set amount=:amount,purpose=:purpose,commentData=:commentData,updated_at=:updated_at where uid=:uid and uidCreator=:uidCreator  and subscriber=:subscriber  limit 1 ",array(
+                "uid"=>$input['uid'],
+
+                "amount"=>$input['amount'],
                 "uidCreator"=>Auth::user()->uid,
 
-                "status"=>$input['status'],
-                "systemUid"=>$input["systemUid"],
-                "subscriber"=>Auth::user()->subscriber,
+               "subscriber"=>Auth::user()->subscriber,
 
                 "purpose"=>$input['purpose']??'none',
-                "commentData"=>$input['commentData'],
+                "commentData"=>$input['commentData']??'none',
                 "updated_at"=>$this->today
                ));
+               if($check){
+                return response([
+                    "status"=>true,
+                    "result"=>$check
 
-        if($check1){
+                ],200);
+            }
+            else{
+                return response([
+                    "status"=>false,
+                    "result"=>$check
 
-           $check=DB::update("update admnin_records set balance=balance+:balance where uid=:uid and status=:status and subscriber=:subscriber and systemUid=:systemUid limit 1",array(
-            "balance"=>$input['balance'],
-            "uid"=>$uidUser,
-            "status"=>$input["status"],
-
-            "systemUid"=>$input["systemUid"],
+                ],200);
+            }
+        }
+    }
+    public function delete_OtherSpending($input){
+        $check=DB::delete("delete From depenses where uid=:uid and subscriber=:subscriber",[
+            "uid"=>$input["uid"],
             "subscriber"=>Auth::user()->subscriber
-           ));
+            ]);
 
            if($check){
-            return array(
-                "status"=>true,
-                "message"=>"Finish update records"
-            );
+            $check1=DB::update("update admnin_records set balance=balance+:balance where uid=:uid and status=:status and subscriber=:subscriber and systemUid=:systemUid limit 1",array(
+                "balance"=>$input['balance'],
+                "uid"=>Auth::user()->uid,
+                "status"=>"GeneralSpend",
+
+                "systemUid"=>$input["systemUid"]??'PointSales1',
+                "subscriber"=>Auth::user()->subscriber
+               ));
+               if($check1){
+                return response([
+                    "status"=>true,
+                    "result"=>$check1
+
+                ],200);
+            }
+            else{
+                return response([
+                    "status"=>false,
+                    "result"=>$check1
+
+                ],200);
+            }
            }
-           else{
+    }
+    public function delete_SafariSpending($input){
+        if(($this->updateSafariSpending($input)->original["status"]))
+        {
+            $check=DB::delete("delete from depenses where uid=:uid and subscriber=:subscriber",[
+                "uid"=>$input["uid"],
+                "subscriber"=>Auth::user()->subscriber
+                ]);
+                if($check){
+                    return response([
+                        "status"=>true,
+                        "result"=>$check
 
-            return array(
-                "status"=>false,
-                "message"=>"no update records"
-            );
-           }
-           return array(
-            "status"=>true,
-            "message"=>"Finish add New admnin_records"
-        );
-         }
-         else{
-           return array(
-               "message"=>"Something went Wrong"
-           );
-         }
-        //
-    });
-
-
-    return response([
-       "status"=>true,
-       "result"=>$check,
-
-   ],200);
-
-
-                } catch (\Exception $e) {
-                    DB::rollback();
-                   // throw $e;
-                    return response()->json(['error' => 'An error occurred',
-                'errorPrint'=>$e->getMessage()], 500); // Return an error JSON response
+                    ],200);
                 }
+                else{
+                    return response([
+                        "status"=>false,
+                        "result"=>$check
+
+                    ],200);
+                }
+        }
+
+    }
+    public function updateSafariSpending($input){
+        $stockInterest=$input['safariId']."_"."int";//interest
+        $stockDisplay=$input['safariId']."_"."dis";//display Stock
+
+        Cache::put($stockInterest,'',now()->addMinutes(0));//Reset
+        Cache::put($stockDisplay,'',now()->addMinutes(0));//Reset
+        $check1=DB::update("update safariproducts set TotBuyAmount=TotBuyAmount+:TotBuyAmount,updated_at=:updated_at where safariId=:safariId and status='spendSafaris' and subscriber=:subscriber limit 1",[
+            "TotBuyAmount"=>$input['balance'],
+            "updated_at"=>$this->today,
+            "safariId"=>$input['safariId'],
+            "subscriber"=>Auth::user()->subscriber
+           ]);
+        if($check1){
+            return response([
+                "status"=>true,
+                "result"=>$check1
+
+            ],200);
+        }
+        else{
+            return response([
+                "status"=>false,
+                "result"=>$check1
+
+            ],200);
+        }
     }
     public function SearchSpending($input)
     {
@@ -4344,6 +4979,7 @@ return $results;
             MAX(depenses.purpose) AS purpose,
             MAX(depenses.commentData) AS commentData,
             Max(safariproducts.TotBuyAmount) AS totSpending,
+            Max(safariproducts.safariId) AS safariId,
             MAX(depenses.amount) AS spending,
             MAX(depenses.created_at) AS created_at
 
@@ -4392,6 +5028,7 @@ return $results;
             MAX(depenses.purpose) AS purpose,
             MAX(depenses.commentData) AS commentData,
             Max(safariproducts.TotBuyAmount) AS totSpending,
+            Max(safariproducts.safariId) AS safariId,
             MAX(depenses.amount) AS spending,
             MAX(depenses.created_at) AS created_at
 

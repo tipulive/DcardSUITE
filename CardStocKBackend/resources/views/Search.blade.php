@@ -25,6 +25,7 @@ var platform="";
 var userProfileName="";
 var CalculateDeclClass="";
 var countryComeFrom="all";
+ var chooseSearchStock=1;
 
 function LoadSettingComeFrom(){
 

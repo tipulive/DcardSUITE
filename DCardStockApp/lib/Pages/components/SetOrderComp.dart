@@ -472,7 +472,7 @@ String orderId="";
     child: Column(
     mainAxisAlignment: MainAxisAlignment.center,
     children: [
-    Text('${commentData}'),
+    Text('${commentData=='null'?"no Comment":commentData}'),
     SizedBox(height: 20),
 
     ],
@@ -696,6 +696,7 @@ String orderId="";
                                                             color: Colors.red
                                                         ),
                                                         onPressed: () {
+                                                          //print("${myLoadercontroller.dispatchOrder[index]["commentData"]}");
                                                           viewComment("${(myLoadercontroller.dispatchOrder[index])["commentData"]}");
 
                                                         },

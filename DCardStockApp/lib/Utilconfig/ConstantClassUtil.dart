@@ -21,6 +21,13 @@ class ConstantClassUtil extends GetxController
     return formatted;
     //update();
   }
+  truncateWithEllipsis(String text, int maxLength) {
+    if (text.length <= maxLength) {
+      return text;
+    } else {
+      return text.substring(0, maxLength) + '...'; // Adding ellipsis
+    }
+  }
 
 
 }
