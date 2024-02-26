@@ -710,37 +710,7 @@ class _SafeDeptCompState extends State<SafeDeptComp> {
 
   }
 
-  stockCount(indexData)async
-  {
 
-
-    (Get.put(HideShowState())).isChangeDelivery(thisListOrder[indexData],indexData,qty_product);
-
-
-    // print((Get.put(HideShowState()).delivery)[indexData]);
-    //print(thisListOrder[indexData]);
-
-
-
-
-
-    /*var resultData=(await StockQuery().stockCount(Topups(uid:"${orderData[0]}"),QuickBonus(uid:"${productCode}",qty:"${qty_product}",subscriber:"StockName",status:"status",description:"Delivered"), User(uid: "UidTransport",name:"refName"))).data;
-
-
-    if(resultData["status"])
-    {
-      Quickdata();
-      thisOrder2();
-
-    }*/
-
-
-
-
-
-
-
-  }
 
 
 

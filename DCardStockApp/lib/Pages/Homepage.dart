@@ -36,6 +36,7 @@ import '../models/User.dart';
 
 
 
+
 class Homepage extends StatefulWidget {
   const Homepage({Key? key}) : super(key: key);
 
@@ -180,6 +181,13 @@ class _HomepageState extends State<Homepage> {
 
               // SearchBarField(search: _data,searchController:searchContro,PerformSearch:,),
               SearchBarField(
+               searchBy:(text) async{
+                 setState(() {
+                   (Get.put(StockQuery()).updateSelected(text));
+
+                 });
+                 //(Get.put(StockQuery()).selectedOption),
+               } ,
                 // Correct: explicitly assigning null
                 searchMethod:(text) async{
                   if (text!= searchText) {
@@ -302,6 +310,11 @@ class _HomepageState extends State<Homepage> {
                                     elevation:0,
                                   ),
                                   onPressed: () async{
+                                    Get.back(canPop: false);
+                                    setState(() {
+                                      showOver=true;
+                                    });
+
                                     (Get.put(StockQuery()).updateHideLoader(false));
 
                                     var resultData=(await StockQuery().deleteTOrder(Topups(uid:"${(Get.put(StockQuery()).order)["resultData"][0]["uid"]}"))).data;
@@ -322,7 +335,7 @@ class _HomepageState extends State<Homepage> {
                                       (Get.put(StockQuery()).updateHidePickClick(true));
 
                                       setState(() {
-                                        showOver=false;
+
                                         cartData.clear();
                                         ///(Get.put(StockQuery()).updateOrder(orderVal));
                                         (Get.put(StockQuery()).updateDeptOrder(0));
@@ -331,7 +344,11 @@ class _HomepageState extends State<Homepage> {
                                         // dataSearch.clear();
 
                                       });
-                                      pickDefaultUser(true,true);
+                                      await pickDefaultUser(true,true);
+
+                                      setState(() {
+                                        showOver=false;
+                                      });
 
 
 
@@ -852,7 +869,6 @@ class _HomepageState extends State<Homepage> {
     try {
 
       var resultData=(await StockQuery().viewUserTempOrder(QuickBonus(uid:"nyota"))).data;
-      print(resultData);
       if(resultData["status"])
       {
 
@@ -932,7 +948,9 @@ class _HomepageState extends State<Homepage> {
 
     try {
       bool searchHide=(statusSearch=='none')?true:false;//to check if is Qr search or no Qr
-      var resultData=(await StockQuery().product(QuickBonus(uid:"none",productName:text,status:statusSearch),Topups(optionCase:"searchProductStock",startlimit:1,endlimit:10))).data;
+      String productCode=((Get.put(StockQuery()).selectedOption)=="Code")?text:"none";
+      String productName=((Get.put(StockQuery()).selectedOption)=="Name")?text:'none';
+      var resultData=(await StockQuery().product(QuickBonus(uid:productCode,productName:productName,status:statusSearch),Topups(optionCase:"searchProductStock",startlimit:1,endlimit:10))).data;
 //print(resultData["status"]);
       if(resultData["status"])
       {
@@ -1300,7 +1318,7 @@ class _HomepageState extends State<Homepage> {
 
         });
       }
-    } catch (e,stackTrace) {
+    } catch (e) {
       setState(() {
         showOver=false;
       });
@@ -1334,13 +1352,16 @@ class _HomepageState extends State<Homepage> {
                 elevation:0,
               ),
               onPressed: () async{
+
+                Get.back(canPop: false);
                 await pickDefaultUser(false,true);
 
                 if((Get.put(StockQuery()).userProfile)["uid"]!='none')
                 {
 
-                  placeOrder(dynamicData);
-                  Get.back();
+                  await placeOrder(dynamicData);
+                  //Get.back(canPop: false);
+
                 }
 
 
@@ -1579,6 +1600,7 @@ class _HomepageState extends State<Homepage> {
   }
 
   void searchUser(BuildContext context) {
+
     Get.bottomSheet(
 
       StatefulBuilder(
@@ -1596,107 +1618,81 @@ class _HomepageState extends State<Homepage> {
                     topRight: Radius.circular(30),
                   ),
                 ),
-                child: Column(
-                  children: [
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
 
-                    Center(child: Text("Client:Name")),
+                      const Center(child: Text("Client:Name")),
 
 
-                    SingleChildScrollView(
-                      child:Column(
-                        children: [
-                          Container(
+                      SingleChildScrollView(
+                        child:Column(
+                          children: [
+                            Container(
 
-                            //padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-                            margin: const EdgeInsets.fromLTRB(10, 20, 10, 10),
-                            child: TextField(
+                              //padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+                              margin: const EdgeInsets.fromLTRB(10, 20, 10, 10),
+                              child: TextField(
 
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(50.0),
+                                decoration: InputDecoration(
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(50.0),
+                                  ),
+                                  labelText: 'Search',
+
                                 ),
-                                labelText: 'Search',
+                                onChanged: (text) async{
+                                  if((int.tryParse(text) != null)){
+                                    setState(() {
+                                      searchValOption=true;
+                                      phoneNumber=text;
+                                    });
+                                    await getUserData();
+                                  }
+                                  else{
+
+                                    setState(() {
+                                      searchName=text;
+                                      searchValOption=true;
+                                      phoneNumber="none";
+                                    });
+                                    await getUserData();
+                                  }
+
+
+
+
+                                  //print(this._data[index]["total_var"]);
+                                  // print("Text changed to: $text");
+                                },
                               ),
-                              onChanged: (text) async{
-                                if((int.tryParse(text) != null)){
-                                  setState(() {
-                                    searchValOption=true;
-                                    phoneNumber=text;
-                                  });
-                                  await getUserData();
-                                }
-                                else{
-
-                                  setState(() {
-                                    searchName=text;
-                                    searchValOption=true;
-                                    phoneNumber="none";
-                                  });
-                                  await getUserData();
-                                }
-
-
-
-
-                                //print(this._data[index]["total_var"]);
-                                // print("Text changed to: $text");
-                              },
                             ),
-                          ),
-                          ListView.separated(
-                            shrinkWrap: true,
-                            itemCount: users.length + 1,
-                            separatorBuilder: (context, index) => const Divider(height: 1.0),
-                            itemBuilder: (context, index) {
-                              if (index < users.length) {
-                                return Card(
-                                  margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                                  child: ListTile(
-                                    leading: CircleAvatar(
-                                      backgroundColor:getRandomColor(),
-                                      child: Icon(_getRandomIcon()),
+                            ListView.separated(
+                              shrinkWrap: true,
+                              itemCount: users.length + 1,
+                              separatorBuilder: (context, index) => const Divider(height: 1.0),
+                              itemBuilder: (context, index) {
+                                if (index < users.length) {
+                                  return Card(
+                                    margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                                    child: ListTile(
+                                      leading: CircleAvatar(
+                                        backgroundColor:getRandomColor(),
+                                        child: Icon(_getRandomIcon()),
 
-                                      //backgroundImage: NetworkImage(users[index].photo_url):
+                                        //backgroundImage: NetworkImage(users[index].photo_url):
 
-                                    ),
-                                    title: Text(users[index]["name"]),
-                                    subtitle: Text(users[index]["PhoneNumber"]),
-                                    trailing:  IconButton(
-                                      icon: const Icon(Icons.add),
-                                      iconSize: 23.0,
-                                      color: Colors.blue,
-                                      onPressed: () async{
+                                      ),
+                                      title: Text(users[index]["name"]),
+                                      subtitle: Text(users[index]["PhoneNumber"]),
+                                      trailing:  IconButton(
+                                        icon: const Icon(Icons.add),
+                                        iconSize: 23.0,
+                                        color: Colors.blue,
+                                        onPressed: () async{
 
-                                        (Get.put(StockQuery()).updateHideLoader(false));
-                                        if(((Get.put(StockQuery()).order)["resultData"][0]["uid"])=="none")
-                                        {
-                                          var userProfile =
-                                          {
-                                            "uid":"${users[index]["uid"]}",
-                                            "name":"${ users[index]["name"]}",
-
-                                            "email": "on@gmail.com",
-                                            "phone": "782389359",
-                                            "Ccode": "+250",
-                                            "country": "Rwanda",
-                                            "initCountry": "none",
-                                            "PhoneNumber":"${users[index]["PhoneNumber"]}",
-                                            "carduid": "TEALTD_7hEnj_1672352175"
-                                          };
-                                          setState(() {
-                                            (Get.put(StockQuery()).updateUserProfile(userProfile));
-                                            (Get
-                                                .put(StockQuery())
-                                                .order)["resultData"][0]["name"] = userProfile["name"];
-                                          });
-                                          Future.microtask(() {
-                                            Navigator.of(context).pop();
-                                          });
-                                        }
-                                        else{
-
-                                          var resultData=(await StockQuery().updateInOrder(QuickBonus(uid:"${(Get.put(StockQuery()).order)["resultData"][0]["uid"]}",productName:"productCode",description:"comment",status:"UpdateUserInOrder"),Participated(uidUser:"${users[index]["uid"]}",status:'Default'))).data;
-                                          if(resultData["status"])
+                                          (Get.put(StockQuery()).updateHideLoader(false));
+                                          if(((Get.put(StockQuery()).order)["resultData"][0]["uid"])=="none")
                                           {
                                             var userProfile =
                                             {
@@ -1720,30 +1716,59 @@ class _HomepageState extends State<Homepage> {
                                             Future.microtask(() {
                                               Navigator.of(context).pop();
                                             });
-
                                           }
                                           else{
 
+                                            var resultData=(await StockQuery().updateInOrder(QuickBonus(uid:"${(Get.put(StockQuery()).order)["resultData"][0]["uid"]}",productName:"productCode",description:"comment",status:"UpdateUserInOrder"),Participated(uidUser:"${users[index]["uid"]}",status:'Default'))).data;
+                                            if(resultData["status"])
+                                            {
+                                              var userProfile =
+                                              {
+                                                "uid":"${users[index]["uid"]}",
+                                                "name":"${ users[index]["name"]}",
+
+                                                "email": "on@gmail.com",
+                                                "phone": "782389359",
+                                                "Ccode": "+250",
+                                                "country": "Rwanda",
+                                                "initCountry": "none",
+                                                "PhoneNumber":"${users[index]["PhoneNumber"]}",
+                                                "carduid": "TEALTD_7hEnj_1672352175"
+                                              };
+                                              setState(() {
+                                                (Get.put(StockQuery()).updateUserProfile(userProfile));
+                                                (Get
+                                                    .put(StockQuery())
+                                                    .order)["resultData"][0]["name"] = userProfile["name"];
+                                              });
+                                              Future.microtask(() {
+                                                Navigator.of(context).pop();
+                                              });
+
+                                            }
+                                            else{
+
+                                            }
                                           }
-                                        }
 
 
 
-                                      },
-                                    ), // Add an icon on the trailing side
-                                  ),
-                                );
-                              } else {
-                                return Container();
-                              }
-                            },
-                          ),
+                                        },
+                                      ), // Add an icon on the trailing side
+                                    ),
+                                  );
+                                } else {
+                                  return Container();
+                                }
+                              },
+                            ),
 
-                        ],
+                          ],
+                        ),
+
                       ),
-
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             );
@@ -2224,15 +2249,20 @@ class SearchBarField extends StatelessWidget {
     required this.searchMethod,
     required this.scanProductMethod,
     required this.searchController,
+    required this.searchBy,
   }) : super(key: key);
 
   final void Function(String) searchMethod;
   final void Function() scanProductMethod;
   final TextEditingController searchController;
+  final void Function(String) searchBy;
 
 
   @override
   Widget build(BuildContext context) {
+     // Default selected option
+
+    List<String> _dropdownOptions = ['Name', 'Code'];
     return Container(
       margin: const EdgeInsets.fromLTRB(5, 20, 5, 0),
       child: TextField(
@@ -2241,7 +2271,30 @@ class SearchBarField extends StatelessWidget {
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(50.0),
           ),
-          labelText: 'Search',
+
+          prefixIcon: Padding(
+            padding: const EdgeInsets.fromLTRB(15, 0, 0, 0),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value:(Get.put(StockQuery()).selectedOption),
+                onChanged: (newValue) {
+                  //(Get.put(StockQuery()).updateSelected(newValue));
+                 searchBy(newValue!);
+                },
+                items: _dropdownOptions.map((option) {
+                  return DropdownMenuItem(
+                    value: option,
+                    child: Text(option),
+                  );
+                }).toList(),
+              ),
+            ),
+          ),
+          labelText: 'Search By',
+
+          labelStyle: TextStyle(color: Colors.black), // Customize label color
+          floatingLabelBehavior: FloatingLabelBehavior.always,
+
 
           suffixIcon: IconButton(
             icon: const Icon(Icons.camera_alt),
@@ -2268,6 +2321,7 @@ class SearchBarField extends StatelessWidget {
               // You can navigate to a scan screen or perform a scan action here
             },
           ),
+
         ),
         onChanged: (text) async{
 
@@ -2277,6 +2331,7 @@ class SearchBarField extends StatelessWidget {
 
         },
       ),
+
     );
   }
 }
@@ -2426,7 +2481,7 @@ class ProductSearchList extends StatelessWidget {
                         children: [
 
                           const Icon(Icons.segment,color:Colors.orange,size:13,),
-                          Text("tags:${searchResult[index]["tags"]} "),
+                          Text("tags:${searchResult[index]["ProductName"]} "),
 
 
 

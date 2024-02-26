@@ -1816,10 +1816,10 @@ var resultObject=resultData[i];
   <td data-label="#"><i class="fas fa-trash text-danger mylogout " title="Delete This Product in Safari" onclick="return deleteStockQty('${btoa(JSON.stringify(resultObject))}',this,'${safariName}')"></i>  ${i+1}</td>
   <td data-label="Name">${resultData[i].productCode}</td>
   <td data-label="Fact Price $">
-  ${(resultData[i].status!='spendSafaris')?`<span class="Formchange" id="CustomPrice_Add_1" onchange="return  OnChangeFactPrice('${btoa(JSON.stringify(resultObject))}',this,'${safariName}')" onkeyup="return OnChangeFactPrice('${btoa(JSON.stringify(resultObject))}',this,'${safariName}')" contenteditable="true">${resultData[i].price}</span><span class="${"Price_"+(resultData[i].productCode).replace(/[.\s'`]/g, '')}"></span>`:'Spending'}
+  ${(resultData[i].status!='spendSafaris')?`<span class="Formchange" id="CustomPrice_Add_1" onchange="return  OnChangeFactPrice('${btoa(JSON.stringify(resultObject))}',this,'${safariName}')" onkeyup="return OnChangeFactPrice('${btoa(JSON.stringify(resultObject))}',this,'${safariName}')" contenteditable="true">${resultData[i].price}</span><span class="${"Price_"+(resultData[i].productCode).replace(/[-!"#$%&'()*+,.\/:;<=>?@[\\\]^`{|}~_.\s'`]/g, '')}"></span>`:'Spending'}
   </td>
   <td data-label="Init qty">
-  ${(resultData[i].status!='spendSafaris')?`<span class="Formchange" id="CustomPrice_Add_1 test" onchange="return  OnChangeInitQty('${btoa(JSON.stringify(resultObject))}',this,'${safariName}')" onkeyup="return OnChangeInitQty('${btoa(JSON.stringify(resultObject))}',this,'${safariName}')" contenteditable="true">${resultData[i].totQty}</span><span class="${"Qty_"+(resultData[i].productCode).replace(/[.\s'`]/g, '')}"></span>`:'Spending'}
+  ${(resultData[i].status!='spendSafaris')?`<span class="Formchange" id="CustomPrice_Add_1 test" onchange="return  OnChangeInitQty('${btoa(JSON.stringify(resultObject))}',this,'${safariName}')" onkeyup="return OnChangeInitQty('${btoa(JSON.stringify(resultObject))}',this,'${safariName}')" contenteditable="true">${resultData[i].totQty}</span><span class="${"Qty_"+(resultData[i].productCode).replace(/[-!"#$%&'()*+,.\/:;<=>?@[\\\]^`{|}~_.\s'`]/g, '')}"></span>`:'Spending'}
  </td>
   <td data-label="Spending">${resultData[i].TotBuyAmount}</td>
   <td data-label="SoldOut Qty">${resultData[i].SoldOut}</td>
@@ -1890,10 +1890,10 @@ var resultData=data["result"];
   <td data-label="#"><i class="fas fa-trash text-danger mylogout " title="Delete This Product in Safari" onclick="return deleteStockQty('${btoa(JSON.stringify(resultObject))}',this,'${safariName}')"></i>  ${i+1}</td>
   <td data-label="Name">${resultData[i].productCode}</td>
   <td data-label="Fact Price $">
-  ${(resultData[i].status!='spendSafaris')?`<span class="Formchange" id="CustomPrice_Add_1" onchange="return  OnChangeFactPrice('${btoa(JSON.stringify(resultObject))}',this,'${safariName}')" onkeyup="return OnChangeFactPrice('${btoa(JSON.stringify(resultObject))}',this,'${safariName}')" contenteditable="true">${resultData[i].price}</span><span class="${"Price_"+(resultData[i].productCode).replace(/[.\s'`]/g, '')}"></span>`:'Spending'}
+  ${(resultData[i].status!='spendSafaris')?`<span class="Formchange" id="CustomPrice_Add_1" onchange="return  OnChangeFactPrice('${btoa(JSON.stringify(resultObject))}',this,'${safariName}')" onkeyup="return OnChangeFactPrice('${btoa(JSON.stringify(resultObject))}',this,'${safariName}')" contenteditable="true">${resultData[i].price}</span><span class="${"Price_"+(resultData[i].productCode).replace(/[-!"#$%&'()*+,.\/:;<=>?@[\\\]^`{|}~_.\s'`]/g, '')}"></span>`:'Spending'}
   </td>
   <td data-label="Init qty">
-  ${(resultData[i].status!='spendSafaris')?`<span class="Formchange" id="CustomPrice_Add_1 test" onchange="return  OnChangeInitQty('${btoa(JSON.stringify(resultObject))}',this,'${safariName}')" onkeyup="return OnChangeInitQty('${btoa(JSON.stringify(resultObject))}',this,'${safariName}')" contenteditable="true">${resultData[i].totQty}</span><span class="${"Qty_"+(resultData[i].productCode).replace(/[.\s'`]/g, '')}"></span>`:'Spending'}
+  ${(resultData[i].status!='spendSafaris')?`<span class="Formchange" id="CustomPrice_Add_1 test" onchange="return  OnChangeInitQty('${btoa(JSON.stringify(resultObject))}',this,'${safariName}')" onkeyup="return OnChangeInitQty('${btoa(JSON.stringify(resultObject))}',this,'${safariName}')" contenteditable="true">${resultData[i].totQty}</span><span class="${"Qty_"+(resultData[i].productCode).replace(/[-!"#$%&'()*+,.\/:;<=>?@[\\\]^`{|}~_.\s'`]/g, '')}"></span>`:'Spending'}
  </td>
   <td data-label="Spending">${resultData[i].TotBuyAmount}</td>
   <td data-label="SoldOut Qty">${resultData[i].SoldOut}</td>
@@ -1936,8 +1936,10 @@ function OnChangeInitQty(dataPass,thisdata,safari)
     data=atob(dataPass);
     data=JSON.parse(data);
     console.log(data);
-    var classData=(data["productCode"]).replace(/[.\s'`]/g, '');
+    var classData=(data["productCode"]).replace(/[-!"#$%&'()*+,.\/:;<=>?@[\\\]^`{|}~_.\s'`]/g, '');
     console.log(classData);
+    //classData=atob(classData);
+   // classData="YWtheXVuZ2lybyBrYW5pbmkga2ljeWF5aSAoNTAgZHpuKQ==";
 
     $(`.${"Qty_"+classData}`).html(`<i class="fas fa-check text-success mylogout" onclick="return EditStockQty('${dataPass}','${btoa(initQty)}','${safari}')"></i>`);
 
@@ -2047,7 +2049,7 @@ function OnChangeFactPrice(dataPass,thisdata,safari)
     data=atob(dataPass);
     data=JSON.parse(data);
     console.log(data);
-    var classData=(data["productCode"]).replace(/[.\s'`]/g, '');
+    var classData=(data["productCode"]).replace(/[-!"#$%&'()*+,.\/:;<=>?@[\\\]^`{|}~_.\s'`]/g, '');
     $(`.${"Price_"+classData}`).html(`<i class="fas fa-check text-success mylogout" onclick="return EditStockFactPrice('${dataPass}','${btoa(factPrice)}','${safari}')"></i>`);
 }
 function EditStockFactPrice(dataPass,factPrice,safari)

@@ -11,6 +11,7 @@ class Topups {
   final int ?startlimit;
   final int ?endlimit;
   final String?optionCase;
+  final String?advancedSearch;
   final String?name;
   final String?safariId;
   final bool?searchOption;
@@ -34,6 +35,7 @@ class Topups {
     this.startlimit,
     this.endlimit,
     this.optionCase,
+    this.advancedSearch,
     this.name,
     this.safariId,
     this.searchOption,
@@ -57,6 +59,7 @@ class Topups {
       startlimit:json['startlimit'],
       endlimit:json['endlimit'],
       optionCase:json['optionCase'],
+      advancedSearch:json['advancedSearch'],
       name:json['name'],
       safariId:json['safariId'],
       searchOption:json['searchOption'],
@@ -78,6 +81,7 @@ class Topups {
       'startlimit':startlimit,
       'endlimit':endlimit,
       'optionCase':optionCase,
+      'advancedSearch':advancedSearch,
       'searchOption':searchOption,
       'created_at': created_at,
       'updated_at': updated_at

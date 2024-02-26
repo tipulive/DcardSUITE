@@ -187,12 +187,12 @@ class _SetDeptCompState extends State<SetDeptComp> {
                 trailing:PopupMenuButton(
                   itemBuilder:(container)=>[
                     PopupMenuItem(
-                        child: GestureDetector(
-                          onTap: (){
+                        child: InkWell(
+                          onTap: () async{
                             setState(() {
                               viewOption="false";
                             });
-                            viewData('test',false);
+                            await viewData('test',false);
                           },
                           child: Column(
                             children: [
@@ -223,13 +223,13 @@ class _SetDeptCompState extends State<SetDeptComp> {
                         )
                     ),
                     PopupMenuItem(
-                        child: GestureDetector(
-                          onTap: (){
+                        child:InkWell(
+                          onTap: () async{
                             //print("type All");
                             setState(() {
                               viewOption="true";
                             });
-                            viewData('test',false);
+                            await viewData('test',false);
 
                           },
                           child: Column(
@@ -1297,37 +1297,7 @@ class _SetDeptCompState extends State<SetDeptComp> {
 
   }
 
-  stockCount(indexData)async
-  {
 
-
-    (Get.put(HideShowState())).isChangeDelivery(thisListOrder[indexData],indexData,qtyProduct);
-
-
-    // print((Get.put(HideShowState()).delivery)[indexData]);
-    //print(thisListOrder[indexData]);
-
-
-
-
-
-    /*var resultData=(await StockQuery().stockCount(Topups(uid:"${orderData[0]}"),QuickBonus(uid:"${productCode}",qty:"${qty_product}",subscriber:"StockName",status:"status",description:"Delivered"), User(uid: "UidTransport",name:"refName"))).data;
-
-
-    if(resultData["status"])
-    {
-      Quickdata();
-      thisOrder2();
-
-    }*/
-
-
-
-
-
-
-
-  }
 
 
 

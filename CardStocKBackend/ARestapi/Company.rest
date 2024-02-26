@@ -816,7 +816,7 @@ Authorization: Bearer {{Auth_token}}
 {
 "productCode":"nyota",
 "uidClient":"kebineericMuna_1674160265",
-"req_qty":5,
+"req_qty":40,
 "ref":"test",
 "comment":"ok",
 "statusForm":"none",
@@ -877,7 +877,7 @@ Authorization: Bearer {{Auth_token}}
 {
 "uid":"Nyota_1672353378",
 "uidUser":"kebineericMuna_1674160265",
-"OrderId":"UID_vE_1705220510",
+"OrderId":"UID_e2_1707876339",
 "inputData":"30",
 "all_total":"250",
 "reach":"1200",
@@ -893,8 +893,11 @@ Content-Type: application/json
 Authorization: Bearer {{Auth_token}}
 
 {
-"searchOption":false,
-"name":"b"
+"searchOption":"false",
+"name":"be",
+"advancedSearch":"choosedate",
+"thisDate":"2024-2-8",
+"toDate":"none"
 
 }
 ### View Order When Someone Submit
@@ -1207,7 +1210,7 @@ content-type: application/json;charset=UTF-8
 Authorization: Bearer {{Auth_token}}
 
 {
-"orderId":"UID_jT_1702383743"
+"orderId":"UID_e2_1707876339"
 }
 
 
@@ -1218,14 +1221,35 @@ content-type: application/json;charset=UTF-8
 Authorization: Bearer {{Auth_token}}
 
 {
-"uid":"UID_jT_1702383743",
-"productCode":"bido_1698592481",
+"uid":"UID_MU_1705831515",
+"productCode":"nyota",
 "uidTransport":"Qito",
-"qty_Transport":1,
+"qty_Transport":-1,
 "stockName":"M crispin",
 "ref":"NeeMaUid",
 "status":"delivered",
 "comment":"comment Test"
+
+
+
+
+
+}
+###stockcount edit
+GET  {{baseUrl}}/StockCountEdit
+content-type: application/json;charset=UTF-8
+Authorization: Bearer {{Auth_token}}
+
+{
+"uid":"UID_8p_1707939776",
+"productCode":"nyota",
+"uidTransport":"Qito",
+"qty_Transport":43,
+"stockName":"M crispin",
+"ref":"NeeMaUid",
+"status":"reverse",
+"comment":"comment Test",
+"carduid":"TEALTD_7hEnj_1672352175"
 
 
 

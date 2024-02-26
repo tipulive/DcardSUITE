@@ -17,6 +17,11 @@ import '../models/QuickBonus.dart';
 
 class StockQuery extends GetxController{
 
+  String selectedOption = 'Code';
+  updateSelected(valData){
+    selectedOption=valData!;
+    update();
+  }
 bool resizable=true;
 updateResizable(valData)
 {
@@ -605,9 +610,13 @@ print(params);
         "LimitStart":topupData.endlimit,  //page
         "LimitEnd":topupData.startlimit,//limit
         "name":topupData.name,
-        "searchOption":topupData.searchOption
+        "searchOption":topupData.optionCase,
+        "advancedSearch":topupData.advancedSearch,
+        "thisDate":topupData.created_at,
+        "toDate":topupData.updated_at??'none'
 
       };
+      //print(params);
       String authToken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
       var url="${ConstantClassUtil.urlLink}/viewSales";
       var response = await Dio().get(url,

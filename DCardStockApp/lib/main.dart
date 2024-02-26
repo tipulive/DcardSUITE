@@ -14,8 +14,8 @@ import 'package:get/get.dart';
 
 
 import 'Query/AdminQuery.dart';
-//import 'api/firebaseApi.dart';
-//import 'firebase_options.dart';
+import 'api/firebaseApi.dart';
+import 'firebase_options.dart';
 
 
 
@@ -23,10 +23,10 @@ void main() async{
   /*this will make apps not going to sleep Mode*/
 
   WidgetsFlutterBinding.ensureInitialized();
- /* await Firebase.initializeApp(
+ await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
- await FirebaseApi().initialize();*/
+ await FirebaseApi().initialize();
 
   Wakelock.enable();
   //i may add  Wakelock.disable(); // to make apps to go on sleep mode

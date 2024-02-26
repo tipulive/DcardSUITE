@@ -10,7 +10,6 @@ import '../../../models/Topups.dart';
 import '../../../models/User.dart';
 import 'package:get/get.dart';
 
-import '../../Query/ParticipatedQuery.dart';
 import '../../Query/StockQuery.dart';
 import 'package:flutter/material.dart';
 
@@ -64,6 +63,9 @@ class _ProductCompState extends State<ProductComp> {
   String pcs="";
   String actionStatus="updatePrice";
   String withTotal="true";
+
+  List<String> _dropdownOptions = ['Name', 'Code'];
+  String selectOption="Code";
 
 
 
@@ -315,7 +317,28 @@ final fontSizeData=13.0;
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(50.0),
               ),
-              labelText: 'Search',
+              prefixIcon: Padding(
+                padding: const EdgeInsets.fromLTRB(15, 0, 0, 0),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value:selectOption,
+                    onChanged: (newValue) {
+                      setState(() {
+                        selectOption=newValue!;
+                      });
+                    },
+                    items: _dropdownOptions.map((option) {
+                      return DropdownMenuItem(
+                        value: option,
+                        child: Text(option),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
+              labelText: 'Search By',
+              labelStyle: TextStyle(color: Colors.black), // Customize label color
+              floatingLabelBehavior: FloatingLabelBehavior.always, // Always show the label above the TextField
             ),
             onChanged: (text) async{
 
@@ -413,7 +436,6 @@ final fontSizeData=13.0;
 
                                                 ),
                                                 onChanged: (text) {
-                                                  print(text);
                                                   if((int.tryParse(text) != null)){
 
                                                     pcs=text;
@@ -532,7 +554,7 @@ final fontSizeData=13.0;
 
 
                           ),
-                          SizedBox(height: 5,),
+                          const SizedBox(height: 5,),
                           // Text("tags:${_data[index]['tags']}"),
                           Text.rich(
                               style: DefaultTextStyle.of(context).style,
@@ -572,7 +594,6 @@ final fontSizeData=13.0;
 
                                           ),
                                           onChanged: (text) {
-                                            print(text);
 
 
 
@@ -715,20 +736,19 @@ final fontSizeData=13.0;
     try {
 
       (Get.put(StockQuery()).updateHideLoader(false));
-      var resultData=(await StockQuery().updateProducts(QuickBonus(uid:"${productCode1}",productName:"${productName1}",price:"${price1}",giftPcs:pcs,status:actionStatus))).data;
-      print(resultData);
+      var resultData=(await StockQuery().updateProducts(QuickBonus(uid:productCode1,productName:productName1,price:price1,giftPcs:pcs,status:actionStatus))).data;
       if(resultData["status"])
       {
        // resetForm();
-        Get.snackbar("Success", "${productName1}",backgroundColor: Color(0xff9a1c55),
-            colorText: Color(0xffffffff),
-            titleText: Text("Updated Successfully",  style: TextStyle(
+        Get.snackbar("Success", productName1,backgroundColor: const Color(0xff9a1c55),
+            colorText: const Color(0xffffffff),
+            titleText: const Text("Updated Successfully",  style: TextStyle(
               color: Colors.white, // Set the text color here
 
             ),),
 
-            icon: Icon(Icons.access_alarm),
-            duration: Duration(seconds: 3));
+            icon: const Icon(Icons.access_alarm),
+            duration: const Duration(seconds: 3));
         if(actionStatus=="updatePrice")
           {
             //await stockTotal("test","totalStock");
@@ -754,7 +774,6 @@ final fontSizeData=13.0;
 
 
     } catch (e) {
-      print(e);
     }
   }
   getDebt(qrScanData) async{
@@ -888,7 +907,10 @@ final fontSizeData=13.0;
     isLoading=true;
     int limit=10;
 
-    var resultData=(await StockQuery().product(QuickBonus(uid:nameVal,productName:productName,status:qrSearch),Topups(optionCase:isProductAction,startlimit:limit,endlimit:_page,purpose:withTotal))).data;
+    String productCode=(selectOption=="Code")?nameVal:"none";
+    String productNames=(selectOption=="Name")?nameVal:'none';
+
+    var resultData=(await StockQuery().product(QuickBonus(uid:productCode,productName:productNames,status:qrSearch),Topups(optionCase:isProductAction,startlimit:limit,endlimit:_page,purpose:withTotal))).data;
 
 
     if(resultData["status"])
@@ -1550,38 +1572,6 @@ final fontSizeData=13.0;
       // Get.put(HideShowState()).isDelivery(0);
       //do whatever you want after closing the bottom sheet
     });
-
-  }
-
-  stockCount(indexData)async
-  {
-
-
-    (Get.put(HideShowState())).isChangeDelivery(thisListOrder[indexData],indexData,qtyProduct);
-
-
-    // print((Get.put(HideShowState()).delivery)[indexData]);
-    //print(thisListOrder[indexData]);
-
-
-
-
-
-    /*var resultData=(await StockQuery().stockCount(Topups(uid:"${orderData[0]}"),QuickBonus(uid:"${productCode}",qty:"${qty_product}",subscriber:"StockName",status:"status",description:"Delivered"), User(uid: "UidTransport",name:"refName"))).data;
-
-
-    if(resultData["status"])
-    {
-      Quickdata();
-      thisOrder2();
-
-    }*/
-
-
-
-
-
-
 
   }
 
