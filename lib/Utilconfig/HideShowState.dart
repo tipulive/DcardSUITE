@@ -19,6 +19,11 @@ class HideShowState extends GetxController{
   ].obs;*/
   final dynamicList =[].obs;
   final delivery=[];
+  int indexCountData=0;
+  trackIndex(valData){
+    indexCountData=valData;
+    update();
+  }
 
 
   isDelivery(valData)
@@ -33,9 +38,17 @@ update();
 
 
   }
-  isChangeDelivery(valData,indexData,qty_product){
-    delivery[indexData]["totalCount"]=qty_product;
-    delivery.addAll(valData);
+  isHideDelivery(indexData,numb){
+    for (int i = 0; i < delivery.length; i++) {
+      delivery[i]["hideAddCart"] =0;
+    }
+
+    delivery[indexData]["hideAddCart"]=numb;
+    update();
+  }
+  isChangeDelivery(indexData,valData,qty_product,){
+    delivery[indexData]["${valData}"]="${qty_product}";
+
     update();
   }
   isHiden(valData){
@@ -46,6 +59,7 @@ update();
   }
   isValid(valData){
     isNumberValid.value=valData;
+    update();
   }
   isNumberCorrect(valData){
     isNumber.value=valData;

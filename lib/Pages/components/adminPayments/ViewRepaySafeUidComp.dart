@@ -1,9 +1,6 @@
 import 'dart:math';
 
 
-import 'package:qr_code_scanner/qr_code_scanner.dart';
-
-import '../../../Query/ParticipatedQuery.dart';
 import '../../../Utilconfig/HideShowState.dart';
 import '../../../models/QuickBonus.dart';
 
@@ -11,8 +8,7 @@ import '../../../models/Topups.dart';
 import '../../../models/User.dart';
 import 'package:get/get.dart';
 
-import '../../Query/StockQuery.dart';
-import '../../models/BonusModel.dart';
+import '../../../Query/StockQuery.dart';
 import 'package:flutter/material.dart';
 
 import 'package:google_fonts/google_fonts.dart';
@@ -21,20 +17,19 @@ import 'package:google_fonts/google_fonts.dart';
 
 
 
-class SetRepayComp extends StatefulWidget {
-  const SetRepayComp({Key? key}) : super(key: key);
+class ViewRepaySafeUidComp extends StatefulWidget {
+  const ViewRepaySafeUidComp({Key? key}) : super(key: key);
 
   @override
-  State<SetRepayComp> createState() => _SetRepayCompState();
+  State<ViewRepaySafeUidComp> createState() => _ViewRepaySafeUidCompState();
 }
 
-class _SetRepayCompState extends State<SetRepayComp> {
+class _ViewRepaySafeUidCompState extends State<ViewRepaySafeUidComp> {
 
   final ScrollController _scrollController = ScrollController();// detect scroll
   final List<dynamic> _data = [];
   List<dynamic> thisListOrder = [];
   List<dynamic> orderData = [];
-  List<dynamic>qrDebt = [];
 
 
   var bottomResult=[];
@@ -47,12 +42,10 @@ class _SetRepayCompState extends State<SetRepayComp> {
   bool isLoading=false;
   num qtyProduct=1;
   String productCode="";
-  num inputData=0;
 
-  bool cameraValue=false;
-  bool flashValue=false;
+
   String clientOrder="";
-
+  String orderId="";
   bool btnExpenseHide=false;
   bool btnExpenseEditHide=false;
   TextEditingController balance=TextEditingController();
@@ -63,11 +56,19 @@ class _SetRepayCompState extends State<SetRepayComp> {
   TextEditingController balanceEdit=TextEditingController();
   TextEditingController purposeEdit=TextEditingController();
   TextEditingController commentDataEdit=TextEditingController();
+  String safariId="none";
+  String safariName="SafariName";
+  String totalAmount="0";
+  String userid="";
+  String options="true";
+  num inputData=0;
+  int maxLength = 15; // Set your desired maximum length
 
 
-  final GlobalKey qrkey = GlobalKey(debugLabel: 'QR');
-  Barcode?result;
-  QRViewController?controller;
+
+
+
+
 
 
   bool showOveray=false;
@@ -142,7 +143,7 @@ class _SetRepayCompState extends State<SetRepayComp> {
                               Center(
                                 child: RichText(
                                   text: TextSpan(
-                                    text: "Repay Dept:",
+                                    text: "Total:",
                                     style: DefaultTextStyle.of(context).style,
                                     children: const <TextSpan>[
 
@@ -172,8 +173,7 @@ class _SetRepayCompState extends State<SetRepayComp> {
                           children: [
 
                             const Icon(Icons.segment,color:Colors.orange,size:13,),
-                            Text("${(_data.isNotEmpty)?_data[0]['borrowBalance']:0}",style:GoogleFonts.pacifico(fontSize:15,color: Colors.orange,fontWeight: FontWeight.w700)),
-
+                            Text("${(_data.isNotEmpty)?totalAmount:0}",style:GoogleFonts.pacifico(fontSize:15,color: Colors.orange,fontWeight: FontWeight.w700)),
 
                           ],
                         ),
@@ -191,7 +191,7 @@ class _SetRepayCompState extends State<SetRepayComp> {
                 trailing:GestureDetector(
                     onTap: () async{
 
-                      getDebtWidget();
+                      addSpending();
 
                     },
                     child:const Icon(Icons.grid_view,color:Colors.orange)
@@ -218,29 +218,7 @@ class _SetRepayCompState extends State<SetRepayComp> {
             ),
             onChanged: (text) async{
 
-              try {
-
-                var resultData=(await ParticipatedQuery().getSearchAllStockOnline(Topups(startlimit:limit,endlimit:_page),BonusModel(uidUser:'',productName:text))).data;
-                if(resultData["status"])
-                {
-                  setState(() {
-                    //print(Resul);
-                    isLoading=false;
-                    hasMoreData=false;
-                    _data.clear();
-
-                    _data.addAll(resultData["result"]);
-                  });
-                }
-                else{
-                  _data.clear();
-                  quickData();
-                }
-
-
-              } catch (e) {
-
-              }
+              viewData(text,true);
 
               //print(this._data[index]["total_var"]);
               // print("Text changed to: $text");
@@ -260,118 +238,201 @@ class _SetRepayCompState extends State<SetRepayComp> {
                 FocusNode test=FocusNode() ;
 
                 _data[index]['focusNode']=test;
-                return Card(
-                  elevation:0,
-                  //margin: EdgeInsets.symmetric(vertical:1,horizontal:5),
-                  //color:Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(9.0),
-                    side: BorderSide(color:_data[index]["color_var"]??true?Colors.white:Colors.green, width: 2),
-                  ),
-
-                  child: ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor:getRandomColor(),
-                        child: Icon(_getRandomIcon()),
+                return Stack(
+                  children: [
+                    Card(
+                      elevation:0,
+                      //margin: EdgeInsets.symmetric(vertical:1,horizontal:5),
+                      //color:Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(9.0),
+                        side: BorderSide(color:_data[index]["color_var"]??true?Colors.white:Colors.green, width: 2),
                       ),
-                      title:Row(
-                        children: [
+
+                      child: ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor:getRandomColor(),
+                          child: Icon(_getRandomIcon()),
+                        ),
+                        title:Row(
+
+                          children: [
+
+                            Expanded(
+                              flex: 1,
+                              child: Stack(
+                                children: [
+
+                                  Column(
+                                    children: [
+
+                                      Padding(
+                                        padding: const EdgeInsets.fromLTRB(0, 10, 0, 2),
+                                        child: RichText(
+                                          text: TextSpan(
+                                            text: "${_data[index]['name']}",
+                                            style: DefaultTextStyle.of(context).style,
+                                            children: const <TextSpan>[
 
 
-                          Expanded(
-                            flex: 1,
-                            child: Stack(
-                              children: [
-
-                                Column(
-                                  children: [
-
-                                    Padding(
-                                      padding: const EdgeInsets.fromLTRB(0, 10, 0, 2),
-                                      child: RichText(
-                                        text: TextSpan(
-                                          text: "${_data[index]['AmountOwner']}",
-                                          style: DefaultTextStyle.of(context).style,
-                                          children: const <TextSpan>[
-
-
-                                          ],
+                                            ],
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                ),
+                                    ],
+                                  ),
 
 
-                              ],
+                                ],
+                              ),
                             ),
+
+                          ],
+                        ),
+
+                        subtitle: Padding(
+                          padding: const EdgeInsets.fromLTRB(0, 5, 0,5),
+                          child: Row(
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+
+
+                                  Wrap(
+                                    crossAxisAlignment: WrapCrossAlignment.center,
+                                    children: [
+
+                                      const Icon(Icons.segment,color:Colors.orange,size:13,),
+                                      Text("Paid:${_data[index]['amount']}"),
+
+                                    ],
+                                  ),
+
+                                 /* Wrap(
+                                    crossAxisAlignment: WrapCrossAlignment.center,
+                                    children: [
+
+                                      const Icon(Icons.segment,color:Colors.orange,size:13,),
+                                      Text("${_data[index]['status']}"),
+
+                                    ],
+                                  ),*/
+
+
+
+                                ],
+                              ),
+
+                            ],
                           ),
-                        ],
-                      ),
-
-                      subtitle: Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 5, 0, 10),
-                        child: Row(
+                        ),
+                        trailing: Stack(
                           children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
-                                Wrap(
-                                  crossAxisAlignment: WrapCrossAlignment.center,
-                                  children: [
+                                IconButton(
+                                  icon: const Icon(Icons.edit),
+                                  onPressed: () {
+                                    // Handle the first icon tap
+                                    Get.dialog(
+                                      AlertDialog(
+                                        title: const Text('Confirmation'),
+                                        content: Text('Do you want to Edit ${_data[index]['OrderId']} ?'),
+                                        actions: [
+                                          ElevatedButton(
+                                            style: ElevatedButton.styleFrom(
 
-                                    const Icon(Icons.segment,color:Colors.orange,size:13,),
-                                    Text("Amount:${_data[index]['amount']}"),
+                                              //primary: Colors.grey[300],
+                                              backgroundColor: Colors.red,
+                                              elevation:0,
+                                            ),
+                                            onPressed: () async{
+                                              if(isLoading) return;
+                                              isLoading=true;
+                                              int limit=10;
 
-                                  ],
+                                              var resultData=(await StockQuery().editOrder(Topups(uid:_data[index]['OrderId']))).data;
+
+                                              if(resultData["status"])
+                                              {
+
+
+
+                                                if(resultData["result"]!=0)
+                                                {
+                                                  Get.toNamed('/home');
+                                                }
+                                                else{
+                                                  setState(() {
+                                                    isLoading=false;
+                                                    hasMoreData=false;
+                                                    _data.clear();
+
+
+                                                  });
+                                                }
+
+
+
+
+                                              }
+                                              else{
+                                                setState(() {
+                                                  isLoading=false;
+                                                  hasMoreData=false;
+                                                  _data.clear();
+
+
+                                                });
+                                              }
+
+
+                                            },
+                                            child: const Text('Yes'),
+                                          ),
+                                          ElevatedButton(
+                                            onPressed: () {
+                                              Get.back(); // close the alert dialog
+                                            },
+                                            child: const Text('Close'),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
                                 ),
 
+                                IconButton(
+                                  icon: const Icon(Icons.grid_view,color:Colors.orange),
+                                  onPressed: () async{
 
-
-
-
+                                  },
+                                ),
                               ],
                             ),
 
                           ],
                         ),
+
+                        //trailing: Text()
                       ),
-                      trailing:GestureDetector(
-                          onTap: () async{
-                            // This function will be called when the icon is tapped.
-                            // thisOrder(_data[index],index);
+                    ),
+                    Positioned(
+                      top:10,
+                      right: 28,
 
 
-
-                            orderData=_data[index].values.toList();
-
-
-                            //print((await thisOrder())["result"]);
-                            var resultData=(await thisOrder());
-                            //print(resultData);
-                            if(resultData["status"]){
-
-
-                              setState(() {
-                                isLoading=false;
-                                thisListOrder.clear();
-
-                                thisListOrder.addAll(resultData["result"]);
-
-
-                              });
-                              viewThisOrder();
-                            }
-
-                            //
-
-
-                          },
-                          child:const Icon(Icons.grid_view,color:Colors.orange)
-                      )
-
-                    //trailing: Text()
-                  ),
+                      child: Center(
+                        child: Text(
+                          '${_data[index]['created_at']}',
+                          style: const TextStyle(color: Colors.deepOrange,fontSize: 10),
+                        ),
+                      ),
+                    ),
+                  ],
                 );
 
               }
@@ -418,136 +479,8 @@ class _SetRepayCompState extends State<SetRepayComp> {
 
 
     _scrollController.dispose();
-    controller?.dispose();
     super.dispose();
   }
-  void _onQRViewCreated(QRViewController controller)
-  {
-    this.controller=controller;
-    controller.resumeCamera();
-    controller.scannedDataStream.listen((scanData) async{
-      setState((){
-        result=scanData;
-      });
-      //await scanMethod();
-      // print("${result!.code}");
-      if(result!=null)
-      {
-        // controller!.pauseCamera();
-
-        bool containsProductCode = qrDebt.any((item) => item['cardUid'] == result!.code);
-        if(containsProductCode)
-        {
-          //data already scaned
-
-        }
-        else{
-          var listData={
-            "cardUid":result!.code
-          };
-          qrDebt.insertAll(0,[listData]);
-
-          getDebt(result!.code);
-
-
-        }
-        //
-      }
-    });
-  }
-
-  getDebt(qrScanData) async{
-    try {
-      (Get.put(StockQuery()).updatePaidDeptScanHide(true));
-      (Get.put(StockQuery()).updateHideLoader(false));
-      var resultData=(await StockQuery().getDebt(User(uid:'none',carduid:qrScanData))).data;
-      //print(resultData);
-      if(resultData["status"])
-      {
-        (Get.put(StockQuery()).updateHideLoader(true));
-        (Get.put(StockQuery()).updatePaidDeptScanHide(false));
-        (Get.put(StockQuery()).updateClientDebt(resultData["result"][0]));
-
-        /* setState(() {
-        (Get.put(StockQuery()).updateClientDebt(resultData["result"][0]));
-
-      });*/
-
-
-
-
-
-      }
-      else{
-        (Get.put(StockQuery()).updateHideLoader(true));
-
-      }
-
-
-    } catch (e) {
-
-    }
-  }
-  paidDebt() async{
-    try {
-      (Get.put(StockQuery()).updateHideLoader(false));
-      var resultData=(await StockQuery().paidDept(User(uid:"${(Get.put(StockQuery()).clientDebt)["uidUser"]}",inputData:inputData))).data;
-      if(resultData["status"])
-      {
-        (Get.put(StockQuery()).clientDebt).clear();
-        (Get.put(StockQuery()).updateHideLoader(true));
-
-        (Get.put(StockQuery()).updateClientDebt(resultData["result"]));
-
-      }
-      else{
-        (Get.put(StockQuery()).updateHideLoader(true));
-
-      }
-
-
-    } catch (e) {
-      (Get.put(StockQuery()).updateHideLoader(true));
-    }
-  }
-  Widget cameraSwitch()=>Transform.scale(
-    scale: 1,
-    child: Switch.adaptive(
-        activeColor: Colors.red,
-        activeTrackColor: Colors.red.withOpacity(0.4),
-        inactiveThumbColor: Colors.orange,
-        inactiveTrackColor: Colors.blueAccent,
-
-        value: cameraValue,
-        onChanged:(value)async{
-          setState((){
-            cameraValue=value;
-
-            //print(value);
-          });
-          await controller!.resumeCamera();
-        }
-    ),
-  );
-  Widget flashSwitch()=>Transform.scale(
-    scale: 1,
-    child: Switch.adaptive(
-        activeColor: Colors.red,
-        activeTrackColor: Colors.red.withOpacity(0.4),
-        inactiveThumbColor: Colors.orange,
-        inactiveTrackColor: Colors.blueAccent,
-
-        value:flashValue,
-        onChanged:(value)async{
-          setState((){
-            flashValue=value;
-
-            //print(value);
-          });
-          await controller!.toggleFlash();
-        }
-    ),
-  );
 
 
 
@@ -569,13 +502,24 @@ class _SetRepayCompState extends State<SetRepayComp> {
 
   //
 
-  quickData()async
+  quickData()
+  {
+    Map<String, dynamic> arguments = Get.arguments as Map<String, dynamic>;
+    userid=arguments["userid"];
+    totalAmount=arguments["totalAmount"];
+
+
+    viewData('test',false);
+
+  }
+  viewData(nameVal,searchVal) async
   {
     if(isLoading) return;
     isLoading=true;
     int limit=10;
 
-    var resultData=(await StockQuery().viewBorrowBalance(Topups(startlimit:limit,endlimit:_page))).data;
+    var resultData=(await StockQuery().viewSafeBorrow(Topups(startlimit:limit,endlimit:_page,name:nameVal,searchOption:searchVal,optionCase:options,uid:userid))).data;
+
     if(resultData["status"])
     {
 
@@ -614,10 +558,7 @@ class _SetRepayCompState extends State<SetRepayComp> {
 
       });
     }
-
-
   }
-
   thisOrder2()async
   {
     if(isLoading) return;
@@ -949,8 +890,34 @@ class _SetRepayCompState extends State<SetRepayComp> {
     });
 
   }
+  addSpendingMethod() async{
 
-  void getDebtWidget() async{
+    try {
+      (Get.put(StockQuery()).updateHideLoader(false));
+      var resultData=(await StockQuery().addSpending(Topups(uid:safariId,name:safariName,amount:"$inputData",purpose:purpose.text,desc:commentData.text,optionCase:options))).data;
+      if(resultData["status"])
+      {
+        viewData('test',false);
+        (Get.put(StockQuery()).updateHideLoader(true));
+
+        (Get.put(StockQuery()).updateClientDebt(resultData["result"]));
+
+      }
+      else{
+        //print(resultData);
+        (Get.put(StockQuery()).updateHideLoader(true));
+
+      }
+
+
+    } catch (e) {
+      (Get.put(StockQuery()).updateHideLoader(true));
+    }
+
+
+  }
+
+  void addSpending() async{
 
     Get.bottomSheet(
       StatefulBuilder(
@@ -960,7 +927,7 @@ class _SetRepayCompState extends State<SetRepayComp> {
               children: [
                 Container(
                   padding:const EdgeInsets.all(2.0),
-                  height: 600,
+                  height: 320,
                   decoration: const BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.only(
@@ -968,244 +935,241 @@ class _SetRepayCompState extends State<SetRepayComp> {
                       topRight: Radius.circular(30),
                     ),
                   ),
-                  child: Column(
-                    children: [
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
 
-                      // (result!=null)?Text("barcode Type ${describeEnum(result!.format)} Data ${result!.code}"): const Text("Scan Code"),
+                        // (result!=null)?Text("barcode Type ${describeEnum(result!.format)} Data ${result!.code}"): const Text("Scan Code"),
 
-                      GetBuilder<StockQuery>(
-                        builder: (controller) {
-                          //return Text('Data: ${_controller.data}');
-                          return Column(
-                            children: [
-                              Padding(
-                                padding:const EdgeInsets.fromLTRB(8,5,8,0),
-                                child: Card(
-                                  elevation:0,
-                                  margin: const EdgeInsets.symmetric(vertical:1,horizontal:5),
-                                  //color:Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(15.0),
-                                    //side: BorderSide(color:_data[0]["color_var"]??true?Colors.white:Colors.green, width: 2),
-                                  ),
+                        GetBuilder<StockQuery>(
+                          builder: (controller) {
+                            //return Text('Data: ${_controller.data}');
+                            return Column(
+                              children: [
+                                Padding(
+                                  padding:const EdgeInsets.fromLTRB(8,5,8,0),
+                                  child: Card(
+                                    elevation:0,
+                                    margin: const EdgeInsets.symmetric(vertical:1,horizontal:5),
+                                    //color:Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(15.0),
+                                      //side: BorderSide(color:_data[0]["color_var"]??true?Colors.white:Colors.green, width: 2),
+                                    ),
 
-                                  child: ListTile(
-                                      leading: CircleAvatar(
-                                        backgroundColor:getRandomColor(),
-                                        child: Icon(_getRandomIcon()),
-                                      ),
-                                      title:Row(
-                                        children: [
-
-
-                                          Expanded(
-                                            flex: 1,
-                                            child: Stack(
-                                              children: [
-
-                                                Column(
-                                                  children: [
-
-                                                    Center(
-                                                      child: RichText(
-                                                        text: TextSpan(
-                                                          text: "${(Get.put(StockQuery()).clientDebt)["name"]}",
-                                                          style: DefaultTextStyle.of(context).style,
-                                                          children: const <TextSpan>[
+                                    child: ListTile(
+                                        leading: CircleAvatar(
+                                          backgroundColor:getRandomColor(),
+                                          child: Icon(_getRandomIcon()),
+                                        ),
+                                        title:Row(
+                                          children: [
 
 
-                                                          ],
+                                            Expanded(
+                                              flex: 1,
+                                              child: Stack(
+                                                children: [
+
+                                                  Column(
+                                                    children: [
+
+                                                      Center(
+                                                        child: RichText(
+                                                          text: TextSpan(
+                                                            text: "${(Get.put(StockQuery()).clientDebt)["name"]}",
+                                                            style: DefaultTextStyle.of(context).style,
+                                                            children: const <TextSpan>[
+
+
+                                                            ],
+                                                          ),
                                                         ),
                                                       ),
-                                                    ),
+                                                    ],
+                                                  ),
+
+
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+
+                                        subtitle: Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Column(
+
+                                              children: [
+                                                Wrap(
+                                                  crossAxisAlignment: WrapCrossAlignment.center,
+                                                  children: [
+
+                                                    Text("DEPT",style:GoogleFonts.odorMeanChey(fontSize:16,color: Colors.green,fontWeight: FontWeight.w700)),
+
+
+                                                  ],
+                                                ),
+                                                Wrap(
+                                                  crossAxisAlignment: WrapCrossAlignment.center,
+                                                  children: [
+
+                                                    const Icon(Icons.segment,color:Colors.orange,size:13,),
+                                                    Text("${(Get.put(StockQuery()).clientDebt)["debt"]}",style:GoogleFonts.pacifico(fontSize:15,color: Colors.orange,fontWeight: FontWeight.w700)),
+
+
                                                   ],
                                                 ),
 
 
+
+
+
+
+
+
                                               ],
                                             ),
-                                          ),
-                                        ],
-                                      ),
 
-                                      subtitle: Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Column(
+                                          ],
+                                        ),
+                                        trailing:GestureDetector(
+                                            onTap: () async{
 
-                                            children: [
-                                              Wrap(
-                                                crossAxisAlignment: WrapCrossAlignment.center,
-                                                children: [
+                                              // getDebtWidget();
 
-                                                  Text("DEPT",style:GoogleFonts.odorMeanChey(fontSize:16,color: Colors.green,fontWeight: FontWeight.w700)),
+                                            },
+                                            child:const Icon(Icons.grid_view,color:Colors.orange)
+                                        )
 
-
-                                                ],
-                                              ),
-                                              Wrap(
-                                                crossAxisAlignment: WrapCrossAlignment.center,
-                                                children: [
-
-                                                  const Icon(Icons.segment,color:Colors.orange,size:13,),
-                                                  Text("${(Get.put(StockQuery()).clientDebt)["debt"]}",style:GoogleFonts.pacifico(fontSize:15,color: Colors.orange,fontWeight: FontWeight.w700)),
-
-
-                                                ],
-                                              ),
-
-
-
-
-
-
-
-
-                                            ],
-                                          ),
-
-                                        ],
-                                      ),
-                                      trailing:GestureDetector(
-                                          onTap: () async{
-
-                                            getDebtWidget();
-
-                                          },
-                                          child:const Icon(Icons.grid_view,color:Colors.orange)
-                                      )
-
-                                    //trailing: Text()
+                                      //trailing: Text()
+                                    ),
                                   ),
                                 ),
-                              ),
 
-                            ],
-                          );
-                        },
-                      ),
-                      if((Get.put(StockQuery()).paidDeptScanHide))
-                        Container(
-
-
-                          padding:const EdgeInsets.fromLTRB(5,0,10,0),
-
-
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(30),
-                              topRight: Radius.circular(30),
-                            ),
-                          ),
-                          child: SingleChildScrollView(
-                            child: Column(
-                              children: [
-                                const SizedBox(height: 5.0,),
-
-                                TextField(
-                                  // controller: uidEdit,
-
-                                  keyboardType: TextInputType.number,
-                                  //obscureText: true,
-                                  decoration: const InputDecoration(
-                                    contentPadding: EdgeInsets.symmetric(vertical: 3,horizontal: 3),
-                                    border: OutlineInputBorder(),
-                                    labelText: 'Enter Amount',
-                                    hintText: 'Enter Amount',
-                                    hintStyle: TextStyle(
-                                      color: Colors.grey,
-                                    ),
-
-                                  ),
-                                  onChanged: (value){
-                                    if((num.tryParse(value) != null)){
-                                      setState((){
-                                        inputData=num.parse(value);
-
-                                        //print(value);
-                                      });
-
-
-
-                                    }
-
-
-
-
-                                  },
-
-
-                                ),
-
-
-                                const SizedBox(height: 2.0,),
-
-                                FloatingActionButton.extended(
-                                    label: const Text('Paid Dept'), // <-- Text
-                                    backgroundColor: Colors.black,
-                                    icon: const Icon( // <-- Icon
-                                      Icons.thumb_up,
-                                      size: 24.0,
-                                    ),
-                                    onPressed: () =>{
-                                      paidDebt()
-
-                                    }),
                               ],
-                            ),
-                          ),
+                            );
+                          },
                         ),
+                        if((Get.put(StockQuery()).paidDeptScanHide))
+                          Container(
 
-                      const SizedBox(height:2.0,),
-                      //if(!(Get.put(StockQuery()).paidDeptScanHide))
-                      Expanded(
-                          flex: 5,
-                          child:Stack(
-                            alignment:Alignment.bottomCenter,
-                            children: [
-                              QRView(key: qrkey,onQRViewCreated: _onQRViewCreated,
-                                overlay: QrScannerOverlayShape(
-                                  borderColor: Colors.pink,
-                                  borderRadius: 10,
-                                  borderLength: 30,
-                                  borderWidth: 10,
-                                  cutOutSize: 300,
-                                  // Add the laser effect
 
-                                ),
+                            padding:const EdgeInsets.fromLTRB(5,0,10,0),
+
+
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(30),
+                                topRight: Radius.circular(30),
                               ),
-
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
+                            ),
+                            child: SingleChildScrollView(
+                              child: Column(
                                 children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
+                                  const SizedBox(height: 5.0,),
 
-                                      cameraSwitch(),
-                                      //SizedBox(width: 10.0,),
+                                  TextField(
+                                    // controller: uidEdit,
 
-                                      // SizedBox(width: 10.0,),
-                                      flashSwitch(),
-                                      Image.asset(
-                                        flashValue ? 'images/on.png' : 'images/off.png',
-                                        height: 30,
+                                    keyboardType: TextInputType.number,
+                                    //obscureText: true,
+                                    decoration: const InputDecoration(
+                                      contentPadding: EdgeInsets.symmetric(vertical: 3,horizontal: 3),
+                                      border: OutlineInputBorder(),
+                                      labelText: 'Enter Amount',
+                                      hintText: 'Enter Amount',
+
+                                      hintStyle: TextStyle(
+                                        color: Colors.grey,
                                       ),
-                                    ],
+
+                                    ),
+                                    onChanged: (value){
+                                      if((num.tryParse(value) != null)){
+                                        setState((){
+                                          inputData=num.parse(value);
+
+                                          //print(value);
+                                        });
+
+
+
+                                      }
+
+
+
+
+                                    },
+
+
                                   ),
+                                  const SizedBox(height: 10.0,),
+                                  TextField(
+                                    controller: purpose,
+
+                                    maxLength: maxLength,
+                                    //obscureText: true,
+                                    decoration: const InputDecoration(
+                                      contentPadding: EdgeInsets.symmetric(vertical: 3,horizontal: 3),
+                                      border: OutlineInputBorder(),
+                                      labelText: 'Enter  purpose Maximum 15',
+                                      hintText: 'Purpose',
+                                      hintStyle: TextStyle(
+                                        color: Colors.grey,
+                                      ),
+
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10.0,),
+                                  TextField(
+
+                                    controller:commentData,
+                                    keyboardType: TextInputType.multiline,
+                                    maxLines: null,
+                                    //obscureText: true,
+                                    decoration: const InputDecoration(
+                                      contentPadding: EdgeInsets.symmetric(vertical: 3,horizontal: 3),
+                                      border: OutlineInputBorder(),
+                                      labelText: 'Comment',
+                                      hintText: 'Comment',
+                                      hintStyle: TextStyle(
+                                        color: Colors.grey,
+                                      ),
+
+                                    ),
+                                  ),
+
+                                  const SizedBox(height: 5.0,),
+
+                                  FloatingActionButton.extended(
+                                      label: const Text('Paid Dept'), // <-- Text
+                                      backgroundColor: Colors.black,
+                                      icon: const Icon( // <-- Icon
+                                        Icons.thumb_up,
+                                        size: 24.0,
+                                      ),
+                                      onPressed: () =>{
+                                        //paidDebt()
+                                        addSpendingMethod(),
+
+                                      }),
                                 ],
                               ),
+                            ),
+                          ),
 
-                            ],
-                          )
-
-                      )
-
-
+                        const SizedBox(height:2.0,),
+                        //if(!(Get.put(StockQuery()).paidDeptScanHide))
 
 
-                    ],
+
+
+
+                      ],
+                    ),
                   ),
                 ),
                 GetBuilder<StockQuery>(
@@ -1232,11 +1196,10 @@ class _SetRepayCompState extends State<SetRepayComp> {
         },
       ),
     ).whenComplete(() {
-      qrDebt.clear();
+
     });
 
   }
-
 
 
 

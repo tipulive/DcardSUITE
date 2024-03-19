@@ -3,6 +3,8 @@ class QuickBonus{
   final String? uid;
   final String? productName;
   final String? qty;
+  final int? reqQty;
+  final int? currentQtyEdit;
   final String? price;
   final String? total;
   final String? status;
@@ -23,6 +25,8 @@ class QuickBonus{
     this.uid,
     this.productName,
     this.qty,
+    this.reqQty,
+    this.currentQtyEdit,
     this.price,
     this.total,
     this.status,
@@ -44,6 +48,9 @@ class QuickBonus{
       uid:json['uid'],
       productName:json['productName'],
       qty:json['qty'],
+      reqQty:json['reqQty'],
+      currentQtyEdit:json['currentQtyEdit'],
+
       price:json['price'],
       total:json['total'],
       status:json['status'],

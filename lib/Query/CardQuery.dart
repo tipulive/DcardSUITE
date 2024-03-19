@@ -160,12 +160,14 @@ class CardQuery extends GetxController{
       "country":AdminData.country,
       "password":AdminData.password??'none',
       //"carduid":"TEALTD_7hEnj_1672352175",
-        "carduid":CardData.uid
+        "carduid":CardData.uid,
+        "actionStatus":AdminData.status??'none'
 
       //"uid":"kebineericMuna_1668935593",//userid
 
         //"options": [1,2,3],
       };
+     print(params);
       String Authtoken =(adminStatedata.obj)["result"][0]["AuthToken"];
 
       var url="${ConstantClassUtil.urlLink}/CreateUserAssign";
@@ -176,6 +178,7 @@ class CardQuery extends GetxController{
         }),
         data: jsonEncode(params),
       );
+      print(response);
       if (response.statusCode == 200) {
 
         return response;

@@ -19,15 +19,15 @@ import 'package:google_fonts/google_fonts.dart';
 
 
 
-class SetDeptComp extends StatefulWidget {
-  const SetDeptComp({Key? key}) : super(key: key);
+class ProductComp extends StatefulWidget {
+  const ProductComp({Key? key}) : super(key: key);
 
   @override
-  State<SetDeptComp> createState() => _SetDeptCompState();
+  State<ProductComp> createState() => _ProductCompState();
 }
 
-class _SetDeptCompState extends State<SetDeptComp> {
-
+class _ProductCompState extends State<ProductComp> {
+  double customFontSize=13.0;
   final ScrollController _scrollController = ScrollController();// detect scroll
   final List<dynamic> _data = [];
   List<dynamic> thisListOrder = [];
@@ -43,6 +43,9 @@ class _SetDeptCompState extends State<SetDeptComp> {
   bool isLoading=false;
   num qtyProduct=1;
   String productCode="";
+  String productName="";
+  String qrSearch="none";
+  String isProductAction="viewProduct";
   num inputData=0;
   bool cameraValue=false;
   bool flashValue=false;
@@ -54,11 +57,22 @@ class _SetDeptCompState extends State<SetDeptComp> {
   final GlobalKey qrkey = GlobalKey(debugLabel: 'QR');
   Barcode?result;
   QRViewController?controller;
+  String productCode1="";
+  String productName1="";
+  String price1="";
+  String pcs="";
+  String actionStatus="updatePrice";
+  String withTotal="true";
+
+  List<String> _dropdownOptions = ['Name', 'Code'];
+  String selectOption="Code";
+
 
 
 
   bool showOveray=false;
 
+final fontSizeData=13.0;
 
 
   @override
@@ -75,16 +89,23 @@ class _SetDeptCompState extends State<SetDeptComp> {
     return Stack(
       children: [
         listdata(),
-        if(showOveray)
-          Positioned.fill(
-            child: Center(
-              child: Container(
-                alignment: Alignment.center,
-                color: Colors.white70,
-                child: const CircularProgressIndicator(),
-              ),
-            ),
-          ),
+        GetBuilder<StockQuery>(
+          builder: (myLoadercontroller) {
+            //return Text('Data: ${_controller.data}');
+            return
+              (myLoadercontroller.hideLoader)?
+              const Text(""):
+              Positioned.fill(
+                child: Center(
+                  child: Container(
+                    alignment: Alignment.center,
+                    color: Colors.white70,
+                    child: const CircularProgressIndicator(),
+                  ),
+                ),
+              );
+          },
+        ),
       ],
     );
     //return Center(child: Text("hello"));
@@ -113,172 +134,172 @@ class _SetDeptCompState extends State<SetDeptComp> {
             ),
 
             child: ListTile(
-                leading: GestureDetector(
-                  onTap: (){
-                    getDebtWidget();
-                  },
-                  child: CircleAvatar(
-                    backgroundColor:getRandomColor(),
-                    child: Icon(_getRandomIcon()),
-                  ),
+              leading: GestureDetector(
+                onTap: (){
+                  getDebtWidget();
+                },
+                child: CircleAvatar(
+                  backgroundColor:getRandomColor(),
+                  child: Icon(_getRandomIcon()),
                 ),
-                title:Row(
-                  children: [
+              ),
+              title:Row(
+                children: [
 
 
-                    Expanded(
-                      flex: 1,
-                      child: Stack(
-                        children: [
-
-                          Column(
-                            children: [
-
-                              Center(
-                                child: RichText(
-                                  text: TextSpan(
-                                    text: "Total:",
-                                    style: DefaultTextStyle.of(context).style,
-                                    children: const <TextSpan>[
-
-
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-
-
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-
-                subtitle: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Column(
-
+                  Expanded(
+                    flex: 1,
+                    child: Stack(
                       children: [
-                        Wrap(
-                          crossAxisAlignment: WrapCrossAlignment.center,
+
+                        Column(
                           children: [
 
-                            const Icon(Icons.segment,color:Colors.orange,size:13,),
-                            Text("${(_data.isNotEmpty)?_data[0]['totDept']:0}",style:GoogleFonts.pacifico(fontSize:15,color: Colors.orange,fontWeight: FontWeight.w700)),
+                            Center(
+                              child: RichText(
+                                text: TextSpan(
+                                  text: "Total:",
+                                  style: DefaultTextStyle.of(context).style,
+                                  children: const <TextSpan>[
 
 
-
+                                  ],
+                                ),
+                              ),
+                            ),
                           ],
                         ),
 
 
-
-
-
-
                       ],
                     ),
+                  ),
+                ],
+              ),
 
-                  ],
-                ),
-                trailing:PopupMenuButton(
-                  itemBuilder:(container)=>[
-                    PopupMenuItem(
-                        child: InkWell(
-                          onTap: () async{
-                            setState(() {
-                              viewOption="false";
-                            });
-                            await viewData('test',false);
-                          },
-                          child: Column(
-                            children: [
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              Row(
-                                children: const [
-                                  Icon(
-                                    Icons.person,
-                                    color: Colors.blue,
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.only(left:10.0),
-                                    child: Text("View"),
-                                  ),
+              subtitle: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Column(
 
-                                ],
-                              ),
-                              const Divider(
-                                height: 20, // Adjust the height as needed
-                                thickness: 0.2, // Adjust the thickness as needed
-                                color: Colors.grey,
-                              ),
+                    children: [
+                      Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
 
-                            ],
-                          ),
-                        )
-                    ),
-                    PopupMenuItem(
-                        child:InkWell(
-                          onTap: () async{
-                            //print("type All");
-                            setState(() {
-                              viewOption="true";
-                            });
-                            await viewData('test',false);
+                          const Icon(Icons.segment,color:Colors.orange,size:13,),
+                          Text("${(_data.isNotEmpty)?_data[0]['totalStock']:0}",style:GoogleFonts.pacifico(fontSize:15,color: Colors.orange,fontWeight: FontWeight.w700)),
 
-                          },
-                          child: Column(
-                            children: [
-                              Row(
-                                children: const [
-                                  Icon(
-                                    Icons.apartment,
-                                    color: Colors.orange,
-                                  ),
 
-                                  Padding(
-                                    padding: EdgeInsets.only(left:10.0),
-                                    child: Text("Company"),
-                                  ),
 
-                                ],
-                              ),
-                              const Divider(
-                                height: 20, // Adjust the height as needed
-                                thickness: 0.2, // Adjust the thickness as needed
-                                color: Colors.grey,
-                              ),
-
-                            ],
-                          ),
-                        )
-                    ),
-
-                  ],
-                  offset: const Offset(0, 40),
-                  child:InkWell(
-
-                    child: Ink(
-                      decoration: ShapeDecoration(
-                        color: Colors.grey.withOpacity(0.2),
-                        shape: const CircleBorder(),
+                        ],
                       ),
-                      child: const Padding(
-                        padding: EdgeInsets.all(5.0),
-                        child: Icon(
 
-                          Icons.visibility, // Replace with your desired icon
-                          color: Colors.pink,
+
+
+
+
+
+                    ],
+                  ),
+
+                ],
+              ),
+              trailing:PopupMenuButton(
+                itemBuilder:(container)=>[
+                  PopupMenuItem(
+                      child: GestureDetector(
+                        onTap: (){
+                          setState(() {
+                            viewOption="false";
+                          });
+                          viewData('test',false);
+                        },
+                        child: Column(
+                          children: [
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Row(
+                              children: const [
+                                Icon(
+                                  Icons.person,
+                                  color: Colors.blue,
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.only(left:10.0),
+                                  child: Text("View"),
+                                ),
+
+                              ],
+                            ),
+                            const Divider(
+                              height: 20, // Adjust the height as needed
+                              thickness: 0.2, // Adjust the thickness as needed
+                              color: Colors.grey,
+                            ),
+
+                          ],
                         ),
+                      )
+                  ),
+                  PopupMenuItem(
+                      child: GestureDetector(
+                        onTap: (){
+                          //print("type All");
+                          setState(() {
+                            viewOption="true";
+                          });
+                          viewData('test',false);
+
+                        },
+                        child: Column(
+                          children: [
+                            Row(
+                              children: const [
+                                Icon(
+                                  Icons.apartment,
+                                  color: Colors.orange,
+                                ),
+
+                                Padding(
+                                  padding: EdgeInsets.only(left:10.0),
+                                  child: Text("Company"),
+                                ),
+
+                              ],
+                            ),
+                            const Divider(
+                              height: 20, // Adjust the height as needed
+                              thickness: 0.2, // Adjust the thickness as needed
+                              color: Colors.grey,
+                            ),
+
+                          ],
+                        ),
+                      )
+                  ),
+
+                ],
+                offset: const Offset(0, 40),
+                child:InkWell(
+
+                  child: Ink(
+                    decoration: ShapeDecoration(
+                      color: Colors.grey.withOpacity(0.2),
+                      shape: const CircleBorder(),
+                    ),
+                    child: const Padding(
+                      padding: EdgeInsets.all(5.0),
+                      child: Icon(
+
+                        Icons.visibility, // Replace with your desired icon
+                        color: Colors.pink,
                       ),
                     ),
                   ),
                 ),
+              ),
 
               //trailing: Text()
             ),
@@ -296,11 +317,32 @@ class _SetDeptCompState extends State<SetDeptComp> {
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(50.0),
               ),
-              labelText: 'Search',
+              prefixIcon: Padding(
+                padding: const EdgeInsets.fromLTRB(15, 0, 0, 0),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value:selectOption,
+                    onChanged: (newValue) {
+                      setState(() {
+                        selectOption=newValue!;
+                      });
+                    },
+                    items: _dropdownOptions.map((option) {
+                      return DropdownMenuItem(
+                        value: option,
+                        child: Text(option),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
+              labelText: 'Search By',
+              labelStyle: TextStyle(color: Colors.black), // Customize label color
+              floatingLabelBehavior: FloatingLabelBehavior.always, // Always show the label above the TextField
             ),
             onChanged: (text) async{
 
-              viewData(text,true);
+              viewData(text,'search');
 
               //print(this._data[index]["total_var"]);
               // print("Text changed to: $text");
@@ -320,6 +362,7 @@ class _SetDeptCompState extends State<SetDeptComp> {
                 FocusNode test=FocusNode() ;
 
                 _data[index]['focusNode']=test;
+
                 return Card(
                   elevation:0,
                   //margin: EdgeInsets.symmetric(vertical:1,horizontal:5),
@@ -330,99 +373,258 @@ class _SetDeptCompState extends State<SetDeptComp> {
                   ),
 
                   child: ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor:getRandomColor(),
-                        child: Icon(_getRandomIcon()),
-                      ),
-                      title:Row(
+                    leading: CircleAvatar(
+                      backgroundColor:getRandomColor(),
+                      child: Icon(_getRandomIcon()),
+                    ),
+                    title:Row(
+                      children: [
+                        Expanded(
+                          flex: 1,
+                          child: Stack(
+                            children: [
+
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(0, 10, 0, 2),
+                                child:                   Text.rich(
+                                    style: DefaultTextStyle.of(context).style,
+                                    TextSpan(
+                                        children: [
+
+
+                                          TextSpan(
+                                            style:TextStyle(
+                                                fontSize:fontSizeData
+                                              // color: Colors.blue, // Set the text color to red
+
+                                            ),
+                                            text: '${_data[index]['productCode'].toUpperCase()}',
+
+                                          ),
+                                           TextSpan(
+                                            style:TextStyle(
+                                                fontSize:fontSizeData
+                                              // color: Colors.blue, // Set the text color to red
+
+                                            ),
+                                            text: '(',
+
+                                          ),
+                                          WidgetSpan(
+
+                                            child: IntrinsicWidth(
+
+                                              stepWidth: 0.5,
+                                              child: TextField(
+
+                                                controller: TextEditingController(text:"${(_data[index]['pcs']=='none')?'0':_data[index]['pcs']}"),
+
+                                                keyboardType: TextInputType.number,
+                                                decoration: const InputDecoration(
+                                                  hintText:"",
+                                                  hintStyle: TextStyle(color: Colors.blue),
+                                                  contentPadding: EdgeInsets.all(0),
+                                                  isDense: true,
+
+
+
+                                                ),
+                                                style:TextStyle(
+                                                  color: Colors.blue,
+                                                  fontSize:fontSizeData,
+                                                  // Set the text color to red
+
+                                                ),
+                                                onChanged: (text) {
+                                                  if((int.tryParse(text) != null)){
+
+                                                    pcs=text;
+                                                    productCode1=_data[index]["productCode"];
+                                                    actionStatus="updatePcs";
+
+                                                  }
+                                                  else{
+                                                    (Get.put(StockQuery()).updateHideaddCart(true));
+                                                  }
+
+
+
+
+                                                },
+                                              ), // set minimum width to 100
+                                            ),
+                                          ),
+                                          TextSpan(
+                                            style:TextStyle(
+                                                fontSize:fontSizeData
+                                              // color: Colors.blue, // Set the text color to red
+
+                                            ),
+                                            text: 'Pcs)',
+
+                                          ),
+
+                                           TextSpan(
+                                            style:TextStyle(
+                                                fontSize:fontSizeData
+                                              // color: Colors.blue, // Set the text color to red
+
+                                            ),
+                                            text: '1X',
+
+                                          ),
+                                          WidgetSpan(
+                                            style: DefaultTextStyle.of(context).style,
+                                            child: IntrinsicWidth(
+                                              stepWidth: 0.5,
+                                              child: TextField(
+                                                controller: TextEditingController(text:"${_data[index]["price"]}"),
+
+                                                keyboardType: TextInputType.number,
+                                                decoration: const InputDecoration(
+                                                  hintText:"",
+                                                  hintStyle: TextStyle(color: Colors.blue),
+                                                  contentPadding: EdgeInsets.all(0),
+                                                  isDense: true,
+
+
+
+                                                ),
+                                                style: TextStyle(
+                                                  color: Colors.blue,
+                                                    fontSize:fontSizeData// Set the text color to red
+
+                                                ),
+                                                onChanged: (text) {
+
+                                                  if((int.tryParse(text) != null)){
+                                                    price1=text;
+                                                    productCode1=_data[index]["productCode"];
+                                                    actionStatus="updatePrice";
+
+                                                  }
+                                                  else{
+
+
+                                                  }
+
+
+
+
+                                                },
+                                              ), // set minimum width to 100
+                                            ),
+                                          ),
+                                        ]
+                                    )
+                                ),
+                              ),
+
+
+                            ],
+                          ),
+                        )
+
+
+
+
+
+
+                      ],
+                    ),
+
+                    subtitle: Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 5, 0, 10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
 
 
-                          Expanded(
-                            flex: 1,
-                            child: Stack(
-                              children: [
+                              Text("Qty:${num.parse(_data[index]['qty'])-num.parse(_data[index]['qty_sold'])} X ${_data[index]['price']}=${(num.parse(_data[index]['qty'])-num.parse(_data[index]['qty_sold']))*num.parse(_data[index]['price'])}", style:TextStyle(
+                                  fontSize:fontSizeData
+                                // color: Colors.blue, // Set the text color to red
 
-                                Column(
+                              ),),
+
+
+                            ],
+
+
+                          ),
+                          const SizedBox(height: 5,),
+                          // Text("tags:${_data[index]['tags']}"),
+                          Text.rich(
+                              style: DefaultTextStyle.of(context).style,
+                              TextSpan(
                                   children: [
 
-                                    Padding(
-                                      padding: const EdgeInsets.fromLTRB(0, 10, 0, 2),
-                                      child: RichText(
-                                        text: TextSpan(
-                                          text: "${_data[index]['name']}:",
-                                          style: DefaultTextStyle.of(context).style,
-                                          children: const <TextSpan>[
+                                     TextSpan(
+                                      style:TextStyle(
+                                          fontSize:fontSizeData,
+                                         color: Colors.grey, // Set the text color to red
+
+                                      ),
+                                      text: 'Name:',
+
+                                    ),
+
+                                    WidgetSpan(
+                                      //style: DefaultTextStyle.of(context).style,
+                                      child: IntrinsicWidth(
+                                        //stepWidth: 0.5,
+                                        child:  TextField(
+                                          controller: TextEditingController(text:"${(_data[index]['ProductName']).toUpperCase()}"),
 
 
-                                          ],
-                                        ),
+                                          decoration: const InputDecoration(
+                                            hintText:"",
+                                            hintStyle: TextStyle(color: Colors.blue),
+                                            contentPadding: EdgeInsets.all(0),
+                                            isDense: true,
+
+
+
+                                          ),
+                                          style:  TextStyle(
+                                              fontSize: fontSizeData
+                                            // color: Colors.blue, // Set the text color to red
+
+                                          ),
+                                          onChanged: (text) {
+
+
+
+                                            productName1=text;
+                                            productCode1=_data[index]["productCode"];
+                                            actionStatus="updateProductName";
+
+
+
+
+
+
+
+                                          },
+                                        ), // set minimum width to 100
                                       ),
                                     ),
-                                  ],
-                                ),
+                                  ]
+                              )
 
-
-                              ],
-                            ),
                           ),
                         ],
                       ),
-
-                      subtitle: Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 5, 0, 10),
-                        child: Row(
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-
-                                Wrap(
-                                  crossAxisAlignment: WrapCrossAlignment.center,
-                                  children: [
-
-                                    const Icon(Icons.segment,color:Colors.orange,size:13,),
-                                    Text("Dept:${_data[index]['debt']}"),
-
-                                  ],
-                                ),
-                                if(viewOption=='true')
-                                   Wrap(
-                                    crossAxisAlignment: WrapCrossAlignment.center,
-                                    children: [
-
-                                    const Icon(Icons.segment,color:Colors.orange,size:13,),
-                                    Text("By:${_data[index]['adminName']}"),
-
-                                    ],
-                                  ),
-
-                              ],
-                            ),
-
-
-                          ],
-                        ),
-                      ),
-                      trailing:GestureDetector(
-                          onTap: () async{
-
-
-                            Map<String, dynamic> clientDebt=
-                            {
-                              "debt":_data[index]['debt'],
-                              "uidUser":_data[index]['myDeptId'],
-                              "name":_data[index]['name']
-                            };
-                            (Get.put(StockQuery()).updateClientDebt(clientDebt));
-                            (Get.put(StockQuery()).updatehideComp(false));
-
-                            getDebtWidget();
-
-
-                          },
-                          child:const Icon(Icons.grid_view,color:Colors.orange)
-                      )
+                    ),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.save,color:Colors.deepOrange), // Replace with your desired icon
+                      onPressed: () {
+                        // Add your button press logic here
+                        updateProducts();
+                      },
+                    ),
 
                     //trailing: Text()
                   ),
@@ -509,6 +711,71 @@ class _SetDeptCompState extends State<SetDeptComp> {
       }
     });
   }
+
+  resetForm(){
+    setState(() {
+       productCode1="";
+       productName1="";
+     price1="";
+     pcs="";
+     actionStatus="";
+    });
+  }
+  changeProduct(name,val){
+    setState(() {
+      productCode1="";
+      productName1="";
+      price1="";
+      pcs="";
+      actionStatus="";
+    });
+  }
+  updateProducts() async{
+
+
+    try {
+
+      (Get.put(StockQuery()).updateHideLoader(false));
+      var resultData=(await StockQuery().updateProducts(QuickBonus(uid:productCode1,productName:productName1,price:price1,giftPcs:pcs,status:actionStatus))).data;
+      if(resultData["status"])
+      {
+       // resetForm();
+        Get.snackbar("Success", productName1,backgroundColor: const Color(0xff9a1c55),
+            colorText: const Color(0xffffffff),
+            titleText: const Text("Updated Successfully",  style: TextStyle(
+              color: Colors.white, // Set the text color here
+
+            ),),
+
+            icon: const Icon(Icons.access_alarm),
+            duration: const Duration(seconds: 3));
+        if(actionStatus=="updatePrice")
+          {
+            //await stockTotal("test","totalStock");
+          }
+
+        (Get.put(StockQuery()).updateHideLoader(true));
+
+
+        /* setState(() {
+        (Get.put(StockQuery()).updateClientDebt(resultData["result"][0]));
+
+      });*/
+
+
+
+
+
+      }
+      else{
+        (Get.put(StockQuery()).updateHideLoader(true));
+
+      }
+
+
+    } catch (e) {
+    }
+  }
   getDebt(qrScanData) async{
     try {
       (Get.put(StockQuery()).updatePaidDeptScanHide(true));
@@ -538,7 +805,7 @@ class _SetDeptCompState extends State<SetDeptComp> {
 
 
     } catch (e) {
-    return e;
+      return e;
     }
   }
   paidDebt() async{
@@ -554,9 +821,9 @@ class _SetDeptCompState extends State<SetDeptComp> {
 
         (Get.put(StockQuery()).updateClientDebt(resultData["result"]));
         if((Get.put(StockQuery()).hideComp))
-          {
+        {
 
-          }
+        }
         else{
           Future.microtask(() {
             Navigator.of(context).pop();
@@ -632,15 +899,19 @@ class _SetDeptCompState extends State<SetDeptComp> {
 
   quickData()
   {
-    viewData('test',false);
+    viewData('test',"ViewProduct");
 
   }
-  viewData(nameVal,searchVal) async{
+  viewData(nameVal,isProductAction) async{
     if(isLoading) return;
     isLoading=true;
     int limit=10;
 
-    var resultData=(await StockQuery().viewDept(Topups(startlimit:limit,endlimit:_page,name:nameVal,searchOption:searchVal,optionCase:viewOption))).data;
+    String productCode=(selectOption=="Code")?nameVal:"none";
+    String productNames=(selectOption=="Name")?nameVal:'none';
+
+    var resultData=(await StockQuery().product(QuickBonus(uid:productCode,productName:productNames,status:qrSearch),Topups(optionCase:isProductAction,startlimit:limit,endlimit:_page,purpose:withTotal))).data;
+
 
     if(resultData["status"])
     {
@@ -682,6 +953,38 @@ class _SetDeptCompState extends State<SetDeptComp> {
     }
   }
 
+  stockTotal(nameVal,isProductAction) async{
+
+
+    var resultData=(await StockQuery().product(QuickBonus(uid:nameVal,productName:productName,status:qrSearch),Topups(optionCase:isProductAction,startlimit:limit,endlimit:_page,purpose:withTotal))).data;
+
+
+    if(resultData["status"])
+    {
+
+
+
+      if(resultData["result"]!=0)
+      {
+        setState(() {
+
+
+          _data[0]['totalStock']=((resultData["result"])[0]['totalStock']);
+
+        });
+      }
+      else{
+
+      }
+
+
+
+
+    }
+    else{
+
+    }
+  }
   void getDebtWidget() async{
 
     Get.bottomSheet(
@@ -770,16 +1073,17 @@ class _SetDeptCompState extends State<SetDeptComp> {
                                                 crossAxisAlignment: WrapCrossAlignment.center,
                                                 children: [
 
-                                                  Text("Dept",style:GoogleFonts.poppins(fontSize:14,color: Colors.green,fontWeight: FontWeight.w700)),
+                                                  Text("DEPT",style:GoogleFonts.odorMeanChey(fontSize:16,color: Colors.green,fontWeight: FontWeight.w700)),
+
 
                                                 ],
                                               ),
                                               Wrap(
                                                 crossAxisAlignment: WrapCrossAlignment.center,
-                                                children: [
+                                                children: const [
 
-                                                  const Icon(Icons.segment,color:Colors.orange,size:13,),
-                                                  Text("${(Get.put(StockQuery()).clientDebt)["debt"]}",style:GoogleFonts.pacifico(fontSize:15,color: Colors.orange,fontWeight: FontWeight.w700)),
+                                                  Icon(Icons.segment,color:Colors.orange,size:13,),
+
 
 
                                                 ],
@@ -886,10 +1190,10 @@ class _SetDeptCompState extends State<SetDeptComp> {
                             ),
                           ),
                         ),
-                    if((Get.put(StockQuery()).hideComp))
-                         const SizedBox(height:2.0,),
+                      if((Get.put(StockQuery()).hideComp))
+                        const SizedBox(height:2.0,),
                       //if(!(Get.put(StockQuery()).paidDeptScanHide))
-                          Expanded(
+                      Expanded(
                           flex: 5,
                           child:Stack(
                             alignment:Alignment.bottomCenter,
@@ -930,14 +1234,14 @@ class _SetDeptCompState extends State<SetDeptComp> {
                             ],
                           )
 
-                         )
+                      )
 
 
 
 
-                        ],
-                       ),
-                      ),
+                    ],
+                  ),
+                ),
                 GetBuilder<StockQuery>(
                   builder: (myLoadercontroller) {
                     //return Text('Data: ${_controller.data}');
@@ -967,34 +1271,7 @@ class _SetDeptCompState extends State<SetDeptComp> {
     });
 
   }
-  thisOrder2()async
-  {
-    if(isLoading) return;
-    isLoading=true;
-    int limit=10;
 
-    var resultData=(await StockQuery().orderViewByUid(Topups(uid:"${orderData[0]}",startlimit:limit,endlimit:_page))).data;
-
-
-    if(resultData["status"])
-    {
-      setState(() {
-        isLoading=false;
-        hasMoreData=false;
-
-
-        thisListOrder.clear();
-        thisListOrder.addAll(resultData["result"]);
-
-
-      });
-      return true;
-    }
-    else{
-      return false;
-    }
-
-  }
 
   thisOrder()async
   {
@@ -1100,6 +1377,7 @@ class _SetDeptCompState extends State<SetDeptComp> {
 
 
                                                 Text.rich(
+                                                    style: DefaultTextStyle.of(context).style,
                                                     TextSpan(
                                                         children: [
                                                           TextSpan(
@@ -1296,8 +1574,6 @@ class _SetDeptCompState extends State<SetDeptComp> {
     });
 
   }
-
-
 
 
 

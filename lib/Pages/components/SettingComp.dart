@@ -1,6 +1,9 @@
 
 
 
+import 'package:dStock/Pages/components/ProductComp.dart';
+import 'package:dStock/Pages/components/SetAdminPaymentComp.dart';
+
 import '../../Pages/SetEditCardNoPage.dart';
 import '../../Pages/SetStockPage.dart';
 import '../../Pages/SetWithdrawBonusPage.dart';
@@ -16,16 +19,19 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../SetDeptPage.dart';
 import '../SetOrderPage.dart';
+import '../SetPage.dart';
 import '../SetPaidDeptPage.dart';
 import '../SetPartHistPage.dart';
 import '../SetPartPage.dart';
 import '../SetQuickBoHistPage.dart';
 import '../SetRepayPage.dart';
 import '../SetSalePage.dart';
-import '../SetSpendingPage.dart';
+
 import '../SetWithdrawBalancePage.dart';
 
 import '../employePage.dart';
+import '../components/SetSpendingComp.dart';
+import 'ContactComp.dart';
 
 
 
@@ -82,21 +88,37 @@ class _SettingCompState extends State<SettingComp> {
             const SizedBox(height:5,),
             GestureDetector(
                 onTap: (){
-                  dept();
+                  contactFunc();
                 },
-                child: detailsProfile("Dept",Icons.calendar_month_outlined,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,dept)),//Last Time Purchase
+                child: detailsProfile("Contacts",Icons.account_balance,"",0xbfebf1ef,"textright",Icons.arrow_forward,"200\$",0xffffffff,contactFunc)),
+
             const SizedBox(height:5,),
             GestureDetector(
                 onTap: (){
-                  paidDept();
+                  dept();
                 },
-                child: detailsProfile("Paid Dept",Icons.calendar_month_outlined,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,paidDept)),//Last Time Purchase
+                child: detailsProfile("Dept",Icons.calendar_month_outlined,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,dept)),//Last Time Purchase
+       //Last Time Purchase
+            const SizedBox(height:5,),
+            GestureDetector(
+                onTap: (){
+                  adminPayment();
+                },
+                child: detailsProfile("Admin Payment",Icons.calendar_month_outlined,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,adminPayment)),
+            const SizedBox(height:5,),
+            GestureDetector(
+                onTap: (){
+                  product();
+                },
+                child: detailsProfile("Products",Icons.calendar_month_outlined,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,product)),//Last Time Purchase
             const SizedBox(height:5,),
             GestureDetector(
                 onTap: (){
                   repay();
                 },
                 child: detailsProfile("Repay",Icons.calendar_month_outlined,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,repay)),
+
+
             const SizedBox(height:5,),
             GestureDetector(
                 onTap: (){
@@ -104,6 +126,7 @@ class _SettingCompState extends State<SettingComp> {
                 },
                 child: detailsProfile("Employee",Icons.calendar_month_outlined,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,employe)),//Last Time Purchase
             const SizedBox(height:5,),
+
             GestureDetector(
                 onTap: (){
                   viewStock();
@@ -374,7 +397,20 @@ sales()async{
 }
 spending() async{
 
-  Get.to(() =>const SetSpendingPage());
+  Get.to(() =>SetPage(dynamicMethod: () {
+    return  const SetSpendingComp();
+  }),arguments:{
+    "title":"Spending",
+  });
+
+}
+adminPayment() async{
+
+  Get.to(() => SetPage(dynamicMethod: () {
+    return const SetAdminPaymentComp();
+  }),arguments:{
+    "title":"Admin Payment",
+  });
 
 }
 dept() async{
@@ -395,6 +431,15 @@ repay() async{
 employe() async{
 
   Get.to(() =>const employePage());
+
+}
+product() async{
+
+  Get.to(() =>SetPage(dynamicMethod: () {
+    return  const ProductComp();
+  }),arguments:{
+    "title":"Products",
+  });
 
 }
 
@@ -421,10 +466,17 @@ quickBoHistfunc() async{
   Get.to(() =>const SetQuickBoHistPage());
 
 }
-
+contactFunc() async{
+  Get.to(() =>SetPage(dynamicMethod: () {
+    return  const ContactComp();
+  }),arguments:{
+    "title":"Contacts",
+  });
+}
 editCardfunc() async{
   Get.to(() =>const SetEditCardNoPage());
 }
+
 logout() async{
   Get.dialog(
     AlertDialog(

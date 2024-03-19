@@ -11,6 +11,9 @@ import 'package:flutter/material.dart';
 
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../Utilconfig/ConstantClassUtil.dart';
+import '../../models/QuickBonus.dart';
+
 
 
 
@@ -32,16 +35,18 @@ class _SetSaleCompState extends State<SetSaleComp> {
 
   var bottomResult=[];
   num countData=0;
-
+  String thisDate="none";
+  String toDate="";
   int _page=0;
   int limit=0;
   bool hasMoreData=true;
   bool isLoading=false;
-  num qty_product=1;
+  num qtyProduct=1;
   String productCode="";
 
   String clientOrder="";
-  String OrderId="";
+  String orderId="";
+  String productExist="true";
 
 
 
@@ -49,7 +54,14 @@ class _SetSaleCompState extends State<SetSaleComp> {
 
   bool showOveray=false;
 
+String advancedSearch="today";
+String viewTitle="Today";
 
+DateTime selectedDate=DateTime.now();
+DateTimeRange selectedDateRange=DateTimeRange(
+    start: DateTime.now(),
+    end: DateTime.now()
+);
 
   @override
   Widget build(BuildContext context) {
@@ -64,6 +76,7 @@ class _SetSaleCompState extends State<SetSaleComp> {
     });*/
     return Stack(
       children: [
+
         listdata(),
         if(showOveray)
           Positioned.fill(
@@ -87,6 +100,7 @@ class _SetSaleCompState extends State<SetSaleComp> {
     return  Column(
       children: [
         //ProfilePic().profile(),
+        Center(child: Text(viewTitle)),
 
         Padding(
           padding:const EdgeInsets.fromLTRB(8,10,8,0),
@@ -165,14 +179,317 @@ class _SetSaleCompState extends State<SetSaleComp> {
 
                   ],
                 ),
-                trailing:GestureDetector(
-                    onTap: () async{
+                trailing:PopupMenuButton(
+                  itemBuilder:(container)=>[
+                    PopupMenuItem(
+                        child: InkWell(
+                          onTap: () async{
+                            setState(() {
+                              advancedSearch="today";
+                              viewTitle="today";
 
+                            });
+                            await viewData('test',"false");
 
+                          },
+                          child: Column(
+                            children: [
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              Row(
+                                children: const [
+                                  Icon(
+                                    Icons.today,
+                                    color: Colors.blue,
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.only(left:10.0),
+                                    child: Text("Today"),
+                                  ),
 
-                    },
-                    child:const Icon(Icons.grid_view,color:Colors.orange)
-                )
+                                ],
+                              ),
+                              const Divider(
+                                height: 20, // Adjust the height as needed
+                                thickness: 0.2, // Adjust the thickness as needed
+                                color: Colors.grey,
+                              ),
+
+                            ],
+                          ),
+                        )
+                    ),
+                    PopupMenuItem(
+                        child: InkWell(
+                          onTap: () async{
+                            setState(() {
+                              advancedSearch="week";
+                              viewTitle="This Week";
+
+                            });
+                            await viewData('test',"false");
+                          },
+                          child: Column(
+                            children: [
+                              Row(
+                                children: const [
+                                  Icon(
+                                    Icons.calendar_view_week,
+                                    color: Colors.orange,
+                                  ),
+
+                                  Padding(
+                                    padding: EdgeInsets.only(left:10.0),
+                                    child: Text("This Week"),
+                                  ),
+
+                                ],
+                              ),
+                              const Divider(
+                                height: 20, // Adjust the height as needed
+                                thickness: 0.2, // Adjust the thickness as needed
+                                color: Colors.grey,
+                              ),
+
+                            ],
+                          ),
+                        )
+                    ),
+                    PopupMenuItem(
+                        child: InkWell(
+                          onTap: () async{
+                            setState(() {
+                              advancedSearch="month";
+                              viewTitle="This Month";
+
+                            });
+                            await viewData('test',"false");
+                          },
+                          child: Column(
+                            children: [
+                              Row(
+                                children: const [
+                                  Icon(
+                                    Icons.calendar_month,
+                                    color: Colors.orange,
+                                  ),
+
+                                  Padding(
+                                    padding: EdgeInsets.only(left:10.0),
+                                    child: Text("This Month"),
+                                  ),
+
+                                ],
+                              ),
+                              const Divider(
+                                height: 20, // Adjust the height as needed
+                                thickness: 0.2, // Adjust the thickness as needed
+                                color: Colors.grey,
+                              ),
+
+                            ],
+                          ),
+                        )
+                    ),
+                    PopupMenuItem(
+                        child: InkWell(
+                          onTap: () async{
+                            setState(() {
+
+                              advancedSearch="year";
+                              viewTitle="This Year";
+                            });
+                            await viewData('test',"false");
+                          },
+                          child: Column(
+                            children: [
+                              Row(
+                                children: const [
+                                  Icon(
+                                    Icons.event_available,
+                                    color: Colors.orange,
+                                  ),
+
+                                  Padding(
+                                    padding: EdgeInsets.only(left:10.0),
+                                    child: Text("This Year"),
+                                  ),
+
+                                ],
+                              ),
+                              const Divider(
+                                height: 20, // Adjust the height as needed
+                                thickness: 0.2, // Adjust the thickness as needed
+                                color: Colors.grey,
+                              ),
+
+                            ],
+                          ),
+                        )
+                    ),
+                    PopupMenuItem(
+                        child: InkWell(
+                          onTap: () async{
+                            /*setState(() {
+
+                              advancedSearch="year";
+                              viewTitle="This Year";
+                            });
+                            await viewData('test',"false");*/
+                            final DateTime? datetime= await showDatePicker(
+                                context: context,
+                                initialDate: selectedDate,
+                                firstDate: DateTime(2024),
+                                lastDate: DateTime(2100));
+                            if(datetime!=null  && datetime != selectedDate){
+                              setState(() {
+                                advancedSearch="choosedate";
+                                selectedDate=datetime;
+
+                                thisDate="${selectedDate.year}-${selectedDate.month}-${selectedDate.day}";
+                                viewTitle="Date:$thisDate";
+                              });
+                              Navigator.pop(context);
+                              await viewData('test',"false");
+                              //print("${selectedDate.year}-${selectedDate.month}-${selectedDate.day}");
+                            }
+                          },
+                          child: Column(
+                            children: [
+                              Row(
+                                children: const [
+                                  Icon(
+                                    Icons.event_note,
+                                    color: Colors.pink,
+                                  ),
+
+                                  Padding(
+                                    padding: EdgeInsets.only(left:10.0),
+                                    child: Text("Choose Date"),
+                                  ),
+
+                                ],
+                              ),
+                              const Divider(
+                                height: 20, // Adjust the height as needed
+                                thickness: 0.2, // Adjust the thickness as needed
+                                color: Colors.grey,
+                              ),
+
+                            ],
+                          ),
+                        )
+                    ),
+                    PopupMenuItem(
+                        child: InkWell(
+                          onTap: () async{
+                            /*setState(() {
+
+                              advancedSearch="year";
+                              viewTitle="This Year";
+                            });
+                            await viewData('test',"false");*/
+                            final DateTimeRange? datetimeRange= await showDateRangePicker(
+                                context: context,
+                                firstDate: DateTime(2024),
+                                lastDate: DateTime(2100));
+                            if(datetimeRange!=null){
+                              setState(() {
+                                advancedSearch="choosedaterange";
+                                selectedDateRange=datetimeRange;
+
+                                thisDate="${selectedDateRange.start.year}-${selectedDateRange.start.month}-${selectedDateRange.start.day}";
+                                toDate="${selectedDateRange.end.year}-${selectedDateRange.end.month}-${selectedDateRange.end.day}";
+                                viewTitle="From:$thisDate To $toDate";
+                              });
+                              await viewData('test',"false");
+                            }
+                          },
+                          child: Column(
+                            children: [
+                              Row(
+                                children: const [
+                                  Icon(
+                                    Icons.date_range,
+                                    color: Colors.pink,
+                                  ),
+
+                                  Padding(
+                                    padding: EdgeInsets.only(left:10.0),
+                                    child: Text("Date Range"),
+                                  ),
+
+                                ],
+                              ),
+                              const Divider(
+                                height: 20, // Adjust the height as needed
+                                thickness: 0.2, // Adjust the thickness as needed
+                                color: Colors.grey,
+                              ),
+
+                            ],
+                          ),
+                        )
+                    ),
+                    PopupMenuItem(
+                        child: InkWell(
+                          onTap: () async{
+                            setState(() {
+                              advancedSearch="mysales";
+                              viewTitle="My Sales";
+
+                            });
+                            await viewData('test',"false");
+                          },
+                          child: Column(
+                            children: [
+                              Row(
+                                children: const [
+                                  Icon(
+                                    Icons.apartment,
+                                    color: Colors.orange,
+                                  ),
+
+                                  Padding(
+                                    padding: EdgeInsets.only(left:10.0),
+                                    child: Text("All My Sales"),
+                                  ),
+
+                                ],
+                              ),
+                              const Divider(
+                                height: 20, // Adjust the height as needed
+                                thickness: 0.2, // Adjust the thickness as needed
+                                color: Colors.grey,
+                              ),
+
+                            ],
+                          ),
+                        )
+                    ),
+
+                  ],
+                  offset: const Offset(0, 40),
+                  child:InkWell(
+
+                    child: Ink(
+                      decoration: ShapeDecoration(
+                        color: Colors.grey.withOpacity(0.2),
+                        shape: const CircleBorder(),
+                      ),
+                      child: const Padding(
+                        padding: EdgeInsets.all(5.0),
+                        child: Icon(
+
+                          Icons.grid_view, // Replace with your desired icon
+                          color: Colors.pink,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+
 
               //trailing: Text()
             ),
@@ -195,7 +512,7 @@ class _SetSaleCompState extends State<SetSaleComp> {
             ),
             onChanged: (text) async{
 
-              viewData(text,true);
+              viewData(text,"true");
 
               //print(this._data[index]["total_var"]);
               // print("Text changed to: $text");
@@ -310,12 +627,12 @@ class _SetSaleCompState extends State<SetSaleComp> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 IconButton(
-                                  icon: Icon(Icons.edit),
+                                  icon: const Icon(Icons.edit),
                                   onPressed: () {
                                     // Handle the first icon tap
                                     Get.dialog(
                                       AlertDialog(
-                                        title: Text('Confirmation'),
+                                        title: const Text('Confirmation'),
                                         content: Text('Do you want to Edit ${_data[index]['OrderId']} ?'),
                                         actions: [
                                           ElevatedButton(
@@ -326,9 +643,7 @@ class _SetSaleCompState extends State<SetSaleComp> {
                                               elevation:0,
                                             ),
                                             onPressed: () async{
-                                              if(isLoading) return;
-                                              isLoading=true;
-                                              int limit=10;
+
 
                                               var resultData=(await StockQuery().editOrder(Topups(uid:_data[index]['OrderId']))).data;
 
@@ -367,13 +682,13 @@ class _SetSaleCompState extends State<SetSaleComp> {
 
 
                                             },
-                                            child: Text('Yes'),
+                                            child: const Text('Yes'),
                                           ),
                                           ElevatedButton(
                                             onPressed: () {
                                               Get.back(); // close the alert dialog
                                             },
-                                            child: Text('Close'),
+                                            child: const Text('Close'),
                                           ),
                                         ],
                                       ),
@@ -382,15 +697,22 @@ class _SetSaleCompState extends State<SetSaleComp> {
                                 ),
 
                                 IconButton(
-                                  icon: Icon(Icons.grid_view,color:Colors.orange),
+                                  icon: const Icon(Icons.grid_view,color:Colors.orange),
                                   onPressed: () async{
                                     // This function will be called when the icon is tapped.
                                     // thisOrder(_data[index],index);
 
+                                    setState(() {
+
+                                      showOveray=true;
+
+
+
+                                    });
+
 
 
                                     orderData=_data[index].values.toList();
-                                    print(orderData);
 
 
                                     //print((await thisOrder())["result"]);
@@ -401,6 +723,8 @@ class _SetSaleCompState extends State<SetSaleComp> {
 
                                       setState(() {
                                         isLoading=false;
+                                        showOveray=false;
+
                                         thisListOrder.clear();
 
                                         thisListOrder.addAll(resultData["result"]);
@@ -428,7 +752,7 @@ class _SetSaleCompState extends State<SetSaleComp> {
                       child: Center(
                         child: Text(
                           '${_data[index]['created_at']}',
-                          style: TextStyle(color: Colors.deepOrange,fontSize: 10),
+                          style: const TextStyle(color: Colors.deepOrange,fontSize: 10),
                         ),
                       ),
                     ),
@@ -460,7 +784,7 @@ class _SetSaleCompState extends State<SetSaleComp> {
     super.initState();
     //getapi();
 
-    Quickdata();
+    quickData();
     _scrollController.addListener(_scrollListener);
 
   }
@@ -469,7 +793,7 @@ class _SetSaleCompState extends State<SetSaleComp> {
         !_scrollController.position.outOfRange) {
       _page=_page+10;
 
-      Quickdata();
+      quickData();
     }
   }
 
@@ -502,9 +826,9 @@ class _SetSaleCompState extends State<SetSaleComp> {
 
   //
 
-  Quickdata()async
+  quickData()async
   {
-    viewData('test',false);
+    viewData('test',"false");
 
   }
   viewData(nameVal,searchVal) async{
@@ -512,7 +836,7 @@ class _SetSaleCompState extends State<SetSaleComp> {
     isLoading=true;
     int limit=10;
 
-    var resultData=(await StockQuery().viewSales(Topups(startlimit:limit,endlimit:_page,name:nameVal,searchOption:searchVal))).data;
+    var resultData=(await StockQuery().viewSales(Topups(startlimit:limit,endlimit:_page,name:nameVal,optionCase:"$searchVal",advancedSearch:advancedSearch,created_at:thisDate,updated_at:toDate))).data;
 
     if(resultData["status"])
     {
@@ -606,7 +930,250 @@ class _SetSaleCompState extends State<SetSaleComp> {
 
 
   }
+  deliverStockView(productC,uidOrder) async{
+    //print(uidOrder);
+    (Get.put(StockQuery()).updateHideLoader(false));
 
+
+    var resultData=(await StockQuery().stockViewDeliver(Topups(uid:uidOrder,optionCase:productExist),QuickBonus(uid:productC))).data;
+
+    print(resultData["result"][0]["uid"]);
+    if(resultData["status"])
+    {
+      setState(() {
+        showOveray=false;
+      });
+      (Get.put(StockQuery()).updateHideLoader(true));
+      if(resultData["result"]!=0)
+      {
+
+
+
+
+        viewDeliver(resultData["result"]);
+
+
+
+
+
+        //
+      }
+      else{
+        setState(() {
+          showOveray=false;
+        });
+        Get.back(canPop: false);
+      }
+    }
+  }
+  viewDeliver(dataV){
+    (Get.put(StockQuery()).updateDispatchOrder2(dataV));
+    return Get.bottomSheet(
+      StatefulBuilder(
+        builder: (BuildContext context, StateSetter setState) {
+          return
+            Stack(
+              children: [
+                Container(
+                  padding:const EdgeInsets.all(5.0),
+                  height: 600,
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(30),
+                      topRight: Radius.circular(30),
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+
+
+                      Center(child: Text("UID:${dataV[0]["uid"]}")),
+                      const SizedBox(height:8.5,),
+
+                      const Divider(
+                        height: 1,
+                        color: Colors.grey,
+                      ),
+
+
+                      GetBuilder<StockQuery>(
+                        builder: (controller) {
+                          return  Expanded(
+                              child:ListView.separated(
+                                itemCount:(controller.dispatchOrder2).length+1,
+                                itemBuilder: (context, index) {
+                                  if(index<(controller.dispatchOrder2).length) {
+                                    //final GlobalKey qrkey1 = GlobalKey(debugLabel: 'QR Key2 $index');
+                                    // (Get.put(HideShowState())).isDelivery(_controller.dispatchOrder2);
+                                    return Stack(
+                                      children: [
+                                        Card(
+                                          elevation: 0,
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(top:10.0),
+                                            child: ListTile(
+
+                                              title: Row(
+                                                children: [
+                                                  Expanded(
+
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        Wrap(
+                                                          crossAxisAlignment: WrapCrossAlignment.center,
+                                                          children: [
+
+                                                            const Icon(Icons.segment,color:Colors.orange,size:13,),
+                                                            Text("${(controller.dispatchOrder2[index]["productCode"].toUpperCase())}",
+                                                              style: const TextStyle(fontSize: 14),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        Wrap(
+                                                          crossAxisAlignment: WrapCrossAlignment.center,
+                                                          children: [
+
+                                                            const Icon(Icons.segment,color:Colors.orange,size:13,),
+                                                            Text("Carry by:${ConstantClassUtil().capitalizeFirstLetter((controller.dispatchOrder2[index]["userName"]))}",
+                                                              style: const TextStyle(fontSize: 14),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        Wrap(
+                                                          crossAxisAlignment: WrapCrossAlignment.center,
+                                                          children: [
+
+                                                            const Icon(Icons.segment,color:Colors.orange,size:13,),
+                                                            Text("Qty:${(controller.dispatchOrder2[index]["qty"])}",
+                                                              style: const TextStyle(fontSize: 14),
+                                                            ),
+                                                          ],
+                                                        ),
+
+                                                        Wrap(
+                                                          crossAxisAlignment: WrapCrossAlignment.center,
+                                                          children: [
+
+
+                                                            const Icon(Icons.segment,color:Colors.orange,size:13,),
+                                                            Text("Send by:${ConstantClassUtil().capitalizeFirstLetter((controller.dispatchOrder2[index]["adminName"]))}",
+                                                              style: const TextStyle(fontSize: 14),
+                                                            ),
+                                                          ],
+                                                        ),
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                      ],
+                                                    ),
+                                                  )
+
+
+
+
+
+
+                                                ],
+                                              ),
+                                              // subtitle: Text('Subtitle for ${_controller.dispatchOrder2[index]["price"]}'),
+                                              leading: CircleAvatar(
+                                                backgroundColor:getRandomColor(),
+                                                child: Icon(_getRandomIcon()),
+                                              ),
+
+                                            ),
+                                          ),
+                                        ),
+                                        Positioned(
+                                          top:10,
+                                          right: 28,
+
+
+                                          child: Center(
+                                            child: Text(
+                                              '${controller.dispatchOrder2[index]['created_at']}',
+                                              style: const TextStyle(color: Colors.deepOrange,fontSize: 10),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  }else{
+                                    return const Text("");
+                                  }
+                                },
+                                separatorBuilder: (context, index) {
+                                  return const Divider(
+                                    height: 1,
+                                    color: Colors.grey,
+                                  );
+                                },
+
+                              ));
+
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                GetBuilder<StockQuery>(
+                  builder: (myLoadercontroller) {
+                    //return Text('Data: ${_controller.data}');
+                    return
+                      (myLoadercontroller.hideLoader)?
+                      const Text(""):
+                      Positioned.fill(
+                        child: Center(
+                          child: Container(
+                            alignment: Alignment.center,
+                            color: Colors.white70,
+                            child: const CircularProgressIndicator(),
+                          ),
+                        ),
+                      );
+                  },
+                ),
+              ],
+            );
+        },
+      ),
+    ).whenComplete(() {
+      // Get.put(HideShowState()).isDelivery(0);
+      //do whatever you want after closing the bottom sheet
+    });
+
+  }
+  void viewComment(commentData){
+    Get.bottomSheet(
+      Container(
+        height: 200,
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('$commentData'),
+            const SizedBox(height: 20),
+
+          ],
+        ),
+      ),
+      barrierColor: Colors.transparent,
+      backgroundColor: Colors.white,
+    );
+  }
   void viewThisOrder() {
 
     Get.bottomSheet(
@@ -648,84 +1215,127 @@ class _SetSaleCompState extends State<SetSaleComp> {
                           //Get.put(HideShowState())).isDelivery(thisListOrder[index]);
 
 
-                          return Container(
-                            margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-                            child: Card(
-                              elevation:0.5,
-                              //margin: EdgeInsets.symmetric(vertical:1,horizontal:5),
-                              //color:Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(7),
-                                //side: BorderSide(color:_data[index]["color_var"]??true?Colors.white:Colors.green, width: 2),
-                              ),
-
-                              child: Column(
-                                children: [
-                                  // Text("sum:${orderSum}"),
-                                  ListTile(
-                                      leading: CircleAvatar(
-                                        backgroundColor:getRandomColor(),
-                                        child: Icon(_getRandomIcon()),
-                                      ),
-                                      title:Row(
-                                        children: [
-                                          Expanded(
-
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-
-                                                RichText(
-                                                  text: TextSpan(
-                                                    text:"${thisListOrder[index]["productName"]} (${thisListOrder[index]["pcs"]} pcs):",
-                                                    style: DefaultTextStyle.of(context).style,
-                                                    children: const <TextSpan>[
-
-
-                                                    ],
-                                                  ),
-                                                ),
-                                                Text("Price:${(thisListOrder[index]["price"])}"),
-
-
-                                                Text.rich(
-                                                    TextSpan(
-                                                        children: [
-                                                          TextSpan(
-                                                            text: 'Qty ${thisListOrder[index]["totalQty"]}:',
-
-                                                          ),
-
-
-
-                                                        ]
-                                                    )
-                                                ),
-                                                Text("Deliver:${(((Get.put(HideShowState()).delivery)[index]["totalQty"])!=((Get.put(HideShowState()).delivery)[index]["totalCount"]))?(((Get.put(HideShowState()).delivery)[index]["totalQty"]-(Get.put(HideShowState()).delivery)[index]["totalCount"])):0}"),
-
-
-                                              ],
-                                            ),
-                                          )
-
-
-
-
-
-
-                                        ],
-                                      ),
-
-
-                                      trailing:Text("${thisListOrder[index]["totalAmount"]}"),
-
-                                    //trailing: Text()
+                          return Stack(
+                            children: [
+                              Container(
+                                margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                child: Card(
+                                  elevation:0.5,
+                                  //margin: EdgeInsets.symmetric(vertical:1,horizontal:5),
+                                  //color:Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(7),
+                                    //side: BorderSide(color:_data[index]["color_var"]??true?Colors.white:Colors.green, width: 2),
                                   ),
 
+                                  child: Column(
+                                    children: [
+                                      // Text("sum:${orderSum}"),
+                                      ListTile(
+                                        leading: CircleAvatar(
+                                          backgroundColor:getRandomColor(),
+                                          child: Icon(_getRandomIcon()),
+                                        ),
+                                        title:Row(
+                                          children: [
+                                            Expanded(
 
-                                ],
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+
+                                                  RichText(
+                                                    text: TextSpan(
+                                                      text:"${thisListOrder[index]["productCode"]} (${thisListOrder[index]["pcs"]} pcs):",
+                                                      style: DefaultTextStyle.of(context).style,
+                                                      children: const <TextSpan>[
+
+
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  Text("Price:${(thisListOrder[index]["price"])}"),
+
+
+                                                  Text.rich(
+                                                      TextSpan(
+                                                          children: [
+                                                            TextSpan(
+                                                              text: 'Qty ${thisListOrder[index]["totalQty"]}:',
+
+                                                            ),
+
+
+
+                                                          ]
+                                                      )
+                                                  ),
+
+                                                  Wrap(
+                                                    crossAxisAlignment: WrapCrossAlignment.center,
+                                                    children: [
+
+                                                      Text("Deliver:${(((Get.put(HideShowState()).delivery)[index]["totalQty"])!=((Get.put(HideShowState()).delivery)[index]["totalCount"]))?((num.parse((Get.put(HideShowState()).delivery)[index]["totalQty"])-num.parse((Get.put(HideShowState()).delivery)[index]["totalCount"]))):0}"),
+                                                      const SizedBox(width:8,),
+                                                      (((Get.put(HideShowState()).delivery)[index]["totalQty"])!=((Get.put(HideShowState()).delivery)[index]["totalCount"]))?
+                                                      InkWell(
+                                                          onTap: () async{
+                                                            setState(() {
+                                                              productExist="true";
+
+                                                            });
+
+
+                                                            //
+                                                            await deliverStockView((Get.put(HideShowState()).delivery)[index]["productCode"],(Get.put(HideShowState()).delivery)[index]["uid"]);
+                                                          },
+
+
+                                                          child: const Icon(Icons.local_shipping,color:Colors.red,size:25,)):const Text("")
+                                                    ],
+                                                  ),
+
+                                                ],
+                                              ),
+                                            )
+
+
+
+
+
+
+                                          ],
+                                        ),
+
+
+                                        trailing:Text("${thisListOrder[index]["totalAmount"]}"),
+
+                                        //trailing: Text()
+                                      ),
+
+
+                                    ],
+                                  ),
+                                ),
                               ),
-                            ),
+                              GetBuilder<StockQuery>(
+                                builder: (myLoadercontroller) {
+                                  //return Text('Data: ${_controller.data}');
+                                  return
+                                    (myLoadercontroller.hideLoader)?
+                                    const Text(""):
+                                    Positioned.fill(
+                                      child: Center(
+                                        child: Container(
+                                          alignment: Alignment.center,
+                                          color: Colors.white70,
+                                          child: const CircularProgressIndicator(),
+                                        ),
+                                      ),
+                                    );
+                                },
+                              ),
+                            ],
                           );
 
                         }
@@ -744,41 +1354,12 @@ class _SetSaleCompState extends State<SetSaleComp> {
     ).whenComplete(() {
       // Get.put(HideShowState()).isDelivery(0);
       //do whatever you want after closing the bottom sheet
+
     });
 
   }
 
-  stockCount(indexData)async
-  {
 
-
-    (Get.put(HideShowState())).isChangeDelivery(thisListOrder[indexData],indexData,qty_product);
-
-
-    // print((Get.put(HideShowState()).delivery)[indexData]);
-    //print(thisListOrder[indexData]);
-
-
-
-
-
-    /*var resultData=(await StockQuery().stockCount(Topups(uid:"${orderData[0]}"),QuickBonus(uid:"${productCode}",qty:"${qty_product}",subscriber:"StockName",status:"status",description:"Delivered"), User(uid: "UidTransport",name:"refName"))).data;
-
-
-    if(resultData["status"])
-    {
-      Quickdata();
-      thisOrder2();
-
-    }*/
-
-
-
-
-
-
-
-  }
 
 
 

@@ -36,7 +36,6 @@ import '../models/User.dart';
 
 
 
-
 class Homepage extends StatefulWidget {
   const Homepage({Key? key}) : super(key: key);
 
@@ -99,7 +98,6 @@ class _HomepageState extends State<Homepage> {
   int editQty=0;
 
 
-
   @override
 
   @override
@@ -131,11 +129,9 @@ class _HomepageState extends State<Homepage> {
 
     //FocusScope.of(context).unfocus();//hide keyboard on screen loadin
     return Scaffold(
-     resizeToAvoidBottomInset:(Get.put(StockQuery()).resizable),
-
+      resizeToAvoidBottomInset: true,
       body:Stack(
         children: [
-
           Column(
             children: [
               //Qr Code
@@ -181,13 +177,6 @@ class _HomepageState extends State<Homepage> {
 
               // SearchBarField(search: _data,searchController:searchContro,PerformSearch:,),
               SearchBarField(
-               searchBy:(text) async{
-                 setState(() {
-                   (Get.put(StockQuery()).updateSelected(text));
-
-                 });
-                 //(Get.put(StockQuery()).selectedOption),
-               } ,
                 // Correct: explicitly assigning null
                 searchMethod:(text) async{
                   if (text!= searchText) {
@@ -234,28 +223,28 @@ class _HomepageState extends State<Homepage> {
                             icon: const Icon(Icons.contact_phone),
                             iconSize: 23.0,
                             color: Colors.blue,
-                            onPressed: () async{
+                            onPressed: () {
                               setState(() {
                                 phoneNumber="test";
                                 searchValOption=false;
                               });
 
 
-                              await getUserData();
+                              getUserData();
                               searchUser(context);
                             }
 
                         ), // Replace with your desired icon
                         const SizedBox(width: 8.0), // Adjust the space between icon and text
                         InkWell(
-                            onTap: () async {
+                            onTap: () {
                               setState(() {
                                 phoneNumber="none";
                                 searchValOption=false;
                               });
 
 
-                              await getUserData();
+                              getUserData();
                               searchUser(context);
                             },
                             child: Text('${(Get.put(StockQuery()).order)["resultData"][0]["name"]}', style: const TextStyle(fontSize: 16.0))),
@@ -310,11 +299,6 @@ class _HomepageState extends State<Homepage> {
                                     elevation:0,
                                   ),
                                   onPressed: () async{
-                                    Get.back(canPop: false);
-                                    setState(() {
-                                      showOver=true;
-                                    });
-
                                     (Get.put(StockQuery()).updateHideLoader(false));
 
                                     var resultData=(await StockQuery().deleteTOrder(Topups(uid:"${(Get.put(StockQuery()).order)["resultData"][0]["uid"]}"))).data;
@@ -335,7 +319,7 @@ class _HomepageState extends State<Homepage> {
                                       (Get.put(StockQuery()).updateHidePickClick(true));
 
                                       setState(() {
-
+                                        showOver=false;
                                         cartData.clear();
                                         ///(Get.put(StockQuery()).updateOrder(orderVal));
                                         (Get.put(StockQuery()).updateDeptOrder(0));
@@ -344,11 +328,7 @@ class _HomepageState extends State<Homepage> {
                                         // dataSearch.clear();
 
                                       });
-                                      await pickDefaultUser(true,true);
-
-                                      setState(() {
-                                        showOver=false;
-                                      });
+                                      pickDefaultUser(true,true);
 
 
 
@@ -458,7 +438,7 @@ class _HomepageState extends State<Homepage> {
 
                             var resultData=(await StockQuery().submitOrder(Participated(uid:"Nyota_1672353378"
                                 ,uidUser:"${(Get.put(StockQuery()).userProfile)["uid"]}",subscriber:"${(Get.put(StockQuery()).order["resultData"][0]["uid"])}",inputData:inputDataText),Promotions(
-                                token:"${(Get.put(StockQuery())).orderSum}",reach:"1200",gain:"350",uid:"PointSales1"
+                                token:"${(Get.put(StockQuery())).orderSum }",reach:"1200",gain:"350",uid:"PointSales1"
                             ))).data;
                             if(resultData["status"])
                             {
@@ -635,7 +615,6 @@ class _HomepageState extends State<Homepage> {
               ),
             ],
           ),
-
           if(showOver)
             Positioned.fill(
               child: Center(
@@ -869,6 +848,7 @@ class _HomepageState extends State<Homepage> {
     try {
 
       var resultData=(await StockQuery().viewUserTempOrder(QuickBonus(uid:"nyota"))).data;
+      print(resultData);
       if(resultData["status"])
       {
 
@@ -948,13 +928,11 @@ class _HomepageState extends State<Homepage> {
 
     try {
       bool searchHide=(statusSearch=='none')?true:false;//to check if is Qr search or no Qr
-      String productCode=((Get.put(StockQuery()).selectedOption)=="Code")?text:"none";
-      String productName=((Get.put(StockQuery()).selectedOption)=="Name")?text:'none';
-      var resultData=(await StockQuery().product(QuickBonus(uid:productCode,productName:productName,status:statusSearch),Topups(optionCase:"searchProductStock",startlimit:1,endlimit:10))).data;
-//print(resultData["status"]);
+      var resultData=(await StockQuery().product(QuickBonus(uid:"none",productName:text,status:statusSearch),Topups(optionCase:"searchProductStock",startlimit:1,endlimit:10))).data;
+print(resultData);
       if(resultData["status"])
       {
-        (Get.put(StockQuery()).updateResizable(false));
+
         setState(() {
           productSearch=searchHide;
 
@@ -970,7 +948,7 @@ class _HomepageState extends State<Homepage> {
       else{
         setState(() {
 
-          (Get.put(StockQuery()).updateResizable(true));
+
           dataSearch.clear();
           (Get.put(StockQuery()).updatedataSearch(dataSearch));
 
@@ -1318,7 +1296,7 @@ class _HomepageState extends State<Homepage> {
 
         });
       }
-    } catch (e) {
+    } catch (e,stackTrace) {
       setState(() {
         showOver=false;
       });
@@ -1352,16 +1330,11 @@ class _HomepageState extends State<Homepage> {
                 elevation:0,
               ),
               onPressed: () async{
-
-                Get.back(canPop: false);
-                await pickDefaultUser(false,true);
-
+                pickDefaultUser(false,true);
                 if((Get.put(StockQuery()).userProfile)["uid"]!='none')
                 {
-
-                  await placeOrder(dynamicData);
-                  //Get.back(canPop: false);
-
+                  placeOrder(dynamicData);
+                  //Get.back();
                 }
 
 
@@ -1489,10 +1462,6 @@ class _HomepageState extends State<Homepage> {
 
   }
   placeOrder(dynamicData) async{
-    setState(() {
-      productSearch=false;
-    });
-    (Get.put(StockQuery()).updateResizable(true));
     (Get.put(StockQuery()).updateHideLoader(false));
     bool containsProductCode = cartData.any((item) => item['productCode'] == dynamicData["productCode"]);
 
@@ -1501,7 +1470,6 @@ class _HomepageState extends State<Homepage> {
       (Get.put(StockQuery()).updateHideLoader(true));
       (Get.put(StockQuery()).updateTextMessage("${dynamicData['ProductName']} Product already Added"));
       (Get.put(StockQuery()).updateHideProductList(true));
-
 
 
     }
@@ -1598,195 +1566,261 @@ class _HomepageState extends State<Homepage> {
   searchUserMethod() async{
 
   }
-
   void searchUser(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Stack(children: [
+          Container(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Visibility(
+                  visible: false,
+                  child: Container(
+                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                    child:  IntlPhoneField(
+                      initialCountryCode: 'CD',
+                      controller: uidInput,
+                      autofocus: true,
 
-    Get.bottomSheet(
+                      decoration: InputDecoration(
+                        labelText: 'Phone Number',
+                        border: const OutlineInputBorder(
+                          borderSide: BorderSide(),
+                        ),
+                        suffixIcon: isValid?const Icon(Icons.done,color:Colors.green,):const Icon(Icons.dangerous,color:Colors.red,),
 
-      StatefulBuilder(
-        builder: (BuildContext context, StateSetter setState) {
-          return
-            SingleChildScrollView(
-              child: Container(
+                      ),
 
-                padding:const EdgeInsets.all(5.0),
-                height: 600,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(30),
-                    topRight: Radius.circular(30),
+
+                      onChanged: (phone) async{
+
+                        if((uidInput.text).isPhoneNumber)
+                        {
+                          phoneNumber=phone.number;
+
+                          getUserData();
+
+
+
+                        }
+                        else{
+                          setState(() {
+                            isValid=false;
+
+                          });
+                        }
+
+
+                        //uidInput4.text=phone.countryCode;
+                        //uidInput2.text=phone.number;
+                        // uidInput2.text=phone.countryISOCode;
+                        //print(phone.completeNumber);
+
+
+
+                      },
+
+                      onCountryChanged: (country) {
+
+                        uidInput4.text="+${country.dialCode}";
+                        uidInput5.text=country.name;
+                        initCountry.text=country.code;
+
+                        if((uidInput.text).isPhoneNumber)
+                        {
+
+                          phoneNumber=uidInput.text;
+                          getUserData();
+
+
+                        }
+                        else{
+                          setState(() {
+                            isValid=false;
+
+                          });
+                        }
+                        // print('Country changed to: ' + country.name);
+                        // print('Country changed to: ' + country.dialCode);
+                      },
+                    ),
                   ),
                 ),
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
+                Container(
+                  height: 55,
+                  //padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+                  margin: const EdgeInsets.fromLTRB(10, 20, 10, 10),
+                  child: TextField(
 
-                      const Center(child: Text("Client:Name")),
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(50.0),
+                      ),
+                      labelText: 'Search',
+                    ),
+                    onChanged: (text) async{
+
+                      if(phoneNumber=='none')
+                      {
+                        setState(() {
+                          searchValOption=true;
+                          searchName=text;
+                        });
+                        if(searchValOption)
+                        {
+                          getUserData();
+                        }
+                      }
+                      else{
+                        setState(() {
+                          searchValOption=true;
+                          phoneNumber=text;
+                        });
+                        if(searchValOption)
+                        {
+                          getUserData();
+                        }
+                      }
 
 
-                      SingleChildScrollView(
-                        child:Column(
-                          children: [
-                            Container(
 
-                              //padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-                              margin: const EdgeInsets.fromLTRB(10, 20, 10, 10),
-                              child: TextField(
+                      //print(this._data[index]["total_var"]);
+                      // print("Text changed to: $text");
+                    },
+                  ),
+                ),
+                Expanded(
+                  child: ListView.separated(
+                    itemCount: users.length+1,
+                    separatorBuilder: (context, index) => const Divider(height: 1.0),
+                    itemBuilder: (context, index) {
+                      if(index<users.length)
+                      {
+                        return Card(
+                          margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                          child: ListTile(
+                            leading: CircleAvatar(
+                              backgroundColor:getRandomColor(),
+                              child: Icon(_getRandomIcon()),
 
-                                decoration: InputDecoration(
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(50.0),
-                                  ),
-                                  labelText: 'Search',
+                              //backgroundImage: NetworkImage(users[index].photo_url):
 
-                                ),
-                                onChanged: (text) async{
-                                  if((int.tryParse(text) != null)){
+                            ),
+                            title: Text(users[index]["name"]),
+                            subtitle: Text(users[index]["PhoneNumber"]),
+                            trailing:  IconButton(
+                              icon: const Icon(Icons.add),
+                              iconSize: 23.0,
+                              color: Colors.blue,
+                              onPressed: () async{
+
+                                (Get.put(StockQuery()).updateHideLoader(false));
+                                if(((Get.put(StockQuery()).order)["resultData"][0]["uid"])=="none")
+                                {
+                                  var userProfile =
+                                  {
+                                    "uid":"${users[index]["uid"]}",
+                                    "name":"${ users[index]["name"]}",
+
+                                    "email": "on@gmail.com",
+                                    "phone": "782389359",
+                                    "Ccode": "+250",
+                                    "country": "Rwanda",
+                                    "initCountry": "none",
+                                    "PhoneNumber":"${users[index]["PhoneNumber"]}",
+                                    "carduid": "TEALTD_7hEnj_1672352175"
+                                  };
+                                  setState(() {
+                                    (Get.put(StockQuery()).updateUserProfile(userProfile));
+                                    (Get
+                                        .put(StockQuery())
+                                        .order)["resultData"][0]["name"] = userProfile["name"];
+                                  });
+                                  Future.microtask(() {
+                                    Navigator.of(context).pop();
+                                  });
+                                }
+                                else{
+
+                                  var resultData=(await StockQuery().updateInOrder(QuickBonus(uid:"${(Get.put(StockQuery()).order)["resultData"][0]["uid"]}",productName:"productCode",description:"comment",status:"UpdateUserInOrder"),Participated(uidUser:"${users[index]["uid"]}",status:'Default'))).data;
+                                  if(resultData["status"])
+                                  {
+                                    var userProfile =
+                                    {
+                                      "uid":"${users[index]["uid"]}",
+                                      "name":"${ users[index]["name"]}",
+
+                                      "email": "on@gmail.com",
+                                      "phone": "782389359",
+                                      "Ccode": "+250",
+                                      "country": "Rwanda",
+                                      "initCountry": "none",
+                                      "PhoneNumber":"${users[index]["PhoneNumber"]}",
+                                      "carduid": "TEALTD_7hEnj_1672352175"
+                                    };
                                     setState(() {
-                                      searchValOption=true;
-                                      phoneNumber=text;
+                                      (Get.put(StockQuery()).updateUserProfile(userProfile));
+                                      (Get
+                                          .put(StockQuery())
+                                          .order)["resultData"][0]["name"] = userProfile["name"];
                                     });
-                                    await getUserData();
+                                    Future.microtask(() {
+                                      Navigator.of(context).pop();
+                                    });
+
                                   }
                                   else{
 
-                                    setState(() {
-                                      searchName=text;
-                                      searchValOption=true;
-                                      phoneNumber="none";
-                                    });
-                                    await getUserData();
                                   }
-
-
-
-
-                                  //print(this._data[index]["total_var"]);
-                                  // print("Text changed to: $text");
-                                },
-                              ),
-                            ),
-                            ListView.separated(
-                              shrinkWrap: true,
-                              itemCount: users.length + 1,
-                              separatorBuilder: (context, index) => const Divider(height: 1.0),
-                              itemBuilder: (context, index) {
-                                if (index < users.length) {
-                                  return Card(
-                                    margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                                    child: ListTile(
-                                      leading: CircleAvatar(
-                                        backgroundColor:getRandomColor(),
-                                        child: Icon(_getRandomIcon()),
-
-                                        //backgroundImage: NetworkImage(users[index].photo_url):
-
-                                      ),
-                                      title: Text(users[index]["name"]),
-                                      subtitle: Text(users[index]["PhoneNumber"]),
-                                      trailing:  IconButton(
-                                        icon: const Icon(Icons.add),
-                                        iconSize: 23.0,
-                                        color: Colors.blue,
-                                        onPressed: () async{
-
-                                          (Get.put(StockQuery()).updateHideLoader(false));
-                                          if(((Get.put(StockQuery()).order)["resultData"][0]["uid"])=="none")
-                                          {
-                                            var userProfile =
-                                            {
-                                              "uid":"${users[index]["uid"]}",
-                                              "name":"${ users[index]["name"]}",
-
-                                              "email": "on@gmail.com",
-                                              "phone": "782389359",
-                                              "Ccode": "+250",
-                                              "country": "Rwanda",
-                                              "initCountry": "none",
-                                              "PhoneNumber":"${users[index]["PhoneNumber"]}",
-                                              "carduid": "TEALTD_7hEnj_1672352175"
-                                            };
-                                            setState(() {
-                                              (Get.put(StockQuery()).updateUserProfile(userProfile));
-                                              (Get
-                                                  .put(StockQuery())
-                                                  .order)["resultData"][0]["name"] = userProfile["name"];
-                                            });
-                                            Future.microtask(() {
-                                              Navigator.of(context).pop();
-                                            });
-                                          }
-                                          else{
-
-                                            var resultData=(await StockQuery().updateInOrder(QuickBonus(uid:"${(Get.put(StockQuery()).order)["resultData"][0]["uid"]}",productName:"productCode",description:"comment",status:"UpdateUserInOrder"),Participated(uidUser:"${users[index]["uid"]}",status:'Default'))).data;
-                                            if(resultData["status"])
-                                            {
-                                              var userProfile =
-                                              {
-                                                "uid":"${users[index]["uid"]}",
-                                                "name":"${ users[index]["name"]}",
-
-                                                "email": "on@gmail.com",
-                                                "phone": "782389359",
-                                                "Ccode": "+250",
-                                                "country": "Rwanda",
-                                                "initCountry": "none",
-                                                "PhoneNumber":"${users[index]["PhoneNumber"]}",
-                                                "carduid": "TEALTD_7hEnj_1672352175"
-                                              };
-                                              setState(() {
-                                                (Get.put(StockQuery()).updateUserProfile(userProfile));
-                                                (Get
-                                                    .put(StockQuery())
-                                                    .order)["resultData"][0]["name"] = userProfile["name"];
-                                              });
-                                              Future.microtask(() {
-                                                Navigator.of(context).pop();
-                                              });
-
-                                            }
-                                            else{
-
-                                            }
-                                          }
-
-
-
-                                        },
-                                      ), // Add an icon on the trailing side
-                                    ),
-                                  );
-                                } else {
-                                  return Container();
                                 }
+
+
+
                               },
-                            ),
+                            ), // Add an icon on the trailing side
+                          ),
+                        );
+                      }
+                      else{
+                        return Container();
+                      }
 
-                          ],
-                        ),
-
-                      ),
-                    ],
+                    },
                   ),
                 ),
-              ),
-            );
-        },
-      ),
-    ).whenComplete(() {
-      // Get.put(HideShowState()).isDelivery(0);
-      //do whatever you want after closing the bottom sheet
+              ],
+            ),
+          ),
+          GetBuilder<StockQuery>(
+            builder: (myLoadercontroller) {
+              //return Text('Data: ${_controller.data}');
+              return
+                (myLoadercontroller.hideLoader)?
+                const Text(""):
+                Positioned.fill(
+                  child: Center(
+                    child: Container(
+                      alignment: Alignment.center,
+                      color: Colors.white70,
+                      child: const CircularProgressIndicator(),
+                    ),
+                  ),
+                );
+            },
+          ),
+        ],);
+      },
+    ).then((value) {
+      // This callback will be executed when the BottomSheet is closed
+
     });
   }
-
   getUserData() async{
-    //FocusManager.instance.primaryFocus?.unfocus();
 
-    setState(() {
-      showOver=true;
-    });
-    //(Get.put(StockQuery()).updateHideLoader(false));
+    (Get.put(StockQuery()).updateHideLoader(false));
     var resultData=(await StockQuery().searchUser(User(uid:"",name:searchName,phone:phoneNumber,platform:"4000",status:"offNotPick"),Topups(optionCase:"false",startlimit:limitData,searchOption:searchValOption))).data;
 
     if(resultData["status"])
@@ -1798,7 +1832,7 @@ class _HomepageState extends State<Homepage> {
       {
 
         setState(() {
-          showOver=false;
+
           users.clear();
           users.addAll(resultData["result"]);
 
@@ -2249,20 +2283,15 @@ class SearchBarField extends StatelessWidget {
     required this.searchMethod,
     required this.scanProductMethod,
     required this.searchController,
-    required this.searchBy,
   }) : super(key: key);
 
   final void Function(String) searchMethod;
   final void Function() scanProductMethod;
   final TextEditingController searchController;
-  final void Function(String) searchBy;
 
 
   @override
   Widget build(BuildContext context) {
-     // Default selected option
-
-    List<String> _dropdownOptions = ['Name', 'Code'];
     return Container(
       margin: const EdgeInsets.fromLTRB(5, 20, 5, 0),
       child: TextField(
@@ -2271,30 +2300,7 @@ class SearchBarField extends StatelessWidget {
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(50.0),
           ),
-
-          prefixIcon: Padding(
-            padding: const EdgeInsets.fromLTRB(15, 0, 0, 0),
-            child: DropdownButtonHideUnderline(
-              child: DropdownButton<String>(
-                value:(Get.put(StockQuery()).selectedOption),
-                onChanged: (newValue) {
-                  //(Get.put(StockQuery()).updateSelected(newValue));
-                 searchBy(newValue!);
-                },
-                items: _dropdownOptions.map((option) {
-                  return DropdownMenuItem(
-                    value: option,
-                    child: Text(option),
-                  );
-                }).toList(),
-              ),
-            ),
-          ),
-          labelText: 'Search By',
-
-          labelStyle: TextStyle(color: Colors.black), // Customize label color
-          floatingLabelBehavior: FloatingLabelBehavior.always,
-
+          labelText: 'Search',
 
           suffixIcon: IconButton(
             icon: const Icon(Icons.camera_alt),
@@ -2321,7 +2327,6 @@ class SearchBarField extends StatelessWidget {
               // You can navigate to a scan screen or perform a scan action here
             },
           ),
-
         ),
         onChanged: (text) async{
 
@@ -2331,7 +2336,6 @@ class SearchBarField extends StatelessWidget {
 
         },
       ),
-
     );
   }
 }
@@ -2481,7 +2485,7 @@ class ProductSearchList extends StatelessWidget {
                         children: [
 
                           const Icon(Icons.segment,color:Colors.orange,size:13,),
-                          Text("tags:${searchResult[index]["ProductName"]} "),
+                          Text("tags:${searchResult[index]["tags"]} "),
 
 
 
@@ -2668,7 +2672,6 @@ class CheckoutPage extends StatelessWidget {
 
                                                     ),
                                                     onChanged: (text) {
-                                                      (Get.put(StockQuery()).updateResizable(true));
                                                       if((int.tryParse(text) != null) && (int.tryParse(text)!=0)){
                                                         if(int.parse(text)>0)
                                                         {

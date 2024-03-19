@@ -1,4 +1,7 @@
 
+import 'package:dStock/Query/StockQuery.dart';
+import 'package:dStock/Utilconfig/HideShowState.dart';
+
 import '../../../models/Admin.dart';
 
 import 'package:intl_phone_field/intl_phone_field.dart';
@@ -474,37 +477,7 @@ class _SetEditCardNoCompState extends State<SetEditCardNoComp> {
     });
   }
 
-  getDataFromNo(phoneNumber) async{
-    setState(() {
-      isLoading=true;
-    });
 
-    var resultData=(await CardQuery().getNumberDetailCardOnline(Admin(uid: "tets", subscriber: "test",phone:phoneNumber,Ccode: uidInput4.text))).data;
-    if(resultData["status"])
-    {
-    uidData.text=resultData["UserDetail"]["uid"];
-    name.text=resultData["UserDetail"]["name"];
-    email.text=resultData["UserDetail"]["email"];
-    initCountry.text=resultData["UserDetail"]["initCountry"];
-    password.text=resultData["UserDetail"]["password"]??'none';
-
-    //print(resultData);
-    setState(() {
-    isValid=true;
-    isLoading=false;
-    });
-    }
-    else{
-
-    setState(() {
-    isValid=false;
-    isLoading=false;
-    });
-
-
-
-    }
-  }
   scanMethod(checkcode){
     controller!.pauseCamera();
     carduid.text=checkcode;
@@ -516,7 +489,38 @@ class _SetEditCardNoCompState extends State<SetEditCardNoComp> {
 
 
   }
+  getDataFromNo(phoneNumber) async{
+    setState(() {
+      isLoading=true;
+    });
 
+    var resultData=(await CardQuery().getNumberDetailCardOnline(Admin(uid: "tets", subscriber: "test",phone:phoneNumber,Ccode: uidInput4.text))).data;
+    if(resultData["status"])
+    {
+      uidData.text=resultData["UserDetail"]["uid"];
+      name.text=resultData["UserDetail"]["name"];
+      email.text=resultData["UserDetail"]["email"];
+      initCountry.text=resultData["UserDetail"]["initCountry"];
+      password.text=resultData["UserDetail"]["password"]??'none';
+
+      //print(resultData);
+
+      setState(() {
+        isValid=true;
+        isLoading=false;
+      });
+    }
+    else{
+
+      setState(() {
+        isValid=false;
+        isLoading=false;
+      });
+
+
+
+    }
+  }
   void dispose(){
     controller?.dispose();
     super.dispose();

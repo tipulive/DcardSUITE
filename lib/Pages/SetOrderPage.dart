@@ -11,7 +11,7 @@ class SetOrderPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
+      resizeToAvoidBottomInset: true,
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(27.0), // customize toolbar height
         child: AppBar(

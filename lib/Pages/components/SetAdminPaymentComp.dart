@@ -16,22 +16,24 @@ import 'package:flutter/material.dart';
 
 import 'package:google_fonts/google_fonts.dart';
 
+
 import '../SetPage2.dart';
-import 'Spendings/SafariComp.dart';
+import 'adminPayments/BorrowPaymentComp.dart';
+import 'adminPayments/SafePaymentComp.dart';
 
 
 
 
 
 
-class SetSpendingComp extends StatefulWidget {
-  const SetSpendingComp({Key? key}) : super(key: key);
+class SetAdminPaymentComp extends StatefulWidget {
+  const SetAdminPaymentComp({Key? key}) : super(key: key);
 
   @override
-  State<SetSpendingComp> createState() => _SetSpendingCompState();
+  State<SetAdminPaymentComp> createState() => _SetAdminPaymentCompState();
 }
 
-class _SetSpendingCompState extends State<SetSpendingComp> {
+class _SetAdminPaymentCompState extends State<SetAdminPaymentComp> {
 
   final ScrollController _scrollController = ScrollController();// detect scroll
   final List<dynamic> _data = [];
@@ -83,25 +85,27 @@ class _SetSpendingCompState extends State<SetSpendingComp> {
   @override
   Widget build(BuildContext context) {
 
-    return ListView(
-
-
+    return Stack(
       children: [
+        ListView(
+
+
+          children: [
 
 
 
-        divLine(),
-        GestureDetector(
-            onTap: (){
-              generalSpending();
-            },
-            child: detailsProfile("Spending",Icons.calendar_month_outlined,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,generalSpending)),//Last Time Purchase
-        const SizedBox(height:5,),
-        GestureDetector(
-            onTap: (){
-              stockSpending();
-            },
-            child: detailsProfile("Stock Spending",Icons.calendar_month_outlined,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,stockSpending)),//Last Time Purchase
+            divLine(),
+            GestureDetector(
+                onTap: (){
+                  safePayment();
+                },
+                child: detailsProfile("Safe Balance",Icons.calendar_month_outlined,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,safePayment)),//Last Time Purchase
+            const SizedBox(height:5,),
+            GestureDetector(
+                onTap: (){
+                  borrowPayment();
+                },
+                child: detailsProfile("Borrow Balance",Icons.calendar_month_outlined,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,borrowPayment)),//Last Time Purchase
 
 
 
@@ -110,6 +114,18 @@ class _SetSpendingCompState extends State<SetSpendingComp> {
 
 
 
+          ],
+        ),
+        if(showOveray)
+          Positioned.fill(
+            child: Center(
+              child: Container(
+                alignment: Alignment.center,
+                color: Colors.white70,
+                child: const CircularProgressIndicator(),
+              ),
+            ),
+          ),
       ],
     );
     //return Center(child: Text("hello"));
@@ -219,22 +235,21 @@ class _SetSpendingCompState extends State<SetSpendingComp> {
     );
   }
 
-  generalSpending() async{
+  safePayment() async{
 
     Get.to(() =>SetPage2(dynamicMethod: () {
-      return const GenSpendingComp();
+      return const SafePaymentComp();
     }),arguments:{
-      "title":"General Spendings",
+      "title":"Safe Balance",
     });
 
-
   }
-  stockSpending() async{
+  borrowPayment() async{
 
     Get.to(() =>SetPage2(dynamicMethod: () {
-      return const SafariComp();
+      return const BorrowPaymentComp();
     }),arguments:{
-      "title":"Safari Stock",
+      "title":"Borrow Balance",
     });
 
   }
