@@ -22,12 +22,12 @@ class StockQuery extends GetxController{
     selectedOption=valData!;
     update();
   }
-bool resizable=true;
-updateResizable(valData)
-{
-  resizable=false;
-  update();
-}
+  bool resizable=true;
+  updateResizable(valData)
+  {
+    resizable=false;
+    update();
+  }
 
   List<dynamic> dispatchOrder = [];
   updateDispatchOrder(valData){
@@ -38,6 +38,17 @@ updateResizable(valData)
     }
 
     update();
+
+  }
+  List<dynamic> dispatchOrder2= [];
+  updateDispatchOrder2(valData){
+    dispatchOrder2.clear();
+
+    if (valData != null) {
+      dispatchOrder2.addAll(valData);
+    }
+
+    //update();
 
   }
   bool paidDeptScanHide=true;
@@ -66,19 +77,19 @@ updateResizable(valData)
     update();
   }
   Map<String, dynamic> userProfile=
-    {
-      //"uid": "kebineericMuna_1674160265",
-      "uid": "none",
-      "name": "unknown",
+  {
+    //"uid": "kebineericMuna_1674160265",
+    "uid": "none",
+    "name": "unknown",
 
-      "email": "on@gmail.com",
-      "phone": "782389359",
-      "Ccode": "+250",
-      "country": "Rwanda",
-      "initCountry": "none",
-      "PhoneNumber": "+250782389359",
-      "carduid": "TEALTD_7hEnj_1672352175"
-    }
+    "email": "on@gmail.com",
+    "phone": "782389359",
+    "Ccode": "+250",
+    "country": "Rwanda",
+    "initCountry": "none",
+    "PhoneNumber": "+250782389359",
+    "carduid": "TEALTD_7hEnj_1672352175"
+  }
   ;
   updateUserProfile(valData)
   {
@@ -86,41 +97,41 @@ updateResizable(valData)
     userProfile=valData;
     update();
   }
- var dataSearch = [];
- updatedataSearch(valdata)
- {
-   dataSearch=valdata;
-   update();
- }
+  var dataSearch = [];
+  updatedataSearch(valdata)
+  {
+    dataSearch=valdata;
+    update();
+  }
   Map<String, dynamic> clientDebt=
-   {
-     "debt":0,
-     "uidUser":"none",
-     "name":"none"
-   };
- updateClientDebt(valData)
- {
-   clientDebt=valData;
-   update();
- }
- String textMessage="";
- updateTextMessage(valData)
- {
-   textMessage=valData;
-   update();
- }
- bool hideProductList=false;
- updateHideProductList(valdata)
- {
-   hideProductList=valdata;
-   update();
- }
- bool hideLoader=true;
- updateHideLoader(valdata)
- {
-   hideLoader=valdata;
-   update();
- }
+  {
+    "debt":0,
+    "uidUser":"none",
+    "name":"none"
+  };
+  updateClientDebt(valData)
+  {
+    clientDebt=valData;
+    update();
+  }
+  String textMessage="";
+  updateTextMessage(valData)
+  {
+    textMessage=valData;
+    update();
+  }
+  bool hideProductList=false;
+  updateHideProductList(valdata)
+  {
+    hideProductList=valdata;
+    update();
+  }
+  bool hideLoader=true;
+  updateHideLoader(valdata)
+  {
+    hideLoader=valdata;
+    update();
+  }
 
   dynamic dataCartui = {
     "id":1,
@@ -177,27 +188,27 @@ updateResizable(valData)
     dept=deptVal;
     update();
   }
-num counterCart=0;
-dynamic dataTest=[];
+  num counterCart=0;
+  dynamic dataTest=[];
   void updateCartui(dynamicData,cartUid,bolCartUid,bolresultData,counterD) {
     counterCart=counterCart + counterD;
 
     if(dataTest.length>0)
-      {
-        dataTest["resultData"]=dynamicData;
-        dataCartui={
-          "datalenght":dataTest.length,
-          "countData":counterCart,
-          "products":{},
+    {
+      dataTest["resultData"]=dynamicData;
+      dataCartui={
+        "datalenght":dataTest.length,
+        "countData":counterCart,
+        "products":{},
 
-          "cartUid":(bolCartUid==true)?cartUid:(Get.put(StockQuery()).dataCartui)["cartUid"],
-          "resultData":dataTest["resultData"],
-          "cartshow":false,
-          //"resultData":(bolresultData==true)?dynamicData:(Get.put(StockQuery()).dataCartui)["resultData"],
+        "cartUid":(bolCartUid==true)?cartUid:(Get.put(StockQuery()).dataCartui)["cartUid"],
+        "resultData":dataTest["resultData"],
+        "cartshow":false,
+        //"resultData":(bolresultData==true)?dynamicData:(Get.put(StockQuery()).dataCartui)["resultData"],
 
-        };
-      }
-      else{
+      };
+    }
+    else{
       dataTest=dynamicData;
       dataCartui={
         "datalenght":dataTest.length,
@@ -215,9 +226,9 @@ dynamic dataTest=[];
 
 
 
-   // dataCartui["resultData"]=(Get.put(StockQuery().dataCartui["id"]==1));
+    // dataCartui["resultData"]=(Get.put(StockQuery().dataCartui["id"]==1));
 
-        update();
+    update();
   }
 
 
@@ -233,7 +244,6 @@ dynamic dataTest=[];
 
         //"options": [1,2,3],
       };
-      print(params);
       String authToken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
       var url="${ConstantClassUtil.urlLink}/placeOrder";
       var response = await Dio().post(url,
@@ -246,7 +256,7 @@ dynamic dataTest=[];
       if (response.statusCode == 200) {
 
         //updateParticipateState(response.data);
-       return response;
+        return response;
 
 
 
@@ -276,7 +286,6 @@ dynamic dataTest=[];
 
 
       };
-print(params);
       String authToken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
       var url="${ConstantClassUtil.urlLink}/SearchUser";
       var response = await Dio().get(url,
@@ -363,7 +372,6 @@ print(params);
 
       };
 
-      print(params);
       String authToken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
       var url="${ConstantClassUtil.urlLink}/updateProducts";
       var response = await Dio().get(url,
@@ -445,7 +453,6 @@ print(params);
 
 
       };
-print(params);
       String authToken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
       var url="${ConstantClassUtil.urlLink}/updateDataOrder";
       var response = await Dio().get(url,
@@ -538,7 +545,6 @@ print(params);
 
         //"options": [1,2,3],
       };
-   print(params);
       //return false;
       String authToken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
       var url="${ConstantClassUtil.urlLink}/SubmitOrder";
@@ -684,7 +690,6 @@ print(params);
 
   editTOrder(QuickBonus product,User userData) async{//balance and Bonus Widthdraw History
     String authToken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
-    var url="${ConstantClassUtil.urlLink}/EditTOrder";
 
 
     var headers = {
@@ -715,7 +720,6 @@ print(params);
       return jsonResponse;
       // Return the response body as a string
     } else {
-      print(response.reasonPhrase);
       // Handle non-200 status codes appropriately, potentially throwing an error
       throw Exception('HTTP request failed with status code ${response.statusCode}');
     }
@@ -729,7 +733,6 @@ print(params);
         "uid":product.uid
 
       };
-      print("delete Single $params");
       String authToken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
       var url="${ConstantClassUtil.urlLink}/deleteTSingleOrder";
       var response = await Dio().get(url,
@@ -1031,7 +1034,7 @@ print(params);
       //return false;
     }
   }
-  stockCount(Topups topupData,QuickBonus product,User user) async{//balance and Bonus Widthdraw History
+  stockViewDeliver(Topups topupData,QuickBonus product) async{//balance and Bonus Widthdraw History
     try {
 
       var params =  {
@@ -1039,18 +1042,14 @@ print(params);
 
         "uid":topupData.uid,
         "productCode":product.uid,
-        "qty_Transport":product.qty,
-        "stockName":product.subscriber,
-        "uidTransport":user.uid,
-        "ref":user.name,
-        "status":product.status,
-        "comment":product.description
+        "productExist":topupData.optionCase
+
 
 
       };
 
       String authToken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
-      var url="${ConstantClassUtil.urlLink}/StockCount";
+      var url="${ConstantClassUtil.urlLink}/StockViewDeliver";
       var response = await Dio().get(url,
         options: Options(headers: {
           HttpHeaders.contentTypeHeader: "application/json",
@@ -1061,12 +1060,6 @@ print(params);
       if (response.statusCode == 200) {
 
 
-        // return (response.data).length;
-        //updateEventState(response.data);
-        //return "hello";
-
-        //updateBalanceHistState(response.data);
-        //return response.data;
 
         return response;
 
@@ -1079,6 +1072,59 @@ print(params);
       //return false;
     }
   }
+  stockCount(Topups topupData,QuickBonus product,User user) async{
+
+    try {
+
+      var params =  {
+        //just to avoid error nothing else
+        //"uidUser":TopupData.uidCreator,//uidUser
+        "uid":topupData.uid,
+        "productCode":product.uid,
+        "qty_Transport":product.qty,
+        "stockName":product.subscriber,
+        "uidTransport":user.uid,
+        "ref":user.name,
+        "status":product.status,
+        "comment":product.description
+
+
+
+
+
+
+        //"options": [1,2,3],
+      };
+      print(params);
+
+      String authToken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
+      var url="${ConstantClassUtil.urlLink}/StockCount";
+      var response = await Dio().post(url,
+        options: Options(headers: {
+          HttpHeaders.contentTypeHeader: "application/json",
+          HttpHeaders.authorizationHeader:"Bearer $authToken"
+        }),
+        data: jsonEncode(params),
+      );
+      if (response.statusCode == 200) {
+
+        //updateParticipateState(response.data);
+        return response;
+
+
+
+
+      } else {
+        return false;
+        //print(false);
+      }
+    } catch (e) {
+      //return false;
+
+    }
+
+  }
+
   addSpending(Topups topupData) async{
 
     try {
@@ -1093,7 +1139,7 @@ print(params);
         "status":"GeneralSpend",
         "commentData":topupData.desc,
         "systemUid":"PointSales1",
-       "options":topupData.optionCase
+        "options":topupData.optionCase
 
 
 
@@ -1132,49 +1178,48 @@ print(params);
   }
   updateSpending(Topups topupData) async{
 
-  try {
+    try {
 
-    var params =  {
-      "safariId":topupData.safariId,
-      "uid":topupData.uid,
-      "amount":"${topupData.amount}",
-      "purpose":topupData.purpose,
-      "actionStatus":topupData.optionCase,//action delete,edit both safari and others
-      "status":"GeneralSpend",
-      "commentData":topupData.desc,
-      "systemUid":"PointSales1"
+      var params =  {
+        "safariId":topupData.safariId,
+        "uid":topupData.uid,
+        "amount":"${topupData.amount}",
+        "purpose":topupData.purpose,
+        "actionStatus":topupData.optionCase,//action delete,edit both safari and others
+        "status":"GeneralSpend",
+        "commentData":topupData.desc,
+        "systemUid":"PointSales1"
 
-      //"options": [1,2,3],
-    };
-print(params);
-    String authToken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
-    var url="${ConstantClassUtil.urlLink}/updateSpending";
-    var response = await Dio().get(url,
-    options: Options(headers: {
-    HttpHeaders.contentTypeHeader: "application/json",
-    HttpHeaders.authorizationHeader:"Bearer $authToken"
-    }),
-    queryParameters: params,
-    );
-    if (response.statusCode == 200) {
-
-
-    // return (response.data).length;
-    //updateEventState(response.data);
-    //return "hello";
-
-    //updateBalanceHistState(response.data);
-    //return response.data;
-
-    return response;
+        //"options": [1,2,3],
+      };
+      String authToken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
+      var url="${ConstantClassUtil.urlLink}/updateSpending";
+      var response = await Dio().get(url,
+        options: Options(headers: {
+          HttpHeaders.contentTypeHeader: "application/json",
+          HttpHeaders.authorizationHeader:"Bearer $authToken"
+        }),
+        queryParameters: params,
+      );
+      if (response.statusCode == 200) {
 
 
-    } else {
-    return false;
-    //print(false);
-    }
+        // return (response.data).length;
+        //updateEventState(response.data);
+        //return "hello";
+
+        //updateBalanceHistState(response.data);
+        //return response.data;
+
+        return response;
+
+
+      } else {
+        return false;
+        //print(false);
+      }
     } catch (e) {
-    //return false;
+      //return false;
     }
 
   }
@@ -1559,7 +1604,7 @@ print(params);
 
         //"options": [1,2,3],
       };
-     // print(params);
+      // print(params);
       String authtoken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
       var url="${ConstantClassUtil.urlLink}/repaidBack";
       var response = await Dio().post(url,
@@ -1676,7 +1721,7 @@ print(params);
 
       var params =  {
 
-       /* "LimitStart":topupData.endlimit,  //page
+        /* "LimitStart":topupData.endlimit,  //page
         "LimitEnd":topupData.startlimit,//limit
         "uid":userData.uid,//userid
         "optionCase":topupData.optionCase//optionCase

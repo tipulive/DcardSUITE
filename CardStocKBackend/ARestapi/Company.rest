@@ -895,7 +895,7 @@ Authorization: Bearer {{Auth_token}}
 {
 "searchOption":"false",
 "name":"be",
-"advancedSearch":"choosedate",
+"advancedSearch":"mysales",
 "thisDate":"2024-2-8",
 "toDate":"none"
 
@@ -1215,6 +1215,37 @@ Authorization: Bearer {{Auth_token}}
 
 
 ### take OuT Stock and Shout
+### StockViewDeliver to view who deliver Stock
+GET  {{baseUrl}}/StockViewDeliver
+content-type: application/json;charset=UTF-8
+Authorization: Bearer {{Auth_token}}
+
+{
+"uid":"UID_MU_1705831515",
+"productCode":"nyota",
+"productExist":"true or false"
+
+
+
+
+
+}
+### StockCountEdit to Edit Who went With Kolis or with
+GET  {{baseUrl}}/StockViewDeliver
+content-type: application/json;charset=UTF-8
+Authorization: Bearer {{Auth_token}}
+
+{
+"uid":"UID_MU_1705831515",
+"productCode":"nyota",
+"uidTransport":"id of transport user"
+
+
+
+
+
+}
+
 ### uid is OrderId StockCount Done 100% reste is Order
 GET  {{baseUrl}}/StockCount
 content-type: application/json;charset=UTF-8

@@ -568,7 +568,24 @@ class CompanyController extends Controller
             {
                 $input=$request->all();
 
+                //return (new StockController)->EditOrder($input);
+                $jsonFalse = array(
+                "editOrderAction" =>false
+            );
+               $jsonData=(Auth::user()->permission==='none')?$jsonFalse:json_decode(Auth::user()->permission,true);
+
+            if($jsonData["editOrderAction"])
+            {
                 return (new StockController)->EditOrder($input);
+            }
+            else{
+                return response([
+                    "status"=>false,
+
+
+
+                ],200);
+            }
             }
             else{
                 return response([
@@ -1391,6 +1408,34 @@ public function viewRepay(Request $request){
                 $input=$request->all();
 
                 return (new StockController)->OrderViewByUid($input);
+            }
+            else{
+                return response([
+                    "status"=>false,
+                    "result"=>$this->Admin_Auth_result_error,
+                    "error"=>$this->Admin_Auth_error,
+
+                ],200);
+            }
+        }
+        else{
+            return response([
+                "status"=>false,
+                "result"=>$this->Admin_Auth_result_error,
+                "error"=>$this->Admin_Auth_error,
+
+            ],200);
+        }
+    }
+    public function StockViewDeliver(Request $request){
+        if(Auth::check())
+        {
+
+            if(Auth::user()->platform==$this->platform1)
+            {
+                $input=$request->all();
+
+                return (new StockController)->StockViewDeliver($input);
             }
             else{
                 return response([

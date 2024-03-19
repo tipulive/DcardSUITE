@@ -2597,8 +2597,44 @@ public function ViewOrderDeliver($input){
         WHERE oh.uid = 'O4Pft' AND productCode='keb'");
 }
 
+public function sendSwipe($input){//who paid and want that,whom he paid to get ownership of this sales
+    //SwapId//is someone Who want to Swap,not done
 
+
+
+    $check=DB::update("update orders set swapId=:swapId,swapStatus=:swapStatus,orderDate=:orderDate where uid=:uid and uidCreator=:uidCreator",[
+        "uid"=>$input["uid"],
+        "swapId"=>Auth::user()->uid,
+        "uidCreator"=>$input["ownerSwap"],
+        "swapStatus"=>$input['swapStatus'],
+        "orderDate"=>$input['orderDate']
+    ]);
+    DB::update("update orderhistories set order_creator=:order_creator where uid=:uid",[
+        "uid"=>$input["uid"],
+        "order_creator"=>$input["ownerSwap"],
+
+    ]);
+}
+public function swipeSales($input){//not done
+    if(Auth::guard('Admin')->attempt([
+
+
+        'password'=>$input['password'],
+
+
+    ]))
+    {
+
+        $DB::update("update admnin_records set balance where status=:  ");
+    }
+    else{
+
+    }
+
+
+}
 public function SubmitOrder($input){
+
         $check_InputData=$input['all_total']-$input['inputData'];//all_total :niyo total ya orders,custom_price or inputData=niyo client yishyuye cash
 
         if($input['all_total']>$input['inputData'])
@@ -2628,18 +2664,24 @@ public function admin_record($input){
                 $uidCreator=Auth::user()->uid; //is the one who will pay money to client when he will withdraw
             $subscriber=Auth::user()->subscriber;
             $systemUid=$input['systemUid'];
+            $mamaUid="MSolange_1709926940";
+            $UserId=($input["uidUser"]===$mamaUid)?$mamaUid:Auth::user()->uid;
+
 
     //
     DB::update("update orderhistories set
 
     all_total=:all_total,custom_price=:custom_price,
-    paidStatus ='checked',orderDebt=:orderDebt
+    paidStatus ='checked',orderDebt=:orderDebt,order_creator=:order_creator
     where uid=:uid and userid=:userid limit 100",array(
         "uid"=>$input["OrderId"],
         "userid"=>$input["uidUser"],
         "orderDebt"=>$input['all_total']-$input['inputData'],
         "all_total"=>$input['all_total'],
-        "custom_price"=>$input['inputData']
+        "custom_price"=>$input['inputData'],
+        "order_creator"=>$UserId
+
+
 
     ));
 
@@ -2677,7 +2719,8 @@ public function admin_record($input){
         "gain"=>$input['gain'],
         "systemUid"=>$systemUid,
         "uidUser"=>($input['uidUser']??$uidCreator),
-        "uidCreator"=>$uidCreator,
+       // "uidCreator"=>$uidCreator,
+        "uidCreator"=>$UserId,
         "subscriber"=>$subscriber,
         "temporalData"=>json_encode($json_array),
         "commentData"=>$input['commentData']??'none',
@@ -2687,7 +2730,8 @@ public function admin_record($input){
 
 
         $check=DB::update("update admnin_records set balance=balance+:balance,dettes=dettes+:dettes where uid=:uid and systemUid=:systemUid limit 1",array(
-            "uid"=>$uidCreator,
+           // "uid"=>$uidCreator,
+            "uid"=>$UserId,
             "systemUid"=>$input['systemUid'],
             "balance"=>$input['all_total'],
             "dettes"=>($input['all_total']-$input['inputData'])
@@ -2699,7 +2743,8 @@ public function admin_record($input){
         else{
             $dataInsert=DB::table("admnin_records")
             ->insert([
-                "uid"=>$uidCreator,
+               // "uid"=>$uidCreator,
+               "uid"=>$UserId,
                 "subscriber"=>$subscriber,
                 "systemUid"=>$input['systemUid'],
                 "status"=>'Sales',
@@ -4254,6 +4299,8 @@ public function admin_record($input){
                    orderhistories.uid as OrderId,
                     MAX(users.name) AS name,
                     MAX(1) AS hideAddCart,
+                    MAX(admins.name) AS adminName,
+                    MAX(orderhistories.created_at) AS created_at,
 
                     SUM(orderhistories.qty) AS totalQty,
                     SUM(orderhistories.total) AS totalAmount,
@@ -4261,6 +4308,7 @@ public function admin_record($input){
                 FROM orderhistories
 
                 INNER JOIN users ON orderhistories.userid = users.uid
+                INNER JOIN admins ON orderhistories.order_creator=admins.uid
                 WHERE orderhistories.subscriber=:subscriber
                     AND orderhistories.paidStatus='checked'
                     AND orderhistories.status ='Open'
@@ -4362,6 +4410,131 @@ public function admin_record($input){
         }
 
     }
+    public function StockViewDeliver($input){
+        $searchOption=($input["productExist"]=='true')?$input["productExist"]:"false";
+        $searchQuery=(object)array(
+            "true"=>array(
+             "DownQuerySearch"=>"AND delivers.productCode=:productCode",
+             "paramSearch"=>array(
+                "uid" =>$input['uid'],
+                "productCode" =>$input['productCode'],
+                "uidTransport"=>'uidTransport'
+             ),
+             "groupByLimit"=>"GROUP BY orders.id
+           LIMIT 10"
+
+            ),
+            "false"=>array(
+             "DownQuerySearch"=>"",
+             "paramSearch"=>array(
+                "uid" =>$input['uid'],
+              "uidTransport" => 'uidTransport'
+
+             ),
+             "groupByLimit"=>"GROUP BY orders.id
+             ORDER BY orders.id DESC
+           LIMIT 100"
+            ),
+          );
+    $DownQuerySearch=$searchQuery->{$searchOption}["DownQuerySearch"];
+    $paramSearch=$searchQuery->{$searchOption}["paramSearch"];
+
+       $check = DB::select("SELECT
+        MAX(delivers.uid) AS uid,
+        MAX(delivers.productCode) AS productCode,
+        MAX(delivers.qty_Transport) AS qty,
+        MAX(delivers.created_at) AS created_at,
+        MAX(admins.name) AS adminName,
+        MAX(users.name) AS userName
+    FROM delivers
+    INNER JOIN admins ON delivers.stockDeliver = admins.uid
+    INNER JOIN users ON delivers.uidTransport = users.uid
+    WHERE
+        delivers.uid=:uid
+        $DownQuerySearch
+        AND delivers.uidTransport!=:uidTransport
+    GROUP BY delivers.id
+    ORDER BY delivers.id DESC
+    LIMIT 25",
+    $paramSearch);
+        if($check){
+            return response([
+                "status"=>true,
+                "result"=>$check,
+
+            ],200);
+        }
+        else{
+            return response([
+                "status"=>false,
+                "result"=>0,
+
+            ],200);
+        }
+    }
+    public function StockCountEdit($input)
+    {
+
+        $check=DB::select("select *from delivers where id=:id and uid=:uid and productCode=:productCode and subscriber=:subscriber limit 1",[
+            "id"=>$input['id'],
+            "uid"=>$input['uid'],
+            "productCode"=>$input['productCode'],
+            "subscriber"=>Auth::user()->subscriber
+        ]);
+
+
+        if($check)
+        {
+            $input["balance"]=(-$check[0]->amount+$input['amount']);
+            $json_array=[
+                "id"=>$check[0]->id,
+                "uid"=>$check[0]->uid,
+                "productCode"=>$check[0]->productCode,
+                "prev_uidTransport"=>$check[0]->uidTransport,
+                "prev_qty_Transport"=>$check[0]->qty_Transport,
+                "StockName"=>$check[0]->StockName,
+                "prev_stockDeliver"=>$check[0]->stockDeliver,
+                "prev_commentData"=>$check[0]->commentData,
+                "current_commentData"=>$input['commentData']??'none',
+                "current__created_at"=>$check[0]->created_at,
+                "current__updated_at"=>$check[0]->updated_at,
+                "stockDeliver"=>$input['stockDeliver'],
+                "updated_at"=>$this->today
+
+             ];
+
+             $data=[
+                "tableName"=>"delivers",
+                "action"=>"StockCountEdit",
+                'tempData'=>json_encode($json_array),
+                'status'=>'edituidTransportDeliver'
+             ];
+
+
+           if($this->createBackupAction($data))
+           {
+
+            $check=DB::update("update delivers set uidTransport=:uidTransport where id=:id and subscriber=:subscriber limit 1",[
+                "id"=>$input["id"],
+                "subscriber"=>Auth::user()->subscriber
+            ]);
+            if($check){
+                return response([
+
+                    "status"=>true,
+                    "result"=>$check,
+                ],200);
+            }
+            else{
+                return response([
+
+                    "status"=>false,
+                    "result"=>$check,
+                ],200);
+            }
+           }
+        }
+    }
     public function StockCount($input){//count when product is out of stocks
 
 
@@ -4369,7 +4542,7 @@ public function admin_record($input){
         try {
             $check=DB::transaction(function () use ($input) {//
 
-                $uidTransport=$input['uidTransport']??'John';//ubitwaye
+                $uidTransport=($input['uidTransport']==='UidTransport')?Auth::user()->uid:$input['uidTransport'];//ubitwaye
                 $qty_Transport=$input['qty_Transport']??'1';
                 $productCode=$input['productCode'];
                 $stockName=$input['stockName']??'Nari Hotel';
@@ -4419,6 +4592,21 @@ public function admin_record($input){
 
                  if($results)
                  {
+                    DB::table("delivers")
+                       ->insert([
+                        "uid"=>$uid,
+                        "productCode"=>$productCode,
+                        "uidTransport"=>$uidTransport,
+                        "qty_Transport"=>$qty_Transport,
+                        "StockName"=>$stockName,
+                        "subscriber"=>Auth::user()->subscriber,
+                        "stockDeliver"=>$stockdeliver,
+                        "commentData"=>$comment,
+                        "created_at"=>$this->today,
+                        "updated_at"=>$this->today
+
+                       ]);
+
                     $limitData=count($results);
                     for($i=0;$i<$limitData;$i++)
                     {
@@ -4451,7 +4639,9 @@ public function admin_record($input){
                 )
             ),
            status='$status',
-           qty_count='$remaining'
+
+           qty_count='$remaining',
+           ref='uidTransport'
             WHERE
                 id = $id AND
                 uid='$uid' AND

@@ -146,7 +146,7 @@ class _AddCardPageState extends State<AddCardPage> {
                                   content: Container(
                                     height: 50,
                                     child: Column(
-                                      children: [
+                                      children: const [
                                         Center(child: Icon(Icons.thumb_up_alt_outlined, color: Colors.green)),
                                         SizedBox(width: 10),
                                         Expanded(

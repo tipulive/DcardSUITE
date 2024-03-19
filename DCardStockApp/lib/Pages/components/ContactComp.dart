@@ -528,7 +528,6 @@ class _ContactCompState extends State<ContactComp> {
   {
     if(isLoading) return;
     isLoading=true;
-    int limit=10;
 
     var resultData=(await StockQuery().searchUser(User(uid:"",name:nameVal,phone:phoneNumber,platform:"4000",status:"offNotPick"),Topups(optionCase:"false",startlimit:limitData,searchOption:searchVal,sortOrder:sortOrderVal))).data;
 
@@ -916,7 +915,7 @@ class _ContactCompState extends State<ContactComp> {
     });
 
     var resultData=(await CardQuery().getNumberDetailCardOnline(Admin(uid: "tets", subscriber: "test",phone:phoneNumber,Ccode: uidInput4.text))).data;
-    print(resultData);
+    //print(resultData);
     if(resultData["status"])
     {
       uidData.text=resultData["UserDetail"]["uid"];
@@ -1030,7 +1029,7 @@ class _ContactCompState extends State<ContactComp> {
                                           Expanded(
                                             flex: 1,
                                             child: Stack(
-                                              children: [
+                                              children: const [
 
                                                 Text("Add User")
 
@@ -1043,7 +1042,7 @@ class _ContactCompState extends State<ContactComp> {
 
                                       subtitle: Row(
                                         mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
+                                        children: const [
 
 
                                         ],
@@ -1087,10 +1086,10 @@ class _ContactCompState extends State<ContactComp> {
 
                                       decoration: InputDecoration(
                                         labelText: 'Phone Number',
-                                        border: OutlineInputBorder(
+                                        border: const OutlineInputBorder(
                                           borderSide: BorderSide(),
                                         ),
-                                        suffixIcon:Obx(() => Get.put(HideShowState()).isNumberValid.value?Icon(Icons.done,color:Colors.green,):Icon(Icons.dangerous,color:Colors.red,)),
+                                        suffixIcon:Obx(() => Get.put(HideShowState()).isNumberValid.value?const Icon(Icons.done,color:Colors.green,):const Icon(Icons.dangerous,color:Colors.red,)),
 
 
                                       ),
@@ -1127,7 +1126,7 @@ class _ContactCompState extends State<ContactComp> {
 
                                       onCountryChanged: (country) {
 
-                                        uidInput4.text="+"+country.dialCode;
+                                        uidInput4.text="+${country.dialCode}";
                                         uidInput5.text=country.name;
                                         initCountry.text=country.code;
 
@@ -1155,8 +1154,8 @@ class _ContactCompState extends State<ContactComp> {
                                     child: TextField(
                                       controller: uidData,
                                       //obscureText: true,
-                                      decoration: InputDecoration(
-                                        contentPadding: const EdgeInsets.symmetric(vertical: 3,horizontal: 3),
+                                      decoration: const InputDecoration(
+                                        contentPadding: EdgeInsets.symmetric(vertical: 3,horizontal: 3),
                                         border: OutlineInputBorder(),
                                         labelText: 'uid',
                                         hintText: 'uid',
@@ -1168,12 +1167,12 @@ class _ContactCompState extends State<ContactComp> {
                                     ),
                                   ),
                                   Container(
-                                    padding: EdgeInsets.fromLTRB(16,0, 16, 0),
+                                    padding: const EdgeInsets.fromLTRB(16,0, 16, 0),
                                     child: TextField(
                                       controller: name,
                                       //obscureText: true,
-                                      decoration: InputDecoration(
-                                        contentPadding: const EdgeInsets.symmetric(vertical: 3,horizontal: 3),
+                                      decoration: const InputDecoration(
+                                        contentPadding: EdgeInsets.symmetric(vertical: 3,horizontal: 3),
                                         border: OutlineInputBorder(),
 
                                         labelText: 'name',
@@ -1191,8 +1190,8 @@ class _ContactCompState extends State<ContactComp> {
                                     child: TextField(
                                       controller: email,
                                       //obscureText: true,
-                                      decoration: InputDecoration(
-                                        contentPadding: const EdgeInsets.symmetric(vertical: 3,horizontal: 3),
+                                      decoration: const InputDecoration(
+                                        contentPadding: EdgeInsets.symmetric(vertical: 3,horizontal: 3),
                                         border: OutlineInputBorder(),
                                         labelText: 'email',
                                         hintText: 'email',
@@ -1209,8 +1208,8 @@ class _ContactCompState extends State<ContactComp> {
                                     child: TextField(
                                       controller: uidInput4,
                                       //obscureText: true,
-                                      decoration: InputDecoration(
-                                        contentPadding: const EdgeInsets.symmetric(vertical: 3,horizontal: 3),
+                                      decoration: const InputDecoration(
+                                        contentPadding: EdgeInsets.symmetric(vertical: 3,horizontal: 3),
                                         border: OutlineInputBorder(),
                                         labelText: 'Ccode',
                                         hintText: 'Ccode',
@@ -1226,8 +1225,8 @@ class _ContactCompState extends State<ContactComp> {
                                     child: TextField(
                                       controller: uidInput5,
                                       //obscureText: true,
-                                      decoration: InputDecoration(
-                                        contentPadding: const EdgeInsets.symmetric(vertical: 3,horizontal: 3),
+                                      decoration: const InputDecoration(
+                                        contentPadding: EdgeInsets.symmetric(vertical: 3,horizontal: 3),
                                         border: OutlineInputBorder(),
                                         labelText: 'Country',
                                         hintText: 'Enter Country',
@@ -1243,8 +1242,8 @@ class _ContactCompState extends State<ContactComp> {
                                     child: TextField(
                                       controller: initCountry,
                                       //obscureText: true,
-                                      decoration: InputDecoration(
-                                        contentPadding: const EdgeInsets.symmetric(vertical: 3,horizontal: 3),
+                                      decoration: const InputDecoration(
+                                        contentPadding: EdgeInsets.symmetric(vertical: 3,horizontal: 3),
                                         border: OutlineInputBorder(),
                                         labelText: 'Country',
                                         hintText: 'Enter Country',
@@ -1260,8 +1259,8 @@ class _ContactCompState extends State<ContactComp> {
                                     child: TextField(
                                       controller:password,
                                       //obscureText: true,
-                                      decoration: InputDecoration(
-                                        contentPadding: const EdgeInsets.symmetric(vertical: 3,horizontal: 3),
+                                      decoration: const InputDecoration(
+                                        contentPadding: EdgeInsets.symmetric(vertical: 3,horizontal: 3),
                                         border: OutlineInputBorder(),
                                         labelText: 'password',
                                         hintText: 'password',
@@ -1277,8 +1276,8 @@ class _ContactCompState extends State<ContactComp> {
                                     child: TextField(
                                       controller:status,
                                       //obscureText: true,
-                                      decoration: InputDecoration(
-                                        contentPadding: const EdgeInsets.symmetric(vertical: 3,horizontal: 3),
+                                      decoration: const InputDecoration(
+                                        contentPadding: EdgeInsets.symmetric(vertical: 3,horizontal: 3),
                                         border: OutlineInputBorder(),
                                         labelText: 'status',
                                         hintText: 'status',
@@ -1292,12 +1291,12 @@ class _ContactCompState extends State<ContactComp> {
                                   Visibility(
                                     visible: false,
                                     child: Container(
-                                      padding: EdgeInsets.fromLTRB(16,16,16,0),
+                                      padding: const EdgeInsets.fromLTRB(16,16,16,0),
                                       child: TextField(
                                         controller:carduid,
                                         //obscureText: true,
-                                        decoration: InputDecoration(
-                                          contentPadding: const EdgeInsets.symmetric(vertical: 3,horizontal: 3),
+                                        decoration: const InputDecoration(
+                                          contentPadding: EdgeInsets.symmetric(vertical: 3,horizontal: 3),
                                           border: OutlineInputBorder(),
                                           labelText: 'cardui',
                                           hintText: 'cardui',
@@ -1331,7 +1330,7 @@ class _ContactCompState extends State<ContactComp> {
                                         formReset(),
 
 
-                                      }):Text("")),
+                                      }):const Text("")),
 
 
 
@@ -1408,7 +1407,8 @@ class _ContactCompState extends State<ContactComp> {
 
   }
   void updateSpending(indexData) {
-    print(indexData);
+    //print(indexData);
+
     actionStatus="Edit_otherSpending";
     uidEdit.text=indexData["spendId"];
     balance.text=indexData["spending"];

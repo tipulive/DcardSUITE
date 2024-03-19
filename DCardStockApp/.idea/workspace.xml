@@ -31,14 +31,14 @@
       <change afterPath="$PROJECT_DIR$/lib/Pages/components/adminPayments/ViewRepaySafeUidComp.dart" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/lib/api/firebaseApi.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../CardStocKBackend/ARestapi/Company.rest" beforeDir="false" afterPath="$PROJECT_DIR$/../CardStocKBackend/ARestapi/Company.rest" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../CardStocKBackend/app/Http/Controllers/CompanyController.php" beforeDir="false" afterPath="$PROJECT_DIR$/../CardStocKBackend/app/Http/Controllers/CompanyController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../CardStocKBackend/CardStocKBackend.zip" beforeDir="false" afterPath="$PROJECT_DIR$/../CardStocKBackend/CardStocKBackend.zip" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../CardStocKBackend/app/Http/Controllers/StockController.php" beforeDir="false" afterPath="$PROJECT_DIR$/../CardStocKBackend/app/Http/Controllers/StockController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../CardStocKBackend/resources/views/adminpage.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/../CardStocKBackend/resources/views/adminpage.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../CardStocKBackend/routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/../CardStocKBackend/routes/api.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../CardStocKBackend/public/public.zip" beforeDir="false" afterPath="$PROJECT_DIR$/../CardStocKBackend/public/public.zip" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/android/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/AndroidManifest.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/android/app/src/profile/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/profile/AndroidManifest.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/Pages/Card/AddCardPage.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/Card/AddCardPage.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/Pages/Homepage.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/Homepage.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Pages/SetOrderPage.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/SetOrderPage.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/Pages/SetSpendingPage.dart" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/Pages/components/SafeDeptComp.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/components/SafeDeptComp.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/Pages/components/SetDeptComp.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Pages/components/SetDeptComp.dart" afterDir="false" />
@@ -87,8 +87,17 @@
     </file-type-list>
   </component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/lib/Utilconfig/HideShowState.dart" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/lib/Pages/Card/AddCardPage.dart" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/lib/Pages/components/SetRepayComp.dart" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/lib/models/Topups.dart" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/lib/Query/StockQuery.dart" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/lib/Query/CardQuery.dart" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/lib/Pages/Homepage.dart" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/lib/Pages/components/SetOrderComp.dart" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/pubspec.yaml" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/README.md" root0="FORCE_HIGHLIGHTING" root1="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/lib/Pages/components/ContactComp.dart" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/lib/main.dart" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="ProjectId" id="2KM8oolxcjqMHK5xLv0mT4p9XSw" />
@@ -167,28 +176,13 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
           <url>file://$PROJECT_DIR$/lib/Query/StockQuery.dart</url>
-          <line>916</line>
+          <line>920</line>
           <option name="timeStamp" value="7" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
           <url>file://$PROJECT_DIR$/lib/Pages/components/QuickCartComp.dart</url>
           <line>559</line>
           <option name="timeStamp" value="8" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
-          <url>file://$PROJECT_DIR$/lib/Query/StockQuery.dart</url>
-          <line>1039</line>
-          <option name="timeStamp" value="9" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
-          <url>file://$PROJECT_DIR$/lib/Pages/Homepage.dart</url>
-          <line>823</line>
-          <option name="timeStamp" value="12" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
-          <url>file://$PROJECT_DIR$/lib/Pages/Homepage.dart</url>
-          <line>661</line>
-          <option name="timeStamp" value="13" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
           <url>file://$PROJECT_DIR$/lib/Pages/components/SetSpendingComp.dart</url>
@@ -204,11 +198,6 @@
           <url>file://$PROJECT_DIR$/lib/Pages/components/Spendings/SafariComp.dart</url>
           <line>507</line>
           <option name="timeStamp" value="17" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
-          <url>file://$PROJECT_DIR$/lib/Pages/Homepage.dart</url>
-          <line>588</line>
-          <option name="timeStamp" value="18" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
           <url>file://$PROJECT_DIR$/lib/Pages/components/SetDeptComp.dart</url>
@@ -229,16 +218,6 @@
           <url>file://$PROJECT_DIR$/lib/Pages/components/SetEditCardNoComp.dart</url>
           <line>269</line>
           <option name="timeStamp" value="23" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
-          <url>file://$PROJECT_DIR$/lib/Pages/components/SetOrderComp.dart</url>
-          <line>1033</line>
-          <option name="timeStamp" value="24" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="Dart">
-          <url>file://$PROJECT_DIR$/lib/Pages/components/SetOrderComp.dart</url>
-          <line>929</line>
-          <option name="timeStamp" value="25" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

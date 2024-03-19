@@ -19,6 +19,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../models/CardModel.dart';
+import '../../../Utilconfig/ConstantClassUtil.dart';
 
 
 
@@ -38,6 +39,7 @@ class _SetOrderCompState extends State<SetOrderComp> {
   List<dynamic> thisListOrder = [];
   List<dynamic> orderData = [];
 
+
   TextEditingController qtychange=TextEditingController();
   var bottomResult=[];
   num countData=0;
@@ -46,12 +48,13 @@ class _SetOrderCompState extends State<SetOrderComp> {
   int limit=0;
   bool hasMoreData=true;
   bool isLoading=false;
-num qtyProduct=1;
+  num qtyProduct=1;
   String productCode="";
 
   String clientOrder="";
-String orderId="";
-String uidTransport="UidTransport";
+  String orderId="";
+  String uidTransport="UidTransport";
+  String productExist="true";
 
 
 
@@ -60,7 +63,7 @@ String uidTransport="UidTransport";
   bool showOveray=false;
 
 
-  final GlobalKey qrkey = GlobalKey(debugLabel: 'QR');
+  final GlobalKey qrkey = GlobalKey(debugLabel: '${UniqueKey()}');
   Barcode?result;
   QRViewController?controller;
   List<dynamic>qrDebt = [];
@@ -109,7 +112,152 @@ String uidTransport="UidTransport";
         Text("Orders",style:GoogleFonts.pacifico(fontSize:15,color: Colors.teal,fontWeight: FontWeight.w700)),
 
 
+        Padding(
+          padding:const EdgeInsets.fromLTRB(8,10,8,0),
+          child: Card(
+            elevation:0,
+            margin: const EdgeInsets.symmetric(vertical:1,horizontal:5),
+            //color:Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15.0),
+              //side: BorderSide(color:_data[0]["color_var"]??true?Colors.white:Colors.green, width: 2),
+            ),
 
+            child: ListTile(
+              leading: CircleAvatar(
+                backgroundColor:getRandomColor(),
+                child: Icon(_getRandomIcon()),
+              ),
+              title:Row(
+                children: [
+
+
+                  Expanded(
+                    flex: 1,
+                    child: Stack(
+                      children: [
+
+
+
+
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+
+              subtitle: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+
+                ],
+              ),
+              trailing:PopupMenuButton(
+                itemBuilder:(container)=>[
+                  PopupMenuItem(
+                      child: InkWell(
+                        onTap: () async{
+                         /* setState(() {
+                            advancedSearch="today";
+                            viewTitle="today";
+
+                          });
+                          await viewData('test',"false");*/
+
+                        },
+                        child: Column(
+                          children: [
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Row(
+                              children: const [
+                                Icon(
+                                  Icons.today,
+                                  color: Colors.blue,
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.only(left:10.0),
+                                  child: Text("Today"),
+                                ),
+
+                              ],
+                            ),
+                            const Divider(
+                              height: 20, // Adjust the height as needed
+                              thickness: 0.2, // Adjust the thickness as needed
+                              color: Colors.grey,
+                            ),
+
+                          ],
+                        ),
+                      )
+                  ),
+                  PopupMenuItem(
+                      child: InkWell(
+                        onTap: () async{
+                          /*setState(() {
+                            advancedSearch="week";
+                            viewTitle="This Week";
+
+                          });
+                          await viewData('test',"false");*/
+                        },
+                        child: Column(
+                          children: [
+                            Row(
+                              children: const [
+                                Icon(
+                                  Icons.calendar_view_week,
+                                  color: Colors.orange,
+                                ),
+
+                                Padding(
+                                  padding: EdgeInsets.only(left:10.0),
+                                  child: Text("This Week"),
+                                ),
+
+                              ],
+                            ),
+                            const Divider(
+                              height: 20, // Adjust the height as needed
+                              thickness: 0.2, // Adjust the thickness as needed
+                              color: Colors.grey,
+                            ),
+
+                          ],
+                        ),
+                      )
+                  ),
+
+
+
+                ],
+                offset: const Offset(0, 40),
+                child:InkWell(
+
+                  child: Ink(
+                    decoration: ShapeDecoration(
+                      color: Colors.grey.withOpacity(0.2),
+                      shape: const CircleBorder(),
+                    ),
+                    child: const Padding(
+                      padding: EdgeInsets.all(5.0),
+                      child: Icon(
+
+                        Icons.grid_view, // Replace with your desired icon
+                        color: Colors.pink,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+
+              //trailing: Text()
+            ),
+          ),
+        ),
         Container(
           height: 55,
           //padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
@@ -166,143 +314,213 @@ String uidTransport="UidTransport";
                 FocusNode test=FocusNode() ;
 
                 _data[index]['focusNode']=test;
-                return Card(
-                  elevation:0,
-                  //margin: EdgeInsets.symmetric(vertical:1,horizontal:5),
-                  //color:Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(9.0),
-                    side: BorderSide(color:_data[index]["color_var"]??true?Colors.white:Colors.green, width: 2),
-                  ),
+                return Stack(
+                  children: [
+                    Card(
+                      elevation:0,
 
-                  child: ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor:getRandomColor(),
-                        child: Icon(_getRandomIcon()),
+                      //margin: EdgeInsets.symmetric(vertical:1,horizontal:5),
+                      //color:Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(9.0),
+                        side: BorderSide(color:_data[index]["color_var"]??true?Colors.white:Colors.green, width: 2),
                       ),
-                      title:Row(
-                        children: [
 
+                      child: Padding(
+                        padding: const EdgeInsets.only(top:8),
+                        child: ListTile(
 
-                          Expanded(
-                            flex: 1,
-                            child: Stack(
+                            leading: CircleAvatar(
+                              backgroundColor:getRandomColor(),
+                              child: Icon(_getRandomIcon()),
+                            ),
+                            title:Row(
                               children: [
 
-                                Column(
-                                  children: [
 
-                                    Padding(
-                                      padding: const EdgeInsets.fromLTRB(0, 10, 0, 2),
-                                      child: RichText(
-                                        text: TextSpan(
-                                          text: "${_data[index]['name']}:",
-                                          style: DefaultTextStyle.of(context).style,
-                                          children: const <TextSpan>[
+                                Expanded(
+                                  flex: 1,
+                                  child: Stack(
+                                    children: [
+
+                                      Column(
+                                        children: [
+
+                                          Padding(
+                                            padding: const EdgeInsets.fromLTRB(0, 10, 0, 2),
+                                            child: InkWell(
+                                              onTap: () async{
+                                                setState(() {
+                                                  productExist="false";
+                                                  showOveray=true;
 
 
-                                          ],
-                                        ),
+
+                                                });
+
+
+                                                //
+                                                await deliverStockView("none",_data[index]["OrderId"]);
+                                              },
+                                              child: RichText(
+                                                text: TextSpan(
+                                                  text: "${_data[index]['name']}:",
+                                                  style: DefaultTextStyle.of(context).style,
+                                                  children: const <TextSpan>[
+
+
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                    ),
-                                  ],
+
+
+                                    ],
+                                  ),
                                 ),
-
-
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      subtitle: Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 5, 0, 10),
-                        child: Row(
-                          children: [
-                            Column(
-                             crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Wrap(
-                                  crossAxisAlignment: WrapCrossAlignment.center,
-                                  children: [
-
-                                    const Icon(Icons.segment,color:Colors.orange,size:13,),
-                                    Text("UID:${_data[index]['OrderId']}"),
-
-                                  ],
-                                ),
-
-                                Wrap(
-                                  crossAxisAlignment: WrapCrossAlignment.center,
-                                  children: [
-
-                                    const Icon(Icons.segment,color:Colors.orange,size:13,),
-                                    Text("Qty:${_data[index]['totalQty']}"),
-
-                                  ],
-                                ),
-
-                                Wrap(
-                                  crossAxisAlignment: WrapCrossAlignment.center,
-                                  children: [
-
-                                    const Icon(Icons.segment,color:Colors.orange,size:13,),
-                                    Text("Amount:${_data[index]['totalAmount']}"),
-
-                                  ],
-                                ),
-
-                                Wrap(
-                                  crossAxisAlignment: WrapCrossAlignment.center,
-                                  children: [
-
-                                    const Icon(Icons.segment,color:Colors.orange,size:13,),
-                                    Text("Deliver:${num.parse(_data[index]['totalQty'])-num.parse(_data[index]['totalCount'])}"),
-
-
-
-                                  ],
-                                ),
-
-
                               ],
                             ),
 
-                          ],
+                            subtitle: Padding(
+                              padding: const EdgeInsets.fromLTRB(0, 5, 0, 10),
+                              child: Row(
+                                children: [
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Wrap(
+                                        crossAxisAlignment: WrapCrossAlignment.center,
+                                        children: [
+
+                                          const Icon(Icons.segment,color:Colors.orange,size:13,),
+                                          Text("UID:${_data[index]['OrderId']}"),
+
+                                        ],
+                                      ),
+
+                                      Wrap(
+                                        crossAxisAlignment: WrapCrossAlignment.center,
+                                        children: [
+
+                                          const Icon(Icons.segment,color:Colors.orange,size:13,),
+                                          Text("Qty:${_data[index]['totalQty']}"),
+
+                                        ],
+                                      ),
+
+                                      Wrap(
+                                        crossAxisAlignment: WrapCrossAlignment.center,
+                                        children: [
+
+                                          const Icon(Icons.segment,color:Colors.orange,size:13,),
+                                          Text("Amount:${_data[index]['totalAmount']}"),
+
+                                        ],
+                                      ),
+
+                                      Wrap(
+                                        crossAxisAlignment: WrapCrossAlignment.center,
+                                        children: [
+
+                                          const Icon(Icons.segment,color:Colors.orange,size:13,),
+                                          Text("Deliver:${num.parse(_data[index]['totalQty'])-num.parse(_data[index]['totalCount'])}"),
+                                          const SizedBox(width:8,),
+                                          ((num.parse(_data[index]['totalQty'])-num.parse(_data[index]['totalCount']))>0)?
+                                          InkWell(
+                                              onTap: () async{
+                                                setState(() {
+                                                  productExist="false";
+                                                  showOveray=true;
+
+
+
+                                                });
+
+
+                                                //
+                                                await deliverStockView("none",_data[index]["OrderId"]);
+                                              },
+
+
+                                              child: const Icon(Icons.rocket_launch,color:Colors.red,size:25,)):const Text(""),
+
+
+
+                                        ],
+                                      ),
+                                      Wrap(
+                                        crossAxisAlignment: WrapCrossAlignment.center,
+                                        children: [
+
+                                          const Icon(Icons.segment,color:Colors.orange,size:13,),
+                                          Text("Send By:${ConstantClassUtil().truncateWithEllipsis((_data[index]['adminName']).toUpperCase(), 9)}"),
+
+
+
+                                        ],
+                                      ),
+
+
+                                    ],
+                                  ),
+
+                                ],
+                              ),
+                            ),
+                            trailing:GestureDetector(
+                                onTap: () async{
+                                  // This function will be called when the icon is tapped.
+                                  // thisOrder(_data[index],index);
+
+
+
+                                  orderData=_data[index].values.toList();
+
+
+
+                                 thisOrder(_data[index]['OrderId']);
+
+
+
+
+
+
+                                  viewThisOrder();
+
+
+
+
+
+
+                                  //
+
+
+                                },
+                                child:const Icon(Icons.grid_view,color:Colors.orange)
+                            )
+
+                          //trailing: Text()
                         ),
                       ),
-                      trailing:GestureDetector(
-                          onTap: () async{
-                            // This function will be called when the icon is tapped.
-                           // thisOrder(_data[index],index);
+                    ),
+                    Positioned(
+                      top:12,
+                      right: 28,
 
 
+                      child: Center(
+                        child: Text(
+                          '${_data[index]['created_at']}',
+                          //'test',
+                          style: const TextStyle(color: Colors.deepOrange,fontSize: 10),
+                        ),
+                      ),
+                    ),
+                  ],
 
-                              orderData=_data[index].values.toList();
-
-
-                           //print((await thisOrder())["result"]);
-                          thisOrder(_data[index]['OrderId']);
-
-                             // print((stockQuery.dispatchOrder)[0]);
-
-                              viewThisOrder();
-
-
-                            // viewThisOrder();
-
-
-
-
-                              //
-
-
-                          },
-                          child:const Icon(Icons.grid_view,color:Colors.orange)
-                      )
-
-                    //trailing: Text()
-                  ),
                 );
 
               }
@@ -329,6 +547,7 @@ String uidTransport="UidTransport";
   {
     super.initState();
     //getapi();
+
 
     quickdata();
     _scrollController.addListener(_scrollListener);
@@ -359,9 +578,9 @@ String uidTransport="UidTransport";
     controller.scannedDataStream.listen((scanData) async{
       setState((){
         result=scanData;
+
       });
       //await scanMethod();
-      // print("${result!.code}");
       if(result!=null)
       {
         // controller!.pauseCamera();
@@ -369,35 +588,66 @@ String uidTransport="UidTransport";
         bool containsQrCode = qrDebt.any((item) => item['cardUid'] == result!.code);
         if(containsQrCode)
         {
-          //data already scaned
-
-        }
-        else{
+          controller.pauseCamera();
           var listData={
             "cardUid":result!.code
           };
           qrDebt.insertAll(0,[listData]);
 
           String cardUid="${result!.code}";
-          print(cardUid);
+          // print(cardUid);
           //getCardDetail(cardUid);
-         // getData("TEALTD_JgTq4_1695233576");
+          // getData("TEALTD_JgTq4_1695233576");
           var checkCard=await getData(cardUid);
-              if(checkCard !=null){
-                checkCard=jsonDecode(checkCard);
-                setState(() {
-                  uidTransport="${checkCard[0]["uid"]}";
-                });
-                confirmUser("${checkCard[0]["name"]}","${checkCard[0]["uid"]}");
-              /*  await stockCountSubmit(Get.put(HideShowState()).indexCountData);
+          if(checkCard !=null){
+            checkCard=jsonDecode(checkCard);
+            setState(() {
+              uidTransport="${checkCard[0]["uid"]}";
+            });
+            confirmUser("${checkCard[0]["name"]}","${checkCard[0]["uid"]}");
+            /*  await stockCountSubmit(Get.put(HideShowState()).indexCountData);
                 Get.back(canPop: false);*/
-              }
-              else{
-                await getCardDetail(cardUid);
+          }
+          else{
+            await getCardDetail(cardUid);
 
-                /*await stockCountSubmit(Get.put(HideShowState()).indexCountData);
+            /*await stockCountSubmit(Get.put(HideShowState()).indexCountData);
                 Get.back(canPop: false);*/
-              }
+          }
+
+          //
+        // print("card exist");
+
+          //
+
+        }
+        else{
+          controller.pauseCamera();
+          var listData={
+            "cardUid":result!.code
+          };
+          qrDebt.insertAll(0,[listData]);
+
+          String cardUid="${result!.code}";
+          // print(cardUid);
+          //getCardDetail(cardUid);
+          // getData("TEALTD_JgTq4_1695233576");
+          var checkCard=await getData(cardUid);
+          if(checkCard !=null){
+            checkCard=jsonDecode(checkCard);
+            setState(() {
+              uidTransport="${checkCard[0]["uid"]}";
+            });
+            confirmUser("${checkCard[0]["name"]}","${checkCard[0]["uid"]}");
+            /*  await stockCountSubmit(Get.put(HideShowState()).indexCountData);
+                Get.back(canPop: false);*/
+          }
+          else{
+            await getCardDetail(cardUid);
+
+            /*await stockCountSubmit(Get.put(HideShowState()).indexCountData);
+                Get.back(canPop: false);*/
+          }
 
 
 
@@ -411,7 +661,7 @@ String uidTransport="UidTransport";
     });
   }
 
-   getCountWidget(index) async{
+  getCountWidget(index) async{
 
     qtychange.text="${(Get.put(HideShowState()).delivery)[index]["currentQty"]}";
     Get.bottomSheet(
@@ -443,20 +693,20 @@ String uidTransport="UidTransport";
                               Padding(
                                 padding:const EdgeInsets.fromLTRB(8,5,8,0),
                                 child: Card(
-                                  elevation:0,
-                                  margin: const EdgeInsets.symmetric(vertical:1,horizontal:5),
-                                  //color:Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(15.0),
-                                    //side: BorderSide(color:_data[0]["color_var"]??true?Colors.white:Colors.green, width: 2),
-                                  ),
+                                    elevation:0,
+                                    margin: const EdgeInsets.symmetric(vertical:1,horizontal:5),
+                                    //color:Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(15.0),
+                                      //side: BorderSide(color:_data[0]["color_var"]??true?Colors.white:Colors.green, width: 2),
+                                    ),
 
-                                  child: Column(
-                                    children: [
-                                      Text("${(controller.dispatchOrder)[index]["productCode"]}"),
-                                      Text("hellob"),
-                                    ],
-                                  )
+                                    child: Column(
+                                      children: [
+                                        Text("${(controller.dispatchOrder)[index]["productCode"]}"),
+                                        const Text("hellob"),
+                                      ],
+                                    )
                                 ),
                               ),
 
@@ -465,108 +715,109 @@ String uidTransport="UidTransport";
                         },
                       ),
 
-                        Container(
+                      Container(
 
 
-                          padding:const EdgeInsets.fromLTRB(5,0,10,0),
+                        padding:const EdgeInsets.fromLTRB(5,0,10,0),
 
 
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(30),
-                              topRight: Radius.circular(30),
-                            ),
-                          ),
-                          child: SingleChildScrollView(
-                            child: Column(
-                              children: [
-                                const SizedBox(height: 5.0,),
-
-                                TextField(
-                                   controller: qtychange,
-
-                                  keyboardType: TextInputType.number,
-                                  //obscureText: true,
-                                  decoration: const InputDecoration(
-                                    contentPadding: EdgeInsets.symmetric(vertical: 3,horizontal: 3),
-                                    border: OutlineInputBorder(),
-                                    labelText: 'Enter Amount',
-                                    hintText: 'Enter Amount',
-                                    hintStyle: TextStyle(
-                                      color: Colors.grey,
-                                    ),
-
-                                  ),
-                                  onChanged: (text) async{
-                                   await changeQtyCount(index,text);
-
-
-
-                                  },
-
-
-                                ),
-
-
-                                const SizedBox(height: 2.0,),
-
-
-                              ],
-                            ),
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(30),
+                            topRight: Radius.circular(30),
                           ),
                         ),
+                        child: SingleChildScrollView(
+                          child: Column(
+                            children: [
+                              const SizedBox(height: 5.0,),
+
+                              TextField(
+                                controller: qtychange,
+
+                                keyboardType: TextInputType.number,
+                                //obscureText: true,
+                                decoration: const InputDecoration(
+                                  contentPadding: EdgeInsets.symmetric(vertical: 3,horizontal: 3),
+                                  border: OutlineInputBorder(),
+                                  labelText: 'Enter Amount',
+                                  hintText: 'Enter Amount',
+                                  hintStyle: TextStyle(
+                                    color: Colors.grey,
+                                  ),
+
+                                ),
+                                onChanged: (text) async{
+
+                                  await changeQtyCount(index,text);
+
+
+
+                                },
+
+
+                              ),
+
+
+                              const SizedBox(height: 2.0,),
+
+
+                            ],
+                          ),
+                        ),
+                      ),
 
                       const SizedBox(height:2.0,),
                       //if(!(Get.put(StockQuery()).paidDeptScanHide))
                       GetBuilder<HideShowState>(
-                       builder: (hideController) {
-          //if((Get.put(HideShowState()).delivery)[index]["hideAddCart"]==1)
+                          builder: (hideController) {
+                            //if((Get.put(HideShowState()).delivery)[index]["hideAddCart"]==1)
 
-                         return((hideController.delivery)[index]["hideAddCart"]==1)?
-            Expanded(
-              flex: 5,
-              child:Stack(
-                alignment:Alignment.bottomCenter,
-                children: [
-                  QRView(key: qrkey,onQRViewCreated: _onQRViewCreated,
-                    overlay: QrScannerOverlayShape(
-                      borderColor: Colors.pink,
-                      borderRadius: 10,
-                      borderLength: 30,
-                      borderWidth: 10,
-                      cutOutSize: 300,
-                      // Add the laser effect
+                            return((hideController.delivery)[index]["hideAddCart"]==1)?
+                            Expanded(
+                                flex: 5,
+                                child:Stack(
+                                  alignment:Alignment.bottomCenter,
+                                  children: [
+                                    QRView(key: qrkey,onQRViewCreated: _onQRViewCreated,
+                                      overlay: QrScannerOverlayShape(
+                                        borderColor: Colors.pink,
+                                        borderRadius: 10,
+                                        borderLength: 30,
+                                        borderWidth: 10,
+                                        cutOutSize: 300,
+                                        // Add the laser effect
 
-                    ),
-                  ),
+                                      ),
+                                    ),
 
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
 
-                          cameraSwitch(),
-                          //SizedBox(width: 10.0,),
+                                            cameraSwitch(),
+                                            //SizedBox(width: 10.0,),
 
-                          // SizedBox(width: 10.0,),
-                          flashSwitch(),
-                          Image.asset(
-                            flashValue ? 'images/on.png' : 'images/off.png',
-                            height: 30,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                                            // SizedBox(width: 10.0,),
+                                            flashSwitch(),
+                                            Image.asset(
+                                              flashValue ? 'images/on.png' : 'images/off.png',
+                                              height: 30,
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
 
-                ],
-              )
+                                  ],
+                                )
 
-          ):Text("${(hideController.delivery)[index]["hideAddCart"]}");
-                      }
+                            ):Text("${(hideController.delivery)[index]["hideAddCart"]}");
+                          }
                       )
 
 
@@ -598,11 +849,22 @@ String uidTransport="UidTransport";
 
         },
       ),
-    ).whenComplete(() {
+    ).whenComplete(() async{
+
       qrDebt.clear();
       setState(() {
         uidTransport="UidTransport";
       });
+      //Get.back(canPop: false);
+
+      await thisOrder(_data[index]['OrderId']);
+      viewThisOrder();
+
+
+
+
+
+
     });
 
   }
@@ -741,8 +1003,10 @@ String uidTransport="UidTransport";
 
   thisOrder(orderId)async
   {
+    //
 
     (Get.put(StockQuery()).updateHideLoader(false));
+
 
     //var resultData=(await StockQuery().orderViewByUid(Topups(uid:"${orderData[0]}",startlimit:limit,endlimit:_page))).data;
     var resultData=(await StockQuery().orderViewByUid(Topups(uid:orderId,startlimit:limit,endlimit:_page))).data;
@@ -751,21 +1015,25 @@ String uidTransport="UidTransport";
     {
       (Get.put(StockQuery()).updateHideLoader(true));
       if(resultData["result"]!=0)
-        {
+      {
 
-          (Get.put(StockQuery()).updateDispatchOrder(resultData["result"]));
-        }
+
+
+
+        (Get.put(StockQuery()).updateDispatchOrder(resultData["result"]));
+
+      }
       else{
         Get.back(canPop: false);
       }
 
 
-    //  print(resultData["result"]);
+      //  print(resultData["result"]);
 
 
 
 //print(orderId);
-     /* final stockQuery = Get.put(StockQuery());
+      /* final stockQuery = Get.put(StockQuery());
       print((stockQuery.dispatchOrder)[0]);*/
 
 
@@ -777,31 +1045,32 @@ String uidTransport="UidTransport";
 
 
 
+
   }
   void viewComment(commentData){
     Get.bottomSheet(
-     Container(
-    height: 200,
-    padding: EdgeInsets.all(16),
-    child: Column(
-    mainAxisAlignment: MainAxisAlignment.center,
-    children: [
-    Text('${commentData=='null'?"no Comment":commentData}'),
-    SizedBox(height: 20),
+      Container(
+        height: 200,
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('${commentData=='null'?"no Comment":commentData}'),
+            const SizedBox(height: 20),
 
-    ],
-    ),
-    ),
+          ],
+        ),
+      ),
       barrierColor: Colors.transparent,
       backgroundColor: Colors.white,
     );
   }
 
-  void viewThisOrder() {
+  viewThisOrder() {
 
 
 
-    Get.bottomSheet(
+    return Get.bottomSheet(
       StatefulBuilder(
         builder: (BuildContext context, StateSetter setState) {
           return
@@ -823,15 +1092,16 @@ String uidTransport="UidTransport";
                       Center(child: Text("Client:${orderData[1]}")),
                       Center(child: Text("UID:${orderData[0]}")),
 
+
                       GetBuilder<StockQuery>(
-                        builder: (_controller) {
+                        builder: (controller) {
                           return  Expanded(
                               child:ListView.separated(
-                                itemCount:(_controller.dispatchOrder).length+1,
+                                itemCount:(controller.dispatchOrder).length+1,
                                 itemBuilder: (context, index) {
-                                  if(index<(_controller.dispatchOrder).length) {
-
-                                    (Get.put(HideShowState())).isDelivery(_controller.dispatchOrder);
+                                  if(index<(controller.dispatchOrder).length) {
+                                    final GlobalKey qrkey1 = GlobalKey(debugLabel: 'QR Key $index');
+                                    (Get.put(HideShowState())).isDelivery(controller.dispatchOrder);
                                     return Card(
                                       elevation: 0,
                                       child: ListTile(
@@ -845,7 +1115,7 @@ String uidTransport="UidTransport";
 
                                                     RichText(
                                                       text: TextSpan(
-                                                        text:"${_controller.dispatchOrder[index]["productCode"]} (${_controller.dispatchOrder[index]["pcs"]} pcs):",
+                                                        text:"${controller.dispatchOrder[index]["productCode"]} (${controller.dispatchOrder[index]["pcs"]} pcs):",
                                                         style: DefaultTextStyle.of(context).style,
                                                         children: const <TextSpan>[
 
@@ -853,14 +1123,14 @@ String uidTransport="UidTransport";
                                                         ],
                                                       ),
                                                     ),
-                                                    Text("Price:${(_controller.dispatchOrder[index]["price"])}"),
+                                                    Text("Price:${(controller.dispatchOrder[index]["price"])}"),
 
 
                                                     Text.rich(
                                                         TextSpan(
                                                             children: [
                                                               TextSpan(
-                                                                text: 'Qty ${_controller.dispatchOrder[index]["totalQty"]}:',
+                                                                text: 'Qty ${controller.dispatchOrder[index]["totalQty"]}:',
 
                                                               ),
 
@@ -869,6 +1139,7 @@ String uidTransport="UidTransport";
                                                                 child: IntrinsicWidth(
                                                                   stepWidth: 0.5,
                                                                   child: TextField(
+
 
 
                                                                     keyboardType: TextInputType.number,
@@ -881,13 +1152,16 @@ String uidTransport="UidTransport";
 
 
 
+
                                                                     ),
+
                                                                     style: const TextStyle(
                                                                       color: Colors.blue, // Set the text color to red
 
                                                                     ),
                                                                     onChanged: (text) async{
-                                                                     await changeQtyCount(index,text);
+                                                                      (Get.put(HideShowState()).trackIndex(index));
+                                                                      await changeQtyCount(index,text);
 
 
                                                                     },
@@ -898,7 +1172,89 @@ String uidTransport="UidTransport";
                                                             ]
                                                         )
                                                     ),
-                                                    Text("Deliver:${(((Get.put(HideShowState()).delivery)[index]["totalQty"])!=((Get.put(HideShowState()).delivery)[index]["totalCount"]))?((num.parse((Get.put(HideShowState()).delivery)[index]["totalQty"])-num.parse((Get.put(HideShowState()).delivery)[index]["totalCount"]))):0}"),
+
+                                                    Wrap(
+                                                      crossAxisAlignment: WrapCrossAlignment.center,
+                                                      children: [
+
+
+                                                        Text("Deliver:${(((Get.put(HideShowState()).delivery)[index]["totalQty"])!=((Get.put(HideShowState()).delivery)[index]["totalCount"]))?((num.parse((Get.put(HideShowState()).delivery)[index]["totalQty"])-num.parse((Get.put(HideShowState()).delivery)[index]["totalCount"]))):0}"),
+                                                        const SizedBox(width:8,),
+                                                        (((Get.put(HideShowState()).delivery)[index]["totalQty"])!=((Get.put(HideShowState()).delivery)[index]["totalCount"]))?
+                                                        InkWell(
+                                                            onTap: () async{
+                                                              setState(() {
+                                                                productExist="true";
+
+                                                              });
+
+
+                                                              //
+                                                              await deliverStockView(controller.dispatchOrder[index]["productCode"],controller.dispatchOrder[index]["uid"]);
+                                                            },
+
+
+                                                            child: const Icon(Icons.local_shipping,color:Colors.red,size:25,)):const Text(""),
+
+                                                      ],
+                                                    ),
+
+
+                                                    GetBuilder<HideShowState>(
+                                                      builder: (myLoadercontroller) {
+                                                        //return Text('Data: ${_controller.data}');
+
+                                                        return
+                                                          (((myLoadercontroller.delivery)[index]["hideAddCart"])==1)?
+
+                                                          SizedBox(
+                                                            width:200,
+                                                            height: 200,
+                                                            child: Stack(
+                                                              alignment:Alignment.bottomCenter,
+                                                              children: [
+                                                                QRView(key:qrkey1,onQRViewCreated: _onQRViewCreated,
+                                                                  overlay: QrScannerOverlayShape(
+                                                                    borderColor: Colors.pink,
+                                                                    borderRadius: 10,
+                                                                    borderLength: 30,
+                                                                    borderWidth: 10,
+                                                                    cutOutSize: 300,
+                                                                    // Add the laser effect
+
+                                                                  ),
+                                                                ),
+
+                                                                Row(
+                                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                                  children: [
+                                                                    Row(
+                                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                      children: [
+
+                                                                        cameraSwitch(),
+                                                                        //SizedBox(width: 10.0,),
+
+                                                                        // SizedBox(width: 10.0,),
+                                                                        flashSwitch(),
+                                                                        Image.asset(
+                                                                          flashValue ? 'images/on.png' : 'images/off.png',
+                                                                          height: 30,
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                  ],
+                                                                ),
+
+                                                              ],
+                                                            ),
+                                                          ):const Visibility(
+                                                              visible: false,
+                                                              child: Text(""));
+                                                      },
+                                                    ),
+
+
 
 
 
@@ -915,23 +1271,25 @@ String uidTransport="UidTransport";
                                           ),
                                           // subtitle: Text('Subtitle for ${_controller.dispatchOrder[index]["price"]}'),
                                           leading: InkWell(
-                                            onTap: () async{
+                                              onTap: () async{
+                                                /*Get.back(canPop: false);
+
                                               (Get.put(HideShowState()).trackIndex(index));
-                                             await getCountWidget(index);
+                                             await getCountWidget(index);*/
 
 
 
-                                              //_saveData();
-                                              //getData("cardUid");
-                                             //deleteData();
-                                             /*var data=await getData("TEALTD_JgTq4_1695233576");
+                                                //_saveData();
+                                                //getData("cardUid");
+                                                //deleteData();
+                                                /*var data=await getData("TEALTD_JgTq4_1695233576");
                                              data=jsonDecode(data);
                                              print("${data[0]["uid"]}");*/
-                                              //var data=await getData("TEALTD_JgTq4_1695233575");
+                                                //var data=await getData("TEALTD_JgTq4_1695233575");
 
 
-                                            },
-                                              child: Icon(Icons.qr_code)
+                                              },
+                                              child: const Icon(Icons.qr_code)
                                           ),
                                           trailing:Column(
                                             children: [
@@ -946,15 +1304,16 @@ String uidTransport="UidTransport";
                                                       return
                                                         (((myLoadercontroller.delivery)[index]["hideAddCart"])==1)?
 
-                                                          IconButton(
-                                                        icon:Icon(Icons.add_shopping_cart,
-                                                            size: 23.0,
-                                                            color: Colors.grey),
-                                                        onPressed: () async{
+                                                        IconButton(
+                                                          icon:const Icon(Icons.add_shopping_cart,
+                                                              size: 23.0,
+                                                              color: Colors.grey),
+                                                          onPressed: () async{
+                                                            (Get.put(StockQuery()).updateHideLoader(false));
 
-                                                          await stockCountSubmit(index);
+                                                            await stockCountSubmit(index);
 
-                                                          },):Text("");
+                                                          },):const Text("");
                                                     },
                                                   ),
 
@@ -964,17 +1323,17 @@ String uidTransport="UidTransport";
                                                       return
                                                         (myLoadercontroller.dispatchOrder[index]["commentData"]!=null)?
                                                         IconButton(
-                                                        icon: const Icon(
-                                                            Icons.mark_unread_chat_alt,
-                                                            size: 23.0,
-                                                            color: Colors.red
-                                                        ),
-                                                        onPressed: () {
-                                                          //print("${myLoadercontroller.dispatchOrder[index]["commentData"]}");
-                                                          viewComment("${(myLoadercontroller.dispatchOrder[index])["commentData"]}");
+                                                          icon: const Icon(
+                                                              Icons.mark_unread_chat_alt,
+                                                              size: 23.0,
+                                                              color: Colors.red
+                                                          ),
+                                                          onPressed: () {
+                                                            //print("${myLoadercontroller.dispatchOrder[index]["commentData"]}");
+                                                            viewComment("${(myLoadercontroller.dispatchOrder[index])["commentData"]}");
 
-                                                        },
-                                                      ):Text("");
+                                                          },
+                                                        ):const Text("");
                                                     },
                                                   ),
 
@@ -988,11 +1347,11 @@ String uidTransport="UidTransport";
                                       ),
                                     );
                                   }else{
-                                    return Text("");
+                                    return const Text("");
                                   }
                                 },
                                 separatorBuilder: (context, index) {
-                                  return Divider(
+                                  return const Divider(
                                     height: 1,
                                     color: Colors.grey,
                                   );
@@ -1027,18 +1386,22 @@ String uidTransport="UidTransport";
         },
       ),
     ).whenComplete(() {
-     // Get.put(HideShowState()).isDelivery(0);
+      // Get.put(HideShowState()).isDelivery(0);
       //do whatever you want after closing the bottom sheet
     });
 
   }
+
   changeQtyCount(index,text){
     if((double.tryParse(text) != null)){
       (Get.put(HideShowState()).delivery)[index]["currentQty"]=num.parse(text);
 
+      num deliver=(((Get.put(HideShowState()).delivery)[index]["totalQty"])!=((Get.put(HideShowState()).delivery)[index]["totalCount"]))?((num.parse((Get.put(HideShowState()).delivery)[index]["totalQty"])-num.parse((Get.put(HideShowState()).delivery)[index]["totalCount"]))):0;
+      //print("Deliver:${(Get.put(HideShowState()).delivery).length}");
+     
+    num currentQty=num.parse("${ConstantClassUtil().convertToNum((Get.put(HideShowState()).delivery)[index]["currentQty"])}");
 
-
-      if((num.parse((Get.put(HideShowState()).delivery)[index]["totalQty"]))>=(Get.put(HideShowState()).delivery)[index]["currentQty"])
+      if((num.parse((Get.put(HideShowState()).delivery)[index]["totalQty"]))>=((currentQty)+(deliver-0)))
       {
         // print((Get.put(HideShowState()).delivery)[index]["currentQty"]);
 
@@ -1063,49 +1426,299 @@ String uidTransport="UidTransport";
     }
   }
 
-stockCountSubmit(index) async{
-  productCode=(Get.put(StockQuery()).dispatchOrder)[index]["productCode"];
+  stockCountSubmit(index) async{
+    productCode=(Get.put(StockQuery()).dispatchOrder)[index]["productCode"];
 
 
-  //await stockCount(index);
 
 
-  num totCount=((num.parse((Get.put(HideShowState()).delivery)[index]["totalCount"])-(Get.put(HideShowState()).delivery)[index]["currentQty"])>=0)?num.parse((Get.put(HideShowState()).delivery)[index]["totalCount"]):0;
-  if(totCount>0)
-  {
-    var resultData=(await StockQuery().stockCount(Topups(uid:"${orderData[0]}"),QuickBonus(uid:productCode,qty:"${(Get.put(HideShowState()).delivery)[index]["currentQty"]}",subscriber:"StockName",status:"status",description:"Delivered"), User(uid:uidTransport,name:"refName"))).data;
-
-    if(resultData["status"])
+    num currentQty=num.parse("${ConstantClassUtil().convertToNum((Get.put(HideShowState()).delivery)[index]["currentQty"])}");
+    num totCount=((num.parse((Get.put(HideShowState()).delivery)[index]["totalCount"])-currentQty)>=0)?num.parse((Get.put(HideShowState()).delivery)[index]["totalCount"]):0;
+    if(totCount>0)
     {
-      await thisOrder(orderData[0]);
+      var resultData=(await StockQuery().stockCount(Topups(uid:"${orderData[0]}"),QuickBonus(uid:productCode,qty:"${(Get.put(HideShowState()).delivery)[index]["currentQty"]}",subscriber:"StockName",status:"status",description:"Delivered"), User(uid:uidTransport,name:"refName"))).data;
 
-       //thisOrder2();
-      await quickdata();
+      if(resultData["status"])
+      {
+        /*Future.delayed(Duration.zero,(){
+        //your code goes here
+        //
 
-      setState(() {
+      });*/
+
+        //thisOrder2();
+
+        await thisOrder(orderData[0]);
+        await quickdata();
+
+
+
+
+
+        /*setState(() {
 
         num dats=(num.parse((Get.put(HideShowState()).delivery)[index]["totalCount"]))-num.parse((Get.put(HideShowState()).delivery)[index]["currentQty"]);
        // (Get.put(HideShowState()).delivery)[index]["totalCount"]="$dats";
         (Get.put(HideShowState()).isChangeDelivery(index,'totalCount',dats));
 
-      });
+      });*/
+      }
+
     }
+  }
+  deliverStockView(productC,uidOrder) async{
+    //print(uidOrder);
+    (Get.put(StockQuery()).updateHideLoader(false));
+
+
+    var resultData=(await StockQuery().stockViewDeliver(Topups(uid:uidOrder,optionCase:productExist),QuickBonus(uid:productC))).data;
+
+    print(resultData);
+    if(resultData["status"])
+    {
+      setState(() {
+        showOveray=false;
+      });
+      (Get.put(StockQuery()).updateHideLoader(true));
+      if(resultData["result"]!=0)
+      {
+
+
+
+
+        viewDeliver(resultData["result"]);
+
+
+
+
+
+        //
+      }
+      else{
+        setState(() {
+          showOveray=false;
+        });
+        Get.back(canPop: false);
+      }
+    }
+    else{
+      setState(() {
+        showOveray=false;
+      });
+      Get.snackbar("Success", uidOrder,backgroundColor: const Color(0xff9a1c55),
+          colorText: const Color(0xffffffff),
+          titleText: const Text("No Data found",  style: TextStyle(
+            color: Colors.white, // Set the text color here
+
+          ),),
+
+          icon: const Icon(Icons.access_alarm),
+          duration: const Duration(seconds: 4));
+    }
+  }
+  viewDeliver(dataV){
+    (Get.put(StockQuery()).updateDispatchOrder2(dataV));
+    return Get.bottomSheet(
+      StatefulBuilder(
+        builder: (BuildContext context, StateSetter setState) {
+          return
+            Stack(
+              children: [
+                Container(
+                  padding:const EdgeInsets.all(5.0),
+                  height: 600,
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(30),
+                      topRight: Radius.circular(30),
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+
+
+                      Center(child: Text("UID:${dataV[0]["uid"]}")),
+                      const SizedBox(height:8.5,),
+
+                      const Divider(
+                        height: 1,
+                        color: Colors.grey,
+                      ),
+
+
+                      GetBuilder<StockQuery>(
+                        builder: (controller) {
+                          return  Expanded(
+                              child:ListView.separated(
+                                itemCount:(controller.dispatchOrder2).length+1,
+                                itemBuilder: (context, index) {
+                                  if(index<(controller.dispatchOrder2).length) {
+                                    //final GlobalKey qrkey1 = GlobalKey(debugLabel: 'QR Key2 $index');
+                                    // (Get.put(HideShowState())).isDelivery(_controller.dispatchOrder2);
+                                    return Stack(
+                                      children: [
+                                        Card(
+                                          elevation: 0,
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(top:10.0),
+                                            child: ListTile(
+
+                                              title: Row(
+                                                children: [
+                                                  Expanded(
+
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        Wrap(
+                                                          crossAxisAlignment: WrapCrossAlignment.center,
+                                                          children: [
+
+                                                            const Icon(Icons.segment,color:Colors.orange,size:13,),
+                                                            Text("${(controller.dispatchOrder2[index]["productCode"].toUpperCase())}",
+                                                              style: const TextStyle(fontSize: 14),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        Wrap(
+                                                          crossAxisAlignment: WrapCrossAlignment.center,
+                                                          children: [
+
+                                                            const Icon(Icons.segment,color:Colors.orange,size:13,),
+                                                            Text("Carry by:${ConstantClassUtil().capitalizeFirstLetter((controller.dispatchOrder2[index]["userName"]))}",
+                                                              style: const TextStyle(fontSize: 14),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        Wrap(
+                                                          crossAxisAlignment: WrapCrossAlignment.center,
+                                                          children: [
+
+                                                            const Icon(Icons.segment,color:Colors.orange,size:13,),
+                                                            Text("Qty:${(controller.dispatchOrder2[index]["qty"])}",
+                                                              style: const TextStyle(fontSize: 14),
+                                                            ),
+                                                          ],
+                                                        ),
+
+                                                        Wrap(
+                                                          crossAxisAlignment: WrapCrossAlignment.center,
+                                                          children: [
+
+
+                                                            const Icon(Icons.segment,color:Colors.orange,size:13,),
+                                                            Text("Send by:${ConstantClassUtil().capitalizeFirstLetter((controller.dispatchOrder2[index]["adminName"]))}",
+                                                              style: const TextStyle(fontSize: 14),
+                                                            ),
+                                                          ],
+                                                        ),
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                      ],
+                                                    ),
+                                                  )
+
+
+
+
+
+
+                                                ],
+                                              ),
+                                              // subtitle: Text('Subtitle for ${_controller.dispatchOrder2[index]["price"]}'),
+                                              leading: CircleAvatar(
+                                                backgroundColor:getRandomColor(),
+                                                child: Icon(_getRandomIcon()),
+                                              ),
+
+                                            ),
+                                          ),
+                                        ),
+                                        Positioned(
+                                          top:10,
+                                          right: 28,
+
+
+                                          child: Center(
+                                            child: Text(
+                                              '${controller.dispatchOrder2[index]['created_at']}',
+                                              style: const TextStyle(color: Colors.deepOrange,fontSize: 10),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  }else{
+                                    return const Text("");
+                                  }
+                                },
+                                separatorBuilder: (context, index) {
+                                  return const Divider(
+                                    height: 1,
+                                    color: Colors.grey,
+                                  );
+                                },
+
+                              ));
+
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                GetBuilder<StockQuery>(
+                  builder: (myLoadercontroller) {
+                    //return Text('Data: ${_controller.data}');
+                    return
+                      (myLoadercontroller.hideLoader)?
+                      const Text(""):
+                      Positioned.fill(
+                        child: Center(
+                          child: Container(
+                            alignment: Alignment.center,
+                            color: Colors.white70,
+                            child: const CircularProgressIndicator(),
+                          ),
+                        ),
+                      );
+                  },
+                ),
+              ],
+            );
+        },
+      ),
+    ).whenComplete(() {
+      // Get.put(HideShowState()).isDelivery(0);
+      //do whatever you want after closing the bottom sheet
+    });
 
   }
-}
-saveData(String carduid,dynamic user) async {
-  List<Map<String, dynamic>> dataList = [
-    {"uid":user["uid"],"name": user["name"],"photo":""}
+  saveData(String carduid,dynamic user) async {
+    List<Map<String, dynamic>> dataList = [
+      {"uid":user["uid"],"name": user["name"],"photo":""}
 
-  ];
+    ];
     final prefs = await SharedPreferences.getInstance();
     final key = carduid;//CardUid
     final value = jsonEncode(dataList); // Convert list of maps to JSON string
     prefs.setString(key, value);
-  setState(() {
-    uidTransport="${user["uid"]}";
-  });
-  confirmUser("${user["name"]}","${user["uid"]}");
+    setState(() {
+      uidTransport="${user["uid"]}";
+    });
+    confirmUser("${user["name"]}","${user["uid"]}");
   }
   getData(cardUid) async{
     final prefs = await SharedPreferences.getInstance();
@@ -1114,11 +1727,11 @@ saveData(String carduid,dynamic user) async {
     //print(action);
   }
   confirmUser(name,uid){
-   // ${(Get.put(HideShowState()).delivery)[Get.put(HideShowState()).indexCountData]["currentQty"]}
-   // (Get.put(StockQuery()).dispatchOrder)[Get.put(HideShowState()).indexCountData]["productCode"];
+    // ${(Get.put(HideShowState()).delivery)[Get.put(HideShowState()).indexCountData]["currentQty"]}
+    // (Get.put(StockQuery()).dispatchOrder)[Get.put(HideShowState()).indexCountData]["productCode"];
     Get.dialog(
       AlertDialog(
-        title: Text("Ni ${name} ?"),
+        title: Text("Ni $name ?"),
         content: Text('Utwaye ${(Get.put(StockQuery()).dispatchOrder)[Get.put(HideShowState()).indexCountData]["productCode"]}:${(Get.put(HideShowState()).delivery)[Get.put(HideShowState()).indexCountData]["currentQty"]}?'),
         actions: [
           ElevatedButton(
@@ -1129,13 +1742,13 @@ saveData(String carduid,dynamic user) async {
               elevation:0,
             ),
             onPressed: () async{
-
+              Get.back(canPop: false);
               await stockCountSubmit(Get.put(HideShowState()).indexCountData);
               qrDebt.clear();
               setState(() {
-                uidTransport="${uid}";
+                uidTransport="$uid";
               });
-              Get.back(canPop: false);
+
 
             },
             child: const Text('Yes'),
@@ -1156,21 +1769,21 @@ saveData(String carduid,dynamic user) async {
   }
   deleteData(carduid) async{
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove("${carduid}");//CardUid
+    await prefs.remove("$carduid");//CardUid
     //print(prefs.getString("my_data"));
 
 
   }
   getCardDetail(resultCode) async{
-   // print("hello");
+    // print("hello");
     //(Get.put(StockQuery()).updateHideLoader(false));
     var resultData=(await CardQuery().GetDetailCardOnline(CardModel(uid:"$resultCode"))).data;
     if(resultData["status"])
     {
 
-        //resultData["UserDetail"]["name"]
+      //resultData["UserDetail"]["name"]
 
-     // print(resultData["UserDetail"]);
+      // print(resultData["UserDetail"]);
       saveData(resultCode, resultData["UserDetail"]);
 
       //print("result ${resultData["UserDetail"]}");
@@ -1191,7 +1804,7 @@ saveData(String carduid,dynamic user) async {
     //(Get.put(HideShowState())).isChangeDelivery(thisListOrder[indexData],indexData,qtyProduct);
 
 
-   // print((Get.put(HideShowState()).delivery)[indexData]);
+    // print((Get.put(HideShowState()).delivery)[indexData]);
     //print(thisListOrder[indexData]);
 
 

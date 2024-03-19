@@ -39,6 +39,10 @@ update();
 
   }
   isHideDelivery(indexData,numb){
+    for (int i = 0; i < delivery.length; i++) {
+      delivery[i]["hideAddCart"] =0;
+    }
+
     delivery[indexData]["hideAddCart"]=numb;
     update();
   }

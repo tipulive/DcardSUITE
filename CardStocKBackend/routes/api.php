@@ -151,8 +151,9 @@ Route::get('/confirmRepaidBack','CompanyController@confirmRepaidBack')->name('co
 Route::get('/viewRepay','CompanyController@viewRepay')->name('viewRepay');
 Route::get('/OrderViewCount','CompanyController@OrderViewCount')->name('OrderViewCount');
 Route::get('/OrderViewByUid','CompanyController@OrderViewByUid')->name('OrderViewByUid');
-Route::get('/StockCount','CompanyController@StockCount')->name('StockCount');
+Route::get('/StockViewDeliver','CompanyController@StockViewDeliver')->name('StockViewDeliver');
 Route::get('/StockCountEdit','CompanyController@StockCountEdit')->name('StockCountEdit');
+Route::post('/StockCount','CompanyController@StockCount')->name('StockCount');
 Route::post('/addSpending','CompanyController@addSpending')->name('addSpending');
 Route::get('/updateSpending','CompanyController@updateSpending')->name('updateSpending');
 Route::get('/viewSpending','CompanyController@viewSpending')->name('viewSpending');

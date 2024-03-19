@@ -458,7 +458,7 @@ class _HomepageState extends State<Homepage> {
 
                             var resultData=(await StockQuery().submitOrder(Participated(uid:"Nyota_1672353378"
                                 ,uidUser:"${(Get.put(StockQuery()).userProfile)["uid"]}",subscriber:"${(Get.put(StockQuery()).order["resultData"][0]["uid"])}",inputData:inputDataText),Promotions(
-                                token:"${(Get.put(StockQuery())).orderSum }",reach:"1200",gain:"350",uid:"PointSales1"
+                                token:"${(Get.put(StockQuery())).orderSum}",reach:"1200",gain:"350",uid:"PointSales1"
                             ))).data;
                             if(resultData["status"])
                             {

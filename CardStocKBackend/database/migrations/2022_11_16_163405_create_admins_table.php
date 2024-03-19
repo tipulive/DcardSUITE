@@ -28,6 +28,7 @@ class CreateAdminsTable extends Migration
             $table->string('PhoneNumber')->default('none')->index("PhoneNumber");
 
             $table->string('platform')->default('none');
+            $table->string('permission')->index('permission')->default('none');
             $table->string('status')->default('none');
             $table->string('CompanyName')->default('none')->index('CompanyName');
             $table->string('subscriber')->default('none')->index("subscriber");//company Name
