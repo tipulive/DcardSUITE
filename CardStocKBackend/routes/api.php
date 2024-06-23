@@ -18,6 +18,7 @@ Route::post('/CreateCompany','AdminController@AdminCreateCompany')->name('AdminC
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
 Route::get('testSubmitOrder', 'TestController@testSubmitOrder');
 Route::post('testPostData', 'TestController@testPostData');
 Route::get('testGetData', 'TestController@testGetData');
@@ -45,8 +46,9 @@ Route::middleware('auth:sanctum')->group( function () {//here is to protect mult
     Route::get('/logout','AccountController@logout')->name('logout');
 
 /*AdminData*/
-
+Route::post('upload','StockController@upload');
 /*Company*/
+Route::post('/utilitySubmitOrder','CompanyController@utilitySubmitOrder')->name('utilitySubmitOrder');
 Route::get('/PrintCard','CompanyController@CompanyPrintCard')->name('CompanyPrintCard');
 Route::post('/CreateUser','CompanyController@CompanyCreateUser')->name('CompanyCreateUser');
 Route::post('/CreateUserAssign','CompanyController@CompanyCreateUserAssign')->name('CompanyCreateUserAssign');
@@ -108,7 +110,8 @@ Route::get('/GetSafaris','CompanyController@GetSafaris')->name('GetSafaris');
 Route::post('/CreateSafari','CompanyController@CreateSafari')->name('CreateSafari');
 Route::post('/EditSafari','CompanyController@EditSafari')->name('EditSafari');
 Route::post('/DeleteSafariStock','CompanyController@DeleteSafariStock')->name('DeleteSafariStock');
-Route::get('/printQrProduct','CompanyController@printQrProduct')->name('printQrProduct');
+Route::get('/createQrProduct','CompanyController@createQrProduct')->name('createQrProduct');
+Route::get('/PrintQrProduct','CompanyController@PrintQrProduct')->name('PrintQrProduct');
 Route::get('/SearchUser','CompanyController@SearchUser')->name('SearchUser');
 Route::get('/Products','CompanyController@Products')->name('Products');
 Route::get('/IsProductExist','CompanyController@IsProductExist')->name('IsProductExist');

@@ -14,6 +14,7 @@ import 'package:get/get.dart';
 
 
 import 'Query/AdminQuery.dart';
+
 //import 'api/firebaseApi.dart';
 //import 'firebase_options.dart';
 
@@ -23,6 +24,7 @@ void main() async{
   /*this will make apps not going to sleep Mode*/
 
   WidgetsFlutterBinding.ensureInitialized();
+
   /*await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );

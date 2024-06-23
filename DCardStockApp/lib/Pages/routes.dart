@@ -1,3 +1,4 @@
+import 'package:dStock/Pages/SetSalePage.dart';
 import 'package:get/get.dart';
 import '../Pages/Homepage.dart';
 import '../Pages/Login.dart';
@@ -15,6 +16,7 @@ class AppRoutes {
   static final routes = [
     GetPage(name: '/', page: () =>const Homepage()),
     GetPage(name: '/home', page: () =>const Homepage()),
+    GetPage(name: '/sale', page: () =>const SetSalePage()),
     GetPage(name: '/Login', page: () =>const Login()),
     GetPage(name: '/ProfilePage', page: () => const ProfilePage()),
     GetPage(name: '/EventsPage', page: () => const EventsPage()),

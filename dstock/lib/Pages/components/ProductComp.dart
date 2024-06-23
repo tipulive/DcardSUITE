@@ -1,6 +1,11 @@
+import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
+import 'dart:typed_data';
 
 
+import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 import '../../../Utilconfig/HideShowState.dart';
@@ -9,11 +14,16 @@ import '../../../models/QuickBonus.dart';
 import '../../../models/Topups.dart';
 import '../../../models/User.dart';
 import 'package:get/get.dart';
-
+import '../../../Query/AdminQuery.dart';
+import '../../../Utilconfig/ConstantClassUtil.dart';
 import '../../Query/StockQuery.dart';
 import 'package:flutter/material.dart';
 
 import 'package:google_fonts/google_fonts.dart';
+import 'package:dio/dio.dart' as dio;
+import 'package:photo_manager/photo_manager.dart';
+
+import '../../Utilconfig/image_card_widget.dart';
 
 
 
@@ -72,6 +82,80 @@ class _ProductCompState extends State<ProductComp> {
 
   bool showOveray=false;
 
+  /* picture upload*/
+  Future<XFile?> pickImage({required ImageSource source}) async {
+    final imagePicker = ImagePicker();
+    final pickedImage = await imagePicker.pickImage(source: source);
+    return pickedImage;
+  }
+
+  XFile? _imageFile;
+
+  Future<void> _pickImage(ImageSource source) async {
+    final pickedImage = await pickImage(source: source);
+    if (pickedImage != null) {
+      //attachPicture();
+      setState(() {
+        _imageFile = pickedImage;
+      });
+     // _compressAndUploadImage();
+    }
+  }
+
+  Future<void> _compressAndUploadImage() async {
+    if (_imageFile == null) return;
+
+    final compressedImage = await compressImage(_imageFile);
+    if (compressedImage == null) return;
+
+    // Upload or store the compressed image here.
+
+    // Create a Dio instance.
+    final dioInstance = dio.Dio();
+    String authToken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
+    dioInstance.options.headers = {
+      'Authorization': 'Bearer $authToken',
+    };
+
+    // Replace this URL with your server's endpoint for uploading images.
+    const String uploadUrl = '${ConstantClassUtil.urlLink}/upload';
+
+    try {
+      // Use Dio to upload the compressed image.
+      final response = await dioInstance.post(
+        uploadUrl,
+        data: dio.FormData.fromMap({
+          'image': dio.MultipartFile.fromBytes(
+            compressedImage,
+            filename: _imageFile!.name,
+          ),
+          'productCode':"nyota"
+        }),
+      );
+
+      // Handle the response from the server.
+      if (response.statusCode == 200) {
+        print('Image uploaded successfully');
+      } else {
+        print('Failed to upload image: ${response.statusMessage}');
+      }
+    } catch (e) {
+      print('Error during image upload: $e');
+    }
+  }
+  Future<Uint8List?> compressImage(XFile? imageFile) async {
+    if (imageFile == null) return null;
+
+    final compressedImage = await FlutterImageCompress.compressWithFile(
+      imageFile.path,
+      quality: 75,
+      format: CompressFormat.jpeg, // Use CompressFormat directly.
+    );
+
+    return compressedImage;
+  }
+  /* picture upload*/
+
 final fontSizeData=13.0;
 
 
@@ -88,6 +172,7 @@ final fontSizeData=13.0;
     });*/
     return Stack(
       children: [
+
         listdata(),
         GetBuilder<StockQuery>(
           builder: (myLoadercontroller) {
@@ -350,6 +435,7 @@ final fontSizeData=13.0;
           ),
         ),
 
+
         Expanded(
           child: ListView.builder(
 
@@ -363,271 +449,305 @@ final fontSizeData=13.0;
 
                 _data[index]['focusNode']=test;
 
-                return Card(
-                  elevation:0,
-                  //margin: EdgeInsets.symmetric(vertical:1,horizontal:5),
-                  color:Colors.white70,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(9.0),
-                    side: BorderSide(color:_data[index]["color_var"]??true?Colors.white:Colors.green, width: 2),
-                  ),
+                return Stack(
+                  children: [
+                    Card(
+                      elevation:0,
+                      //margin: EdgeInsets.symmetric(vertical:1,horizontal:5),
+                      color:Colors.white70,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(9.0),
+                        side: BorderSide(color:_data[index]["color_var"]??true?Colors.white:Colors.green, width: 2),
+                      ),
 
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor:getRandomColor(),
-                      child: Icon(_getRandomIcon()),
-                    ),
-                    title:Row(
-                      children: [
-                        Expanded(
-                          flex: 1,
-                          child: Stack(
-                            children: [
+                      child: ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor:getRandomColor(),
+                          child: Icon(_getRandomIcon()),
+                        ),
+                        title:Row(
+                          children: [
+                            Expanded(
+                              flex: 1,
+                              child: Stack(
+                                children: [
 
-                              Padding(
-                                padding: const EdgeInsets.fromLTRB(0, 10, 0, 2),
-                                child:                   Text.rich(
-                                    style: DefaultTextStyle.of(context).style,
-                                    TextSpan(
-                                        children: [
-
-
-                                          TextSpan(
-                                            style:TextStyle(
-                                                fontSize:fontSizeData
-                                              // color: Colors.blue, // Set the text color to red
-
-                                            ),
-                                            text: '${_data[index]['productCode'].toUpperCase()}',
-
-                                          ),
-                                           TextSpan(
-                                            style:TextStyle(
-                                                fontSize:fontSizeData
-                                              // color: Colors.blue, // Set the text color to red
-
-                                            ),
-                                            text: '(',
-
-                                          ),
-                                          WidgetSpan(
-
-                                            child: IntrinsicWidth(
-
-                                              stepWidth: 0.5,
-                                              child: TextField(
-
-                                                controller: TextEditingController(text:"${(_data[index]['pcs']=='none')?'0':_data[index]['pcs']}"),
-
-                                                keyboardType: TextInputType.number,
-                                                decoration: const InputDecoration(
-                                                  hintText:"",
-                                                  hintStyle: TextStyle(color: Colors.blue),
-                                                  contentPadding: EdgeInsets.all(0),
-                                                  isDense: true,
+                                  Padding(
+                                    padding: const EdgeInsets.fromLTRB(0, 10, 0, 2),
+                                    child:                   Text.rich(
+                                        style: DefaultTextStyle.of(context).style,
+                                        TextSpan(
+                                            children: [
 
 
-
-                                                ),
+                                              TextSpan(
                                                 style:TextStyle(
-                                                  color: Colors.blue,
-                                                  fontSize:fontSizeData,
-                                                  // Set the text color to red
+                                                    fontSize:fontSizeData
+                                                  // color: Colors.blue, // Set the text color to red
 
                                                 ),
-                                                onChanged: (text) {
-                                                  if((int.tryParse(text) != null)){
+                                                text: '${_data[index]['productCode'].toUpperCase()}',
 
-                                                    pcs=text;
-                                                    productCode1=_data[index]["productCode"];
-                                                    actionStatus="updatePcs";
-
-                                                  }
-                                                  else{
-                                                    (Get.put(StockQuery()).updateHideaddCart(true));
-                                                  }
-
-
-
-
-                                                },
-                                              ), // set minimum width to 100
-                                            ),
-                                          ),
-                                          TextSpan(
-                                            style:TextStyle(
-                                                fontSize:fontSizeData
-                                              // color: Colors.blue, // Set the text color to red
-
-                                            ),
-                                            text: 'Pcs)',
-
-                                          ),
-
-                                           TextSpan(
-                                            style:TextStyle(
-                                                fontSize:fontSizeData
-                                              // color: Colors.blue, // Set the text color to red
-
-                                            ),
-                                            text: '1X',
-
-                                          ),
-                                          WidgetSpan(
-                                            style: DefaultTextStyle.of(context).style,
-                                            child: IntrinsicWidth(
-                                              stepWidth: 0.5,
-                                              child: TextField(
-                                                controller: TextEditingController(text:"${_data[index]["price"]}"),
-
-                                                keyboardType: TextInputType.number,
-                                                decoration: const InputDecoration(
-                                                  hintText:"",
-                                                  hintStyle: TextStyle(color: Colors.blue),
-                                                  contentPadding: EdgeInsets.all(0),
-                                                  isDense: true,
-
-
+                                              ),
+                                              TextSpan(
+                                                style:TextStyle(
+                                                    fontSize:fontSizeData
+                                                  // color: Colors.blue, // Set the text color to red
 
                                                 ),
-                                                style: TextStyle(
-                                                  color: Colors.blue,
-                                                    fontSize:fontSizeData// Set the text color to red
+                                                text: '(',
+
+                                              ),
+                                              WidgetSpan(
+
+                                                child: IntrinsicWidth(
+
+                                                  stepWidth: 0.5,
+                                                  child: TextField(
+
+                                                    controller: TextEditingController(text:"${(_data[index]['pcs']=='none')?'0':_data[index]['pcs']}"),
+
+                                                    keyboardType: TextInputType.number,
+                                                    decoration: const InputDecoration(
+                                                      hintText:"",
+                                                      hintStyle: TextStyle(color: Colors.blue),
+                                                      contentPadding: EdgeInsets.all(0),
+                                                      isDense: true,
+
+
+
+                                                    ),
+                                                    style:TextStyle(
+                                                      color: Colors.blue,
+                                                      fontSize:fontSizeData,
+                                                      // Set the text color to red
+
+                                                    ),
+                                                    onChanged: (text) {
+                                                      if((int.tryParse(text) != null)){
+
+                                                        pcs=text;
+                                                        productCode1=_data[index]["productCode"];
+                                                        actionStatus="updatePcs";
+
+                                                      }
+                                                      else{
+                                                        (Get.put(StockQuery()).updateHideaddCart(true));
+                                                      }
+
+
+
+
+                                                    },
+                                                  ), // set minimum width to 100
+                                                ),
+                                              ),
+                                              TextSpan(
+                                                style:TextStyle(
+                                                    fontSize:fontSizeData
+                                                  // color: Colors.blue, // Set the text color to red
 
                                                 ),
-                                                onChanged: (text) {
+                                                text: 'Pcs)',
 
-                                                  if((int.tryParse(text) != null)){
-                                                    price1=text;
-                                                    productCode1=_data[index]["productCode"];
-                                                    actionStatus="updatePrice";
+                                              ),
 
-                                                  }
-                                                  else{
+                                              TextSpan(
+                                                style:TextStyle(
+                                                    fontSize:fontSizeData
+                                                  // color: Colors.blue, // Set the text color to red
+
+                                                ),
+                                                text: '1X',
+
+                                              ),
+                                              WidgetSpan(
+                                                style: DefaultTextStyle.of(context).style,
+                                                child: IntrinsicWidth(
+                                                  stepWidth: 0.5,
+                                                  child: TextField(
+                                                    controller: TextEditingController(text:"${_data[index]["price"]}"),
+
+                                                    keyboardType: TextInputType.number,
+                                                    decoration: const InputDecoration(
+                                                      hintText:"",
+                                                      hintStyle: TextStyle(color: Colors.blue),
+                                                      contentPadding: EdgeInsets.all(0),
+                                                      isDense: true,
 
 
-                                                  }
+
+                                                    ),
+                                                    style: TextStyle(
+                                                        color: Colors.blue,
+                                                        fontSize:fontSizeData// Set the text color to red
+
+                                                    ),
+                                                    onChanged: (text) {
+
+                                                      if((int.tryParse(text) != null)){
+                                                        price1=text;
+                                                        productCode1=_data[index]["productCode"];
+                                                        actionStatus="updatePrice";
+
+                                                      }
+                                                      else{
+
+
+                                                      }
 
 
 
 
-                                                },
-                                              ), // set minimum width to 100
-                                            ),
+                                                    },
+                                                  ), // set minimum width to 100
+                                                ),
+                                              ),
+                                            ]
+                                        )
+                                    ),
+                                  ),
+
+
+                                ],
+                              ),
+                            )
+
+
+
+
+
+
+                          ],
+                        ),
+
+                        subtitle: Padding(
+                          padding: const EdgeInsets.fromLTRB(0, 5, 0, 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Wrap(
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                children: [
+
+
+                                  Text("Qty:${num.parse(_data[index]['qty'])-num.parse(_data[index]['qty_sold'])} X ${_data[index]['price']}=${(num.parse(_data[index]['qty'])-num.parse(_data[index]['qty_sold']))*num.parse(_data[index]['price'])}", style:TextStyle(
+                                      fontSize:fontSizeData
+                                    // color: Colors.blue, // Set the text color to red
+
+                                  ),),
+
+
+                                ],
+
+
+                              ),
+                              const SizedBox(height: 5,),
+                              // Text("tags:${_data[index]['tags']}"),
+                              Text.rich(
+                                  style: DefaultTextStyle.of(context).style,
+                                  TextSpan(
+                                      children: [
+
+                                        TextSpan(
+                                          style:TextStyle(
+                                            fontSize:fontSizeData,
+                                            color: Colors.grey, // Set the text color to red
+
                                           ),
-                                        ]
-                                    )
-                                ),
+                                          text: 'Name:',
+
+                                        ),
+
+                                        WidgetSpan(
+                                          //style: DefaultTextStyle.of(context).style,
+                                          child: IntrinsicWidth(
+                                            //stepWidth: 0.5,
+                                            child:  TextField(
+                                              controller: TextEditingController(text:"${(_data[index]['ProductName']).toUpperCase()}"),
+
+
+                                              decoration: const InputDecoration(
+                                                hintText:"",
+                                                hintStyle: TextStyle(color: Colors.blue),
+                                                contentPadding: EdgeInsets.all(0),
+                                                isDense: true,
+
+
+
+                                              ),
+                                              style:  TextStyle(
+                                                  fontSize: fontSizeData
+                                                // color: Colors.blue, // Set the text color to red
+
+                                              ),
+                                              onChanged: (text) {
+
+
+
+                                                productName1=text;
+                                                productCode1=_data[index]["productCode"];
+                                                actionStatus="updateProductName";
+
+
+
+
+
+
+
+                                              },
+                                            ), // set minimum width to 100
+                                          ),
+                                        ),
+                                      ]
+                                  )
+
                               ),
 
-
                             ],
                           ),
-                        )
+                        ),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.save,color:Colors.deepOrange), // Replace with your desired icon
+                          onPressed: () {
+                            // attachPicture();
+                            // Add your button press logic here
+                            updateProducts();
+                          },
+                        ),
 
-
-
-
-
-
-                      ],
-                    ),
-
-                    subtitle: Padding(
-                      padding: const EdgeInsets.fromLTRB(0, 5, 0, 10),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Wrap(
-                            crossAxisAlignment: WrapCrossAlignment.center,
-                            children: [
-
-
-                              Text("Qty:${num.parse(_data[index]['qty'])-num.parse(_data[index]['qty_sold'])} X ${_data[index]['price']}=${(num.parse(_data[index]['qty'])-num.parse(_data[index]['qty_sold']))*num.parse(_data[index]['price'])}", style:TextStyle(
-                                  fontSize:fontSizeData
-                                // color: Colors.blue, // Set the text color to red
-
-                              ),),
-
-
-                            ],
-
-
-                          ),
-                          const SizedBox(height: 5,),
-                          // Text("tags:${_data[index]['tags']}"),
-                          Text.rich(
-                              style: DefaultTextStyle.of(context).style,
-                              TextSpan(
-                                  children: [
-
-                                     TextSpan(
-                                      style:TextStyle(
-                                          fontSize:fontSizeData,
-                                         color: Colors.grey, // Set the text color to red
-
-                                      ),
-                                      text: 'Name:',
-
-                                    ),
-
-                                    WidgetSpan(
-                                      //style: DefaultTextStyle.of(context).style,
-                                      child: IntrinsicWidth(
-                                        //stepWidth: 0.5,
-                                        child:  TextField(
-                                          controller: TextEditingController(text:"${(_data[index]['ProductName']).toUpperCase()}"),
-
-
-                                          decoration: const InputDecoration(
-                                            hintText:"",
-                                            hintStyle: TextStyle(color: Colors.blue),
-                                            contentPadding: EdgeInsets.all(0),
-                                            isDense: true,
-
-
-
-                                          ),
-                                          style:  TextStyle(
-                                              fontSize: fontSizeData
-                                            // color: Colors.blue, // Set the text color to red
-
-                                          ),
-                                          onChanged: (text) {
-
-
-
-                                            productName1=text;
-                                            productCode1=_data[index]["productCode"];
-                                            actionStatus="updateProductName";
-
-
-
-
-
-
-
-                                          },
-                                        ), // set minimum width to 100
-                                      ),
-                                    ),
-                                  ]
-                              )
-
-                          ),
-                        ],
+                        //trailing: Text()
                       ),
                     ),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.save,color:Colors.deepOrange), // Replace with your desired icon
-                      onPressed: () {
-                        // Add your button press logic here
-                        updateProducts();
-                      },
+                    Positioned(
+                      top: -10,
+                      right: 3,
+                      child: GestureDetector(
+                        onTap: () {
+                          //Map<String, dynamic> jsonObject = jsonDecode(_data[index]["img_url"]);
+                          //print("${jsonObject}");
+                          //print(_data[index]);
+                          //print(Get.put(S))
+                          attachPicture(_data[index]["productCode"]);
+                        },
+                        child: Container(
+                          width: 50,
+                          height: 50,
+                          decoration: BoxDecoration(
+                           // color: Colors.greenAccent,
+                            //shape: BoxShape.circle,
+                          ),
+                          child: Center(
+                            child: Icon(
+                              Icons.attach_file,
+                              size: 30,
+                              color: Colors.grey[700],
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
-
-                    //trailing: Text()
-                  ),
+                  ],
                 );
 
               }
@@ -1298,6 +1418,93 @@ final fontSizeData=13.0;
 
   }
 
+  void attachPicture(productCode){
+
+    print("code:${productCode}  link:${ConstantClassUtil.urlApp}/images/product/${productCode}_${(Get.put(AdminQuery()).obj)["result"][0]["subscriber"]}_1.jpg");
+    Get.bottomSheet(
+      StatefulBuilder(
+        builder: (BuildContext context, StateSetter setState) {
+          return
+            Container(
+              padding:const EdgeInsets.all(5.0),
+              height: 600,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(30),
+                  topRight: Radius.circular(30),
+                ),
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    ImageCardWidget(
+                      imgArguments:{
+                        "productCode":productCode,
+                        "editDisplay":"true",
+
+                      },
+                      mainImageUrl: '${ConstantClassUtil.urlApp}/images/product/${productCode}_${(Get.put(AdminQuery()).obj)["result"][0]["subscriber"]}_1.jpg?Ver=12',
+                      smallImageUrls: [
+                        '${ConstantClassUtil.urlApp}/images/product/${productCode}_${(Get.put(AdminQuery()).obj)["result"][0]["subscriber"]}_2.jpg?Ver=',
+                        '${ConstantClassUtil.urlApp}/images/product/${productCode}_${(Get.put(AdminQuery()).obj)["result"][0]["subscriber"]}_3.jpg?Ver=',
+                        '${ConstantClassUtil.urlApp}/images/product/${productCode}_${(Get.put(AdminQuery()).obj)["result"][0]["subscriber"]}_4.jpg?ver=',
+                            
+                      ], initialImageUrl: '${ConstantClassUtil.urlApp}/images/product/${productCode}_${(Get.put(AdminQuery()).obj)["result"][0]["subscriber"]}_1.jpg?Ver=12',
+                    ),
+                    Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          if (_imageFile != null)
+                            Image.file(
+                              File(_imageFile!.path),
+                              width: 200,
+                              height: 200,
+                            ),
+                          SizedBox(height: 20),
+                          Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              ListTile(
+                                leading: Icon(Icons.camera),
+                                title: Text('Camera'),
+                                onTap: () {
+                                  Navigator.pop(context);
+                                  _pickImage(ImageSource.camera);
+                                },
+                              ),
+                              ListTile(
+                                leading: Icon(Icons.image),
+                                title: Text('Gallery'),
+                                onTap: () {
+                                  Navigator.pop(context);
+                                  _pickImage(ImageSource.gallery);
+                                },
+                              ),
+                            ],
+                          ),
+                            
+                          SizedBox(height: 20),
+                          ElevatedButton(
+                            onPressed: _compressAndUploadImage,
+                            child: Text('Compress and upload image'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+        },
+      ),
+    ).whenComplete(() {
+      // Get.put(HideShowState()).isDelivery(0);
+      //do whatever you want after closing the bottom sheet
+    });
+  }
+
   void viewThisOrder() {
 
     Get.bottomSheet(
@@ -1576,7 +1783,36 @@ final fontSizeData=13.0;
 
   }
 
-
+  Future<void> _showImageSourceBottomSheet(BuildContext context) async {
+    await showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              ListTile(
+                leading: Icon(Icons.camera),
+                title: Text('Camera'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickImage(ImageSource.camera);
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.image),
+                title: Text('Gallery'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickImage(ImageSource.gallery);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
 //
 }

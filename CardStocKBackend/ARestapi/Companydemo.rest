@@ -2,7 +2,7 @@
 @email=kopa@gmail.com
 @PhoneNumber=ceke@gmail.com
 @password=1
-@Auth_token=431|aZYthavpHxXhak6Q3vbFAVCZmrC6gUzEVA3M4UXK
+@Auth_token=505|GuVlaXRswz5LDJTJaV9vr3EwUxMtmCFJAfIdzLyj
 
 ### Company Login with email
 POST  {{baseUrl}}/AdminLoginEmail/
@@ -23,6 +23,16 @@ Content-Type: application/json
 "password": "{{password}}"
 }
 
+###upload
+POST  {{baseUrl}}/upload
+content-type: application/json;charset=UTF-8
+Authorization: Bearer {{Auth_token}}
+
+{
+"name": "kebine eric Muna"
+
+
+}
 
 ###Company Create User
 POST  {{baseUrl}}/CreateUser

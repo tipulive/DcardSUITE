@@ -2,7 +2,7 @@
 @email=company@gmail.com
 @PhoneNumber=+250782389359
 @password=1
-@Auth_token=422|Aljq67Y9Q90cnMZnhKvD927J1IWAfhlxSvO5sbhm
+@Auth_token=794|Ow6Hyt0cJgOrldYGHLqUxwMEu5CUCwiZgw8jmsfu
 
 ### Company Login with email
 POST  {{baseUrl}}/AdminLoginEmail/
@@ -227,6 +227,16 @@ Authorization: Bearer {{Auth_token}}
 
 {
 "numberQr": "kebine eric Muna"
+
+}
+### upload file
+###Company Create Card single card depricated
+POST  {{baseUrl}}/upload
+content-type: application/json;charset=UTF-8
+Authorization: Bearer {{Auth_token}}
+
+{
+
 
 }
 ###Company Create Multiple Card
@@ -679,24 +689,33 @@ Authorization: Bearer {{Auth_token}}
 
 {
 "productCode":"none",
-"productName":"we",
+"productName":"none",
 "productQr":"none",
 "LimitStart":1,
 "LimitEnd":10,
-"isProductAction":"totalStoc",
+"isProductAction":"search",
 "withTotal":"true"
 
 
 
 }
-
-### printQrProduct
+### print Qr code on product
 GET  {{baseUrl}}/printQrProduct
 content-type: application/json;charset=UTF-8
 Authorization: Bearer {{Auth_token}}
 
 {
-"productCode":"webcam_1700726985"
+
+
+
+}
+### create Qr code on product
+GET  {{baseUrl}}/createQrProduct
+content-type: application/json;charset=UTF-8
+Authorization: Bearer {{Auth_token}}
+
+{
+
 
 
 }
@@ -814,9 +833,9 @@ content-type: application/json;charset=UTF-8
 Authorization: Bearer {{Auth_token}}
 
 {
-"productCode":"nyota",
-"uidClient":"kebineericMuna_1674160265",
-"req_qty":40,
+"productCode":"ibishyimbo",
+"uidClient":"ERICMUSHI_1688628812",
+"req_qty":35,
 "ref":"test",
 "comment":"ok",
 "statusForm":"none",
@@ -834,11 +853,11 @@ content-type: application/json;charset=UTF-8
 Authorization: Bearer {{Auth_token}}
 
 {
-"productCode":"webcam_1700726985",
-"req_qty":9.6,
-"currentQtyEdit":5.6,
-"uid":"UID_En_1705562807",
-"uidClient":"kebineericMuna_1674160265",
+"productCode":"ibishyimbo",
+"req_qty":55,
+"currentQtyEdit":15,
+"uid":"UID_9R_1717426384",
+"uidClient":"ERICMUSHI_1688628812",
 "statusForm":"editOrder"
 
 
@@ -851,8 +870,8 @@ content-type: application/json;charset=UTF-8
 Authorization: Bearer {{Auth_token}}
 
 {
-"productCode":"webcam_1700726985",
-"uid":"OrderId_8b_1701507455"
+"productCode":"3011",
+"uid":"UID_6i_1716325666"
 
 }
 
@@ -880,6 +899,23 @@ Authorization: Bearer {{Auth_token}}
 "OrderId":"UID_e2_1707876339",
 "inputData":"30",
 "all_total":"250",
+"reach":"1200",
+"gain":"350",
+"systemUid":"PointSales1"
+
+
+}
+
+### utility submitOrder,uidUser is card
+POST  {{baseUrl}}/utilitySubmitOrder
+Content-Type: application/json
+Authorization: Bearer {{Auth_token}}
+
+{
+"productCode":"snel",
+"uid":"Nyota_1672353378",
+"uidUser":"99890",
+"inputData":"60",
 "reach":"1200",
 "gain":"350",
 "systemUid":"PointSales1"
@@ -1056,7 +1092,7 @@ Authorization: Bearer {{Auth_token}}
 
 {
 
-"cardUid":"TEALTD_7hEnj_1672352175"
+"cardUid":"TEALTD_gcKxX_1686942109"
 
 
 
@@ -1068,8 +1104,8 @@ Authorization: Bearer {{Auth_token}}
 
 {
 
-"uidUser":"kebineericMuna_1674160265",
-"inputData":100,
+"uidUser":"TEALTD",
+"inputData":-5300,
 "all_total":"215",
 "ref":"Eric",
 "reach":"1200",
@@ -1088,8 +1124,8 @@ Authorization: Bearer {{Auth_token}}
 
 {
 
-"uidUser":"kebineericMuna_1674160265",
-"inputData":100,
+"uidUser":"TEALTD",
+"inputData":595,
 "all_total":"215",
 "ref":"Eric",
 "reach":"1200",
@@ -1107,9 +1143,9 @@ Content-Type: application/json
 Authorization: Bearer {{Auth_token}}
 
 {
-"viewAll":"fa",
+"viewAll":"true",
 "searchOption":false,
-"name":"m"
+"name":"ERIC"
 }
 ### done but not by SystemUid
 
@@ -1160,8 +1196,8 @@ Content-Type: application/json
 Authorization: Bearer {{Auth_token}}
 
 {
-"uidReceiver":"kebineericMuna_1668935525",
-"amount":100
+"uidReceiver":"KARERAMULUMBAALEXIS_1688718925",
+"amount":2500
 }
 
 ### Confirm Payment
@@ -1171,7 +1207,7 @@ Authorization: Bearer {{Auth_token}}
 
 {
 
-"uid":"PID_j7_1704746516"
+"uid":"PID_p6_1717317416"
 
 
 

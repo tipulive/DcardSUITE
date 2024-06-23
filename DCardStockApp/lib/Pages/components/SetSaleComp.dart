@@ -54,14 +54,14 @@ class _SetSaleCompState extends State<SetSaleComp> {
 
   bool showOveray=false;
 
-String advancedSearch="today";
-String viewTitle="Today";
+  String advancedSearch="today";
+  String viewTitle="Today";
 
-DateTime selectedDate=DateTime.now();
-DateTimeRange selectedDateRange=DateTimeRange(
-    start: DateTime.now(),
-    end: DateTime.now()
-);
+  DateTime selectedDate=DateTime.now();
+  DateTimeRange selectedDateRange=DateTimeRange(
+      start: DateTime.now(),
+      end: DateTime.now()
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -114,381 +114,381 @@ DateTimeRange selectedDateRange=DateTimeRange(
             ),
 
             child: ListTile(
-                leading: CircleAvatar(
-                  backgroundColor:getRandomColor(),
-                  child: Icon(_getRandomIcon()),
-                ),
-                title:Row(
-                  children: [
+              leading: CircleAvatar(
+                backgroundColor:getRandomColor(),
+                child: Icon(_getRandomIcon()),
+              ),
+              title:Row(
+                children: [
 
 
-                    Expanded(
-                      flex: 1,
-                      child: Stack(
-                        children: [
-
-                          Column(
-                            children: [
-
-                              Center(
-                                child: RichText(
-                                  text: TextSpan(
-                                    text: "Total:",
-                                    style: DefaultTextStyle.of(context).style,
-                                    children: const <TextSpan>[
-
-
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-
-
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-
-                subtitle: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Column(
-
+                  Expanded(
+                    flex: 1,
+                    child: Stack(
                       children: [
-                        Wrap(
-                          crossAxisAlignment: WrapCrossAlignment.center,
+
+                        Column(
                           children: [
 
-                            const Icon(Icons.segment,color:Colors.orange,size:13,),
-                            Text("${(_data.isNotEmpty)?_data[0]['saleBalance']:0}",style:GoogleFonts.pacifico(fontSize:15,color: Colors.orange,fontWeight: FontWeight.w700)),
+                            Center(
+                              child: RichText(
+                                text: TextSpan(
+                                  text: "Total:",
+                                  style: DefaultTextStyle.of(context).style,
+                                  children: const <TextSpan>[
 
 
+                                  ],
+                                ),
+                              ),
+                            ),
                           ],
                         ),
 
 
-
-
-
-
                       ],
                     ),
+                  ),
+                ],
+              ),
 
-                  ],
-                ),
-                trailing:PopupMenuButton(
-                  itemBuilder:(container)=>[
-                    PopupMenuItem(
-                        child: InkWell(
-                          onTap: () async{
-                            setState(() {
-                              advancedSearch="today";
-                              viewTitle="today";
+              subtitle: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Column(
 
-                            });
-                            await viewData('test',"false");
+                    children: [
+                      Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
 
-                          },
-                          child: Column(
-                            children: [
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              Row(
-                                children: const [
-                                  Icon(
-                                    Icons.today,
-                                    color: Colors.blue,
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.only(left:10.0),
-                                    child: Text("Today"),
-                                  ),
+                          const Icon(Icons.segment,color:Colors.orange,size:13,),
+                          Text("${(_data.isNotEmpty)?_data[0]['saleBalance']:0}",style:GoogleFonts.pacifico(fontSize:15,color: Colors.orange,fontWeight: FontWeight.w700)),
 
-                                ],
-                              ),
-                              const Divider(
-                                height: 20, // Adjust the height as needed
-                                thickness: 0.2, // Adjust the thickness as needed
-                                color: Colors.grey,
-                              ),
 
-                            ],
-                          ),
-                        )
-                    ),
-                    PopupMenuItem(
-                        child: InkWell(
-                          onTap: () async{
-                            setState(() {
-                              advancedSearch="week";
-                              viewTitle="This Week";
-
-                            });
-                            await viewData('test',"false");
-                          },
-                          child: Column(
-                            children: [
-                              Row(
-                                children: const [
-                                  Icon(
-                                    Icons.calendar_view_week,
-                                    color: Colors.orange,
-                                  ),
-
-                                  Padding(
-                                    padding: EdgeInsets.only(left:10.0),
-                                    child: Text("This Week"),
-                                  ),
-
-                                ],
-                              ),
-                              const Divider(
-                                height: 20, // Adjust the height as needed
-                                thickness: 0.2, // Adjust the thickness as needed
-                                color: Colors.grey,
-                              ),
-
-                            ],
-                          ),
-                        )
-                    ),
-                    PopupMenuItem(
-                        child: InkWell(
-                          onTap: () async{
-                            setState(() {
-                              advancedSearch="month";
-                              viewTitle="This Month";
-
-                            });
-                            await viewData('test',"false");
-                          },
-                          child: Column(
-                            children: [
-                              Row(
-                                children: const [
-                                  Icon(
-                                    Icons.calendar_month,
-                                    color: Colors.orange,
-                                  ),
-
-                                  Padding(
-                                    padding: EdgeInsets.only(left:10.0),
-                                    child: Text("This Month"),
-                                  ),
-
-                                ],
-                              ),
-                              const Divider(
-                                height: 20, // Adjust the height as needed
-                                thickness: 0.2, // Adjust the thickness as needed
-                                color: Colors.grey,
-                              ),
-
-                            ],
-                          ),
-                        )
-                    ),
-                    PopupMenuItem(
-                        child: InkWell(
-                          onTap: () async{
-                            setState(() {
-
-                              advancedSearch="year";
-                              viewTitle="This Year";
-                            });
-                            await viewData('test',"false");
-                          },
-                          child: Column(
-                            children: [
-                              Row(
-                                children: const [
-                                  Icon(
-                                    Icons.event_available,
-                                    color: Colors.orange,
-                                  ),
-
-                                  Padding(
-                                    padding: EdgeInsets.only(left:10.0),
-                                    child: Text("This Year"),
-                                  ),
-
-                                ],
-                              ),
-                              const Divider(
-                                height: 20, // Adjust the height as needed
-                                thickness: 0.2, // Adjust the thickness as needed
-                                color: Colors.grey,
-                              ),
-
-                            ],
-                          ),
-                        )
-                    ),
-                    PopupMenuItem(
-                        child: InkWell(
-                          onTap: () async{
-                            /*setState(() {
-
-                              advancedSearch="year";
-                              viewTitle="This Year";
-                            });
-                            await viewData('test',"false");*/
-                            final DateTime? datetime= await showDatePicker(
-                                context: context,
-                                initialDate: selectedDate,
-                                firstDate: DateTime(2024),
-                                lastDate: DateTime(2100));
-                            if(datetime!=null  && datetime != selectedDate){
-                              setState(() {
-                                advancedSearch="choosedate";
-                                selectedDate=datetime;
-
-                                thisDate="${selectedDate.year}-${selectedDate.month}-${selectedDate.day}";
-                                viewTitle="Date:$thisDate";
-                              });
-                              Navigator.pop(context);
-                              await viewData('test',"false");
-                              //print("${selectedDate.year}-${selectedDate.month}-${selectedDate.day}");
-                            }
-                          },
-                          child: Column(
-                            children: [
-                              Row(
-                                children: const [
-                                  Icon(
-                                    Icons.event_note,
-                                    color: Colors.pink,
-                                  ),
-
-                                  Padding(
-                                    padding: EdgeInsets.only(left:10.0),
-                                    child: Text("Choose Date"),
-                                  ),
-
-                                ],
-                              ),
-                              const Divider(
-                                height: 20, // Adjust the height as needed
-                                thickness: 0.2, // Adjust the thickness as needed
-                                color: Colors.grey,
-                              ),
-
-                            ],
-                          ),
-                        )
-                    ),
-                    PopupMenuItem(
-                        child: InkWell(
-                          onTap: () async{
-                            /*setState(() {
-
-                              advancedSearch="year";
-                              viewTitle="This Year";
-                            });
-                            await viewData('test',"false");*/
-                            final DateTimeRange? datetimeRange= await showDateRangePicker(
-                                context: context,
-                                firstDate: DateTime(2024),
-                                lastDate: DateTime(2100));
-                            if(datetimeRange!=null){
-                              setState(() {
-                                advancedSearch="choosedaterange";
-                                selectedDateRange=datetimeRange;
-
-                                thisDate="${selectedDateRange.start.year}-${selectedDateRange.start.month}-${selectedDateRange.start.day}";
-                                toDate="${selectedDateRange.end.year}-${selectedDateRange.end.month}-${selectedDateRange.end.day}";
-                                viewTitle="From:$thisDate To $toDate";
-                              });
-                              await viewData('test',"false");
-                            }
-                          },
-                          child: Column(
-                            children: [
-                              Row(
-                                children: const [
-                                  Icon(
-                                    Icons.date_range,
-                                    color: Colors.pink,
-                                  ),
-
-                                  Padding(
-                                    padding: EdgeInsets.only(left:10.0),
-                                    child: Text("Date Range"),
-                                  ),
-
-                                ],
-                              ),
-                              const Divider(
-                                height: 20, // Adjust the height as needed
-                                thickness: 0.2, // Adjust the thickness as needed
-                                color: Colors.grey,
-                              ),
-
-                            ],
-                          ),
-                        )
-                    ),
-                    PopupMenuItem(
-                        child: InkWell(
-                          onTap: () async{
-                            setState(() {
-                              advancedSearch="mysales";
-                              viewTitle="My Sales";
-
-                            });
-                            await viewData('test',"false");
-                          },
-                          child: Column(
-                            children: [
-                              Row(
-                                children: const [
-                                  Icon(
-                                    Icons.apartment,
-                                    color: Colors.orange,
-                                  ),
-
-                                  Padding(
-                                    padding: EdgeInsets.only(left:10.0),
-                                    child: Text("All My Sales"),
-                                  ),
-
-                                ],
-                              ),
-                              const Divider(
-                                height: 20, // Adjust the height as needed
-                                thickness: 0.2, // Adjust the thickness as needed
-                                color: Colors.grey,
-                              ),
-
-                            ],
-                          ),
-                        )
-                    ),
-
-                  ],
-                  offset: const Offset(0, 40),
-                  child:InkWell(
-
-                    child: Ink(
-                      decoration: ShapeDecoration(
-                        color: Colors.grey.withOpacity(0.2),
-                        shape: const CircleBorder(),
+                        ],
                       ),
-                      child: const Padding(
-                        padding: EdgeInsets.all(5.0),
-                        child: Icon(
 
-                          Icons.grid_view, // Replace with your desired icon
-                          color: Colors.pink,
+
+
+
+
+
+                    ],
+                  ),
+
+                ],
+              ),
+              trailing:PopupMenuButton(
+                itemBuilder:(container)=>[
+                  PopupMenuItem(
+                      child: InkWell(
+                        onTap: () async{
+                          setState(() {
+                            advancedSearch="today";
+                            viewTitle="today";
+
+                          });
+                          await viewData('test',"false");
+
+                        },
+                        child: Column(
+                          children: [
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Row(
+                              children: const [
+                                Icon(
+                                  Icons.today,
+                                  color: Colors.blue,
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.only(left:10.0),
+                                  child: Text("Today"),
+                                ),
+
+                              ],
+                            ),
+                            const Divider(
+                              height: 20, // Adjust the height as needed
+                              thickness: 0.2, // Adjust the thickness as needed
+                              color: Colors.grey,
+                            ),
+
+                          ],
                         ),
+                      )
+                  ),
+                  PopupMenuItem(
+                      child: InkWell(
+                        onTap: () async{
+                          setState(() {
+                            advancedSearch="week";
+                            viewTitle="This Week";
+
+                          });
+                          await viewData('test',"false");
+                        },
+                        child: Column(
+                          children: [
+                            Row(
+                              children: const [
+                                Icon(
+                                  Icons.calendar_view_week,
+                                  color: Colors.orange,
+                                ),
+
+                                Padding(
+                                  padding: EdgeInsets.only(left:10.0),
+                                  child: Text("This Week"),
+                                ),
+
+                              ],
+                            ),
+                            const Divider(
+                              height: 20, // Adjust the height as needed
+                              thickness: 0.2, // Adjust the thickness as needed
+                              color: Colors.grey,
+                            ),
+
+                          ],
+                        ),
+                      )
+                  ),
+                  PopupMenuItem(
+                      child: InkWell(
+                        onTap: () async{
+                          setState(() {
+                            advancedSearch="month";
+                            viewTitle="This Month";
+
+                          });
+                          await viewData('test',"false");
+                        },
+                        child: Column(
+                          children: [
+                            Row(
+                              children: const [
+                                Icon(
+                                  Icons.calendar_month,
+                                  color: Colors.orange,
+                                ),
+
+                                Padding(
+                                  padding: EdgeInsets.only(left:10.0),
+                                  child: Text("This Month"),
+                                ),
+
+                              ],
+                            ),
+                            const Divider(
+                              height: 20, // Adjust the height as needed
+                              thickness: 0.2, // Adjust the thickness as needed
+                              color: Colors.grey,
+                            ),
+
+                          ],
+                        ),
+                      )
+                  ),
+                  PopupMenuItem(
+                      child: InkWell(
+                        onTap: () async{
+                          setState(() {
+
+                            advancedSearch="year";
+                            viewTitle="This Year";
+                          });
+                          await viewData('test',"false");
+                        },
+                        child: Column(
+                          children: [
+                            Row(
+                              children: const [
+                                Icon(
+                                  Icons.event_available,
+                                  color: Colors.orange,
+                                ),
+
+                                Padding(
+                                  padding: EdgeInsets.only(left:10.0),
+                                  child: Text("This Year"),
+                                ),
+
+                              ],
+                            ),
+                            const Divider(
+                              height: 20, // Adjust the height as needed
+                              thickness: 0.2, // Adjust the thickness as needed
+                              color: Colors.grey,
+                            ),
+
+                          ],
+                        ),
+                      )
+                  ),
+                  PopupMenuItem(
+                      child: InkWell(
+                        onTap: () async{
+                          /*setState(() {
+
+                              advancedSearch="year";
+                              viewTitle="This Year";
+                            });
+                            await viewData('test',"false");*/
+                          final DateTime? datetime= await showDatePicker(
+                              context: context,
+                              initialDate: selectedDate,
+                              firstDate: DateTime(2024),
+                              lastDate: DateTime(2100));
+                          if(datetime!=null  && datetime != selectedDate){
+                            setState(() {
+                              advancedSearch="choosedate";
+                              selectedDate=datetime;
+
+                              thisDate="${selectedDate.year}-${selectedDate.month}-${selectedDate.day}";
+                              viewTitle="Date:$thisDate";
+                            });
+                            Navigator.pop(context);
+                            await viewData('test',"false");
+                            //print("${selectedDate.year}-${selectedDate.month}-${selectedDate.day}");
+                          }
+                        },
+                        child: Column(
+                          children: [
+                            Row(
+                              children: const [
+                                Icon(
+                                  Icons.event_note,
+                                  color: Colors.pink,
+                                ),
+
+                                Padding(
+                                  padding: EdgeInsets.only(left:10.0),
+                                  child: Text("Choose Date"),
+                                ),
+
+                              ],
+                            ),
+                            const Divider(
+                              height: 20, // Adjust the height as needed
+                              thickness: 0.2, // Adjust the thickness as needed
+                              color: Colors.grey,
+                            ),
+
+                          ],
+                        ),
+                      )
+                  ),
+                  PopupMenuItem(
+                      child: InkWell(
+                        onTap: () async{
+                          /*setState(() {
+
+                              advancedSearch="year";
+                              viewTitle="This Year";
+                            });
+                            await viewData('test',"false");*/
+                          final DateTimeRange? datetimeRange= await showDateRangePicker(
+                              context: context,
+                              firstDate: DateTime(2024),
+                              lastDate: DateTime(2100));
+                          if(datetimeRange!=null){
+                            setState(() {
+                              advancedSearch="choosedaterange";
+                              selectedDateRange=datetimeRange;
+
+                              thisDate="${selectedDateRange.start.year}-${selectedDateRange.start.month}-${selectedDateRange.start.day}";
+                              toDate="${selectedDateRange.end.year}-${selectedDateRange.end.month}-${selectedDateRange.end.day}";
+                              viewTitle="From:$thisDate To $toDate";
+                            });
+                            await viewData('test',"false");
+                          }
+                        },
+                        child: Column(
+                          children: [
+                            Row(
+                              children: const [
+                                Icon(
+                                  Icons.date_range,
+                                  color: Colors.pink,
+                                ),
+
+                                Padding(
+                                  padding: EdgeInsets.only(left:10.0),
+                                  child: Text("Date Range"),
+                                ),
+
+                              ],
+                            ),
+                            const Divider(
+                              height: 20, // Adjust the height as needed
+                              thickness: 0.2, // Adjust the thickness as needed
+                              color: Colors.grey,
+                            ),
+
+                          ],
+                        ),
+                      )
+                  ),
+                  PopupMenuItem(
+                      child: InkWell(
+                        onTap: () async{
+                          setState(() {
+                            advancedSearch="mysales";
+                            viewTitle="My Sales";
+
+                          });
+                          await viewData('test',"false");
+                        },
+                        child: Column(
+                          children: [
+                            Row(
+                              children: const [
+                                Icon(
+                                  Icons.apartment,
+                                  color: Colors.orange,
+                                ),
+
+                                Padding(
+                                  padding: EdgeInsets.only(left:10.0),
+                                  child: Text("All My Sales"),
+                                ),
+
+                              ],
+                            ),
+                            const Divider(
+                              height: 20, // Adjust the height as needed
+                              thickness: 0.2, // Adjust the thickness as needed
+                              color: Colors.grey,
+                            ),
+
+                          ],
+                        ),
+                      )
+                  ),
+
+                ],
+                offset: const Offset(0, 40),
+                child:InkWell(
+
+                  child: Ink(
+                    decoration: ShapeDecoration(
+                      color: Colors.grey.withOpacity(0.2),
+                      shape: const CircleBorder(),
+                    ),
+                    child: const Padding(
+                      padding: EdgeInsets.all(5.0),
+                      child: Icon(
+
+                        Icons.grid_view, // Replace with your desired icon
+                        color: Colors.pink,
                       ),
                     ),
                   ),
                 ),
+              ),
 
 
               //trailing: Text()

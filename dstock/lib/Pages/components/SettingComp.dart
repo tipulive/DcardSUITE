@@ -1,6 +1,8 @@
 
 
 
+import 'package:dstock/Query/StockQuery.dart';
+
 import '../../Pages/components/ProductComp.dart';
 import '../../Pages/components/SetAdminPaymentComp.dart';
 
@@ -32,9 +34,16 @@ import '../SetWithdrawBalancePage.dart';
 import '../employePage.dart';
 import '../components/SetSpendingComp.dart';
 import 'ContactComp.dart';
+import '../../Utilconfig/language/language.dart';
 
 
+class CountryModel {
+  final String name;
+  final String fName;
+  final String flag;
 
+  CountryModel({required this.name, required this.fName, required this.flag});
+}
 class SettingComp extends StatefulWidget {
   const SettingComp({super.key});
 
@@ -47,6 +56,19 @@ class _SettingCompState extends State<SettingComp> {
   bool showOveray=false;
   var balance="0";
   var bonus="0";
+  Language langV=Language();
+  var pageName="pageName";
+  final List<CountryModel> countries = [
+    CountryModel(name: 'English',fName:'English', flag: '🇺🇸'),
+
+    CountryModel(name: 'French',fName:'France', flag: 'FR'),
+    CountryModel(name: 'Kiswahili',fName:'Kiswahili',flag: '🇨🇩'),
+    CountryModel(name: 'Kinyarwanda', fName:'Rwanda',flag: '🇷🇼'), // Rwanda
+
+    // Add more countries as needed
+  ];
+
+  String? selectedCountry;
 
 
   @override
@@ -68,6 +90,18 @@ class _SettingCompState extends State<SettingComp> {
             ),
 
             divLine(),
+            GestureDetector(
+                onTap: (){
+                  dispatchOrder();
+                },
+                child: detailsProfile("${langV.languageV[(Get.put(StockQuery()).lang)][pageName]["title"]}",Icons.calendar_month_outlined,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,dispatchOrder)),//Last Time Purchase
+            const SizedBox(height:5,),
+            GestureDetector(
+                onTap: (){
+                  changeLanguage();
+                },
+                child: detailsProfile("Language",Icons.calendar_month_outlined,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,changeLanguage)),//Last Time Purchase
+            const SizedBox(height:5,),
             GestureDetector(
                 onTap: (){
                   dispatchOrder();
@@ -238,6 +272,9 @@ class _SettingCompState extends State<SettingComp> {
   {
     super.initState();
     //getapi();
+    selectedCountry='English';
+    langV.getLanguage();
+    //getLanguage();
     scrolldata();
 
   }
@@ -249,6 +286,60 @@ class _SettingCompState extends State<SettingComp> {
     super.dispose();
   }
 
+  changeLangWidget() async{
+    Get.dialog(
+      AlertDialog(
+        title: const Text('Change Language'),
+        content:DropdownButtonHideUnderline(
+          child: DropdownButton<String>(
+            value:selectedCountry,
+            onChanged: (newValue) {
+
+             //print(newValue);
+              setState(() {
+                selectedCountry=newValue!;
+                langV.saveData(newValue);
+              });
+            },
+            items:countries.map((country) {
+              return DropdownMenuItem<String>(
+                value: country.name,
+                child: Row(
+                  children: <Widget>[
+                    Text(country.flag),
+                    const SizedBox(width: 15),
+                    Text(country.name),
+                  ],
+                ),
+              );
+            }).toList(),
+          ),
+        ),
+        actions: [
+
+          ElevatedButton(
+            onPressed: () {
+              Get.back(); // close the alert dialog
+            },
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+  changeLanguage() async{
+
+    changeLangWidget();
+ /* String valueData="french";
+  setState(() {
+     langV.saveData(valueData);
+
+  });*/
+
+
+
+
+  }
   scrolldata()async
   {
     if(showOveray) return;
@@ -355,6 +446,7 @@ Widget detailsProfile(iconText,icon,iconDescr,listBackground,iconrightText,iconr
 
           ),
           const SizedBox(width:3,),
+
           Text(iconText+":",style:GoogleFonts.pacifico(fontSize:15,color: Colors.teal,fontWeight: FontWeight.w700)),
           const SizedBox(width:5,),
           Expanded(
@@ -392,6 +484,7 @@ dispatchOrder() async{
   Get.to(() =>const SetOrderPage());
 
 }
+
 sales()async{
 
   Get.to(() =>const SetSalePage());

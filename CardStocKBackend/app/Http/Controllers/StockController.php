@@ -3,12 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\ParticipateController;
 use DB;
 use Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Cache;
-
+//Sandbox
 class StockController extends Controller
 {
     //
@@ -27,7 +28,281 @@ class StockController extends Controller
         $this->Admin_Auth_result_error="0";//Admin auth result zero
         $this->platform1=env('PLATFORM3');
     }
+    public function upload(Request $request)
+{
 
+    $check=DB::select("select img_url from products where productCode=:productCode",[
+        "productCode"=>'nyota'
+    ]);
+    return response([
+        "status"=>$check,
+
+
+    ],200);
+    /*$actionStatus=$request->input("actionStatus");
+    if($actionStatus==='upload')
+    {
+     return $this->uploadImage($request);
+    }
+    else if($actionStatus==='setDefault')
+    {
+        return $this->setDefault($request);
+    }
+    else if($actionStatus==='EditUpload')
+    {
+return $this->EditImage($request);
+    }
+    else{
+
+    }*/
+
+}
+
+public function imageUpload(Request $request,$fileNumb,$isFilenameExist)
+{
+    $validator = Validator::make($request->all(), [
+        'image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+        'productCode' => 'required|string',
+    ]);
+
+    if ($validator->fails()) {
+        return [
+            'status' => false,
+            'msg' => 'Validation failed',
+            'errors' => $validator->errors()
+        ];
+    }
+
+    try {
+        // Define the destination path for the image
+        $destinationPath = base_path('images/product');
+
+        // Generate a unique filename for the image
+        //$filename = time() . '.' . $request->file('image')->extension();
+
+$filename = ($isFilenameExist==="true")?$fileNumb:$request->input('productCode').'_'.Auth::user()->subscriber.'_'.$fileNumb.'.' . $request->file('image')->extension();
+//there $fileNumb is equal to existed filename
+        // Move the image to the destination path
+        $request->file('image')->move($destinationPath, $filename);
+        //this code will make cache Image to be easy Cache
+        $versionN=$request->input('versionN');
+DB::update("UPDATE products
+SET img_url = JSON_SET(img_url, '$.numb2', $versionN)
+WHERE productCode =:productCode and subscriber=:subscriber",[
+    "productCode"=>$request->input('productCode'),
+    "subscriber"=>Auth::user()->subscriber
+]);
+        return [
+            'status' => true,
+            'filename' => $filename
+        ];
+    } catch (\Exception $e) {
+        return [
+            'status' => false,
+            'msg' => 'File upload error',
+            'error' => $e->getMessage()
+        ];
+    }
+}
+public function uploadImage(Request $request)
+{
+    DB::beginTransaction();
+
+    try {
+
+   $input=$request->all();
+        $check=DB::table('products')
+            ->select('mult_imgurl')
+            ->where('productCode', $input['productCode'])
+            ->first();
+
+        if ($check->mult_imgurl === 'none') {
+            $uploadedFile = $this->imageUpload($request,1,"false");
+            if ($uploadedFile['status']) {
+                DB::update("UPDATE products SET  mult_imgurl = :mult_imgurl WHERE productCode = :productCode and subscriber=:subscriber", [
+                    //'img_url' => $uploadedFile['filename'],
+                    'subscriber' => Auth::user()->subscriber,
+                    'mult_imgurl' => 1,
+                    'productCode' => $input['productCode']
+                ]);
+
+                DB::table('product_images')->insert([
+                    'productCode' => $input['productCode'],
+                    'img_url' => $uploadedFile['filename'],
+                    'subscriber' => Auth::user()->subscriber,
+                    'created_at' => $this->today
+                ]);
+
+                DB::commit();
+
+                return response()->json([
+                    'status' => true,
+                    'filename' => $uploadedFile['filename']
+                ]);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'msg' => 'Image not uploaded'
+                ]);
+            }
+        } elseif ($check->mult_imgurl + 1 >= 5) {
+            // Enough pictures, three pictures only required
+
+            return response()->json([
+                'status' => false,
+                'msg' => 'Maximum of Four images allowed'
+            ]);
+        } else {
+            $fileNumb=$check->mult_imgurl+1;
+            $uploadedFile = $this->imageUpload($request,$fileNumb,"false");
+             DB::update("UPDATE products SET  mult_imgurl =mult_imgurl+:mult_imgurl WHERE productCode = :productCode", [
+
+                    'mult_imgurl' => 1,
+                    'productCode' => $input['productCode']
+                ]);
+            if ($uploadedFile['status']) {
+                DB::table('product_images')->insert([
+                    'productCode' => $input['productCode'],
+                    'img_url' => $uploadedFile['filename'],
+                    'subscriber' => Auth::user()->subscriber,
+                    'created_at' => $this->today
+                ]);
+
+                DB::commit();
+
+                return response()->json([
+                    'status' => true,
+                    'filename' => $uploadedFile['filename']
+                ]);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'msg' => 'Image not uploaded'
+                ]);
+            }
+        }
+    } catch (\Exception $e) {
+        DB::rollBack();
+
+        return response()->json([
+            'error' => 'An error occurred',
+            'errorPrint' => $e->getMessage(),
+            'errorCode' => $e->getLine(),
+        ], 500);
+    }
+}
+
+
+public function SetDefault(Request $request){
+
+
+    $dir = base_path('images/product/'); // Replace with the actual directory path
+
+
+
+    $file1 = $request->input('productCode').'_'.Auth::user()->subscriber.'_'.'1.jpg';
+    $file2 = $request->input("fileNam");
+    for ($i = strlen($file2) - 1; $i >= 0; $i--) {//this is try to get number to be updated
+
+        if (is_numeric($file2[$i])) {
+
+            $number ="numb"."".$file2[$i];
+            break;
+        }
+    }
+
+     $number;
+
+    // Create temporary file names
+    $tempFile1 = $dir . 'temp_' . $file1;
+    $tempFile2 = $dir . 'temp_' . $file2;
+
+    // Rename the files with detailed error messages
+    if (!file_exists($dir . $file1)) {
+        echo "Error: File $dir$file1 does not exist.";
+        exit;
+    }
+
+    if (!file_exists($dir . $file2)) {
+        echo "Error: File $dir$file2 does not exist.";
+        exit;
+    }
+
+    if (rename($dir . $file1, $tempFile1)) {
+        if (rename($dir . $file2, $tempFile2)) {
+            if (rename($tempFile1, $dir . $file2)) {
+                if (rename($tempFile2, $dir . $file1)) {
+                    //swap code
+                    DB::update("UPDATE products
+                    SET img_url = JSON_SET(
+                        JSON_SET(
+                            img_url,
+                            '$.$number',
+                            JSON_EXTRACT(img_url, '$.numb1')
+                        ),
+                        '$.numb1',
+                        JSON_EXTRACT(img_url, '$.$number')
+                    )
+                    WHERE productCode=:productCode and subscriber=:subscriber limit 1",[
+                        "productCode"=>$request->input('productCode'),
+                        "subscriber"=>Auth::user()->subscriber
+
+                    ]);
+
+                    echo "Files have been swapped successfully.";
+                } else {
+                    echo "Error: Failed to rename $tempFile2 to $dir$file1.";
+                }
+            } else {
+                echo "Error: Failed to rename $tempFile1 to $dir$file2.";
+            }
+        } else {
+            echo "Error: Failed to rename $dir$file2 to $tempFile2.";
+        }
+    } else {
+        echo "Error: Failed to rename $dir$file1 to $tempFile1.";
+    }
+
+
+
+
+
+
+
+}
+public function EditImage(Request $request){
+
+    $fileNam=$request->input("fileNam");
+
+   if($this->deleteImage($fileNam))
+   {
+ return $this->imageUpload($request,$fileNam,"true");
+   }
+   else{
+
+   }
+}
+public function deleteImage($fileNam){
+
+
+    // Path to the image file
+    $destinationPath = base_path('images/product');
+    $imagePath = $destinationPath.'/'.$fileNam;
+
+    // Check if the file exists
+    if (file_exists($imagePath)) {
+        // Attempt to delete the file
+        if (unlink($imagePath)) {
+            return true;
+        } else {
+            return false;
+        }
+    } else {
+        return false;
+    }
+
+
+    }
 
     public function SearchSafari($input){
         $item = strtolower($input["name"]);
@@ -196,42 +471,53 @@ class StockController extends Controller
 
     }
 
-    public function printQrProduct($input)
+    public function PrintQrProduct($input){
+        $check=DB::select("select *from products where subscriber=:subscriber and isQr=:isQr",array(
+            "subscriber"=>Auth::user()->subscriber,
+            "isQr"=>1
+            )
+        );
+
+        return response([
+            "status"=>true,
+            "result"=>$check
+
+
+        ],200);
+    }
+    public function createQrProduct($input)
     {
-           //later more develop,in database i will add how to track if Qr Code product has been created or not
-           // to avoid twice Qr code image to be created,because admin may select more products and prints all using
-           //array of request product,product will have Name,pcs,and Image of Products ,dou zaine
 
-          $isProductExist=DB::select("select pcs,productName,productCode,img_url,isQr from products where productCode=:productCode and subscriber=:subscriber",[
-            "productCode"=>strtolower($input["productCode"]),
-            "subscriber"=>Auth::user()->subscriber
+        set_time_limit(1000);
+        $chunkSize = 50;
 
-          ]);
-          if($isProductExist)
-          {
-            if($isProductExist[0]->isQr)
-            {
-           //printQr images as PDF or save
-           echo "Qr Exist";
-            }
-            else{
-                DB::update("update products set isQr=:isQr where productCode=:productCode and subscriber=:subscriber limit 1",[
-                    "productCode"=>strtolower($input["productCode"]),
-                    "subscriber"=>Auth::user()->subscriber,
-                    "isQr"=>true
+        // Process records in chunks
+        $check=DB::table('products')
+            ->select('price', 'productName', 'productCode')
+            ->where('isQr', 0)
+            ->orderBy('id')
+            ->limit(1)
+            ->chunk($chunkSize, function ($products) {
+                foreach ($products as $product) {
+                    // Update 'isQr' to 1 for each product
+                    DB::table('products')
+                        ->where('productCode', $product->productCode)
+                        ->update(['isQr' => 1]);
+
+                    // Generate QR code for the product
+                    $filename = $product->productCode;
+                    \QrCode::size(500)
+                        ->format('png')
+                        ->generate($product->productCode, base_path("images/ProductsQr/{$filename}.png"));
+                }
+            });
+            if($check){
+                return response([
+                    "status" => true,
+
+
                 ]);
-                $filename=Auth::user()->subscriber.""."_".$isProductExist[0]->productCode;
-                return \QrCode::size(500)
-                ->format('png')
-                //->merge('images/api.jpg', 0.5, true)
-                ->generate($isProductExist[0]->productCode, public_path("images/ProductsQr/".$filename.".png"));
             }
-
-          }
-          else{
-
-
-          }
 
 
 
@@ -317,6 +603,7 @@ class StockController extends Controller
             ));
             if($check) {
                 return response([
+
                     "status" => true,
 
                     "result" => $check
@@ -607,7 +894,7 @@ class StockController extends Controller
     public function isViewProduct($input){
           $subscriber=Auth::user()->subscriber;
         $withTotal=($input["withTotal"]==="true")?",(SELECT sum(price *(qty-qty_sold)) from products where subscriber='$subscriber' and qty>0) as totalStock":"";
-        $check = DB::select("select productCode,ProductName,price,qty,qty_sold,pcs,tags $withTotal from products where subscriber=:subscriber LIMIT :perPage OFFSET :offset", array(
+        $check = DB::select("select productCode,ProductName,price,qty,qty_sold,pcs,tags,img_url $withTotal from products where subscriber=:subscriber LIMIT :perPage OFFSET :offset", array(
             "subscriber" =>$subscriber,
             "perPage"=>$input["LimitEnd"]??0,
             "offset"=>$input["LimitStart"]??10
@@ -1804,6 +2091,19 @@ else{
        // $req_qtyProduct=$input['req_qtyFromorderEdit']??$input['req_qty'];
           $SignChange=($input['statusForm']=='editOrder')?"-$currentQtyOfOrder+":'+';
         //list($QueryFactory,$myArray) = ($input['statusForm']=='editOrder') ? [$QueryFactoryDelete,$sqlDelete,$myArrayDelete] : [$QueryFactoryUpdate,$sqlUpdate,$myArrayUpdate];
+        $orderId=$input['orderIdFromEdit']??'none';
+        $uid =($orderId=='none')?"UID"."_".Str::random(2).""."_".date(time()):$orderId;
+       // echo $uid;
+        $checkDup=DB::select("select  uid from orderhistories where uid=:uid and paidStatus=:paidStatus limit 1",[
+            "uid"=>$uid,
+            "paidStatus"=>'checked'
+            ]);
+        if($checkDup){
+                 //Some Duplicate please
+                 echo"not exist";
+        }
+        else{
+        //Working
         $check=DB::update("update products set qty_sold=qty_sold  $SignChange $req_qty where subscriber=:subscriber and productCode=:productCode and qty>=qty_sold+$req_qty limit 1",array(
             "productCode"=>$productCode,
             "subscriber"=>Auth::user()->subscriber
@@ -1839,7 +2139,7 @@ else{
 
 
 
-                return $this->testorderPlace($results,$input);
+                return $this->testorderPlace($results,$input,$uid);
          }
          else{
 
@@ -1848,21 +2148,27 @@ else{
                 "message"=>'Something Wrong check if you have enough qty of '."".$productCode,
                  ],200);
          }
+
+        }
+
+
     }
-    public function testorderPlace($results,$input){
+    public function testorderPlace($results,$input,$uid){
         $req_qty=$input['req_qty'];
         $productCode=$input['productCode'];
         $product=DB::select("select price from products where subscriber=:subscriber and productCode=:productCode limit 1",array(
          "productCode"=>$productCode,
          "subscriber"=>Auth::user()->subscriber
         ));
-        $orderId=$input['orderIdFromEdit']??'none';
-        $uid =($orderId=='none')?"UID"."_".Str::random(2).""."_".date(time()):$orderId;
+        //$orderId=$input['orderIdFromEdit']??'none';
+        //$uid =($orderId=='none')?"UID"."_".Str::random(2).""."_".date(time()):$orderId;
         $data=[];
         $ids=[];
           $limitData=count($results);
         for($i=0;$i<$limitData;$i++)
         {
+            if($results[$i]->qty>0)
+            {
             $id=$results[$i]->id;
             $ids[]=$results[$i]->id;
             $data[] = [
@@ -1896,18 +2202,21 @@ else{
            "productCode"=>$productCode,
 
            ));
+        }
 
         }
 
 
-        DB::table("orderhistories")
-        ->insert($data);
-        /*DB::update("update orders set userid=:userid where uid='1' limit 1",array(
-            'userid' =>'kati6'
-            ));*/
+
+            $checkInsert=DB::table("orderhistories")
+            ->insert($data);
+            /*DB::update("update orders set userid=:userid where uid='1' limit 1",array(
+                'userid' =>'kati6'
+                ));*/
 
 
-
+    if($checkInsert)
+    {
 
         return response([
 
@@ -1920,6 +2229,25 @@ else{
 
 
             ],200);
+    }
+    else{
+        return response([
+
+            "status"=>false,
+            //"result"=>$results,
+
+
+            //"data"=>$data
+
+
+
+            ],200);
+    }
+
+
+
+
+
     }
     public function productEditOrder($input){//idea behind this is first to reset cart (orderhistory),and start as new one
 
@@ -2017,6 +2345,8 @@ else{
                        $searchLimitData=count($searchResult);
                        for($i=0;$i<$searchLimitData;$i++)
                        {
+                        if($searchResult[$i]->qty>0)
+                        {
                            $id=$searchResult[$i]->id;
                            $ids[]=$searchResult[$i]->id;
                            $data[] = [
@@ -2050,16 +2380,25 @@ else{
                           "productCode"=>$productCode,
 
                           ));
+                        }
 
                        }
 
 
-                       DB::table("orderhistories")
+                       $checkInsert=DB::table("orderhistories")
                        ->insert($data);
-                       return array(
-                        "status"=>true,
-                        "message"=>"testDa enough"
-                    );
+                    if($checkInsert){
+                        return array(
+                            "status"=>true,
+                            "message"=>"testDa enough"
+                        );
+                    }
+                    else{
+                        return array(
+                            "status"=>false,
+                            "message"=>"something Wrong"
+                        );
+                    }
 
                }
 
@@ -2668,92 +3007,102 @@ public function admin_record($input){
             $UserId=($input["uidUser"]===$mamaUid)?$mamaUid:Auth::user()->uid;
 
 
-    //
-    DB::update("update orderhistories set
 
-    all_total=:all_total,custom_price=:custom_price,
-    paidStatus ='checked',orderDebt=:orderDebt,order_creator=:order_creator
-    where uid=:uid and userid=:userid limit 100",array(
-        "uid"=>$input["OrderId"],
-        "userid"=>$input["uidUser"],
-        "orderDebt"=>$input['all_total']-$input['inputData'],
-        "all_total"=>$input['all_total'],
-        "custom_price"=>$input['inputData'],
-        "order_creator"=>$UserId
-
-
-
-    ));
-
-    $paidStatus = ($input['inputData'] == $input['all_total']) ? 'paid' : (($input['inputData'] > $input['all_total']) ? 'paidReturn' : 'dettes');
-
-    $json_array =  [
-        [
-        "uid"=>$input["OrderId"],//orderId
-        "total"=>$input['all_total'],
-        "paid"=>$input['inputData'],
-        "debt"=>$input['all_total']-$input['inputData'],
-        "promotionUid"=>$input['uid'],
-        "reach"=>$input['reach'],
-        "gain"=>$input['gain'],
-        "paidStatus"=>$paidStatus,
-        "actionStatus"=>"Created",
-        "systemUid"=>$systemUid,
-        "uidUser"=>($input['uidUser']??$uidCreator),
-        "uidCreator"=>$uidCreator,
-        "subscriber"=>$subscriber,
-        "commentData"=>$input['commentData']??'none',
-        "created_at"=>$this->today,
-        "updated_at"=>$this->today
-        ]
-    ];
-    DB::table("orders")
-    ->insert([
-        "uid"=>$input["OrderId"],//orderId
-        "total"=>$input['all_total'],
-        "paid"=>$input['inputData'],
-        "debt"=>$input['all_total']-$input['inputData'],
-        "paidStatus"=>$paidStatus,
-        "promotionUid"=>$input['uid'],
-        "reach"=>$input['reach'],
-        "gain"=>$input['gain'],
-        "systemUid"=>$systemUid,
-        "uidUser"=>($input['uidUser']??$uidCreator),
-       // "uidCreator"=>$uidCreator,
-        "uidCreator"=>$UserId,
-        "subscriber"=>$subscriber,
-        "temporalData"=>json_encode($json_array),
-        "commentData"=>$input['commentData']??'none',
-        "created_at"=>$this->today,
-        "updated_at"=>$this->today
-    ] );
-
-
-        $check=DB::update("update admnin_records set balance=balance+:balance,dettes=dettes+:dettes where uid=:uid and systemUid=:systemUid limit 1",array(
-           // "uid"=>$uidCreator,
-            "uid"=>$UserId,
-            "systemUid"=>$input['systemUid'],
-            "balance"=>$input['all_total'],
-            "dettes"=>($input['all_total']-$input['inputData'])
-        ));
-        if($check)
-        {
-            return $check;
-        }
-        else{
-            $dataInsert=DB::table("admnin_records")
-            ->insert([
-               // "uid"=>$uidCreator,
-               "uid"=>$UserId,
-                "subscriber"=>$subscriber,
-                "systemUid"=>$input['systemUid'],
-                "status"=>'Sales',
-                "balance"=>$input['all_total'],
-                "dettes"=>($input['all_total']-$input['inputData'])
-
+            $checkSum=DB::select("select sum(total) as total from orderhistories where uid=:uid limit 2000",[
+                "uid"=>$input["OrderId"]
             ]);
-            return $dataInsert;
-        }
+
+
+    //
+           if($checkSum){
+            $input['all_total']=$checkSum[0]->total;
+
+            DB::update("update orderhistories set
+
+            all_total=:all_total,custom_price=:custom_price,
+            paidStatus ='checked',orderDebt=:orderDebt,order_creator=:order_creator
+            where uid=:uid and userid=:userid limit 100",array(
+                "uid"=>$input["OrderId"],
+                "userid"=>$input["uidUser"],
+                "orderDebt"=>$input['all_total']-$input['inputData'],
+                "all_total"=>$input['all_total'],
+                "custom_price"=>$input['inputData'],
+                "order_creator"=>$UserId
+
+
+
+            ));
+
+            $paidStatus = ($input['inputData'] == $input['all_total']) ? 'paid' : (($input['inputData'] > $input['all_total']) ? 'paidReturn' : 'dettes');
+
+            $json_array =  [
+                [
+                "uid"=>$input["OrderId"],//orderId
+                "total"=>$input['all_total'],
+                "paid"=>$input['inputData'],
+                "debt"=>$input['all_total']-$input['inputData'],
+                "promotionUid"=>$input['uid'],
+                "reach"=>$input['reach'],
+                "gain"=>$input['gain'],
+                "paidStatus"=>$paidStatus,
+                "actionStatus"=>"Created",
+                "systemUid"=>$systemUid,
+                "uidUser"=>($input['uidUser']??$uidCreator),
+                "uidCreator"=>$uidCreator,
+                "subscriber"=>$subscriber,
+                "commentData"=>$input['commentData']??'none',
+                "created_at"=>$this->today,
+                "updated_at"=>$this->today
+                ]
+            ];
+            DB::table("orders")
+            ->insert([
+                "uid"=>$input["OrderId"],//orderId
+                "total"=>$input['all_total'],
+                "paid"=>$input['inputData'],
+                "debt"=>$input['all_total']-$input['inputData'],
+                "paidStatus"=>$paidStatus,
+                "promotionUid"=>$input['uid'],
+                "reach"=>$input['reach'],
+                "gain"=>$input['gain'],
+                "systemUid"=>$systemUid,
+                "uidUser"=>($input['uidUser']??$uidCreator),
+               // "uidCreator"=>$uidCreator,
+                "uidCreator"=>$UserId,
+                "subscriber"=>$subscriber,
+                "temporalData"=>json_encode($json_array),
+                "commentData"=>$input['commentData']??'none',
+                "created_at"=>$this->today,
+                "updated_at"=>$this->today
+            ] );
+
+
+                $check=DB::update("update admnin_records set balance=balance+:balance,dettes=dettes+:dettes where uid=:uid and systemUid=:systemUid limit 1",array(
+                   // "uid"=>$uidCreator,
+                    "uid"=>$UserId,
+                    "systemUid"=>$input['systemUid'],
+                    "balance"=>$input['all_total'],
+                    "dettes"=>($input['all_total']-$input['inputData'])
+                ));
+                if($check)
+                {
+                    return $check;
+                }
+                else{
+                    $dataInsert=DB::table("admnin_records")
+                    ->insert([
+                       // "uid"=>$uidCreator,
+                       "uid"=>$UserId,
+                        "subscriber"=>$subscriber,
+                        "systemUid"=>$input['systemUid'],
+                        "status"=>'Sales',
+                        "balance"=>$input['all_total'],
+                        "dettes"=>($input['all_total']-$input['inputData'])
+
+                    ]);
+                    return $dataInsert;
+                }
+           }
  });
 
 
@@ -2835,12 +3184,30 @@ public function admin_record($input){
 
       $item = strtolower($input["name"]??'none');
       $itemSearch='%'.$item.'%';
-      $searchOption=($input["searchOption"]=='true')?$input["searchOption"]:"false";
+      $searchOption=($input["searchOption"]=='name'|| $input["searchOption"]=='orderid' || $input["searchOption"]=='true')?$input["searchOption"]:"false";
       $searchQuery=(object)array(
        "true"=>array(
         "DownQuerySearch"=>"AND users.name LIKE :Name",
         "paramSearch"=>array(
             'Name'=>$itemSearch
+        ),
+        "groupByLimit"=>"GROUP BY orders.id
+      LIMIT 10"
+
+       ),
+       "name"=>array(
+        "DownQuerySearch"=>"AND users.name LIKE :Name",
+        "paramSearch"=>array(
+            'Name'=>$itemSearch
+        ),
+        "groupByLimit"=>"GROUP BY orders.id
+      LIMIT 10"
+
+       ),
+       "orderid"=>array(
+        "DownQuerySearch"=>"AND orders.uid LIKE :orderId",
+        "paramSearch"=>array(
+            'orderId'=>$itemSearch
         ),
         "groupByLimit"=>"GROUP BY orders.id
       LIMIT 10"
@@ -3339,6 +3706,7 @@ public function admin_record($input){
     // return (new ParticipateController)->participate($input);
 
     }
+
     public function dettesPaid($input){
         $subscriber=Auth::user()->subscriber;
         $uidUser=$input['uidUser'];
@@ -3360,6 +3728,19 @@ public function admin_record($input){
              $status=$input["status"]??'PaidDette';
          // this query will give you a list of how much you will pay every Admin in This Company by dividing according,based on every someone you have debts
 
+         $checkData = DB::select("
+         SELECT SUM(debt) AS total_debt
+         FROM orders
+         WHERE uidUser = :uidUser AND subscriber = :subscriber AND debt != '0'
+         HAVING total_debt >= :sumDebt
+     ", [
+         'uidUser' => $uidUser,
+         'subscriber' => $subscriber,
+         'sumDebt' => $inputData
+     ]);
+
+         if($checkData){
+         //code
          DB::select("SET @requested_qty=?",[$inputData]);
          $data=DB::select("SELECT
          id,
@@ -3395,6 +3776,7 @@ public function admin_record($input){
             "uidUser"=>$uidUser,
             "subscriber"=>$subscriber
          ));
+         $paid="PID"."_".Str::random(2).""."_".date(time());
          $dataLimit=count($data);
          for($i=0;$i<$dataLimit;$i++)
          {
@@ -3404,11 +3786,13 @@ public function admin_record($input){
             $paidAmount=$data[$i]->debt;
              $json_array =  [
                  [
+
                     "uid"=>$data[$i]->uid,//orders ID
                      "uidUser"=>$uidUser,
                      "uidReceiver"=>$data[$i]->uidCreator,//owner of dettes
                      "uidCreator"=>$uidCreator,//who received amount as admin
                      "amount"=>$paidAmount,//amount Paid
+                     "totalDebt"=>$checkData[0]->total_debt,//previous total debt
                      "InputAmount"=>$inputData,//amount Submitted
                      "paidStatus"=>(($data[$i]->uidCreator==$uidCreator?'paidReceived':'PaidAdminNotReceived')),//
                      "ref"=>$input['ref']??'none',
@@ -3429,6 +3813,8 @@ public function admin_record($input){
                  "uidCreator"=>$uidCreator,//who received amount as admin
                  "amount"=>$paidAmount,//amount
                  "safeAmount"=>$paidAmount,//amount
+                 "tot_paid"=>$inputData,
+                 "paid_id"=>$paid,
                  "paidStatus"=>(($data[$i]->uidCreator==$uidCreator?'paidReceived':'PaidAdminNotReceived')),//
                  "temporalData"=>json_encode($json_array),
                  "systemUid"=>$data[$i]->systemUid,
@@ -3456,7 +3842,7 @@ public function admin_record($input){
         "subscriber"=>Auth::user()->subscriber,
         "systemUid"=>$data[$i]->systemUid,
         "status"=>"Sales",
-        "dettes"=>$inputData
+        "dettes"=>$paidAmount
      );
      $Query2="update admnin_records set safeBalance=safeBalance+:safeBalance,dettes=dettes-:dettes";
     $QueryArray2=array(
@@ -3464,8 +3850,8 @@ public function admin_record($input){
         "subscriber"=>Auth::user()->subscriber,
         "systemUid"=>$data[$i]->systemUid,
         "status"=>"Sales",
-        "safeBalance"=>$inputData,
-        "dettes"=>$inputData
+        "safeBalance"=>$paidAmount,
+        "dettes"=>$paidAmount
      );
     $Query3="update admnin_records set borrowBalance=borrowBalance+:borrowBalance";
     $QueryArray3=[
@@ -3473,7 +3859,7 @@ public function admin_record($input){
         "subscriber"=>Auth::user()->subscriber,
         "systemUid"=>$data[$i]->systemUid,
         "status"=>"Sales",
-        "borrowBalance"=>$inputData
+        "borrowBalance"=>$paidAmount
     ];
 
 
@@ -3487,18 +3873,31 @@ public function admin_record($input){
 
 
          }
+         return array(
+            //"data"=>$checkData[0]->total_debt,
+            "status"=>true,
+            "message"=>"Payment Received"
 
-     return array(
-        "result"=>$data,
-        "datacount"=>count($data)
-     );
+
+         );
+         //End code
+
+         }else{
+            return array(
+                "status"=>false,
+                "message"=>"Please Try Again, amount Paid is greater that debt client has ,contact system Admin"
+
+
+             );
+         }
 
 
 
         });
 
-        return response()->json(['status'=>true,'message' => 'Payment Received',"data"=>$check], 200);
+        //return response()->json(['status'=>true,'message' => 'Payment Received',"data"=>$check], 200);
 
+        return response($check,200);
             } catch (\Exception $e) {
                      DB::rollback();
                     // throw $e;
@@ -3536,7 +3935,7 @@ public function admin_record($input){
         Max(orders.uidUser) as myDeptId,
         MAX(users.name) AS name,
         Max(admnin_records.dettes) AS totDept,
-        SUM(orders.debt) AS debt
+        Max(orders.debt) AS debt
         FROM orders
         INNER JOIN admnin_records ON orders.uidCreator =admnin_records.uid
         INNER JOIN users ON orders.uidUser = users.uid
@@ -3548,7 +3947,7 @@ public function admin_record($input){
             AND orders.debt>0
             AND users.name LIKE :Name
             GROUP BY orders.uidUser
-            ORDER BY orders.id DESC
+            ORDER BY orders.id ASC
 
 
     ", [
@@ -3584,7 +3983,7 @@ public function admin_record($input){
             Max(orders.uidUser) as myDeptId,
             MAX(users.name) AS name,
             Max(admnin_records.dettes) AS totDept,
-            SUM(orders.debt) AS debt
+            Max(orders.debt) AS debt
         FROM orders
         INNER JOIN admnin_records ON orders.uidCreator =admnin_records.uid
         INNER JOIN users ON orders.uidUser = users.uid
@@ -3624,33 +4023,46 @@ public function admin_record($input){
     public function SearchAllDept($input){
         $item = strtolower($input["name"]);
         $itemSearch='%'.$item.'%';
+
         $check = DB::select("
+        WITH total_dettes AS (
+            SELECT
+                SUM(admnin_records.dettes) AS totDept
+            FROM
+                admnin_records
+            WHERE
+                admnin_records.status = 'Sales'
+                AND admnin_records.subscriber = :adminSubscriber1
+        )
         SELECT
-        Max(orders.uidUser) as myDeptId,
-        MAX(users.name) AS name,
-        MAX(admins.name) AS adminName,
-        SUM(admnin_records.dettes) AS totDept,
-        SUM(orders.debt) AS debt
-        FROM orders
-        INNER JOIN admnin_records ON orders.uidCreator =admnin_records.uid
+            MAX(orders.uidUser) AS myDeptId,
+            MAX(users.name) AS name,
+            MAX(admins.name) AS adminName,
+            (SELECT totDept FROM total_dettes) AS totDept,
+            MAX(orders.debt) AS debt
+        FROM
+            orders
+        INNER JOIN admnin_records ON orders.uidCreator = admnin_records.uid
         INNER JOIN users ON orders.uidUser = users.uid
         INNER JOIN admins ON orders.uidCreator = admins.uid
-        WHERE orders.subscriber = :subscriber
-            AND admnin_records.status ='Sales'
-            AND admnin_records.subscriber=:adminSubscriber
-            AND orders.paidStatus='dettes'
-            AND orders.debt>0
+        WHERE
+            orders.subscriber = :subscriber
+            AND admnin_records.status = 'Sales'
+            AND admnin_records.subscriber = :adminSubscriber2
+            AND orders.paidStatus = 'dettes'
+            AND orders.debt > 0
             AND users.name LIKE :Name
-            GROUP BY orders.uidUser
-            ORDER BY orders.id DESC
-
-
+        GROUP BY
+            orders.uidUser
+        ORDER BY
+            MAX(orders.id) ASC
     ", [
-        'subscriber' => Auth::user()->subscriber,
-        'adminSubscriber' => Auth::user()->subscriber,
-
+        'adminSubscriber1' => Auth::user()->subscriber,
+        'adminSubscriber2' =>Auth::user()->subscriber,
+        'subscriber' =>Auth::user()->subscriber,
         'Name'=>$itemSearch
     ]);
+
 
     if($check)
     {
@@ -3673,30 +4085,42 @@ public function admin_record($input){
     public function viewAllDept($input){
         if($input["searchOption"]=='true') return $this->SearchAllDept($input);
          $check = DB::select("
+         WITH total_dettes AS (
+             SELECT
+                 SUM(admnin_records.dettes) AS totDept
+             FROM
+                 admnin_records
+             WHERE
+                 admnin_records.status = 'Sales'
+                 AND admnin_records.subscriber = :adminSubscriber1
+         )
          SELECT
-             Max(orders.uidUser) as myDeptId,
+             MAX(orders.uidUser) AS myDeptId,
              MAX(users.name) AS name,
              MAX(admins.name) AS adminName,
-             SUM(admnin_records.dettes) AS totDept,
-             SUM(orders.debt) AS debt
-         FROM orders
-         INNER JOIN admnin_records ON orders.uidCreator =admnin_records.uid
-         INNER JOIN users ON orders.uidUser=users.uid
-         INNER JOIN admins ON orders.uidCreator=admins.uid
-         WHERE orders.subscriber = :subscriber
-             AND admnin_records.status ='Sales'
-             AND admnin_records.subscriber=:adminSubscriber
-             AND orders.paidStatus='dettes'
-             AND orders.debt>0
-             GROUP BY orders.uidUser
-             ORDER BY orders.id DESC
-
-
+             (SELECT totDept FROM total_dettes) AS totDept,
+             sum(orders.debt) AS debt
+         FROM
+             orders
+         INNER JOIN admnin_records ON orders.uidCreator = admnin_records.uid
+         INNER JOIN users ON orders.uidUser = users.uid
+         INNER JOIN admins ON orders.uidCreator = admins.uid
+         WHERE
+             orders.subscriber = :subscriber
+             AND admnin_records.status = 'Sales'
+             AND admnin_records.subscriber = :adminSubscriber2
+             AND orders.paidStatus = 'dettes'
+             AND orders.debt > 0
+         GROUP BY
+             orders.uidUser
+         ORDER BY
+             MAX(orders.id) DESC
      ", [
-         'subscriber' => Auth::user()->subscriber,
-         'adminSubscriber' => Auth::user()->subscriber
-
+         'adminSubscriber1' => Auth::user()->subscriber,
+         'adminSubscriber2' =>Auth::user()->subscriber,
+         'subscriber' =>Auth::user()->subscriber
      ]);
+
 
      if($check)
      {
@@ -4661,6 +5085,7 @@ public function admin_record($input){
 
                 "status"=>true,
                 "result"=>$check,
+                "qty_send"=>$input['qty_Transport']
 
 
 
@@ -4686,7 +5111,26 @@ public function admin_record($input){
 
             $checkData=DB::transaction(function () use ($input) {
             $amount=$input['amount'];
-        DB::select("SET @requested_qty=?",[$amount]);
+
+
+            $checkInData = DB::select("
+            SELECT SUM(safeAmount) AS total_debt
+            FROM paid_dettes
+            WHERE uidCreator = :uidCreator1 AND uidReceiver = :uidReceiver1 and paidStatus=:paidStatus1 AND subscriber = :subscriber AND safeAmount != '0'
+            HAVING total_debt >= :sumDebt
+        ", [
+            'uidCreator1' => Auth::user()->uid,
+            'uidReceiver1' => $input['uidReceiver'],
+            'paidStatus1'=>'PaidAdminNotReceived',
+            'subscriber' => Auth::user()->subscriber,
+            'sumDebt' => $input['amount']
+        ]);
+
+
+        if($checkInData){
+//code
+
+ DB::select("SET @requested_qty=?",[$amount]);
         $data=DB::select("SELECT
         id,
         uid,
@@ -4736,7 +5180,7 @@ public function admin_record($input){
                 "uidReceiver"=>$input['uidReceiver'],//Owner of Debt
                 "subscriber"=>Auth::user()->subscriber,
                 "amount"=>$input['amount'],
-                "systemUid"=>$input['systemUid'],
+                "systemUid"=>$input['systemUid']??'PointSales1',
                 "status"=>'Paid',
                 "purpose"=>$input['purpose']??'none',
                 "commentData"=>$input['commentData']??'none',
@@ -4778,6 +5222,14 @@ public function admin_record($input){
        );
                    }
 
+                   return array(
+    //"data"=>$checkData[0]->total_debt,
+    "status"=>true,
+    "checkData"=>$checkInData,
+    "message"=>"Payment Received"
+
+
+ );
 
             }
 
@@ -4785,11 +5237,28 @@ public function admin_record($input){
         else{
 
         }
+//End code
+
+
+   //
+
+        }
+        else{
+            return array(
+                "status"=>false,
+                "checkData"=>$checkInData,
+                "message"=>"Please Try Again, amount Paid is greater that debt client has ,contact system Admin"
+
+
+             );
+        }
+
 
 
         });
 
-        return response()->json(['status'=>true,'message' => 'Payment Received',"result"=>$checkData], 200);
+        return response($checkData,200);
+        //return response()->json(['status'=>true,'message' => 'Payment Received',"result"=>$checkData], 200);
 
             } catch (\Exception $e) {
                      DB::rollback();

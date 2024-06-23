@@ -49,4 +49,6 @@ class ConstantClassUtil extends GetxController
   }
 
 
+
 }
+

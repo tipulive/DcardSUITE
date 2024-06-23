@@ -23,7 +23,7 @@ void main() async{
   /*this will make apps not going to sleep Mode*/
 
   WidgetsFlutterBinding.ensureInitialized();
- /*await Firebase.initializeApp(
+  /*await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
  await FirebaseApi().initialize();*/
@@ -113,23 +113,23 @@ class _MyHomePageState extends State<MyHomePage> {
     //return checkAuth();
     return Scaffold(
       body:  Center(
-        child:Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text("Welcome TO Our Shop"),
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white, // set background color
-                borderRadius: BorderRadius.circular(10.0), // set border radius if needed
+          child:Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text("Welcome TO Our Shop"),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white, // set background color
+                  borderRadius: BorderRadius.circular(10.0), // set border radius if needed
+                ),
+                child: Image.asset(
+                  'images/shop.png', // path to the image asset
+                  width: 200, // set the width of the image
+                  height: 200, // set how the image should fit inside the container
+                ),
               ),
-              child: Image.asset(
-                'images/shop.png', // path to the image asset
-                width: 200, // set the width of the image
-                height: 200, // set how the image should fit inside the container
-              ),
-            ),
-          ],
-        )
+            ],
+          )
       ),
     );
 
@@ -153,11 +153,11 @@ class _MyHomePageState extends State<MyHomePage> {
   checkAuth() async{
     await Future.delayed(const Duration(seconds: 3));
     if(await Get.put(AdminQuery()).auth()==0)//no data in localDb
-      {
+        {
       //i will add full screen pics with delay
 
       Get.toNamed('/Login');
-      }
+    }
     else{
       //i will add full screen pics with delay
       //print(await Get.put(AdminQuery()).obj["result"][0]["name"]);
@@ -166,7 +166,7 @@ class _MyHomePageState extends State<MyHomePage> {
       //print(await Get.put(AdminQuery()).logout());
 
     }
-   // print(await Get.put(AdminQuery()).obj);
+    // print(await Get.put(AdminQuery()).obj);
     //Get.toNamed('/Login');
 
 

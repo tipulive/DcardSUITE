@@ -1,0 +1,21 @@
+title="Ayo Wabiguze byose izo Qty"
+
+
+hano icyo ndibukore nuko
+nshyiraho API ituma izajya ihamagara product ikanyereka igiciro product iriho
+iga comparing igiciro izagereraho,nabona ihomba igashyiraho umutuku na loss
+cg igahita inyereka niba izahomba cg itazahomba,
+noneho ikindi kindi nuko uzaba ufite option yo gu printing ,
+
+E:\amyapp\aaClientCard\DcardLaravel\Dcard
+
+60*20=1200
+20*100=2000
+
+<div class="form-group ">
+<label>Stock Price</label>
+<input type="text" class="form-control"  name="stockPrice" onkeyup="autoCompleteTopItem(this)" value="${name}" required/>
+</div>
+
+
+${resultDataInterest.interest>0?"":"Stock Loss"}

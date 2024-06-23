@@ -15,6 +15,7 @@ use App\Http\Controllers\SafariController;
 use App\Http\Controllers\TopupController;
 use App\Http\Controllers\MyHistoryController;
 use App\Http\Controllers\StockController;
+use App\Http\Controllers\utilityController;
 
 
 class CompanyController extends Controller
@@ -34,6 +35,35 @@ class CompanyController extends Controller
         $this->Admin_Auth_result_error="0";//Admin auth result zero
         $this->platform1=env('PLATFORM3');
     }
+    /*Utility Code */
+    public function utilitySubmitOrder(Request $request) {
+        if(Auth::check())
+        {
+        if(Auth::user()->platform==$this->platform1)
+            {
+                $input=$request->all();
+
+                return (new utilityController)->utilitySubmitOrder($input);
+            }
+            else{
+                return response([
+                    "status"=>false,
+                    "result"=>$this->Admin_Auth_result_error,
+                    "error"=>$this->Admin_Auth_error,
+
+                ],200);
+            }
+        }
+        else{
+            return response([
+                "status"=>false,
+                "result"=>$this->Admin_Auth_result_error,
+                "error"=>$this->Admin_Auth_error,
+
+            ],200);
+        }
+    }
+    /*Utility Code */
     /*Safari Stock New Code */
     public function searchSpendPurpose(Request $request){
         $input=$request->all();
@@ -191,7 +221,7 @@ class CompanyController extends Controller
             ],200);
         }
     }
-    public function printQrProduct(Request $request) {
+    public function PrintQrProduct(Request $request) {
         if(Auth::check())
         {
 
@@ -199,7 +229,35 @@ class CompanyController extends Controller
             {
                 $input=$request->all();
 
-                return (new StockController)->printQrProduct($input);
+                return (new StockController)->PrintQrProduct($input);
+            }
+            else{
+                return response([
+                    "status"=>false,
+                    "result"=>$this->Admin_Auth_result_error,
+                    "error"=>$this->Admin_Auth_error,
+
+                ],200);
+            }
+        }
+        else{
+            return response([
+                "status"=>false,
+                "result"=>$this->Admin_Auth_result_error,
+                "error"=>$this->Admin_Auth_error,
+
+            ],200);
+        }
+    }
+    public function createQrProduct(Request $request) {
+        if(Auth::check())
+        {
+
+            if(Auth::user()->platform==$this->platform1)
+            {
+                $input=$request->all();
+
+                return (new StockController)->createQrProduct($input);
             }
             else{
                 return response([

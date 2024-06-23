@@ -17,6 +17,7 @@ import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 //import 'package:wakelock/wakelock.dart';
 import 'package:get/get.dart';
+import '../Utilconfig/language/language.dart';
 
 
 
@@ -26,13 +27,14 @@ import '../../../models/Participated.dart';
 import '../../../models/Promotions.dart';
 import '../Query/AdminQuery.dart';
 import '../Pages/components/BottomNavigator/HomeNavigator.dart';
-
+import '../Utilconfig/image_card_widget.dart';
 
 
 
 import '../../../Query/PromotionQuery.dart';
 
 import '../models/User.dart';
+
 
 
 
@@ -97,6 +99,11 @@ class _HomepageState extends State<Homepage> {
   int limitData=10;
   bool searchValOption=false;
   int editQty=0;
+  String pageName="Home";
+  Language langV=Language();
+
+
+
 
 
 
@@ -139,8 +146,17 @@ class _HomepageState extends State<Homepage> {
           Column(
             children: [
               //Qr Code
+              const SizedBox(height: 40,),
 
+             /* ImageCardWidget(
+                mainImageUrl: '${ConstantClassUtil.urlApp}/images/bg_1og2.jpg',
+                smallImageUrls: [
+                  '${ConstantClassUtil.urlApp}/images/bg_10g6.jpg',
+                  '${ConstantClassUtil.urlApp}/images/api.jpg',
+                  '${ConstantClassUtil.urlApp}/images/bg_20.jpg',
 
+                ], initialImageUrl: '${ConstantClassUtil.urlApp}/images/bg_1og2.jpg',
+              ),*/
               const SizedBox(height: 40,),
               GetBuilder<StockQuery>(
                 builder: (hideShowcontroller) {
@@ -162,13 +178,14 @@ class _HomepageState extends State<Homepage> {
                         //or you can not choose any Other Account,
                       },
 
-                      child: const Row(
+                      child:  Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.star, color: Colors.yellow), // Replace with your desired icon
-                          SizedBox(width: 8.0), // Adjust the space between icon and text
-                          Text('Pick Default Account', style: TextStyle(fontSize: 16.0)),
+                          const Icon(Icons.star, color: Colors.yellow), // Replace with your desired icon
+                          const SizedBox(width: 8.0), // Adjust the space between icon and text
+
+                          Text("${langV.languageV[(Get.put(StockQuery()).lang)][pageName]["pickDft"]}", style: TextStyle(fontSize: 16.0)),
                         ],
                       ),
 
@@ -379,6 +396,7 @@ class _HomepageState extends State<Homepage> {
                     ),
                   ],
                 ),
+              //Text("id ${(Get.put(StockQuery()).order["resultData"][0]["uid"])}"),
               Text("Total:${(Get.put(StockQuery()).orderSum)}"),
               Padding(
                 padding: const EdgeInsets.fromLTRB(40,0,40,0),
@@ -458,17 +476,59 @@ class _HomepageState extends State<Homepage> {
                           try {
                             var inputDataText=(inputDataDept.text=="")?"0":inputDataDept.text;
 
+                            /* hano ngiye gutuma variable nzi resetting mbere ya submission */
+
+                            String userProfile=(Get.put(StockQuery()).userProfile)["uid"];
+
+                            String orderId=(Get.put(StockQuery()).order["resultData"][0]["uid"]);
+                            num orderSum=(Get.put(StockQuery())).orderSum;
+                            (Get.put(StockQuery()).updateHidePickClick(true));
+                            List<dynamic> orderVal=[
+                              {
+                                "name":"unknown",
+                                "uid":"none"
+                              }
+                            ];
+                            num totalVal=0;
+
+                            (Get.put(StockQuery()).updateSumOrder(totalVal));
+
+                            setState(() {
+                              //showOver=false;
+                              cartData.clear();
+                              //(Get.put(StockQuery()).updateOrder(orderVal));
+                              (Get.put(StockQuery()).updateDeptOrder(0));
+                              (Get.put(StockQuery()).updateOrder(orderVal));
+                              inputDataDept.text="";
+
+                              // dataSearch.clear();
+
+                            });
+
+
+                            //pickDefaultUser(true,true);
+
+                            /* hano ngiye gutuma variable nzi resetting mbere ya submission */
+
+
+
                             var resultData=(await StockQuery().submitOrder(Participated(uid:"Nyota_1672353378"
-                                ,uidUser:"${(Get.put(StockQuery()).userProfile)["uid"]}",subscriber:"${(Get.put(StockQuery()).order["resultData"][0]["uid"])}",inputData:inputDataText),Promotions(
-                                token:"${(Get.put(StockQuery())).orderSum}",reach:"1200",gain:"350",uid:"PointSales1"
+                                ,uidUser:"$userProfile",subscriber:"$orderId",inputData:inputDataText),Promotions(
+                                token:"$orderSum",reach:"1200",gain:"350",uid:"PointSales1"
                             ))).data;
                             if(resultData["status"])
                             {
                               //print(resultData);
+                              setState(() {
+                                showOver=false;
+                                inputDataDept.text="";
 
 
 
-                              num totalVal=0;
+                              });
+
+                              pickDefaultUser(true,true);
+                             /* num totalVal=0;
 
                               (Get.put(StockQuery()).updateSumOrder(totalVal));
 
@@ -483,7 +543,7 @@ class _HomepageState extends State<Homepage> {
 
                               });
                               (Get.put(StockQuery()).updateHidePickClick(true));
-                              pickDefaultUser(true,true);
+                              pickDefaultUser(true,true);*/
                             }
                             else{
 
@@ -494,6 +554,7 @@ class _HomepageState extends State<Homepage> {
 
 
                               });
+                              pickDefaultUser(true,true);
                             }
                           } catch (e) {
                             setState(() {
@@ -503,6 +564,7 @@ class _HomepageState extends State<Homepage> {
 
 
                             });
+                            pickDefaultUser(true,true);
                           }
 
                         },
@@ -527,9 +589,11 @@ class _HomepageState extends State<Homepage> {
               ),
 
               Expanded(child: CheckoutPage(chekoutResult:cartData,changeQtyCheckout:(index,price,valueData,checkHide,thisQty){
-                setState(() {
+                /*setState(() {
                   editQty=thisQty;
-                });
+                });*/
+                print("oldQty:${thisQty}");
+
                 changeQtyMethod(index,price,valueData,checkHide);
 
               },saveChangeQtyCheckout:(productCode,indexData,currentEditQty){
@@ -996,6 +1060,7 @@ class _HomepageState extends State<Homepage> {
   }
   void changeQtyMethod(indexData,price,valueData,checkHide) {
 
+
     if(checkHide)
     {
       setState(() {
@@ -1010,6 +1075,7 @@ class _HomepageState extends State<Homepage> {
         cartData[indexData]["totalAmount"]=price*valueData;
         cartData[indexData]["totalQty"]=valueData;
 
+        print(cartData[indexData]);
         //(Get.put(StockQuery()).updateSumOrder(totalVal));
       });
 
@@ -1281,23 +1347,38 @@ class _HomepageState extends State<Homepage> {
 
     try {
       setState(() {
+
         showOver=true;
       });
 
       String qtyData=(cartData[indexData]["totalQty"]).toString().replaceAll(' ', '');
-      var resultData=(await StockQuery().editTOrder(QuickBonus(productName:"$productCode",reqQty:int.parse(qtyData),currentQtyEdit:editQty,uid:(Get.put(StockQuery()).order)["resultData"][0]["uid"]), User(uid:"${(Get.put(StockQuery()).userProfile)["uid"]}")));
 
+      var resultData=(await StockQuery().editTOrder(QuickBonus(productName:"$productCode",reqQty:int.parse(qtyData),currentQtyEdit:cartData[indexData]["old_qty"],uid:(Get.put(StockQuery()).order)["resultData"][0]["uid"]), User(uid:"${(Get.put(StockQuery()).userProfile)["uid"]}")));
+
+     // print(resultData);
       if(resultData["status"])
       {
 
         setState(() {
 
           showOver=false;
-
+      cartData[indexData]["old_qty"]=int.parse(qtyData);
 
           cartData[indexData]["saveChangeBtn"]=true;
 
-          num totalVal = cartData.fold(0, (previousValue, element) => previousValue + element['totalAmount']);
+        //  num totalVal = cartData.fold(0, (previousValue, element) => previousValue + element['totalAmount']);
+
+          num totalVal = 0;
+
+          // Sum the totalAmount from each item
+          for (var item in cartData) {
+            var amount = item['totalAmount'];
+            if (amount is String) {
+              amount = num.tryParse(amount) ?? 0;
+            }
+            totalVal += amount;
+          }
+
 
           (Get.put(StockQuery()).updateSumOrder(totalVal));
 
@@ -1310,6 +1391,21 @@ class _HomepageState extends State<Homepage> {
       }
       else{
 
+        Get.dialog(
+          AlertDialog(
+            title: const Text('Something Wrong'),
+            content: const Text('Please put less Qty or Contact System Admin'),
+            actions: [
+
+              ElevatedButton(
+                onPressed: () {
+                  Get.back(); // close the alert dialog
+                },
+                child: const Text('Close'),
+              ),
+            ],
+          ),
+        );
         setState(() {
 
           showOver=false;
@@ -1604,185 +1700,155 @@ class _HomepageState extends State<Homepage> {
   }
 
   void searchUser(BuildContext context) {
-
     Get.bottomSheet(
-
       StatefulBuilder(
         builder: (BuildContext context, StateSetter setState) {
-          return
-            SingleChildScrollView(
-              child: Container(
-
-                padding:const EdgeInsets.all(5.0),
-                height: 600,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(30),
-                    topRight: Radius.circular(30),
-                  ),
+          return SingleChildScrollView(
+            child: Container(
+              padding: const EdgeInsets.all(5.0),
+              height: 600,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(30),
+                  topRight: Radius.circular(30),
                 ),
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-
-                      const Center(child: Text("Client:Name")),
-
-
-                      SingleChildScrollView(
-                        child:Column(
-                          children: [
-                            Container(
-
-                              //padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-                              margin: const EdgeInsets.fromLTRB(10, 20, 10, 10),
-                              child: TextField(
-
-                                decoration: InputDecoration(
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(50.0),
-                                  ),
-                                  labelText: 'Search',
-
-                                ),
-                                onChanged: (text) async{
-                                  if((int.tryParse(text) != null)){
-                                    setState(() {
-                                      searchValOption=true;
-                                      phoneNumber=text;
-                                    });
-                                    await getUserData();
-                                  }
-                                  else{
-
-                                    setState(() {
-                                      searchName=text;
-                                      searchValOption=true;
-                                      phoneNumber="none";
-                                    });
-                                    await getUserData();
-                                  }
-
-
-
-
-                                  //print(this._data[index]["total_var"]);
-                                  // print("Text changed to: $text");
-                                },
-                              ),
+              ),
+              child: Column(
+                children: [
+                  //const Center(child: Text("Client:Name")),
+                  Container(
+                    margin: const EdgeInsets.fromLTRB(10, 20, 10, 10),
+                    child: TextField(
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(50.0),
+                        ),
+                        labelText: 'Search',
+                      ),
+                      onChanged: (text) async {
+                        if ((int.tryParse(text) != null)) {
+                          setState(() {
+                            searchValOption = true;
+                            phoneNumber = text;
+                          });
+                          await getUserData();
+                        } else {
+                          setState(() {
+                            searchName = text;
+                            searchValOption = true;
+                            phoneNumber = "none";
+                          });
+                          await getUserData();
+                        }
+                      },
+                    ),
+                  ),
+            GetBuilder<StockQuery>(
+              builder: (myController) {
+                return   Expanded(
+                  child: ListView.separated(
+                    shrinkWrap: true,
+                    itemCount: myController.usersPick.length + 1,
+                    separatorBuilder: (context, index) => const Divider(height: 1.0),
+                    itemBuilder: (context, index) {
+                      if (index < myController.usersPick.length) {
+                        return Card(
+                          margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                          child: ListTile(
+                            leading: CircleAvatar(
+                              backgroundColor: getRandomColor(),
+                              child: Icon(_getRandomIcon()),
                             ),
-                            ListView.separated(
-                              shrinkWrap: true,
-                              itemCount: users.length + 1,
-                              separatorBuilder: (context, index) => const Divider(height: 1.0),
-                              itemBuilder: (context, index) {
-                                if (index < users.length) {
-                                  return Card(
-                                    margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                                    child: ListTile(
-                                      leading: CircleAvatar(
-                                        backgroundColor:getRandomColor(),
-                                        child: Icon(_getRandomIcon()),
-
-                                        //backgroundImage: NetworkImage(users[index].photo_url):
-
-                                      ),
-                                      title: Text(users[index]["name"]),
-                                      subtitle: Text(users[index]["PhoneNumber"]),
-                                      trailing:  IconButton(
-                                        icon: const Icon(Icons.add),
-                                        iconSize: 23.0,
-                                        color: Colors.blue,
-                                        onPressed: () async{
-
-                                          (Get.put(StockQuery()).updateHideLoader(false));
-                                          if(((Get.put(StockQuery()).order)["resultData"][0]["uid"])=="none")
-                                          {
-                                            var userProfile =
-                                            {
-                                              "uid":"${users[index]["uid"]}",
-                                              "name":"${ users[index]["name"]}",
-
-                                              "email": "on@gmail.com",
-                                              "phone": "782389359",
-                                              "Ccode": "+250",
-                                              "country": "Rwanda",
-                                              "initCountry": "none",
-                                              "PhoneNumber":"${users[index]["PhoneNumber"]}",
-                                              "carduid": "TEALTD_7hEnj_1672352175"
-                                            };
-                                            setState(() {
-                                              (Get.put(StockQuery()).updateUserProfile(userProfile));
-                                              (Get
-                                                  .put(StockQuery())
-                                                  .order)["resultData"][0]["name"] = userProfile["name"];
-                                            });
-                                            Future.microtask(() {
-                                              Navigator.of(context).pop();
-                                            });
-                                          }
-                                          else{
-
-                                            var resultData=(await StockQuery().updateInOrder(QuickBonus(uid:"${(Get.put(StockQuery()).order)["resultData"][0]["uid"]}",productName:"productCode",description:"comment",status:"UpdateUserInOrder"),Participated(uidUser:"${users[index]["uid"]}",status:'Default'))).data;
-                                            if(resultData["status"])
-                                            {
-                                              var userProfile =
-                                              {
-                                                "uid":"${users[index]["uid"]}",
-                                                "name":"${ users[index]["name"]}",
-
-                                                "email": "on@gmail.com",
-                                                "phone": "782389359",
-                                                "Ccode": "+250",
-                                                "country": "Rwanda",
-                                                "initCountry": "none",
-                                                "PhoneNumber":"${users[index]["PhoneNumber"]}",
-                                                "carduid": "TEALTD_7hEnj_1672352175"
-                                              };
-                                              setState(() {
-                                                (Get.put(StockQuery()).updateUserProfile(userProfile));
-                                                (Get
-                                                    .put(StockQuery())
-                                                    .order)["resultData"][0]["name"] = userProfile["name"];
-                                              });
-                                              Future.microtask(() {
-                                                Navigator.of(context).pop();
-                                              });
-
-                                            }
-                                            else{
-
-                                            }
-                                          }
-
-
-
-                                        },
-                                      ), // Add an icon on the trailing side
-                                    ),
-                                  );
+                            title: Text(myController.usersPick[index]["name"]),
+                            subtitle: Text(myController.usersPick[index]["PhoneNumber"]),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.add),
+                              iconSize: 23.0,
+                              color: Colors.blue,
+                              onPressed: () async {
+                                //print("${users[index]}");
+                  
+                                //print("search");
+                                (Get.put(StockQuery()).updateHideLoader(false));
+                                if (((Get.put(StockQuery()).order)["resultData"][0]["uid"]) == "none") {
+                                  print("ibyeri5 ${myController.usersPick[index]["name"]}");
+                                  var userProfile = {
+                                    "uid": "${myController.usersPick[index]["uid"]}",
+                                    "name": "${myController.usersPick[index]["name"]}",
+                                    "email": "on@gmail.com",
+                                    "phone": "782389359",
+                                    "Ccode": "+250",
+                                    "country": "Rwanda",
+                                    "initCountry": "none",
+                                    "PhoneNumber": "${myController.usersPick[index]["PhoneNumber"]}",
+                                    "carduid": "TEALTD_7hEnj_1672352175"
+                                  };
+                                  setState(() {
+                                    (Get.put(StockQuery()).updateUserProfile(userProfile));
+                                    (Get.put(StockQuery()).order)["resultData"][0]["name"] = userProfile["name"];
+                                  });
+                                  Future.microtask(() {
+                                    Navigator.of(context).pop();
+                                  });
                                 } else {
-                                  return Container();
+                  
+                                  var resultData = (await StockQuery().updateInOrder(
+                                      QuickBonus(
+                                          uid: "${(Get.put(StockQuery()).order)["resultData"][0]["uid"]}",
+                                          productName: "productCode",
+                                          description: "comment",
+                                          status: "UpdateUserInOrder"),
+                                      Participated(uidUser: "${myController.usersPick[index]["uid"]}", status: 'Default')))
+                                      .data;
+                                  if (resultData["status"]) {
+                                    var userProfile = {
+                                      "uid": "${myController.usersPick[index]["uid"]}",
+                                      "name": "${myController.usersPick[index]["name"]}",
+                                      "email": "on@gmail.com",
+                                      "phone": "782389359",
+                                      "Ccode": "+250",
+                                      "country": "Rwanda",
+                                      "initCountry": "none",
+                                      "PhoneNumber": "${myController.usersPick[index]["PhoneNumber"]}",
+                                      "carduid": "TEALTD_7hEnj_1672352175"
+                                    };
+                                    setState(() {
+                                      (Get.put(StockQuery()).updateUserProfile(userProfile));
+                                      (Get.put(StockQuery()).order)["resultData"][0]["name"] = userProfile["name"];
+                                    });
+                                    Future.microtask(() {
+                                      Navigator.of(context).pop();
+                                    });
+                                  } else {
+                                    // Handle error
+                                  }
                                 }
                               },
                             ),
-
-                          ],
-                        ),
-
-                      ),
-                    ],
+                          ),
+                        );
+                      } else {
+                        return Container();
+                      }
+                    },
                   ),
-                ),
+                );
+              }),
+
+
+                ],
               ),
-            );
+            ),
+          );
         },
       ),
     ).whenComplete(() {
-      // Get.put(HideShowState()).isDelivery(0);
-      //do whatever you want after closing the bottom sheet
+      // Do whatever you want after closing the bottom sheet
     });
   }
+
+
 
   getUserData() async{
     //FocusManager.instance.primaryFocus?.unfocus();
@@ -1791,7 +1857,8 @@ class _HomepageState extends State<Homepage> {
       showOver=true;
     });
     //(Get.put(StockQuery()).updateHideLoader(false));
-    var resultData=(await StockQuery().searchUser(User(uid:"",name:searchName,phone:phoneNumber,platform:"4000",status:"offNotPick"),Topups(optionCase:"false",startlimit:limitData,searchOption:searchValOption))).data;
+    var resultData=(await StockQuery().searchUser(User(uid:"",name:searchName,phone:phoneNumber,platform:"4000",status:"offNotPick"),Topups(optionCase:"false",startlimit:limitData,searchOption:searchValOption,sortOrder:"ASC"))).data;
+   // print("amaData:${resultData}");
 
     if(resultData["status"])
     {
@@ -1803,10 +1870,12 @@ class _HomepageState extends State<Homepage> {
 
         setState(() {
           showOver=false;
-          users.clear();
-          users.addAll(resultData["result"]);
+          //users.clear();
+          //users.addAll(resultData["result"]);
+          (Get.put(StockQuery()).updateusersPick(resultData["result"]));
 
         });
+       // print(users);
       }
       else{
         setState(() {
@@ -2596,7 +2665,15 @@ class CheckoutPage extends StatelessWidget {
 
         if(index<chekoutResult.length)
         {
+          if (chekoutResult[index].containsKey("old_qty")) {
 
+          }
+          else{
+            chekoutResult[index]["old_qty"] = chekoutResult[index]["totalQty"] is int
+                ? chekoutResult[index]["totalQty"]
+                : int.parse(chekoutResult[index]["totalQty"].toString());
+
+          }
 
           return Stack(
             children: [
@@ -2672,6 +2749,8 @@ class CheckoutPage extends StatelessWidget {
 
                                                     ),
                                                     onChanged: (text) {
+                                                      //chekoutResult[index]["old_qty"]=int.parse(chekoutResult[index]["totalQty"]);
+
                                                       (Get.put(StockQuery()).updateResizable(true));
                                                       if((int.tryParse(text) != null) && (int.tryParse(text)!=0)){
                                                         if(int.parse(text)>0)
@@ -2679,14 +2758,14 @@ class CheckoutPage extends StatelessWidget {
                                                           //String qtyDa=text.
                                                           //print("${(chekoutResult[index]["price"]).runtimeType} ${(chekoutResult[index]["totalQty"]).runtimeType} ${text.runtimeType}");
 
-                                                          changeQtyCheckout(index,(int.parse(chekoutResult[index]["price"])),(int.parse(text)),false,1);
+                                                          changeQtyCheckout(index,(int.parse(chekoutResult[index]["price"])),(int.parse(text)),false,chekoutResult[index]["old_qty"]);
 
                                                         }
 
 
 
                                                       }else{
-                                                        changeQtyCheckout(index,1,1,true,1);
+                                                        changeQtyCheckout(index,1,1,true,chekoutResult[index]["old_qty"]);
                                                       }
 
                                                       //print(this._data[index]["total_var"]);
@@ -2726,6 +2805,7 @@ class CheckoutPage extends StatelessWidget {
                                           size: 23.0,
                                           color: Colors.grey),
                                       onPressed: () async{
+                                        //print("checkout");
                                         saveChangeQtyCheckout("${chekoutResult[index]["productCode"]}",index,"${chekoutResult[index]["totalQty"]}");
                                       },
                                     ) ,

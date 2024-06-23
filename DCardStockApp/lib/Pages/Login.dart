@@ -237,9 +237,11 @@ setState(() {
           //Get.to(() => Homepage());
           Get.put(HideShowState()).isCameraVisible(true);
           await adminStatedata.auth();
-          //Get.to(() => Homepage());
+
+
           Get.toNamed('/home');
-          //print(await SyncService().SyncDownloadCard());
+          //Get.toNamed('/sale');
+
         }
         else{
           // print((await AdminQuery().addData(Admin(uid:uidInput.text,subscriber: uidInput2.text)))),

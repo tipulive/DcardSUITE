@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 import '../../../Query/AdminQuery.dart';
 import '../../../models/Participated.dart';
 import '../../../models/Promotions.dart';
@@ -17,6 +18,39 @@ import '../models/QuickBonus.dart';
 
 class StockQuery extends GetxController{
 
+  List<dynamic> imgUrl = [];
+  updateImgUrl(valData){
+    imgUrl.clear();
+
+    if (valData != null) {
+      imgUrl.addAll(valData);
+    }
+
+    update();
+
+  }
+  List<dynamic> usersPick = [];
+  updateusersPick(valData){
+    usersPick.clear();
+
+    if (valData != null) {
+      usersPick.addAll(valData);
+    }
+
+    update();
+
+  }
+  String lang="English";
+  updateLang(valData){
+    lang=valData;
+    update();
+
+  }
+  XFile? imageFile;
+  updateImageFile(valData){
+    imageFile=valData;
+    update();
+  }
   String selectedOption = 'Code';
   updateSelected(valData){
     selectedOption=valData!;
@@ -703,7 +737,7 @@ class StockQuery extends GetxController{
 {
   "productCode":"${product.productName}",
   "req_qty":${product.reqQty},
-  "currentQtyEdit":${product.reqQty},
+  "currentQtyEdit":${product.currentQtyEdit},
   "uid": "${product.uid}",
   "uidClient": "${userData.uid}",
   "statusForm": "editOrder"

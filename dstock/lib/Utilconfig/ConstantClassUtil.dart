@@ -8,10 +8,18 @@ class ConstantClassUtil extends GetxController
   var formatted = (formatter.format(now)).obs;
   //static const urlLink="http://10.0.2.2:8000/api";//Testing Link
 
-  //static const urlLink="https://api.appdev.live/api"; //production Link
+  /*static const urlLink="https://api.appdev.live/api"; //production Link
+  static const urlApp="https://api.appdev.live";*/
   static const urlLink="https://sanboxstock.appdev.live/api";
+  static const urlApp="https://sanboxstock.appdev.live";
+
+
   //static final StockLink="http://10.0.2.2:8050/api";//Testing Link
   static const StockLink="https://stock.appdev.live/api";//production Link
+
+
+
+
 
 
   updateDate() async{

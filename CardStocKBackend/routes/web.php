@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TestController;
+use App\Http\Controllers\StockController;
 use App\Http\Controllers\CompanyController;
 
 
@@ -42,6 +43,9 @@ Route::get('company/{subscriber}', function ($subscriber) {//create User Under C
 
 Route::get('/ViewCard', function () {
     return view('PrintCard');
+});
+Route::get('/ViewQrProduct', function () {
+    return view('PrintProduct');
 });
 
 Route::get('/submit-form','TestController@submitForm')->middleware('auth:sanctum');

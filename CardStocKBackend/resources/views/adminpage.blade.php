@@ -366,6 +366,12 @@ table th {
                                             <i class="metismenu-icon"></i>View
                                         </a>
                                     </li>
+
+                                    <li>
+                                        <a href="/ViewQrProduct" aria-expanded="false">
+                                            <i class="metismenu-icon"></i>Product Qr
+                                        </a>
+                                    </li>
                                     <!--Combine Create Safari and View Safari -->
                                    <!-- <li>
                                         <a  href="#Create Product" onclick="return ViewSafari()" aria-expanded="false">

@@ -30,7 +30,7 @@ class _LoginState extends State<Login> {
   bool showOveray=false;
   bool _canShowButton=true;
   bool isValid=false;
- FocusNode focusNode=FocusNode() ;
+  FocusNode focusNode=FocusNode() ;
 
   @override
   Widget build(BuildContext context) {
@@ -61,29 +61,29 @@ class _LoginState extends State<Login> {
 
 
 
-                    //
+                      //
 
 
 
-    Container(
+                      Container(
                         padding: const EdgeInsets.fromLTRB(20, 5, 20, 0),
                         child: IntlPhoneField(
                           controller: uidInput,
                           initialCountryCode: 'RW',
                           decoration: InputDecoration(
-                            labelText: 'Phone Number',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(5.0),
-                            ),
-                            //suffixIcon:Obx(() => Get.put(HideShowState()).isNumberValid.value?Icon(Icons.done,color:Colors.green,):Icon(Icons.dangerous,color:Colors.red,)),
-                            suffixIcon:isValid?const Icon(Icons.done,color:Colors.green,):const Icon(Icons.dangerous,color:Colors.red,)
+                              labelText: 'Phone Number',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(5.0),
+                              ),
+                              //suffixIcon:Obx(() => Get.put(HideShowState()).isNumberValid.value?Icon(Icons.done,color:Colors.green,):Icon(Icons.dangerous,color:Colors.red,)),
+                              suffixIcon:isValid?const Icon(Icons.done,color:Colors.green,):const Icon(Icons.dangerous,color:Colors.red,)
 
                           ),
                           onChanged: (phone) {
 
                             if((uidInput.text).isPhoneNumber)
                             {
-                             // Get.put(HideShowState()).isValid(true);
+                              // Get.put(HideShowState()).isValid(true);
                               setState(() {
                                 isValid=true;
                               });
@@ -91,7 +91,7 @@ class _LoginState extends State<Login> {
 
                             }
                             else{
-                             // Get.put(HideShowState()).isValid(false);
+                              // Get.put(HideShowState()).isValid(false);
 
                               setState(() {
                                 isValid=false;
@@ -111,7 +111,7 @@ class _LoginState extends State<Login> {
                               });
                             }
                             else{
-                             // Get.put(HideShowState()).isValid(false);
+                              // Get.put(HideShowState()).isValid(false);
                               setState(() {
                                 isValid=false;
                               });
@@ -145,31 +145,31 @@ class _LoginState extends State<Login> {
                           ),
                         ),
                       ),
-                    Visibility(
-                      visible:isValid,
-                      child: Container(
-                          height: 100,
+                      Visibility(
+                        visible:isValid,
+                        child: Container(
+                            height: 100,
 
 
-                          padding: const EdgeInsets.all(20),
-                          child: ElevatedButton(
+                            padding: const EdgeInsets.all(20),
+                            child: ElevatedButton(
 
-                            style: ElevatedButton.styleFrom(
+                              style: ElevatedButton.styleFrom(
 
-                              minimumSize: const Size.fromHeight(50),
-                              backgroundColor: Colors.black,
-                              foregroundColor: Colors.white
+                                  minimumSize: const Size.fromHeight(50),
+                                  backgroundColor: Colors.black,
+                                  foregroundColor: Colors.white
 
-                            ),
-                            child: const Text('Log In'),
-                            onPressed: () async{
-                              //print(uidInput.text);
-                              //print(await loginOnline());
-                              await loginOnline();
-                              // Get.to(() =>Aboutpage());
-                            },
-                          )),
-                    ),
+                              ),
+                              child: const Text('Log In'),
+                              onPressed: () async{
+                                //print(uidInput.text);
+                                //print(await loginOnline());
+                                await loginOnline();
+                                // Get.to(() =>Aboutpage());
+                              },
+                            )),
+                      ),
 
 
                       TextButton(
@@ -189,15 +189,15 @@ class _LoginState extends State<Login> {
               ),
             ),
             if(showOveray)
-            Positioned.fill(
-              child: Center(
-                child: Container(
-                  alignment: Alignment.center,
-                  color: Colors.white70,
-                  child: const CircularProgressIndicator(),
+              Positioned.fill(
+                child: Center(
+                  child: Container(
+                    alignment: Alignment.center,
+                    color: Colors.white70,
+                    child: const CircularProgressIndicator(),
+                  ),
                 ),
               ),
-            ),
 
           ],
         )
@@ -210,12 +210,12 @@ class _LoginState extends State<Login> {
     });
   }
   loginOnline() async{
-  // print(await SyncService().SyncDownloadCard());
+    // print(await SyncService().SyncDownloadCard());
     //print(await SyncService().SyncUploadCard());
- //print(await CardQuery().SyncOffCardAdd());
-setState(() {
-  showOveray=true;
-});
+    //print(await CardQuery().SyncOffCardAdd());
+    setState(() {
+      showOveray=true;
+    });
     try {
 
       var params =  {
@@ -235,7 +235,7 @@ setState(() {
       );
       if (response.statusCode == 200) {
         //print(params);
-       // print("done");
+        // print("done");
         //return response.data;
         //return response.data["User"]["name"];
         if((await AdminQuery().addData(Admin(uid:response.data["User"]["uid"],name:response.data["User"]["name"],subscriber:response.data["User"]["subscriber"],AuthToken: response.data["token"],email: response.data["User"]["email"],phone: response.data["User"]["tel"])))>0)
@@ -421,7 +421,6 @@ setState(() {
 
   }
 }
-
 
 
 
