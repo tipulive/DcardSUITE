@@ -163,8 +163,10 @@ width: 100% !important;
     @csrf
 
     <input type="file" name="image" accept="image/*">
-    <input type="text" name="productCode" >
+    <input type="text" name="productCode" value="nyota">
     <input type="text" name="fileNam" placeholder="">
+    <input type="text" name="NumbVer" placeholder="number version caption">
+    <input type="text" name="versionN" placeholder="version">
     <select option="" name="actionStatus">
         <option value="upload">upload</option>
         <option value="setDefault">setDefault</option>

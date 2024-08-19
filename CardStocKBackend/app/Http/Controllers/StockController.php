@@ -32,14 +32,16 @@ class StockController extends Controller
 {
 
     $check=DB::select("select img_url from products where productCode=:productCode",[
-        "productCode"=>'nyota'
+        //"productCode"=>'nyota'
+        "productCode"=>$request->input("productCode")
     ]);
-    return response([
+    /*return response([
+        "data"=>"new Data",
         "status"=>$check,
 
 
-    ],200);
-    /*$actionStatus=$request->input("actionStatus");
+    ],200);*/
+    $actionStatus=$request->input("actionStatus");
     if($actionStatus==='upload')
     {
      return $this->uploadImage($request);
@@ -54,7 +56,7 @@ return $this->EditImage($request);
     }
     else{
 
-    }*/
+    }
 
 }
 
@@ -86,8 +88,11 @@ $filename = ($isFilenameExist==="true")?$fileNumb:$request->input('productCode')
         $request->file('image')->move($destinationPath, $filename);
         //this code will make cache Image to be easy Cache
         $versionN=$request->input('versionN');
+        //$versionN=date(time());
+        $number=$request->input('NumbVer');
+       //$versionN="4";
 DB::update("UPDATE products
-SET img_url = JSON_SET(img_url, '$.numb2', $versionN)
+SET img_url = JSON_SET(img_url, '$.$number', $versionN)
 WHERE productCode =:productCode and subscriber=:subscriber",[
     "productCode"=>$request->input('productCode'),
     "subscriber"=>Auth::user()->subscriber
@@ -116,7 +121,7 @@ public function uploadImage(Request $request)
             ->where('productCode', $input['productCode'])
             ->first();
 
-        if ($check->mult_imgurl === 'none') {
+        if ($check->mult_imgurl ==='none') {
             $uploadedFile = $this->imageUpload($request,1,"false");
             if ($uploadedFile['status']) {
                 DB::update("UPDATE products SET  mult_imgurl = :mult_imgurl WHERE productCode = :productCode and subscriber=:subscriber", [
@@ -142,7 +147,8 @@ public function uploadImage(Request $request)
             } else {
                 return response()->json([
                     'status' => false,
-                    'msg' => 'Image not uploaded'
+                    "data"=>$check->mult_imgurl,
+                    'msg' => 'Image not uploaded 1'
                 ]);
             }
         } elseif ($check->mult_imgurl + 1 >= 5) {
@@ -177,7 +183,7 @@ public function uploadImage(Request $request)
             } else {
                 return response()->json([
                     'status' => false,
-                    'msg' => 'Image not uploaded'
+                    'msg' => 'Image not uploaded 2'
                 ]);
             }
         }
@@ -831,6 +837,7 @@ public function deleteImage($fileNam){
                 MAX(products.isQr) as isQr,
                 MAX(products.qty_sold) as qty_sold,
                 MAX(products.pcs) as pcs,
+                MAX(products.img_url) as img_url,
                 MAX(products.tags) as tags
              FROM
                 products
@@ -2858,6 +2865,7 @@ public function ViewUserTempOrder($input){//make sure order must not be more tha
                 MAX(products.productName) AS productName,
                 MAX(orderhistories.price) AS price,
                 MAX(products.pcs) AS pcs,
+                MAX(products.img_url) AS img_url,
                 SUM(orderhistories.qty) AS totalQty,
                 SUM(orderhistories.total) AS totalAmount,
                 SUM(orderhistories.qty_count) AS totalCount
@@ -3561,6 +3569,7 @@ public function admin_record($input){
                     MAX(products.productName) AS productName,
                     MAX(orderhistories.price) AS price,
                     MAX(products.pcs) AS pcs,
+                    MAX(products.img_url) AS img_url,
                     SUM(orderhistories.qty) AS totalQty,
                     SUM(orderhistories.total) AS totalAmount,
                     SUM(orderhistories.qty_count) AS totalCount
@@ -4787,6 +4796,7 @@ public function admin_record($input){
                     MAX(products.productName) AS productName,
                     MAX(orderhistories.price) AS price,
                     MAX(products.pcs) AS pcs,
+                    MAX(products.img_url) AS img_url,
                     SUM(orderhistories.qty) AS totalQty,
                     SUM(orderhistories.total) AS totalAmount,
                     SUM(orderhistories.qty_count) AS totalCount

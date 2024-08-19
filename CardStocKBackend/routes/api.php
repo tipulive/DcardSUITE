@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+Route::post('/buyElectricity','utilityController@ussDBuyElectricity')->name('ussDBuyElectricity');
 Route::post('/CreateCompany','AdminController@AdminCreateCompany')->name('AdminCreateCompany');
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

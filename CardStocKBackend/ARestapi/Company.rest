@@ -2,7 +2,7 @@
 @email=company@gmail.com
 @PhoneNumber=+250782389359
 @password=1
-@Auth_token=794|Ow6Hyt0cJgOrldYGHLqUxwMEu5CUCwiZgw8jmsfu
+@Auth_token=507|7SAaLomJssxOmQbfqCYuHWzd9trE7qfRSiYrf8Iw
 
 ### Company Login with email
 POST  {{baseUrl}}/AdminLoginEmail/
@@ -23,7 +23,35 @@ Content-Type: application/json
 "password": "{{password}}"
 }
 
+### USSD ###
 
+POST  {{baseUrl}}/buyElectricity/
+Content-Type: application/json
+
+{
+"sessionId": "45",
+"serviceCode": "^384*4#",
+"phoneNumber":"0782389359",
+"text": "1"
+}
+### utility submitOrder,uidUser is card
+POST  {{baseUrl}}/utilitySubmitOrder
+Content-Type: application/json
+Authorization: Bearer {{Auth_token}}
+
+{
+"productCode":"snel",
+"uid":"Nyota_1672353378",
+"ref":"1998600",
+"currency":"FC",
+"uidUser":"kebineericMuna_1674160265",
+"inputData":"28600",
+"reach":"1200",
+"gain":"350",
+"systemUid":"PointSales1"
+
+
+}
 ###Company Create User
 POST  {{baseUrl}}/CreateUser
 content-type: application/json;charset=UTF-8
@@ -906,22 +934,7 @@ Authorization: Bearer {{Auth_token}}
 
 }
 
-### utility submitOrder,uidUser is card
-POST  {{baseUrl}}/utilitySubmitOrder
-Content-Type: application/json
-Authorization: Bearer {{Auth_token}}
 
-{
-"productCode":"snel",
-"uid":"Nyota_1672353378",
-"uidUser":"99890",
-"inputData":"60",
-"reach":"1200",
-"gain":"350",
-"systemUid":"PointSales1"
-
-
-}
 ### done but not by SystemUid
 
 GET  {{baseUrl}}/viewSales
