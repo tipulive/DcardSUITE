@@ -13,7 +13,7 @@ class CreateExchangesTable extends Migration
      */
     public function up()
     {
-        Schema::create('exchanges', function (Blueprint $table) {
+        Schema::create('exchanges', function (Blueprint $table) {//this is currency according to dollars currency
             $table->id();
             $table->string('currency')->default('0')->index('currency');
             $table->string('currencyV')->default('0')->index('currencyV');
@@ -22,6 +22,10 @@ class CreateExchangesTable extends Migration
             $table->timestamps();
         });
     }
+    /*e.g: -usd:1
+            -fc:2880
+            -Rand:17
+            -frw:1380 */
 
     /**
      * Reverse the migrations.

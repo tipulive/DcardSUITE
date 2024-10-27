@@ -6,6 +6,43 @@
     <title>Joe Transport</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        /*loader*/
+.cover-spin {
+    position:fixed;
+    width:100%;
+    left:0;right:0;top:0;bottom:0;
+    background-color: rgba(255,255,255,0.7);
+    z-index:120000;
+
+    }
+
+    @-webkit-keyframes spin {
+    from {-webkit-transform:rotate(0deg);}
+    to {-webkit-transform:rotate(360deg);}
+    }
+
+    @keyframes spin {
+    from {transform:rotate(0deg);}
+    to {transform:rotate(360deg);}
+    }
+    .two_columns_75_25>.column1{
+  width: 100% !important;
+    }
+    .cover-spin::after {
+    content:'';
+    display:block;
+    position:absolute;
+    left:48%;top:40%;
+    width:40px;height:40px;
+    border-style:solid;
+    border-color:black;
+    border-top-color:transparent;
+    border-width: 4px;
+    border-radius:50%;
+    -webkit-animation: spin .8s linear infinite;
+    animation: spin .8s linear infinite;
+    }
+    /*loader*/
         .modal-content {
             border-radius: 10px;
             overflow: hidden;
@@ -41,7 +78,8 @@
     top:0;
     right:20px;
     color:white;
-    font-size:15px;
+    font-weight: 800;
+    font-size: 25px;
     cursor: pointer;
 }
 .spanClass{
@@ -119,6 +157,14 @@ table th {
   font-size: .85em;
   letter-spacing: .1em;
   text-transform: uppercase;
+}
+@media  screen and (max-width: 800px) {
+    img.imgLogo{
+        width: 40%;
+    }
+    .mobile-div{
+
+    }
 }
 
 
@@ -247,15 +293,15 @@ table th {
             font-family: Arial, Helvetica, sans-serif;
         }
         .bg-img {
-            /* The image used */
-            /*background-image: url('https://plus.unsplash.com/premium_photo-1661932015882-c35eee885897?q=80&w=1906&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');*/
-            background-image: url('{{ asset('images/1hd.jpeg') }}');
-            /* Control the height of the image */
             height: 100%;
-            /* Center and scale the image nicely */
             background-position: center;
             background-repeat: no-repeat;
             background-size: cover;
+            background-color: #f3f3f3; /* light gray as a placeholder */
+        }
+        /* Actual background will be set via JS */
+        .bg-img[data-src] {
+            background-image: url('{{ asset('images/placeholder.jpeg') }}');
         }
        /* .centered-form {
             position: absolute;
@@ -278,6 +324,7 @@ table th {
           </style>
 </head>
 <body>
+    <div class="cover-spin"></div>
 <!-- Trigger button -->
 <button type="button" class="btn btn-primary d-none" data-bs-toggle="modal" data-bs-target="#loginModal" onclick="return loginApp('noNumber')">
         Open Login Modal
@@ -306,12 +353,12 @@ table th {
             </div>
         </div>
     </div>
-    <div class="bg-img">
-        <div class="">
+    <div class="bg-img" data-src="{{ asset('images/1hd.jpeg') }}">
+        <div class="mobile-div">
 
         <span class="divRight " onclick="return loginApp('noNumber')">Sign in</span>
-        <div class="centerDiv" onclick="return loginApp('+250782389359')"><img src="{{ asset('images/test.jpeg') }}" class="imgLogo"></div>
-        <span onclick="return loginApp('+250782389359')" class="centerDiv spanClass d-none">Joe family</span>
+        <div class="centerDiv" onclick="return loginApp('+8613819963280')"><img src="{{ asset('images/test.jpeg') }}" class="imgLogo"></div>
+        <span onclick="return loginApp('+8613819963280')" class="centerDiv spanClass d-none">Joe family</span>
 
             <div class="p-2">
             <div class="row">
@@ -319,7 +366,7 @@ table th {
             <div class="col-md-6 ">
             <form class="mb-4 formSearch" onsubmit="return SearchTrack()">
                 <div class="input-group">
-                    <input type="text" class="form-control" name="PhoneNumber" placeholder="Search Tel:+250782389359">
+                    <input type="text" class="form-control" name="PhoneNumber" placeholder="+250782389359">
                     <button class="btn btn-primary" type="submit">Search</button>
                 </div>
             </form>
@@ -346,7 +393,7 @@ function loginApp(number){
     var withNumber=`<label for="email" class="form-label ">Tel</label>
                     <input type="email" class="form-control" id="email" name="email" required>`;
     var withoutNumber=`<p class="text-center" text-align="center">Joe Family</p>
-    <input type="hidden" class="form-control" id="email" name="email" value="+250782389359">
+    <input type="hidden" class="form-control" id="email" name="email" value="+8613819963280">
     `;
  var login=(number=='noNumber')?withNumber:withoutNumber;
     $('.loginNumber').html(login);
@@ -397,7 +444,7 @@ function LoadShippingTemplate(data){
     var resultData=data.ProductResult;
     var resultDataSpend=data.OtherSpend;*/
 
-
+    var todaysDate=data.todaysDate;
 
 $('.MyRequest_table').html("");
 
@@ -412,12 +459,14 @@ getData+=`
 <thead>
 <tr>
 <th scope="col">#</th>
+<th scope="col">Marks</th>
 <th scope="col">Client</th>
 <th scope="col">Driver</th>
 <th scope="col">Plaque</th>
 <th scope="col">From->To</th>
 <th scope="col">C Location</th>
 <th scope="col">Status</th>
+<th scope="col">Retention</th>
 
 
 
@@ -435,6 +484,9 @@ var resultObject=resultData[i];
 
  <tr>
   <td data-label="#"><i class="fas fa-trash text-danger mylogout " title="Delete This Product in Safari" onclick="return deleteShipping()"></i>  ${i+1}</td>
+  <td data-label="Marks">${resultData[i].marks}
+
+  </td>
   <td data-label="Client"><p>${resultData[i].name}<p>
   <p>${resultData[i].PhoneNumber}<p>
 
@@ -449,8 +501,12 @@ var resultObject=resultData[i];
    </td>
     <td data-label="C Location"><p>${resultData[i].liveLocation}<p>
    </td>
-   <td data-label="Status"><p class="text-danger">${resultData[i].status} <i class="fas fa-eye text-primary mylogout" title="View Safari Items Load" onClick="return ViewEditStatusShipping('${btoa(JSON.stringify(resultData[i]))}')"></i><p>
-   <p>${resultData[i].eta}<p>
+   <td data-label="Status"  class="${(resultData[i].status!="Arrived")?'':'bg-danger'}"><p >${resultData[i].status} <i class="fas fa-eye text-primary mylogout" title="View Safari Items Load" onClick="return ViewEditStatusShipping('${btoa(JSON.stringify(resultData[i]))}')"></i><p>
+   <span class="${(resultData[i].status=="Arrived")?'':'d-none'} text-white">${resultData[i].updated_at}</span>
+   <p class="${(resultData[i].status!="Arrived")?'':'d-none'}">E.T.A:${resultData[i].eta}<p>
+   </td>
+   <td data-label="Retention" class="">
+   ${checkRetention(todaysDate, resultData[i].updated_at, resultData[i].status)}
    </td>
 
 
@@ -470,6 +526,74 @@ $('.MainForm').html(getData);
 
     //
 }
+function addBusinessDays(startDate, daysToAdd) {
+    let currentDate = new Date(startDate);
+    let addedDays = 0;
+
+    while (addedDays < daysToAdd) {
+        currentDate.setDate(currentDate.getDate() + 1);
+
+        // Check if the current day is a weekday (Monday to Friday)
+        //if (currentDate.getDay() !== 0 && currentDate.getDay() !== 6) {//here =!=0 means exclude sunday and !==6 exclude saturday
+            if (currentDate.getDay() !== 0) {
+            addedDays++;
+        }
+    }
+
+    return currentDate;
+}
+
+function checkRetention(todaysD,startD,status){
+    // Example usage
+
+let startDate = new Date(startD);
+let todaysDate = new Date(todaysD);
+let resultDate = addBusinessDays(startDate, 4);
+
+if(startD==="null" || status!=='Arrived'){
+ return "...";
+}
+else if((todaysDate)>(resultDate))
+{
+
+   let differenceInTime = todaysDate.getTime() - resultDate.getTime();
+    let differenceInDays = Math.ceil(differenceInTime / (1000 * 3600 * 24));
+    return `<span class="text-danger">${differenceInDays} days</span>`;
+
+}else{
+
+     return updateCountdown(todaysDate, resultDate);
+
+}
+}
+
+
+
+
+// Initial call to display the countdown immediately
+
+function updateCountdown(todaysDate,resultDate) {
+    let now = new Date();
+
+             let timeRemaining = resultDate-todaysDate;
+             //let timeRemaining = resultDate-now;
+
+            if (timeRemaining > 0) {
+                let days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+                let hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                let minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+                let seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+
+               return `<span class="text-info">Left ${days} Days, ${hours} Hours,${minutes} Min</span>`;
+
+
+               //return "days";
+
+            } else {
+
+            }
+    }
+
     function SearchTrack(){
 //console.log("hello");
 
@@ -494,6 +618,8 @@ LoadShippingTemplate(data);
 
 }
 else{
+    console.log(data);
+    $('.MainForm').html(`<p class="text-center text-white">No Data Found Please check your number or try again</p>`)
 //LoadSafariStockAddItemBtnTemplate(data);
 
 
@@ -517,5 +643,56 @@ return false;
 
 }
         </script>
+         <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const lazyBackgrounds = document.querySelectorAll('.bg-img[data-src]');
+
+            $('.cover-spin').hide();
+            // Function to check if an image URL is cached
+            const isImageCached = (url) => {
+                return localStorage.getItem(url) === 'cached';
+            };
+
+            // Function to set an image URL as cached
+            const setImageCached = (url) => {
+                localStorage.setItem(url, 'cached');
+            };
+
+            const lazyLoad = (entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const bg = entry.target;
+                        const src = bg.getAttribute('data-src');
+
+                        if (isImageCached(src)) {
+                            bg.style.backgroundImage = `url(${src})`;
+
+                        } else {
+                            const img = new Image();
+                            img.src = src;
+                            img.onload = () => {
+                                bg.style.backgroundImage = `url(${src})`;
+                                setImageCached(src);
+
+                            };
+                        }
+
+                        bg.removeAttribute('data-src');
+                        observer.unobserve(bg);
+                    }
+                });
+            };
+
+            const observer = new IntersectionObserver(lazyLoad, {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.1
+            });
+
+            lazyBackgrounds.forEach(bg => {
+                observer.observe(bg);
+            });
+        });
+    </script>
 </body>
 </html>

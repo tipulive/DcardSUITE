@@ -120,7 +120,7 @@ class _MyHomePageState extends State<MyHomePage> {
           child:Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text("V1.0.0"),
+              const Text("V2Beta.0.0"),
               const Text("Welcome TO Our Shop"),
               Container(
                 decoration: BoxDecoration(

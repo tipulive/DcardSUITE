@@ -33,6 +33,7 @@ import '../SetWithdrawBalancePage.dart';
 
 import '../employePage.dart';
 import '../components/SetSpendingComp.dart';
+import '../components/SetAllSaleComp.dart';
 import 'ContactComp.dart';
 import '../../Utilconfig/language/language.dart';
 
@@ -90,7 +91,7 @@ class _SettingCompState extends State<SettingComp> {
             ),
 
             divLine(),
-            GestureDetector(
+            /*GestureDetector(
                 onTap: (){
                   dispatchOrder();
                 },
@@ -101,7 +102,7 @@ class _SettingCompState extends State<SettingComp> {
                   changeLanguage();
                 },
                 child: detailsProfile("Language",Icons.calendar_month_outlined,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,changeLanguage)),//Last Time Purchase
-            const SizedBox(height:5,),
+            const SizedBox(height:5,),*/
             GestureDetector(
                 onTap: (){
                   dispatchOrder();
@@ -113,6 +114,12 @@ class _SettingCompState extends State<SettingComp> {
                   sales();
                 },
                 child: detailsProfile("Sales",Icons.calendar_month_outlined,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,sales)),//Last Time Purchase
+            const SizedBox(height:5,),
+            GestureDetector(
+                onTap: (){
+                  allSales();
+                },
+                child: detailsProfile("All Sales",Icons.calendar_month_outlined,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,allSales)),
             const SizedBox(height:5,),
             GestureDetector(
                 onTap: (){
@@ -488,6 +495,15 @@ dispatchOrder() async{
 sales()async{
 
   Get.to(() =>const SetSalePage());
+
+}
+allSales() async{
+
+  Get.to(() =>SetPage(dynamicMethod: () {
+    return  const SetAllSaleComp();
+  }),arguments:{
+    "title":"All Sales",
+  });
 
 }
 spending() async{

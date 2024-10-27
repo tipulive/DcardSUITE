@@ -14,6 +14,7 @@ class shippingController extends Controller
     {
         date_default_timezone_set(env('TIME_ZONE'));
         $this->today = date('Y-m-d H:i:s', time());
+        $this->today5 = date('Y-m-dTH:i:s', time());
         $this->today2 = date('d-m-Y H:i:s', time());
         $this->Appstate=env('APP_LIVE')?env('APP_PRO'):env('APP_DEV');
         $this->AppName=env('APP_NAME');
@@ -38,6 +39,17 @@ class shippingController extends Controller
             "subscriber"=>Auth::user()->subscriber,
             "itemName" => $itemName,
         ]);
+        /*$check=DB::select("select
+        MAX(users.uid) AS uid,
+        MAX(users.name) AS name,
+        MAX(users.PhoneNumber) AS PhoneNumber,
+        MAX(shippings.marks) AS marks
+        from users
+        inner join shippings ON users.uid=shippings.uidUser
+ where users.subscriber=:subscriber and $queryData LIKE :itemName limit 10 ",[
+            "subscriber"=>Auth::user()->subscriber,
+            "itemName" => $itemName,
+        ]);*/
         if($check){
             return response([
                 "status"=>true,
@@ -171,6 +183,15 @@ class shippingController extends Controller
                 "groupByLimit"=>"GROUP BY shippings.id LIMIT 10"
 
                ),
+                "marks"=>array(
+                "DownQuerySearch"=>"AND shippings.marks LIKE :marks",
+                "paramSearch"=>array(
+                    'marks'=>$itemSearch,
+                    'subscriber' => Auth::user()->subscriber
+                ),
+                "groupByLimit"=>"GROUP BY shippings.id LIMIT 10"
+
+               ),
                "livelocation"=>array(
                 "DownQuerySearch"=>"AND shippings.liveLocation LIKE :liveLocation",
                 "paramSearch"=>array(
@@ -208,6 +229,7 @@ class shippingController extends Controller
                 MAX(shippings.status) AS status,
                 MAX(shippings.eta) AS eta,
                 MAX(shippings.created_at) AS created_at,
+                MAX(shippings.updated_at) AS updated_at,
                 MAX(shippings.commentData) AS commentData
             FROM shippings
             INNER JOIN users ON shippings.uidUser = users.uid
@@ -219,6 +241,7 @@ class shippingController extends Controller
         if($check){
             return response([
                 "status"=>true,
+                "todaysDate"=>"$this->today",
                 "result"=>$check,
                 "permission"=>Auth::user()->permission??'none',
 
@@ -250,7 +273,8 @@ class shippingController extends Controller
     }
     public function viewAllShipping($input){
         //$phoneNumber = strtolower($input["PhoneNumber"]);
-
+        //    LIMIT 10 OFFSET 0  //this means start from 0 give me paginatiom
+         $offset=$input["offset"]??"0";
         $check = DB::select("
         SELECT
             MAX(shippings.uid) as uid,
@@ -266,12 +290,14 @@ class shippingController extends Controller
             MAX(shippings.status) AS status,
             MAX(shippings.eta) AS eta,
             MAX(shippings.created_at) AS created_at,
+            MAX(shippings.updated_at) AS updated_at,
             MAX(shippings.commentData) AS commentData
         FROM shippings
         INNER JOIN users ON shippings.uidUser = users.uid
         WHERE shippings.subscriber = :subscriber
-        GROUP BY shippings.uidUser
-        ORDER BY shippings.id DESC
+        GROUP BY shippings.id
+        ORDER BY shippings.id desc
+        LIMIT 10 OFFSET $offset
     ", [
         'subscriber' => Auth::user()->subscriber
     ]);
@@ -279,6 +305,7 @@ class shippingController extends Controller
     if($check){
         return response([
             "status"=>true,
+            "todaysDate"=>"$this->today",
             "result"=>$check,
             "permission"=>Auth::user()->permission??'none',
 
@@ -286,30 +313,54 @@ class shippingController extends Controller
         ],200);
 
     }
+    else{
+        return response([
+            "status"=>false,
+            "permission"=>Auth::user()->permission??'none',
+
+
+        ],200);
+    }
 
     }
 
     public function ShippingCreate($input){
 
-        $PhoneNumber=$input['PhoneNumber'];
-        $check=DB::select("select uid from users where PhoneNumber=:PhoneNumber and subscriber=:subscriber",[
-            "PhoneNumber"=>$PhoneNumber,
-            "subscriber"=>Auth::user()->subscriber
-        ]);
+        $PhoneNumber=$input['PhoneNumber']??'none';
+        if(strtolower($PhoneNumber)=='none')
 
-        if($check){
-            $input["uidUser"]=$check[0]->uid;
-            return $this->AddUser($input);
+        {
+            $input["uidUser"]=($this->createUser($input)->original["uid"]);
+                    if($input["uidUser"]!=false)
+                    {
+                        return $this->AddUser($input);
+
+                        }
+                        else{
+                            return response([
+                                "status"=>false,
+                                "result"=>$check,
+                                "message"=>"user has not added DB"
+
+                            ],200);
+                        }
 
 
         }
         else{
-
-
-
-            if(($this->createUser($input)->original["status"])){
-                        $input["uidUser"]=($this->createUser($input)->original["uid"]);
-                        return $this->AddUser($input);
+            $check=DB::select("select uid from users where PhoneNumber=:PhoneNumber and subscriber=:subscriber limit 1",[
+                "PhoneNumber"=>$PhoneNumber,
+                "subscriber"=>Auth::user()->subscriber
+            ]);
+            if($check){
+                $input["uidUser"]=$check[0]->uid;
+                return $this->AddUser($input);
+            }
+            else{
+                $input["uidUser"]=($this->createUser($input)->original["uid"]);
+                if($input["uidUser"]!=false)
+                {
+                    return $this->AddUser($input);
 
                     }
                     else{
@@ -320,6 +371,8 @@ class shippingController extends Controller
 
                         ],200);
                     }
+            }
+
 
 
         }
@@ -333,14 +386,14 @@ class shippingController extends Controller
         $uid=$uid.""."_".date(time());
                 $checkUser=DB::table("users")
                 ->insert([
-                    'name'=>strtolower($input['name']),
+                    'name'=>strtolower($input['name'])??'none',
 
                     //'fname'=>$input['fname'],
                     //'lname'=>$input['lname'],
                     'email'=>$input['email']??'none',
                     'Ccode'=>$input['Ccode']??'none',//country code
                     'phone'=>$input['phone']??'none',
-                    'PhoneNumber'=>$input['PhoneNumber'],
+                    'PhoneNumber'=>$input['PhoneNumber']??'none',
                     'uidCreator'=>Auth::user()->uid,
 
                     'subscriber'=>Auth::user()->subscriber,
@@ -364,6 +417,7 @@ class shippingController extends Controller
                 else{
                     return response([
                         "status" =>false,
+                        "uid"=>false,
                     ]);
                 }
     }
@@ -376,7 +430,7 @@ class shippingController extends Controller
             "uidUser"=>$input["uidUser"],
             "uidCreator"=>Auth::user()->uid,
             "subscriber"=>Auth::user()->subscriber,
-            "marks"=>$input["marks"],
+            "marks"=>$input["marks"]??'none',
             "driverName"=>$input["driverName"],
             "driverTel"=>$input["driverTel"],
             "numberPlate"=>$input["numberPlate"],
@@ -407,7 +461,43 @@ class shippingController extends Controller
     }
     public function editShipping($input){
   try {
+
     //code...
+    $PhoneNumber=$input['PhoneNumber']??'none';
+        if(strtolower($PhoneNumber)=='none') {
+
+       /*$checkShip=DB::select("select uidUser from shippings where uid=:uid and subscriber=:subscriber limit 1",[
+            "uid"=>$input["uid"],
+            "subscriber"=>Auth::user()->subscriber
+        ]);
+        if($checkShip){
+
+            $input["actionStatus"]="edit";
+            if(($this->backupShip($input)->original["status"])){
+                $input["uidUser"]=$checkShip[0]->uidUser;
+                $checkName=DB::update("update users set name=:name where uid=:uid and subscriber=:subscriber limit 1",[
+                    "name"=>$input["name"]??'none',
+                    "uid"=>$input["uidUser"],
+                   "subscriber"=>Auth::user()->subscriber
+                ]);
+                return $this->updateShip($input);
+            }
+        }*/
+        if(($this->backupShip($input)->original["status"]))
+        {
+           /* if(($this->createUser($input)->original["status"])){
+                $uidUser["uidUser"]=($this->createUser($input)->original["uid"]);
+                return $this->updateShip($input);
+            }*/
+            $input["uidUser"]=($this->createUser($input)->original["uid"]);
+
+            if($input["uidUser"]!=false)
+            {
+               return $this->updateShip($input);
+            }
+        }
+    }
+   else{
     $check=DB::select("select name,PhoneNumber,uid from users where PhoneNumber=:PhoneNumber and subscriber=:subscriber limit 1",[
         "PhoneNumber"=>$input["PhoneNumber"],
         "subscriber"=>Auth::user()->subscriber
@@ -448,14 +538,21 @@ class shippingController extends Controller
 
          if(($this->backupShip($input)->original["status"]))
          {
-             if(($this->createUser($input)->original["status"])){
+            /* if(($this->createUser($input)->original["status"])){
                  $uidUser["uidUser"]=($this->createUser($input)->original["uid"]);
                  return $this->updateShip($input);
+             }*/
+             $input["uidUser"]=($this->createUser($input)->original["uid"]);
+
+             if($input["uidUser"]!=false)
+             {
+                return $this->updateShip($input);
              }
          }
 
 
      }
+   }
   } catch (\Exception $e) {
     //throw $th;
     return response()->json([
@@ -549,10 +646,19 @@ class shippingController extends Controller
         'origin' => $input['origin'],
         'destination' => $input['destination'],
         'commentData' => $input['commentData'] ?? 'none',
-        'marks' => $input['marks'],
+        'marks' => $input['marks']??'none',
         'updated_at' => $this->today, // Assuming you are using Carbon or similar to get the current timestamp
     ]);
-
+    if ($check) {
+        return response([
+            "status" => true,
+        ]);
+    } else {
+        return response([
+            "status" => false,
+            "msg" => "none"
+        ]);
+    }
 
     }
     public function deleteShipping($input){
@@ -674,6 +780,7 @@ class shippingController extends Controller
                 MAX(shippings.uid) AS uid,
                 MAX(users.name) AS name,
                 MAX(users.PhoneNumber) AS PhoneNumber,
+                MAX(shippings.marks) AS marks,
                 MAX(shippings.driverName) AS driverName,
                 MAX(shippings.driverTel) AS driverTel,
                 MAX(shippings.numberPlate) AS numberPlate,
@@ -682,14 +789,15 @@ class shippingController extends Controller
                 MAX(shippings.destination) AS destination,
                 MAX(shippings.status) AS status,
                 MAX(shippings.eta) AS eta,
+                MAX(shippings.updated_at) AS updated_at,
                 MAX(shippings.commentData) AS commentData
             FROM shippings
             INNER JOIN users ON shippings.uidUser = users.uid
             WHERE shippings.subscriber = :subscriber
               AND users.PhoneNumber = :PhoneNumber
-              AND (shippings.status != 'none' AND shippings.status != 'offloaded')
-            GROUP BY shippings.uidUser
-            ORDER BY shippings.id ASC
+              AND (shippings.status != 'none' AND shippings.status != 'Offloaded')
+            GROUP BY shippings.id
+            ORDER BY shippings.id DESC
         ", [
             'subscriber' => $checkPhone[0]->subscriber,
             'PhoneNumber' => $phoneNumber
@@ -698,6 +806,7 @@ class shippingController extends Controller
     if($check){
         return response([
             "status"=>true,
+            "todaysDate"=>"$this->today",
             "result"=>$check,
 
 

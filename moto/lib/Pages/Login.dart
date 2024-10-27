@@ -115,8 +115,8 @@ class _LoginState extends State<Login> {
                         padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
                         child: Image.asset(
                           'images/playstore.png',
-                          width: 40,
-                          height: 40,
+                          width: 60,
+                          height: 60,
                         ),
                       ),
                       Padding(
@@ -144,6 +144,7 @@ class _LoginState extends State<Login> {
                                     child: IntlPhoneField(
 
                                       controller: uidInput,
+                                      keyboardType: TextInputType.number,
                                       initialCountryCode: 'RW',
                                       decoration: InputDecoration(
                                           labelText: 'Phone Number',

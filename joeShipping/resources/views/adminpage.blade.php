@@ -16,6 +16,9 @@
 .disNone{
     display:none;
 }
+.btnCreateHide{
+    display:none;
+}
 span.Formchange {
     /* width: 200px; */
     padding-top: 10px;
@@ -107,6 +110,12 @@ width: 100% !important;
         font-size: 36px;
         margin-left: 50px;
       }
+      @media only screen and (min-width: 1024px) {
+    .customizeContainer{
+        padding-right:10% !important;
+        padding-left:10% !important;
+    }
+}
       @media screen and (max-height: 450px) {
         .sidenav {padding-top: 15px;}
         .sidenav a {font-size: 18px;}
@@ -137,6 +146,7 @@ width: 100% !important;
 </style>
 <!--Menu Css-->
 <!--style table -->
+
 <style>
 
 table {
@@ -325,8 +335,8 @@ table th {
                                     <i class="metismenu-icon pe-7s-graph2"></i> Update
                                 </a>
                             </li>
-                        <li class="app-sidebar__heading">Users</li>
-                            <li>
+                        <li class="app-sidebar__heading btnCreateHide">Users</li>
+                            <li class="btnCreateHide">
                                 <a href="#View All Users" onclick="return ViewAllUsers()">
                                     <i class="metismenu-icon pe-7s-graph2"></i>View
                                 </a>
@@ -457,7 +467,7 @@ table th {
 <body>
 
 <!--search form-->
-<div class="container">
+<div class="container-fluid customizeContainer">
 
 <!--form -->
 
@@ -466,6 +476,7 @@ table th {
     <div class="modal-content ">
 
 <div class="modal-header MyTitleModal"></div>
+
       <!--Order Request table-->
 <div class="ModalPassword">
     <table class="viewReqTable">
@@ -545,6 +556,9 @@ table th {
 <script>
 
 
+$(function() {
+    viewAllShipping();
+        });
     /*shipping Code */
     var searchItemData="clientName";
 
@@ -554,27 +568,32 @@ table th {
      var searchTable=`
 </div>
 <div class="pb-2">
-<button type="button" class="btn btn-dark" onclick="return FormShippingCreate()">Create</button>
+
+<button type="button" class="btn btn-dark btnCreateHide d-none" onclick="return paginate(2)">Previous</button>
+<button type="button" class="btn btn-dark btnCreateHide" onclick="return FormShippingCreate()">Create</button>
 
 
 </div>
 
 
-<div class="input-group mb-3">
+<div class="input-group mb-2">
   <div class="input-group-prepend">
     <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">By</button>
     <div class="dropdown-menu">
+    <a class="dropdown-item" href="#SearchByMarks" onclick="return chooseSearchShip('${"marks"}','${"Search by Marks"}')">Client Marks</a>
     <a class="dropdown-item" href="#SearchByClientName" onclick="return chooseSearchShip('${"clientName"}','${"Search by Client Name"}')">Client Name</a>
       <a class="dropdown-item" href="#SearchByClientTel" onclick="return chooseSearchShip('${"clientTel"}','${"Search by Client Tel"}')">Client Tel</a>
-      <a class="dropdown-item" href="#SearchByDriverName" onclick="return chooseSearchShip('${"driverName"}','${"Search by Driver Name"}')">Driver Name</a>
-      <a class="dropdown-item" href="#SearchByDriverTel" onclick="return chooseSearchShip('${"driverTel"}','${"Search by Driver Tel"}')">Driver Tel</a>
-      <a class="dropdown-item" href="#SearchByPlaque" onclick="return chooseSearchShip('${"numberPlate"}','${"Search by Plaque"}')">Plaque</a>
-      <a class="dropdown-item" href="#SearchByLocation" onclick="return chooseSearchShip('${"liveLocation"}','${"Search by Location"}')">location</a>
+      <a class="dropdown-item btnCreateHide" href="#SearchByDriverName" onclick="return chooseSearchShip('${"driverName"}','${"Search by Driver Name"}')">Driver Name</a>
+      <a class="dropdown-item btnCreateHide" href="#SearchByDriverTel" onclick="return chooseSearchShip('${"driverTel"}','${"Search by Driver Tel"}')">Driver Tel</a>
+      <a class="dropdown-item btnCreateHide" href="#SearchByPlaque" onclick="return chooseSearchShip('${"numberPlate"}','${"Search by Plaque"}')">Plaque</a>
+      <a class="dropdown-item btnCreateHide" href="#SearchByLocation" onclick="return chooseSearchShip('${"liveLocation"}','${"Search by Location"}')">location</a>
     </div>
   </div>
 
-  <input type="text" class="form-control searchProductTable searchShip" aria-label="Text input with dropdown button" placeholder="Search by Client Name" onkeyup="return SearchShipping(this,0)">
-</div>`;
+  <input type="text" class="form-control searchProductTable searchShip" aria-label="Text input with dropdown button" placeholder="Search by Marks" onkeyup="return SearchShipping(this,0)">
+</div>
+<button type="button" class="btn btn-dark   pull-right pb-2" onclick="return paginate(1)">next</button>
+`;
 
      function autoCompleteShip(thisData,searchItem,autoComp)
 {
@@ -713,10 +732,18 @@ function addItemPopup(dataPass){
         $('.autoCompleteTopItem').html("");
     }
 }
-function statusShipChange(thisData){
-    if(thisData.value=="On Port"){//Mombasa
+function statusShipChange(thisData,dataPass){
+    console.log(thisData.value);
+    data=atob(dataPass);
+    data=JSON.parse(data);
+    if(thisData.value==="On Port"){//Mombasa
 
-        $('.location').html(locationSet);
+        //$('.location').html(locationSet);
+        $('.location').html(
+            `<label>Current location</label>
+<input type="text" class="form-control" name="liveLocation" value="${data.origin}" readonly/>
+`
+        );
         $(".etaDiv").html(`
         <div class="d">
         <label>ETA(Estimated TIme Arrival)</label>
@@ -729,13 +756,31 @@ dateFormat: "Y-m-d",
 
 });
     }
-    else if(thisData.value=="Arrived")
+    else if(thisData.value==="Arrived")
     {
         $(".etaDiv").html(`<div class="d-none">
         <label>Status</label>
 <input type="text" class="form-control eta"  name="eta" value="Offloaded"/>
         </div>`);
+        $('.location').html(
+            `<label>Arrived</label>
+<input type="text" class="form-control" name="liveLocation" value="${data.destination}" readonly />
+`
+        );
     }
+    else if(thisData.value==="Offloaded")
+    {
+        $(".etaDiv").html(`<div class="d-none">
+        <label>Status</label>
+<input type="text" class="form-control eta"  name="eta" value="Offloaded Goods"/>
+        </div>`);
+        $('.location').html(
+            `<label>Offloaded</label>
+<input type="text" class="form-control" name="liveLocation" value="${data.destination}" readonly />
+`
+        );
+    }
+
 
     else{
         $('.location').html(
@@ -823,7 +868,9 @@ $(`.autocompleteIcon`).html(`<i class="fas fa-check text-success"></i>`);
 
 $('.viewOrder').modal('show');
 
-$('.MyTitleModal').html(`<h5 class="text-center">  <strong>Edit Item ${data.name}</strong></h5>`)
+$('.MyTitleModal').html(`<h5 class="text-center">  <strong>Edit Item ${data.name} </strong></h5> <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>`)
 $('.ModalPassword').html(`
 
 <form class="formShippingCreate" onsubmit="return ShippingEdit()">
@@ -836,7 +883,7 @@ $('.ModalPassword').html(`
 <label>Client Tel <span class="text-danger">*</span></label>
 <input type="hidden" class="form-control" name="uid" value="${data.uid}"/>
 <input type="hidden" class="form-control" name="actionStatus" value="actionStatus"/>
-<input type="text" class="form-control clientTelClass" name="PhoneNumber" autocomplete="off" onkeyup="autoCompleteShipUser(this,'clientTel','Users')" value="${data.PhoneNumber}" required/>
+<input type="text" class="form-control clientTelClass" name="PhoneNumber" autocomplete="off" onkeyup="autoCompleteShipUser(this,'clientTel','Users')" value="${data.PhoneNumber}" />
 <span class="autocompleteIcon clientTel_icon" onclick="hidePopupShip('clientTel')"><i class="fas fa-exclamation-triangle text-danger" ></i></span>
 </div>
 <ul class="list-group  autoCompleteTopItem clientTel disNone">
@@ -845,7 +892,7 @@ $('.ModalPassword').html(`
 
 <div class="form-group right-inner-addon">
 <label>Client Name <span class="text-danger">*</span></label>
-<input type="text" class="form-control clientNameClass" name="name" autocomplete="off" onkeyup="autoCompleteShipUser(this,'clientName','Users')" value="${data.name}" required/>
+<input type="text" class="form-control clientNameClass" name="name" autocomplete="off" onkeyup="autoCompleteShipUser(this,'clientName','Users')" value="${data.name}" />
 <span class="autocompleteIcon clientName_icon" onclick="hidePopupShip('clientName')"><i class="fas fa-exclamation-triangle text-danger" ></i></span>
 </div>
 <ul class="list-group  autoCompleteTopItem clientName disNone">
@@ -854,7 +901,7 @@ $('.ModalPassword').html(`
 
 <div class="form-group right-inner-addon">
 <label>Client Marks</label>
-<input type="text" class="form-control clientMarkClass" name="marks" autocomplete="off" onkeyup="autoCompleteShipUser(this,'clientMark','marks')" value="${data.marks}" required/>
+<input type="text" class="form-control clientMarkClass" name="marks" autocomplete="off" onkeyup="autoCompleteShipUser(this,'clientMark','marks')" value="${data.marks}" />
 <span class="autocompleteIcon clientMark_icon" onclick="hidePopupShip('clientMark')"><i class="fas fa-exclamation-triangle text-danger" ></i></span>
 </div>
 <ul class="list-group  autoCompleteTopItem clientMark disNone">
@@ -923,7 +970,7 @@ $('.ModalPassword').html(`
 
 `);
 
-
+$('.autoCompleteTopItem').css('z-index','0');
 
 
 }
@@ -975,7 +1022,9 @@ function ViewEditStatusShipping(dataPass){
     data=JSON.parse(data);
     $('.viewOrder').modal('show');
 
-$('.MyTitleModal').html(`<h5 class="text-center">  <strong>Edit Item ${data.name}</strong></h5>`)
+$('.MyTitleModal').html(`<h5 class="text-center">  <strong>Edit Item ${data.name}</strong></h5> <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>`)
 $('.ModalPassword').html(`
 
 <form class="formEditStatShipping" onsubmit="return EditStatShipping()">
@@ -986,30 +1035,32 @@ $('.ModalPassword').html(`
 </div>
 <div class="form-group">
     <label for="">Choose Status</label>
-<select id="Ultra" name="status"  class="form-control" onchange="return statusShipChange(this)">
+<select id="Ultra" name="status"  class="form-control" onchange="return statusShipChange(this,'${btoa(JSON.stringify(data))}')">
      <option value="On Port" selected>On Port</option>
      <option value="On The Way">On The Way</option>
      <option value="Arrived">Arrived</option>
+     <option value="Offloaded">Offloaded</option>
 
 </select>
 </div>
 <div class="form-group etaDiv">
-<div class="d-none">
+<div class="form-group">
         <label>ETA(Estimated TIme Arrival)</label>
-<input type="text" class="form-control eta" name="eta" value="Offloaded"/>
+<input type="text" class="form-control eta" name="eta" id="datetime-picker" placeholder="choose Date"/>
         </div>
 </div>
 <div class="form-group location">
-${locationSet}
+<label>Current location</label>
+<input type="text" class="form-control" name="liveLocation" value="${data.origin}" readonly/>
 </div>
 
 
 
 
 
-<div class="form-group">
-  <label for="exampleFormControlTextarea3">Enter Comment</label>
-  <textarea class="form-control" name="commentData" placeholder="Enter Comment" rows="7"></textarea>
+<div class="form-group d-none">
+  <label for="exampleFormControlTextarea3" class="d-none">Enter Comment</label>
+  <textarea class="form-control d-none" name="commentData" placeholder="Enter Comment" rows="7"></textarea>
 </div>
 
 
@@ -1022,6 +1073,11 @@ ${locationSet}
 </form>
 
 `)
+$('#datetime-picker').flatpickr({
+
+dateFormat: "Y-m-d",
+
+});
 }
 function EditStatShipping(){
    // $('.cover-spin').show();
@@ -1065,11 +1121,20 @@ error:function(data){
 
 return false;
 }
+var page=0;
+var prevPage=0;
+var countNum=0;
 function LoadShippingTemplate(data){
     //
 //console.log(data.permission.shippingEditStatus);
  var permission=JSON.parse(data.permission);
- console.log(permission.shippingEditStatus);
+ var todaysDate=data.todaysDate;
+ console.log(todaysDate);
+ //console.log(`create:${permission.shippingCreate}`);
+
+
+ (permission.shippingCreate)?$('.btnCreateHide').css("display","block"):$('.btnCreateHide').css("display","none");
+
     /*var resultDataInterest=data.CalculateInterest;
     var resultData=data.ProductResult;
     var resultDataSpend=data.OtherSpend;*/
@@ -1099,7 +1164,8 @@ getData+=`
 <th scope="col">From->To</th>
 <th scope="col">C Location</th>
 <th scope="col" class="${permission.shippingEditStatus?'':'d-none'}">Status</th>
-<th scope="col">created_at</th>
+<th scope="col" class="${permission.created_at?'':'d-none'}">created_at</th>
+<th scope="col">Retention</th>
 
 
 
@@ -1110,12 +1176,16 @@ getData+=`
 `;
 var resultData=data["result"];
 console.log(resultData);
+prevPage=page+resultData.length;
+page=(checkDirect==2)?prevPage-resultData.length:page+resultData.length;
 for(var i=0;i<resultData.length;i++){
+    countNum=countNum+1;
+
 var resultObject=resultData[i];
  getData+=`
 
  <tr>
-  <td data-label="#"><i class="fas fa-edit text-danger mylogout " title="Delete This " onclick="return editMyShipping('${btoa(JSON.stringify(resultData[i]))}')"></i> |<i class="fas fa-trash text-danger mylogout " title="Delete This " onclick="return deleteShipping('${btoa(JSON.stringify(resultData[i]))}')"></i>  ${i+1}</td>
+  <td data-label="#"><i class="fas fa-edit text-danger mylogout ${permission.editOrderAction?'':'d-none'}" title="Edit This " onclick="return editMyShipping('${btoa(JSON.stringify(resultData[i]))}')"></i> |<i class="fas fa-trash text-danger mylogout ${permission.deleteShipping?'':'d-none'}" title="Delete This " onclick="return deleteShipping('${btoa(JSON.stringify(resultData[i]))}')"></i>  ${countNum}</td>
   <td data-label="Marks"><p>${resultData[i].marks}<p>
    </td>
   <td data-label="Client"><p>${resultData[i].name}<p>
@@ -1132,12 +1202,16 @@ var resultObject=resultData[i];
    </td>
     <td data-label="C Location"><p>${resultData[i].liveLocation}<p>
    </td>
-   <td data-label="Status" class="${permission.shippingEditStatus?'':'d-none'}"><p class="text-danger">${resultData[i].status} <i class="fas fa-edit text-primary mylogout ${permission.shippingEditStatusIcon?'':'d-none'}" title="View Safari Items Load" onClick="return ViewEditStatusShipping('${btoa(JSON.stringify(resultData[i]))}')"></i><p>
-   <p>${resultData[i].eta}<p>
+   <td data-label="Status" class="${permission.shippingEditStatus?'':'d-none'} ${(resultData[i].status!="Arrived")?'':'bg-danger'} ${(resultData[i].status!="Offloaded")?'':'bg-info text-white'}"><p>${resultData[i].status} <i class="fas fa-edit text-primary mylogout ${permission.shippingEditStatusIcon?'':'d-none'}" title="View Safari Items Load" onClick="return ViewEditStatusShipping('${btoa(JSON.stringify(resultData[i]))}')"></i><p>
+   <span class="${(resultData[i].status=="Arrived" || resultData[i].status=="Offloaded")?'':'d-none'}  text-white">${resultData[i].updated_at}</span>
+   <p class="${(resultData[i].status!="Arrived")?'':'d-none'} ${(resultData[i].status!="Offloaded")?'':'d-none'}">E.T.A:${resultData[i].eta} <p>
    </td>
 
-   <td data-label="Status"><p class="text-danger">${resultData[i].created_at}<p>
+   <td data-label="created_at" class="${permission.created_at?'':'d-none'}">${resultData[i].created_at}
 
+   </td>
+   <td data-label="Retention" class="">
+   ${checkRetention(todaysDate, resultData[i].updated_at, resultData[i].status)}
    </td>
 
 
@@ -1154,12 +1228,97 @@ getData+=`
 $('.MainFormTable').html(getData);
 
 
+
+
     //
 }
+function addBusinessDays(startDate, daysToAdd) {
+    let currentDate = new Date(startDate);
+    let addedDays = 0;
 
+    while (addedDays < daysToAdd) {
+        currentDate.setDate(currentDate.getDate() + 1);
+
+        // Check if the current day is a weekday (Monday to Friday)
+        //if (currentDate.getDay() !== 0 && currentDate.getDay() !== 6) {//here =!=0 means exclude sunday and !==6 exclude saturday
+            if (currentDate.getDay() !== 0) {
+            addedDays++;
+        }
+    }
+
+    return currentDate;
+}
+
+function checkRetention(todaysD,startD,status){
+    // Example usage
+
+let startDate = new Date(startD);
+let todaysDate = new Date(todaysD);
+let resultDate = addBusinessDays(startDate, 4);
+
+if(startD==="null" || status!=='Arrived'){
+ return "...";
+}
+else if((todaysDate)>(resultDate))
+{
+
+   let differenceInTime = todaysDate.getTime() - resultDate.getTime();
+    let differenceInDays = Math.ceil(differenceInTime / (1000 * 3600 * 24));
+    return `<span class="text-danger">${differenceInDays} days</span>`;
+
+}else{
+
+     return updateCountdown(todaysDate, resultDate);
+
+}
+}
+
+
+
+
+// Initial call to display the countdown immediately
+
+function updateCountdown(todaysDate,resultDate) {
+    let now = new Date();
+
+             let timeRemaining = resultDate-todaysDate;
+             //let timeRemaining = resultDate-now;
+
+            if (timeRemaining > 0) {
+                let days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+                let hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                let minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+                let seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+
+               return `<span class="text-info">Left ${days} Days, ${hours} Hours,${minutes} Min</span>`;
+
+
+               //return "days";
+
+            } else {
+
+            }
+    }
+    var restartPaginate=0;
+    var checkDirect=1;
+function paginate(directPaginate){
+    restartPaginate=1;
+    if(directPaginate==1){//next
+        checkDirect=1;
+        viewAllShipping();
+    }
+    else{
+        checkDirect=2;
+        viewAllShipping();
+    }
+}
 function viewAllShipping(){
 
 var Usertoken=localStorage.getItem("Usertoken");
+$('.MainbigTitle').html(`
+<h5 class="text-center mainTitle"></h5>
+
+`);
 $('.MainForm').html(`
 ${searchTable}
     <div class="MainFormTable"></div>
@@ -1168,6 +1327,9 @@ $.ajax({
 
 url:`./api/viewAllShipping`,
 type:'get',
+data:{
+    "offset":page
+},
 headers: {
 "Content-Type": "application/json;charset=UTF-8",
 "Authorization": `Bearer ${Usertoken}`
@@ -1186,9 +1348,24 @@ LoadShippingTemplate(data);
 
 }
 else{
+    if(restartPaginate==1){
+        page=0;
+        countNum=0;
+        viewAllShipping();
+    }
+
+    else{
+        var permission=JSON.parse(data.permission);
+ //console.log(`create:${permission.shippingCreate}`);
+
+
+ (permission.shippingCreate)?$('.btnCreateHide').css("display","block"):$('.btnCreateHide').css("display","none");
+
 //LoadSafariStockAddItemBtnTemplate(data);
 
 $('.MyRequest_table').html("");
+    }
+
 /*getData=`
 ${searchTable}
 `;
@@ -1217,7 +1394,9 @@ return false;
 
     $('.viewOrder').modal('show');
 
-$('.MyTitleModal').html(`<h5 class="text-center">  <strong>Add Item </strong></h5>`)
+$('.MyTitleModal').html(`<h5 class="text-center">  <strong>Add Item </strong></h5><button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>`)
 $('.ModalPassword').html(`
 
 <form class="formShippingCreate" onsubmit="return ShippingCreate()">
@@ -1228,7 +1407,7 @@ $('.ModalPassword').html(`
 
 <div class="form-group right-inner-addon">
 <label>Client Tel <span class="text-danger">*</span></label>
-<input type="text" class="form-control clientTelClass" name="PhoneNumber" autocomplete="off" onkeyup="autoCompleteShipUser(this,'clientTel','Users')" required/>
+<input type="text" class="form-control clientTelClass" name="PhoneNumber" autocomplete="off" onkeyup="autoCompleteShipUser(this,'clientTel','Users')"/>
 <span class="autocompleteIcon clientTel_icon" onclick="hidePopupShip('clientTel')"><i class="fas fa-exclamation-triangle text-danger" ></i></span>
 </div>
 <ul class="list-group  autoCompleteTopItem clientTel disNone">
@@ -1237,7 +1416,7 @@ $('.ModalPassword').html(`
 
 <div class="form-group right-inner-addon">
 <label>Client Name <span class="text-danger">*</span></label>
-<input type="text" class="form-control clientNameClass" name="name" autocomplete="off" onkeyup="autoCompleteShipUser(this,'clientName','Users')" required/>
+<input type="text" class="form-control clientNameClass" name="name" autocomplete="off" onkeyup="autoCompleteShipUser(this,'clientName','Users')"/>
 <span class="autocompleteIcon clientName_icon" onclick="hidePopupShip('clientName')"><i class="fas fa-exclamation-triangle text-danger" ></i></span>
 </div>
 <ul class="list-group  autoCompleteTopItem clientName disNone">
@@ -1246,7 +1425,7 @@ $('.ModalPassword').html(`
 
 <div class="form-group right-inner-addon">
 <label>Client Marks</label>
-<input type="text" class="form-control clientMarkClass" name="marks" autocomplete="off" onkeyup="autoCompleteShipUser(this,'clientMark','marks')" required/>
+<input type="text" class="form-control clientMarkClass" name="marks" autocomplete="off" onkeyup="autoCompleteShipUser(this,'clientMark','marks')"/>
 <span class="autocompleteIcon clientMark_icon" onclick="hidePopupShip('clientMark')"><i class="fas fa-exclamation-triangle text-danger" ></i></span>
 </div>
 <ul class="list-group  autoCompleteTopItem clientMark disNone">
@@ -1313,10 +1492,11 @@ $('.ModalPassword').html(`
 </form>
 
 `)
-
+$('.autoCompleteTopItem').css('z-index','0');
     //
 
 }
+
 
 
 function ShippingCreate(){
@@ -1339,6 +1519,8 @@ if(data.status){//return data as true
    // console.log(`done $${CalculateDeclClass}`);
 
     $('.formShippingCreate .form-control').val("");
+    page=0;
+    countNum=0;
 
     viewAllShipping();
 
@@ -1731,7 +1913,9 @@ function ViewPromotion(data)
     data=JSON.parse(decodeURIComponent(data));
     $('.viewOrder').modal('show');
 
-$('.MyTitleModal').html(`<h5 class="text-center">  <strong>View Promotion</strong></h5>`)
+$('.MyTitleModal').html(`<h5 class="text-center">  <strong>View Promotion</strong></h5><button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>`)
 $('.ModalPassword').html(`
 
 <ul class="list-group">
@@ -1751,7 +1935,9 @@ function EditPromotion(data){
     data=JSON.parse(decodeURIComponent(data));
     $('.viewOrder').modal('show');
 
-$('.MyTitleModal').html(`<h5 class="text-center">  <strong>Edit Promotion</strong></h5>`)
+$('.MyTitleModal').html(`<h5 class="text-center">  <strong>Edit Promotion</strong></h5><button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>`)
 $('.ModalPassword').html(`
 <form class="formDataCreate pl-2 pr-2" onsubmit="return EditPromotionEvent()">
 
@@ -2002,6 +2188,7 @@ function autoCompleteShipUser(thisdata,className,searchOption)
 {
     $('.autoCompleteTopItem').html("");
     $('.autoCompleteTopItem').css('display','none');
+    $('.autoCompleteTopItem').css('z-index','99999');
     $(`.autocompleteIcon .${className}_icon`).html(`<i class="fas fa-exclamation-triangle text-danger onclick="hidePopup()"></i>`);
     //
         if(thisdata.value=="") return EmptyShipCompleteTopItem(className);
@@ -2124,6 +2311,9 @@ function EmptyShipCompleteTopItem(className){
     $(`.${className}`).html("");
     $(`.${className}`).hide();
     $(`.${className}_icon`).html("");
+
+    $('.autoCompleteTopItem').css('z-index','0');
+
 }
 function autoCompleteStock(thisdata)
 {
@@ -2970,7 +3160,9 @@ function ViewEditItemSafariStock(id,uid,safariuid,qty,price,pcs,comment,name,Sol
 
 $('.viewOrder').modal('show');
 
-$('.MyTitleModal').html(`<h5 class="text-center">  <strong>Edit Item</strong></h5>`)
+$('.MyTitleModal').html(`<h5 class="text-center">  <strong>Edit Item</strong></h5><button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>`)
 $('.ModalPassword').html(`
 
 <form class="formEditItemSafariStock" onsubmit="return SafariStockEditItem()">
@@ -3231,7 +3423,9 @@ function SafariStockForm(){
 
     $('.viewOrder').modal('show');
 
-$('.MyTitleModal').html(`<h5 class="text-center">  <strong>Create Safari</strong></h5>`)
+$('.MyTitleModal').html(`<h5 class="text-center">  <strong>Create Safari</strong></h5><button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>`)
 $('.ModalPassword').html(`
 <form class="formSafariCreate" onsubmit="return formSafariStockCreate()">
 <div class="p-2">
@@ -3356,7 +3550,9 @@ function FormCalcItemSafariStock(dataPass,status)
     console.log(data);
     $('.viewOrder').modal('show');
 
-$('.MyTitleModal').html(`<h5 class="text-center">  <strong>Add Item ${data.name}</strong></h5>`)
+$('.MyTitleModal').html(`<h5 class="text-center">  <strong>Add Item ${data.name}</strong></h5><button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>`)
 $('.ModalPassword').html(`
 
 <form class="formAddItemSafariStock" onsubmit="return SafariStockAddItem()">
@@ -3463,7 +3659,9 @@ function FormAddItemSafariStockSpent(dataPass,status)
     console.log(data);
     $('.viewOrder').modal('show');
 
-$('.MyTitleModal').html(`<h5 class="text-center">  <strong>Add Item ${data.name}</strong></h5>`)
+$('.MyTitleModal').html(`<h5 class="text-center">  <strong>Add Item ${data.name}</strong></h5><button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>`)
 $('.ModalPassword').html(`
 
 <form class="formAddItemSafariStock" onsubmit="return SafariSpendAddItem()">
@@ -3529,7 +3727,9 @@ function FormCalcItemSafariStock2(dataPass,status){
 
 $('.viewOrder').modal('show');
 
-$('.MyTitleModal').html(`<h5 class="text-center">  <strong>Add Item ${atob(safariName)}</strong></h5>`)
+$('.MyTitleModal').html(`<h5 class="text-center">  <strong>Add Item ${atob(safariName)}</strong></h5><button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>`)
 $('.ModalPassword').html(`
 
 <form class="formAddItemSafari" onsubmit="return SafariAddItem()">
@@ -3847,7 +4047,9 @@ return false;
 function ViewEditSafariStock(uid,name,comment,uidCreator,subscriber){
     $('.viewOrder').modal('show');
 
-$('.MyTitleModal').html(`<h5 class="text-center">  <strong>Edit Safari</strong></h5>`)
+$('.MyTitleModal').html(`<h5 class="text-center">  <strong>Edit Safari</strong></h5><button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>`)
 $('.ModalPassword').html(`
 <form class="formSafariEdit" onsubmit="return SafariEdit()">
 <div class="p-2">
@@ -4167,7 +4369,9 @@ function ViewEditItemSafari(id,uid,safariuid,qty,price,pcs,comment,name,SoldInte
 
     $('.viewOrder').modal('show');
 
-$('.MyTitleModal').html(`<h5 class="text-center">  <strong>Edit Item</strong></h5>`)
+$('.MyTitleModal').html(`<h5 class="text-center">  <strong>Edit Item</strong></h5><button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>`)
 $('.ModalPassword').html(`
 
 <form class="formEditItemSafari" onsubmit="return SafariEditItem()">
@@ -4428,7 +4632,9 @@ function SafariForm(){
 
     $('.viewOrder').modal('show');
 
-$('.MyTitleModal').html(`<h5 class="text-center"> <strong>Create Safari</strong></h5>`)
+$('.MyTitleModal').html(`<h5 class="text-center"> <strong>Create Safari</strong></h5><button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>`)
 $('.ModalPassword').html(`
 <form class="formSafariCreate" onsubmit="return formSafariCreate()">
 <div class="p-2">
@@ -4497,7 +4703,9 @@ function FormAddItemSafariSpent(safariuid,safariName)
 
     $('.viewOrder').modal('show');
 
-$('.MyTitleModal').html(`<h5 class="text-center">  <strong>Add Item ${atob(safariName)}</strong></h5>`)
+$('.MyTitleModal').html(`<h5 class="text-center">  <strong>Add Item ${atob(safariName)}</strong></h5><button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>`)
 $('.ModalPassword').html(`
 
 <form class="formAddItemSafari" onsubmit="return SafariAddItem()">
@@ -4552,7 +4760,9 @@ function FormAddItemSafari(safariuid,safariName){
 
 $('.viewOrder').modal('show');
 
-$('.MyTitleModal').html(`<h5 class="text-center">  <strong>Add Item ${atob(safariName)}</strong></h5>`)
+$('.MyTitleModal').html(`<h5 class="text-center">  <strong>Add Item ${atob(safariName)}</strong></h5><button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>`)
 $('.ModalPassword').html(`
 
 <form class="formAddItemSafari" onsubmit="return SafariAddItem()">
@@ -4912,7 +5122,9 @@ return false;
 function ViewEditSafari(uid,name,comment,uidCreator,subscriber){
     $('.viewOrder').modal('show');
 
-$('.MyTitleModal').html(`<h5 class="text-center">  <strong>Edit Safari</strong></h5>`)
+$('.MyTitleModal').html(`<h5 class="text-center">  <strong>Edit Safari</strong></h5><button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>`)
 $('.ModalPassword').html(`
 <form class="formSafariStockEdit" onsubmit="return SafariStockEdit()">
 <div class="p-2">
@@ -5209,7 +5421,9 @@ function ViewEditItemDeclaration(id,uid,name,qty,price,profit,transpfees){
 
     $('.viewOrder').modal('show');
 
-$('.MyTitleModal').html(`<h5 class="text-center">  <strong>Edit Item</strong></h5>`)
+$('.MyTitleModal').html(`<h5 class="text-center">  <strong>Edit Item</strong></h5><button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>`)
 $('.ModalPassword').html(`
 
 <form class="formEditItemDeclaration" onsubmit="return AdminDeclarationEditItem()">
@@ -5387,7 +5601,9 @@ function DeclarationForm(){
 
     $('.viewOrder').modal('show');
 
-$('.MyTitleModal').html(`<h5 class="text-center">  <strong>Create Declaration</strong></h5>`)
+$('.MyTitleModal').html(`<h5 class="text-center">  <strong>Create Declaration</strong></h5><button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>`)
 $('.ModalPassword').html(`
 <form class="formDeclarationCreate" onsubmit="return formDeclarationCreate()">
 <div class="p-2">
@@ -5531,7 +5747,9 @@ function FormAddItemDeclaration(uid,plaque,transpfees,profit,totClass){
 
 $('.viewOrder').modal('show');
 
-$('.MyTitleModal').html(`<h5 class="text-center">  <strong>Add Item</strong></h5>`)
+$('.MyTitleModal').html(`<h5 class="text-center">  <strong>Add Item</strong></h5><button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>`)
 $('.ModalPassword').html(`
 
 <form class="formAddItemDeclaration" onsubmit="return AdminDeclarationAddItem()">
@@ -5839,7 +6057,9 @@ return false;
 function ViewEditDeclaration(uid,plaque,profit,transpfees,exchangerate){
     $('.viewOrder').modal('show');
 
-$('.MyTitleModal').html(`<h5 class="text-center">  <strong>Edit Declaration</strong></h5>`)
+$('.MyTitleModal').html(`<h5 class="text-center">  <strong>Edit Declaration</strong></h5><button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>`)
 $('.ModalPassword').html(`
 <form class="formDeclarationEdit" onsubmit="return AdminEditDeclaration()">
 <div class="p-2">
@@ -6142,7 +6362,9 @@ function View_order(orderid){
 //
 var Usertoken=localStorage.getItem("Usertoken");
     $('.viewOrder').modal('show');
-    $('.MyTitleModal').html(`<h5 class="text-center">Order ID#:${orderid}</h5>`)
+    $('.MyTitleModal').html(`<h5 class="text-center">Order ID#:${orderid}</h5><button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>`)
     $('.cover-spin').show();
 
     $.ajax({
@@ -6524,7 +6746,9 @@ function AdminAddPassword(userid,name) {
 
     $('.viewOrder').modal('show');
 
-    $('.MyTitleModal').html(`<h5 class="text-center">Close  <strong>${name}</strong></h5>`)
+    $('.MyTitleModal').html(`<h5 class="text-center">Close  <strong>${name}</strong></h5><button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>`)
     $('.ModalPassword').html(`
     <form class="formData" >
 <div class="p-2">
@@ -7156,18 +7380,39 @@ function viewPermission(name,uid,permission){
     //console.log(permissionAdm);
     $('.viewOrder').modal('show');
 
-$('.MyTitleModal').html(`<h5 class="text-center">  <strong>Settings</strong></h5>`)
+$('.MyTitleModal').html(`<h5 class="text-center">  <strong>Settings</strong></h5><button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>`)
 $('.ModalPassword').html(`
 <ul class="list-group">
 
 <li class="list-group-item d-flex justify-content-between align-items-center" >
-Editing Shipping
-    <span class="badge "> <i class="fas ${permissionAdm.shippingEditStatus?'fa-check':'fa-ban'} text-success" onclick="return changePermission('${uid}','${btoa(permissionAdm.shippingEditStatus)}','${btoa('shippingEditStatus')}')"></i></span>
+ Create Shipping
+    <span class="badge "> <i class="fas ${permissionAdm.shippingCreate?'fa-check text-success':'fa-ban text-danger'}" onclick="return changePermission('${uid}','${btoa(permissionAdm.shippingCreate??false)}','${btoa('shippingCreate')}')"></i></span>
+  </li>
+<li class="list-group-item d-flex justify-content-between align-items-center" >
+Edit Status
+    <span class="badge "> <i class="fas ${permissionAdm.shippingEditStatus?'fa-check text-success':'fa-ban text-danger'}" onclick="return changePermission('${uid}','${btoa(permissionAdm.shippingEditStatus??false)}','${btoa('shippingEditStatus')}')"></i></span>
   </li>
 
   <li class="list-group-item d-flex justify-content-between align-items-center" >
-Editing editOrderAction
-    <span class="badge "> <i class="fas ${permissionAdm.editOrderAction?'fa-check':'fa-ban'} text-success" onclick="return changePermission('${uid}','${btoa(permissionAdm.editOrderAction)}','${btoa('editOrderAction')}')"></i></span>
+Edit Status Icon
+    <span class="badge "> <i class="fas ${permissionAdm.shippingEditStatusIcon?'fa-check text-success':'fa-ban text-danger'}" onclick="return changePermission('${uid}','${btoa(permissionAdm.shippingEditStatusIcon??false)}','${btoa('shippingEditStatusIcon')}')"></i></span>
+  </li>
+
+  <li class="list-group-item d-flex justify-content-between align-items-center" >
+Edit shipping
+    <span class="badge "> <i class="fas ${permissionAdm.editOrderAction?'fa-check text-success':'fa-ban text-danger'}" onclick="return changePermission('${uid}','${btoa(permissionAdm.editOrderAction??false)}','${btoa('editOrderAction')}')"></i></span>
+  </li>
+
+  <li class="list-group-item d-flex justify-content-between align-items-center" >
+Delete shipping
+    <span class="badge "> <i class="fas ${permissionAdm.deleteShipping?'fa-check text-success':'fa-ban text-danger'}" onclick="return changePermission('${uid}','${btoa(permissionAdm.deleteShipping??false)}','${btoa('deleteShipping')}')"></i></span>
+  </li>
+
+  <li class="list-group-item d-flex justify-content-between align-items-center" >
+created_at
+    <span class="badge "> <i class="fas ${permissionAdm.created_at?'fa-check text-success':'fa-ban text-danger'}" onclick="return changePermission('${uid}','${btoa(permissionAdm.created_at??false)}','${btoa('created_at')}')"></i></span>
   </li>
 
 </ul>
@@ -7176,8 +7421,13 @@ Editing editOrderAction
 `);
 
 }
+function stringToBoolean(str) {
+    return str.toLowerCase() === "true";
+}
+
 function changePermission(uid,permBolean,permJsonValue){
-    permBolean=(Boolean(atob(permBolean)));
+     permBolean=(atob(permBolean));
+    //console.log(`${typeof stringToBoolean(permBolean)} then boolean :${!stringToBoolean(permBolean)}`);
 
     if(confirm(`Do you Want to edit Permission `))
     {
@@ -7196,7 +7446,7 @@ headers: {
 },
 data:{
 uid:uid,
-permBolean:permBolean,
+permBolean:!stringToBoolean(permBolean),
 permJsonValue:atob(permJsonValue)
 },
 success:function(data){
@@ -7206,7 +7456,7 @@ if(data.status){//return data as true
 
 
 $('.cover-spin').hide();
-
+ViewAllUsers();
 
 }
 else{
@@ -7346,7 +7596,9 @@ error:function(data){
 }
 function AdminChangeAdjustProduct(id,productCode,price,qty,total,tags,created_at,cat){
     $('.viewOrder').modal('show');
-    $('.MyTitleModal').html(`<h5 class="text-center">Adjust <strong>${atob(productCode)}</strong></h5>`);
+    $('.MyTitleModal').html(`<h5 class="text-center">Adjust <strong>${atob(productCode)}</strong></h5><button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>`);
     $('.ModalPassword').html(`
   <div class="p-2">
     <form class="formData"  enctype="multipart/form-data">
@@ -7435,7 +7687,9 @@ function AdminChangeAdjustProduct(id,productCode,price,qty,total,tags,created_at
 }
 function AdminChangeProduct(id,productCode,price,qty,total,tags,created_at,cat){
     $('.viewOrder').modal('show');
-    $('.MyTitleModal').html(`<h5 class="text-center">Edit <strong>${atob(productCode)}</strong></h5>`);
+    $('.MyTitleModal').html(`<h5 class="text-center">Edit <strong>${atob(productCode)}</strong></h5><button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>`);
     $('.ModalPassword').html(`
   <div class="p-2">
     <form class="formData"  enctype="multipart/form-data">
@@ -8077,7 +8331,9 @@ var catName= sel.options[sel.selectedIndex].text;
 function SettingComeFrom(){
     $('.viewOrder').modal('show');
 
-$('.MyTitleModal').html(`<h5 class="text-center">  <strong>Settings</strong></h5>`)
+$('.MyTitleModal').html(`<h5 class="text-center">  <strong>Settings</strong></h5><button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>`)
 $('.ModalPassword').html(`
 <div class="pl-1 pr-1 pt-1">
 <div class="input-group mb-3">

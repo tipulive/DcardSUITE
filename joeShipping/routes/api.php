@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+Route::post('/DataUssD','ussdController@DataUssD')->name('DataUssD');
 Route::post('/CreateCompany','AdminController@AdminCreateCompany')->name('AdminCreateCompany');
 Route::get('/trackNumber','shippingController@trackNumber')->name('trackNumber');
 
@@ -44,7 +45,12 @@ Route::post('/AdminLoginPhone','AdminController@AdminLoginPhone')->name(' AdminL
 //Route::get('/testauth','TestController@testauth')->name('testauth');
 
 Route::middleware('auth:sanctum')->group( function () {//here is to protect multiple route
-   /*shipping */
+  /*Travers */
+  Route::post('/registerVehicle','CompanyController@registerVehicle')->name('registerVehicle');
+  Route::post('/createLocation','CompanyController@createLocation')->name('createLocation');
+  Route::post('/addDashboardTrip','CompanyController@addDashboardTrip')->name('addDashboardTrip');
+  /*Travers */
+    /*shipping */
    Route::get('/searchShipUser','CompanyController@searchShipUser')->name('searchShipUser');
    Route::post('/deleteShipping','CompanyController@deleteShipping')->name('deleteShipping');
    Route::post('/editShipping','CompanyController@editShipping')->name('editShipping');

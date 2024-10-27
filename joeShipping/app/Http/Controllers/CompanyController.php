@@ -36,6 +36,90 @@ class CompanyController extends Controller
         $this->Admin_Auth_result_error="0";//Admin auth result zero
         $this->platform1=env('PLATFORM3');
     }
+    /*travel Company*/
+    public function registerVehicle(Request $request) {
+        if(Auth::check())
+        {
+        if(Auth::user()->platform==$this->platform1)
+            {
+                $input=$request->all();
+
+                return (new TransportController)->registerVehicle($input);
+            }
+            else{
+                return response([
+                    "status"=>false,
+                    "result"=>$this->Admin_Auth_result_error,
+                    "error"=>$this->Admin_Auth_error,
+
+                ],200);
+            }
+        }
+        else{
+            return response([
+                "status"=>false,
+                "result"=>$this->Admin_Auth_result_error,
+                "error"=>$this->Admin_Auth_error,
+
+            ],200);
+        }
+    }
+    public function createLocation(Request $request) {
+        if(Auth::check())
+        {
+        if(Auth::user()->platform==$this->platform1)
+            {
+                $input=$request->all();
+
+                return (new TransportController)->createLocation($input);
+            }
+            else{
+                return response([
+                    "status"=>false,
+                    "result"=>$this->Admin_Auth_result_error,
+                    "error"=>$this->Admin_Auth_error,
+
+                ],200);
+            }
+        }
+        else{
+            return response([
+                "status"=>false,
+                "result"=>$this->Admin_Auth_result_error,
+                "error"=>$this->Admin_Auth_error,
+
+            ],200);
+        }
+    }
+    public function addDashboardTrip(Request $request) {
+        if(Auth::check())
+        {
+        if(Auth::user()->platform==$this->platform1)
+            {
+                $input=$request->all();
+
+                return (new TransportController)->addDashboardTrip($input);
+            }
+            else{
+                return response([
+                    "status"=>false,
+                    "result"=>$this->Admin_Auth_result_error,
+                    "error"=>$this->Admin_Auth_error,
+
+                ],200);
+            }
+        }
+        else{
+            return response([
+                "status"=>false,
+                "result"=>$this->Admin_Auth_result_error,
+                "error"=>$this->Admin_Auth_error,
+
+            ],200);
+        }
+    }
+
+    /*travel Company*/
     /*shipping */
     public function searchShipUser(Request $request) {
         if(Auth::check())

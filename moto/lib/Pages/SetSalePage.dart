@@ -25,16 +25,14 @@ class SetSalePage extends StatelessWidget {
               //Get.toNamed('settings');
             },
           ),
-          title: Padding(
-            padding: const EdgeInsets.all(70.0),
-            child: Text("Sales",style:GoogleFonts.abel(fontSize:15,color: Colors.teal,fontWeight: FontWeight.w700)),
-          ),
+
+
         ),
       ),
 
 
       body:SetSaleComp(),
-      bottomNavigationBar:HomeNavigator(),
+     // bottomNavigationBar:HomeNavigator(),
 
 
 

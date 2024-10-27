@@ -117,17 +117,19 @@ public function uploadImage(Request $request)
 
    $input=$request->all();
         $check=DB::table('products')
-            ->select('mult_imgurl')
+            ->select('img_url')
             ->where('productCode', $input['productCode'])
             ->first();
-
-        if ($check->mult_imgurl ==='none') {
-            $uploadedFile = $this->imageUpload($request,1,"false");
+            $number=$request->input('NumbVer');
+            $numberData = substr($number, -1);
+$data = json_decode($check->img_url, true);
+        if (count($data) <4) {
+            $uploadedFile = $this->imageUpload($request,$numberData,"false");
             if ($uploadedFile['status']) {
                 DB::update("UPDATE products SET  mult_imgurl = :mult_imgurl WHERE productCode = :productCode and subscriber=:subscriber", [
                     //'img_url' => $uploadedFile['filename'],
                     'subscriber' => Auth::user()->subscriber,
-                    'mult_imgurl' => 1,
+                    'mult_imgurl' =>$numberData,
                     'productCode' => $input['productCode']
                 ]);
 
@@ -151,41 +153,13 @@ public function uploadImage(Request $request)
                     'msg' => 'Image not uploaded 1'
                 ]);
             }
-        } elseif ($check->mult_imgurl + 1 >= 5) {
+        } else {
             // Enough pictures, three pictures only required
 
             return response()->json([
                 'status' => false,
                 'msg' => 'Maximum of Four images allowed'
             ]);
-        } else {
-            $fileNumb=$check->mult_imgurl+1;
-            $uploadedFile = $this->imageUpload($request,$fileNumb,"false");
-             DB::update("UPDATE products SET  mult_imgurl =mult_imgurl+:mult_imgurl WHERE productCode = :productCode", [
-
-                    'mult_imgurl' => 1,
-                    'productCode' => $input['productCode']
-                ]);
-            if ($uploadedFile['status']) {
-                DB::table('product_images')->insert([
-                    'productCode' => $input['productCode'],
-                    'img_url' => $uploadedFile['filename'],
-                    'subscriber' => Auth::user()->subscriber,
-                    'created_at' => $this->today
-                ]);
-
-                DB::commit();
-
-                return response()->json([
-                    'status' => true,
-                    'filename' => $uploadedFile['filename']
-                ]);
-            } else {
-                return response()->json([
-                    'status' => false,
-                    'msg' => 'Image not uploaded 2'
-                ]);
-            }
         }
     } catch (\Exception $e) {
         DB::rollBack();
@@ -197,7 +171,6 @@ public function uploadImage(Request $request)
         ], 500);
     }
 }
-
 
 public function SetDefault(Request $request){
 
@@ -2101,62 +2074,74 @@ else{
         $orderId=$input['orderIdFromEdit']??'none';
         $uid =($orderId=='none')?"UID"."_".Str::random(2).""."_".date(time()):$orderId;
        // echo $uid;
-        $checkDup=DB::select("select  uid from orderhistories where uid=:uid and paidStatus=:paidStatus limit 1",[
-            "uid"=>$uid,
-            "paidStatus"=>'checked'
-            ]);
-        if($checkDup){
-                 //Some Duplicate please
-                 echo"not exist";
-        }
-        else{
-        //Working
-        $check=DB::update("update products set qty_sold=qty_sold  $SignChange $req_qty where subscriber=:subscriber and productCode=:productCode and qty>=qty_sold+$req_qty limit 1",array(
-            "productCode"=>$productCode,
-            "subscriber"=>Auth::user()->subscriber
-         ));
-         if($check)
-         {
-            $subscriber=Auth::user()->subscriber;
-            DB::select("SET @requested_qty = ?", [$req_qty]);
+       $checkAvoid=DB::select("select uid from orders where uid=:uid limit 1",[
+        "uid"=>$uid
+        ]);
+if($checkAvoid)
+{
+    return response([
+        "status"=>false,
+        "message"=>'there is a problem of duplicate ID',
+         ],200);
+}
+else{
+    $checkDup=DB::select("select  uid from orderhistories where uid=:uid and paidStatus=:paidStatus limit 1",[
+        "uid"=>$uid,
+        "paidStatus"=>'checked'
+        ]);
+    if($checkDup){
+             //Some Duplicate please
+             echo"not exist";
+    }
+    else{
+    //Working
+    $check=DB::update("update products set qty_sold=qty_sold  $SignChange $req_qty where subscriber=:subscriber and productCode=:productCode and qty>=qty_sold+$req_qty limit 1",array(
+        "productCode"=>$productCode,
+        "subscriber"=>Auth::user()->subscriber
+     ));
+     if($check)
+     {
+        $subscriber=Auth::user()->subscriber;
+        DB::select("SET @requested_qty = ?", [$req_qty]);
 
-            $results = DB::select("
-                SELECT
-                    id,
-                    safariId,
-                    CASE
-                        WHEN @requested_qty >= qty THEN qty
-                        ELSE @requested_qty
-                    END AS qty,
-                    CASE
-                        WHEN @requested_qty >= qty THEN 0
-                        ELSE @requested_qty - qty
-                    END AS remaining,
-                    @requested_qty := GREATEST(@requested_qty - qty, 0) AS updated_requested_qty
-                FROM
-                safariproducts
-                WHERE
-                    subscriber='$subscriber' and
-                    productCode='$productCode' AND
-                    qty != 0 AND
-                    @requested_qty > 0
-                ORDER BY
-                    id;
-            ");
+        $results = DB::select("
+            SELECT
+                id,
+                safariId,
+                CASE
+                    WHEN @requested_qty >= qty THEN qty
+                    ELSE @requested_qty
+                END AS qty,
+                CASE
+                    WHEN @requested_qty >= qty THEN 0
+                    ELSE @requested_qty - qty
+                END AS remaining,
+                @requested_qty := GREATEST(@requested_qty - qty, 0) AS updated_requested_qty
+            FROM
+            safariproducts
+            WHERE
+                subscriber='$subscriber' and
+                productCode='$productCode' AND
+                qty != 0 AND
+                @requested_qty > 0
+            ORDER BY
+                id;
+        ");
 
 
 
-                return $this->testorderPlace($results,$input,$uid);
-         }
-         else{
+            return $this->testorderPlace($results,$input,$uid);
+     }
+     else{
 
-        return response([
-                "status"=>false,
-                "message"=>'Something Wrong check if you have enough qty of '."".$productCode,
-                 ],200);
-         }
+    return response([
+            "status"=>false,
+            "message"=>'Something Wrong check if you have enough qty of '."".$productCode,
+             ],200);
+     }
 
-        }
+    }
+}
 
 
     }
@@ -2280,6 +2265,7 @@ else{
            $results= DB::select("select *from orderhistories where uid=:uid and productCode=:productCode ",[
                "uid"=>$input['uid'],
                "productCode"=>$input['productCode'],
+
 
            ]);
            $limitData=count($results);
@@ -2435,158 +2421,184 @@ else{
 
 
         }
-public function deleteTSingleOrder($input){
-    //$req_qty=$input['req_qty'];
-    try {
-        $check=DB::transaction(function () use ($input) {
-            $productCode=$input['productCode'];
-              // $current_qty=$input['current_qty'];
-               $uid=$input['uid'];
-               $subscriber=Auth::user()->subscriber;
-               $results=DB::select("select *FROM
-               orderhistories
-           WHERE
-               productCode='$productCode' AND
-               uid='$uid' AND
-               subscriber='$subscriber'");
+        public function deleteTSingleOrder($input){
+            //$req_qty=$input['req_qty'];
+            try {
+                $check=DB::transaction(function () use ($input) {
+                    $productCode=$input['productCode'];
+                      // $current_qty=$input['current_qty'];
+                       $uid=$input['uid'];
+                       $subscriber=Auth::user()->subscriber;
+                       //avoid delete first
+                         $checkAvoid=DB::select("select uid from orders where uid=:uid limit 1",[
+                           "uid"=>$uid
+                           ]);
+         if($checkAvoid)
+         {
+                         return array(
+                                    "status"=>true,
+
+                                );
+         }
+         else{
+                           $results=DB::select("select *FROM
+                       orderhistories
+                   WHERE
+                       productCode='$productCode' AND
+                       uid='$uid' AND
+                       subscriber='$subscriber'");
 
 
-               $data=[];
-               $ids=[];
-               $orderId="OrderId";
-                 $limitData=count($results);
-                    $totalQty=0;
-                    $countLoop=0;
-               for($i=0;$i<$limitData;$i++)
-               {
+                       $data=[];
+                       $ids=[];
+                       $orderId="OrderId";
+                         $limitData=count($results);
+                            $totalQty=0;
+                            $countLoop=0;
+                       for($i=0;$i<$limitData;$i++)
+                       {
 
-                   $id=$results[$i]->id;
-                   $ids[]=$results[$i]->id;
-                   $orderId=$results[$i]->uid;
+                           $id=$results[$i]->id;
+                           $ids[]=$results[$i]->id;
+                           $orderId=$results[$i]->uid;
 
-                  DB::update("update safariproducts set qty=qty+:qty,SoldOut=SoldOut-:SoldOut,TotSoldAmount=TotSoldAmount-:TotSoldAmout where safariId=:safariId and productCode=:productCode limit 100 ",array(
-                          "qty"=>$results[$i]->qty,
-                          "SoldOut"=>$results[$i]->qty,
-                          "TotSoldAmout"=>$results[$i]->total,
-                          "safariId"=>$results[$i]->SafariId,
-                          "productCode"=>$results[$i]->productCode
+                          DB::update("update safariproducts set qty=qty+:qty,SoldOut=SoldOut-:SoldOut,TotSoldAmount=TotSoldAmount-:TotSoldAmout where safariId=:safariId and productCode=:productCode limit 100 ",array(
+                                  "qty"=>$results[$i]->qty,
+                                  "SoldOut"=>$results[$i]->qty,
+                                  "TotSoldAmout"=>$results[$i]->total,
+                                  "safariId"=>$results[$i]->SafariId,
+                                  "productCode"=>$results[$i]->productCode
 
-                   ));
-
-
-                       $countLoop=$i+1;
-   $totalQty+=$results[$i]->qty;
-               }
-               $input['currentQtyOfOrder']=$totalQty;
-               if($results){
-                if($countLoop>=$limitData){
-                    DB::delete("delete from orderhistories where uid=:uid and productCode=:productCode limit 50",array(
-                        "uid"=>$input['uid'],
-                        "productCode"=>$input['productCode']
+                           ));
 
 
-                        ));
-                       $checkProduct=DB::update("update products set qty_sold=qty_sold-$totalQty where subscriber=:subscriber and productCode=:productCode  limit 1",array(
-                           "productCode"=>$productCode,
-                           "subscriber"=>Auth::user()->subscriber
-                        ));
-                        if($checkProduct)
-                        {
-
-                           return array(
-                            "status"=>true,
-                            "result"=> $checkProduct,
-                        );
-
-                        }
-                        else{
-                            return array(
-                                "status"=>true,
-                                "result"=> $checkProduct,
-                            );
-                        }
-                   }
-
-               }
-
-            });
-        return response($check,200);
-    } catch (\Exception $e) {
-        DB::rollback();
-        return response()->json([
-            'error' => 'An error occurred',
-            'errorPrint' => $e->getMessage(),
-            'errorCode' => $e->getLine(),
-        ], 500);
-    }
-
-}
-public function deleteTOrder($input){
+                               $countLoop=$i+1;
+           $totalQty+=$results[$i]->qty;
+                       }
+                       $input['currentQtyOfOrder']=$totalQty;
+                       if($results){
+                        if($countLoop>=$limitData){
+                            DB::delete("delete from orderhistories where uid=:uid and productCode=:productCode limit 50",array(
+                                "uid"=>$input['uid'],
+                                "productCode"=>$input['productCode']
 
 
-   // $current_qty=$input['current_qty'];
-    $uid=$input['uid'];
-    $subscriber=Auth::user()->subscriber;
-    $results=DB::select("select *FROM
-    orderhistories
-WHERE
-    uid=:uid AND
-    paidStatus='none' AND
-    subscriber=:subscriber limit 200",
-    [
-       "uid"=>$uid,
-       "subscriber"=>$subscriber
-    ]
-);
+                                ));
+                               $checkProduct=DB::update("update products set qty_sold=qty_sold-$totalQty where subscriber=:subscriber and productCode=:productCode  limit 1",array(
+                                   "productCode"=>$productCode,
+                                   "subscriber"=>Auth::user()->subscriber
+                                ));
+                                if($checkProduct)
+                                {
 
+                                   return array(
+                                    "status"=>true,
+                                    "result"=> $checkProduct,
+                                );
 
-    $data=[];
-    $ids=[];
-    $orderId="OrderId";
-      $limitData=count($results);
-         $totalQty=0;
-    for($i=0;$i<$limitData;$i++)
-    {
-        $totalQty+=$results[$i]->qty;
-        $id=$results[$i]->id;
-        $ids[]=$results[$i]->id;
-        $orderId=$results[$i]->uid;
-        $qty=$results[$i]->qty;
+                                }
+                                else{
+                                    return array(
+                                        "status"=>true,
+                                        "result"=> $checkProduct,
+                                    );
+                                }
+                           }
 
-       DB::update("update safariproducts set qty=qty+:qty,SoldOut=SoldOut-:SoldOut,TotSoldAmount=TotSoldAmount-:TotSoldAmout where safariId=:safariId and productCode=:productCode limit 100 ",array(
-               "qty"=>$results[$i]->qty,
-               "SoldOut"=>$results[$i]->qty,
-               "TotSoldAmout"=>$results[$i]->total,
-               "safariId"=>$results[$i]->SafariId,
-               "productCode"=>$results[$i]->productCode
+                       }
 
-        ));
-        DB::delete("delete from orderhistories where uid=:uid and productCode=:productCode limit 50",array(
-            "uid"=>$input['uid'],
-            "productCode"=>$results[$i]->productCode
+         }
 
-
-            ));
-
-            $checkProduct=DB::update("update products set qty_sold=qty_sold-$qty where subscriber=:subscriber and productCode=:productCode  limit 1",array(
-                "productCode"=>$results[$i]->productCode,
-                "subscriber"=>Auth::user()->subscriber
-             ));
-
-           if ($i == ($limitData-1)) {
-                return response([
-                    "status"=>true,
-                    "result"=>$checkProduct,
-
-                ],200);
-
+                    });
+                return response($check,200);
+            } catch (\Exception $e) {
+                DB::rollback();
+                return response()->json([
+                    'error' => 'An error occurred',
+                    'errorPrint' => $e->getMessage(),
+                    'errorCode' => $e->getLine(),
+                ], 500);
             }
-    }
+
+        }
+        public function deleteTOrder($input){
+
+
+           // $current_qty=$input['current_qty'];
+            $uid=$input['uid'];
+            $subscriber=Auth::user()->subscriber;
+             $checkAvoid=DB::select("select uid from orders where uid=:uid limit 1",[
+                           "uid"=>$uid
+                           ]);
+         if($checkAvoid)
+         {
+              return response([
+                            "status"=>true,
+
+
+                        ],200);
+         }
+         else{
+                $results=DB::select("select *FROM
+            orderhistories
+        WHERE
+            uid=:uid AND
+            paidStatus='none' AND
+            subscriber=:subscriber limit 200",
+            [
+               "uid"=>$uid,
+               "subscriber"=>$subscriber
+            ]
+        );
+
+
+            $data=[];
+            $ids=[];
+            $orderId="OrderId";
+              $limitData=count($results);
+                 $totalQty=0;
+            for($i=0;$i<$limitData;$i++)
+            {
+                $totalQty+=$results[$i]->qty;
+                $id=$results[$i]->id;
+                $ids[]=$results[$i]->id;
+                $orderId=$results[$i]->uid;
+                $qty=$results[$i]->qty;
+
+               DB::update("update safariproducts set qty=qty+:qty,SoldOut=SoldOut-:SoldOut,TotSoldAmount=TotSoldAmount-:TotSoldAmout where safariId=:safariId and productCode=:productCode limit 100 ",array(
+                       "qty"=>$results[$i]->qty,
+                       "SoldOut"=>$results[$i]->qty,
+                       "TotSoldAmout"=>$results[$i]->total,
+                       "safariId"=>$results[$i]->SafariId,
+                       "productCode"=>$results[$i]->productCode
+
+                ));
+                DB::delete("delete from orderhistories where uid=:uid and productCode=:productCode limit 50",array(
+                    "uid"=>$input['uid'],
+                    "productCode"=>$results[$i]->productCode
+
+
+                    ));
+
+                    $checkProduct=DB::update("update products set qty_sold=qty_sold-$qty where subscriber=:subscriber and productCode=:productCode  limit 1",array(
+                        "productCode"=>$results[$i]->productCode,
+                        "subscriber"=>Auth::user()->subscriber
+                     ));
+
+                   if ($i == ($limitData-1)) {
+                        return response([
+                            "status"=>true,
+                            "result"=>$checkProduct,
+
+                        ],200);
+
+                    }
+            }
+         }
 
 
 
-
-}
+        }
 public function EditOrder($input){
 
     //Clone First
@@ -3001,7 +3013,7 @@ public function SubmitOrder($input){
 //$check_InputData<=0?(new ParticipateController)->participate($input):$this->notparticipate();//means client azaba yishyuye yose nta deni afite
 
     }
-public function admin_record($input){
+    public function admin_record($input){
 
 
         try{
@@ -3014,9 +3026,15 @@ public function admin_record($input){
             $mamaUid="MSolange_1709926940";
             $UserId=($input["uidUser"]===$mamaUid)?$mamaUid:Auth::user()->uid;
 
-
-
-            $checkSum=DB::select("select sum(total) as total from orderhistories where uid=:uid limit 2000",[
+                  $checkAvoid=DB::select("select uid from orders where uid=:uid limit 1",[
+                   "uid"=>$input["OrderId"]
+                   ]);
+ if($checkAvoid)
+ {
+      return $checkAvoid;
+ }
+ else{
+      $checkSum=DB::select("select sum(total) as total from orderhistories where uid=:uid limit 2000",[
                 "uid"=>$input["OrderId"]
             ]);
 
@@ -3111,6 +3129,9 @@ public function admin_record($input){
                     return $dataInsert;
                 }
            }
+ }
+
+
  });
 
 
@@ -3183,6 +3204,327 @@ public function admin_record($input){
        ],200);
     }
     }
+    public function viewAnySales($input){//any one view any Sales
+        //if($input["searchOption"]=='true') return $this->SearchSales($input);
+
+        try {
+          //code...
+          $advancedSearch=strtolower($input["advancedSearch"]);
+
+        $item = strtolower($input["name"]??'none');
+        $itemSearch='%'.$item.'%';
+        $searchOption=($input["searchOption"]=='name'|| $input["searchOption"]=='orderid' || $input["searchOption"]=='true')?$input["searchOption"]:"false";
+        $searchQuery=(object)array(
+         "true"=>array(
+          "DownQuerySearch"=>"AND users.name LIKE :Name",
+          "paramSearch"=>array(
+              'Name'=>$itemSearch
+          ),
+          "groupByLimit"=>"GROUP BY orders.id
+        LIMIT 10"
+
+         ),
+         "name"=>array(
+          "DownQuerySearch"=>"AND users.name LIKE :Name",
+          "paramSearch"=>array(
+              'Name'=>$itemSearch
+          ),
+          "groupByLimit"=>"GROUP BY orders.id
+        LIMIT 10"
+
+         ),
+         "orderid"=>array(
+          "DownQuerySearch"=>"AND orders.uid LIKE :orderId",
+          "paramSearch"=>array(
+              'orderId'=>$itemSearch
+          ),
+          "groupByLimit"=>"GROUP BY orders.id
+        LIMIT 10"
+
+         ),
+         "false"=>array(
+          "DownQuerySearch"=>"",
+          "paramSearch"=>array(
+
+          ),
+          "groupByLimit"=>"GROUP BY orders.id
+          ORDER BY orders.id DESC
+        LIMIT 100"
+         ),
+       );
+       $DownQuerySearch=$searchQuery->{$searchOption}["DownQuerySearch"];
+       $paramSearch=$searchQuery->{$searchOption}["paramSearch"];
+       $groupByLimitSeach=$searchQuery->{$searchOption}["groupByLimit"];
+        $isQuery=(object)array(
+          "mysales"=>array(
+             "TopQuery"=>"Max(admnin_records.balance) AS saleBalance,
+              MAX(orders.total) AS totalPaid,
+              MAX(orders.created_at) AS created_at,
+              MAX(orders.paidStatus) as paidStatus",
+              "DownQuery"=>"WHERE orders.subscriber = :subscriber
+
+              AND admnin_records.status ='Sales'
+              AND admnin_records.subscriber=:adminSubscriber
+              $DownQuerySearch
+              ",
+              "params"=>array(
+                  'subscriber' => Auth::user()->subscriber,
+                  'adminSubscriber' => Auth::user()->subscriber,
+                  //'uidCreator' => Auth::user()->uid,
+
+
+              )
+
+
+              ),
+          "today"=>array(
+              "TopQuery"=>"Max(total_orders.saleBalance) as saleBalance,
+              MAX(orders.total) AS totalPaid,
+              MAX(orders.created_at) AS created_at,
+              MAX(orders.paidStatus) as paidStatus",
+              "DownQuery"=>"
+              INNER JOIN (
+                 SELECT SUM(total) AS saleBalance
+                 FROM orders where  (DATE(orders.created_at) =CURDATE())
+             ) AS total_orders
+             WHERE orders.subscriber = :subscriber
+
+               AND admnin_records.status ='Sales'
+               AND admnin_records.subscriber=:adminSubscriber
+               AND (DATE(orders.created_at) = CURDATE())
+               $DownQuerySearch
+               "
+
+               ,
+               "params"=>array(
+                  'subscriber' =>Auth::user()->subscriber,
+                  'adminSubscriber'=>Auth::user()->subscriber,
+                  //'uidCreator'=>Auth::user()->uid,
+                  //'uidCreatorCount'=>Auth::user()->uid,
+
+              )
+
+
+               ),
+          "week"=>array(
+              "TopQuery"=>"Max(total_orders.saleBalance) as saleBalance,
+              MAX(orders.total) AS totalPaid,
+              MAX(orders.created_at) AS created_at,
+              MAX(orders.paidStatus) as paidStatus",
+
+              "DownQuery"=>"
+              INNER JOIN (
+                 SELECT SUM(total) AS saleBalance
+                 FROM orders where (YEARWEEK(orders.created_at) = YEARWEEK(NOW()))
+             ) AS total_orders
+             WHERE orders.subscriber = :subscriber
+
+               AND admnin_records.status ='Sales'
+               AND admnin_records.subscriber=:adminSubscriber
+               AND (YEARWEEK(orders.created_at) = YEARWEEK(NOW()))
+               $DownQuerySearch
+               "
+
+               ,
+               "params"=>array(
+                  'subscriber' =>Auth::user()->subscriber,
+                  'adminSubscriber'=>Auth::user()->subscriber,
+                  //'uidCreator'=>Auth::user()->uid,
+                  //'uidCreatorCount'=>Auth::user()->uid,
+
+
+
+              )
+
+               ),
+
+          "month"=>array(
+                          "TopQuery"=>"Max(total_orders.saleBalance) as saleBalance,
+                           MAX(orders.total) AS totalPaid,
+                           MAX(orders.created_at) AS created_at,
+                           MAX(orders.paidStatus) as paidStatus",
+                           "DownQuery"=>"
+                           INNER JOIN (
+                              SELECT SUM(total) AS saleBalance
+                              FROM orders where  (YEAR(orders.created_at) = YEAR(CURDATE()) AND MONTH(orders.created_at) = MONTH(CURDATE()))
+                          ) AS total_orders
+                           WHERE orders.subscriber = :subscriber
+
+                           AND admnin_records.status ='Sales'
+                           AND admnin_records.subscriber=:adminSubscriber
+                           AND (YEAR(orders.created_at) = YEAR(CURDATE()) AND MONTH(orders.created_at) = MONTH(CURDATE()))
+                           $DownQuerySearch
+                           "
+
+                           ,
+                           "params"=>array(
+                               'subscriber' =>Auth::user()->subscriber,
+                               'adminSubscriber'=>Auth::user()->subscriber,
+                               //'uidCreator'=>Auth::user()->uid,
+                               //'uidCreatorCount'=>Auth::user()->uid,
+
+                           )
+
+
+                           ),
+          "year"=>array(
+              "TopQuery"=>"Max(total_orders.saleBalance) as saleBalance,
+              MAX(orders.total) AS totalPaid,
+              MAX(orders.created_at) AS created_at,
+              MAX(orders.paidStatus) as paidStatus",
+              "DownQuery"=>"
+              INNER JOIN (
+                 SELECT SUM(total) AS saleBalance
+                 FROM orders where  (YEAR(orders.created_at) = YEAR(CURDATE()))
+             ) AS total_orders
+               WHERE orders.subscriber = :subscriber
+
+               AND admnin_records.status ='Sales'
+               AND admnin_records.subscriber=:adminSubscriber
+               AND (YEAR(orders.created_at) = YEAR(CURDATE()))
+               $DownQuerySearch
+               "
+
+               ,
+               "params"=>array(
+                   'subscriber'=>Auth::user()->subscriber,
+                   'adminSubscriber'=>Auth::user()->subscriber,
+                   //'uidCreator'=>Auth::user()->uid,
+                   //'uidCreatorCount'=>Auth::user()->uid,
+
+               )
+
+
+               ),
+               "choosedate"=>array(
+                  "TopQuery"=>"Max(total_orders.saleBalance) as saleBalance,
+                  MAX(orders.total) AS totalPaid,
+                  MAX(orders.created_at) AS created_at,
+                  MAX(orders.paidStatus) as paidStatus",
+                  "DownQuery"=>"
+                  INNER JOIN (
+                     SELECT SUM(total) AS saleBalance
+                     FROM orders where
+                      (DATE(orders.created_at)=:thisDate)
+                 ) AS total_orders
+                   WHERE orders.subscriber = :subscriber
+
+                   AND admnin_records.status ='Sales'
+                   AND admnin_records.subscriber=:adminSubscriber
+                   AND (DATE(orders.created_at) =:thisDate2)
+                   $DownQuerySearch
+                   "
+
+                   ,
+                   "params"=>array(
+                       'subscriber'=>Auth::user()->subscriber,
+                       'adminSubscriber'=>Auth::user()->subscriber,
+                      // 'uidCreator'=>Auth::user()->uid,
+                       //'uidCreatorCount'=>Auth::user()->uid,
+                       'thisDate'=>$input['thisDate'],
+                       'thisDate2'=>$input['thisDate']
+
+                   )
+
+
+                   ),
+                   "choosedaterange"=>array(
+                      "TopQuery"=>"Max(total_orders.saleBalance) as saleBalance,
+                      MAX(orders.total) AS totalPaid,
+                      MAX(orders.created_at) AS created_at,
+                      MAX(orders.paidStatus) as paidStatus",
+                      "DownQuery"=>"
+                      INNER JOIN (
+                         SELECT SUM(total) AS saleBalance
+                         FROM orders where
+                         (DATE(orders.created_at) BETWEEN :thisDate AND :toDate)
+                     ) AS total_orders
+                       WHERE orders.subscriber = :subscriber
+
+                       AND admnin_records.status ='Sales'
+                       AND admnin_records.subscriber=:adminSubscriber
+                       AND (DATE(orders.created_at) BETWEEN :thisDate2 AND :toDate2)
+                       $DownQuerySearch
+                       "
+
+                       ,
+                       "params"=>array(
+                           'subscriber'=>Auth::user()->subscriber,
+                           'adminSubscriber'=>Auth::user()->subscriber,
+                           //'uidCreator'=>Auth::user()->uid,
+                           //'uidCreatorCount'=>Auth::user()->uid,
+                           'thisDate'=>$input['thisDate'],
+                           'thisDate2'=>$input['thisDate'],
+                           'toDate'=>$input['toDate'],
+                           'toDate2'=>$input['toDate'],
+
+                       )
+
+
+                       ),
+
+
+
+
+
+
+
+        );
+       // $Query=$searchQuery->{$advancedSearch};
+       $topQuery=$isQuery->{$advancedSearch}["TopQuery"];
+       $downQuery=$isQuery->{$advancedSearch}["DownQuery"];
+       $paramsQuery1=$isQuery->{$advancedSearch}["params"];
+       $paramsQuery = array_merge($paramsQuery1, $paramSearch);
+       $check = DB::select("
+       SELECT
+           Max(orders.uid) as OrderId,
+           MAX(users.name) AS name,
+           MAX(admins.name) AS adminName,
+           $topQuery
+
+
+       FROM orders
+       INNER JOIN admnin_records ON orders.uidCreator =admnin_records.uid
+       INNER JOIN admins ON orders.uidCreator=admins.uid
+       INNER JOIN users ON orders.uidUser = users.uid
+       $downQuery
+       $groupByLimitSeach
+   ", $paramsQuery);
+
+      if($check)
+      {
+          return response([
+              "status"=>true,
+              "test"=>$this->curdate,
+              "down"=>$DownQuerySearch,
+             // "parameters"=>$paramSearch,
+              "result"=>$check
+
+
+
+          ],200);
+
+      }
+      else{
+         return response([
+          "test2"=>$this->curdate,
+             "status"=>true,
+             "result"=>0,
+
+         ],200);
+      }
+        } catch (\Exception $e) {
+          return response()->json([
+              'error' => 'An error occurred',
+              'errorPrint' => $e->getMessage(),
+              'errorCode' => $e->getLine(),
+          ], 500);
+      }
+
+
+
+
+      }
     public function viewSales($input){
       //if($input["searchOption"]=='true') return $this->SearchSales($input);
 
@@ -4892,6 +5234,7 @@ public function admin_record($input){
     LIMIT 25",
     $paramSearch);
         if($check){
+
             return response([
                 "status"=>true,
                 "result"=>$check,
@@ -4899,6 +5242,7 @@ public function admin_record($input){
             ],200);
         }
         else{
+
             return response([
                 "status"=>false,
                 "result"=>0,

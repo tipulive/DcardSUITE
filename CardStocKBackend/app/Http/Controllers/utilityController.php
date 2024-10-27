@@ -16,6 +16,7 @@ class utilityController extends Controller
         date_default_timezone_set(env('TIME_ZONE'));
         $this->today = date('Y-m-d H:i:s', time());
         $this->curdate=date('Y-m-d', time());
+        $this->curTime=date('H:i', time());
         $this->Appstate=env('APP_LIVE')?env('APP_PRO'):env('APP_DEV');
         $this->AppName=env('APP_NAME');
 
@@ -27,6 +28,17 @@ class utilityController extends Controller
         $this->platform1=env('PLATFORM3');
     }
 
+    public function cbmCalculator(){
+        $check=DB::select("select id,productCode,interest,(0) as Totinterest,(1) as qty,cbm as percbm,(0) as cbm,(0) as Toteachcbm from cbms");
+        if($check){
+
+            return response([
+                "status"=>true,
+                "result"=>$check,
+
+            ],200);
+        }
+    }
     public function validateBuy(){//validate if client has enough amount on his account to buy electricity
 
     }
@@ -146,7 +158,345 @@ admin promotion option later */
         }
 
     }
+    public function utilityViewSales($input){
+        //if($input["searchOption"]=='true') return $this->SearchSales($input);
 
+        try {
+          //code...
+          $advancedSearch=strtolower($input["advancedSearch"]);
+
+        $item = strtolower($input["name"]??'none');
+        $itemSearch='%'.$item.'%';
+        $searchOption=($input["searchOption"]=='name'|| $input["searchOption"]=='orderid' || $input["searchOption"]=='true')?$input["searchOption"]:"false";
+        $searchQuery=(object)array(
+         "true"=>array(
+          "DownQuerySearch"=>"AND users.name LIKE :Name",
+          "paramSearch"=>array(
+              'Name'=>$itemSearch
+          ),
+          "groupByLimit"=>"GROUP BY orders.id
+        LIMIT 10"
+
+         ),
+         "name"=>array(
+          "DownQuerySearch"=>"AND users.name LIKE :Name",
+          "paramSearch"=>array(
+              'Name'=>$itemSearch
+          ),
+          "groupByLimit"=>"GROUP BY orders.id
+        LIMIT 10"
+
+         ),
+         "orderid"=>array(
+          "DownQuerySearch"=>"AND orders.uid LIKE :orderId",
+          "paramSearch"=>array(
+              'orderId'=>$itemSearch
+          ),
+          "groupByLimit"=>"GROUP BY orders.id
+        LIMIT 10"
+
+         ),
+         "false"=>array(
+          "DownQuerySearch"=>"",
+          "paramSearch"=>array(
+
+          ),
+          "groupByLimit"=>"GROUP BY orders.id
+          ORDER BY orders.id DESC
+        LIMIT 100"
+         ),
+       );
+       $DownQuerySearch=$searchQuery->{$searchOption}["DownQuerySearch"];
+       $paramSearch=$searchQuery->{$searchOption}["paramSearch"];
+       $groupByLimitSeach=$searchQuery->{$searchOption}["groupByLimit"];
+        $isQuery=(object)array(
+          "mysales"=>array(
+             "TopQuery"=>"Max(admnin_records.balance) AS saleBalance,
+              MAX(orders.total) AS totalPaid,
+              MAX(orders.status) AS status,
+              MAX(orders.commentData) AS commentData,
+              MAX(orders.created_at) AS created_at,
+              MAX(orders.paidStatus) as paidStatus",
+              "DownQuery"=>"WHERE orders.subscriber = :subscriber
+              AND orders.uidCreator=:uidCreator
+              AND admnin_records.status ='Sales'
+              AND admnin_records.subscriber=:adminSubscriber
+              $DownQuerySearch
+              ",
+              "params"=>array(
+                  'subscriber' => Auth::user()->subscriber,
+                  'adminSubscriber' => Auth::user()->subscriber,
+                  'uidCreator' => Auth::user()->uid,
+
+
+              )
+
+
+              ),
+          "today"=>array(
+              "TopQuery"=>"Max(total_orders.saleBalance) as saleBalance,
+              MAX(orders.total) AS totalPaid,
+              MAX(orders.status) AS status,
+              MAX(orders.commentData) AS commentData,
+              MAX(orders.created_at) AS created_at,
+              MAX(orders.paidStatus) as paidStatus",
+              "DownQuery"=>"
+              INNER JOIN (
+                 SELECT SUM(total) AS saleBalance
+                 FROM orders where orders.uidCreator = :uidCreatorCount
+                 AND (DATE(orders.created_at) =CURDATE())
+             ) AS total_orders
+             WHERE orders.subscriber = :subscriber
+               AND orders.uidCreator = :uidCreator
+               AND admnin_records.status ='Sales'
+               AND admnin_records.subscriber=:adminSubscriber
+               AND (DATE(orders.created_at) = CURDATE())
+               $DownQuerySearch
+               "
+
+               ,
+               "params"=>array(
+                  'subscriber' =>Auth::user()->subscriber,
+                  'adminSubscriber'=>Auth::user()->subscriber,
+                  'uidCreator'=>Auth::user()->uid,
+                  'uidCreatorCount'=>Auth::user()->uid,
+
+              )
+
+
+               ),
+          "week"=>array(
+              "TopQuery"=>"Max(total_orders.saleBalance) as saleBalance,
+              MAX(orders.total) AS totalPaid,
+              MAX(orders.status) AS status,
+              MAX(orders.commentData) AS commentData,
+              MAX(orders.created_at) AS created_at,
+              MAX(orders.paidStatus) as paidStatus",
+
+              "DownQuery"=>"
+              INNER JOIN (
+                 SELECT SUM(total) AS saleBalance
+                 FROM orders where orders.uidCreator = :uidCreatorCount
+                 AND (YEARWEEK(orders.created_at) = YEARWEEK(NOW()))
+             ) AS total_orders
+             WHERE orders.subscriber = :subscriber
+               AND orders.uidCreator = :uidCreator
+               AND admnin_records.status ='Sales'
+               AND admnin_records.subscriber=:adminSubscriber
+               AND (YEARWEEK(orders.created_at) = YEARWEEK(NOW()))
+               $DownQuerySearch
+               "
+
+               ,
+               "params"=>array(
+                  'subscriber' =>Auth::user()->subscriber,
+                  'adminSubscriber'=>Auth::user()->subscriber,
+                  'uidCreator'=>Auth::user()->uid,
+                  'uidCreatorCount'=>Auth::user()->uid,
+
+
+
+              )
+
+               ),
+
+          "month"=>array(
+                          "TopQuery"=>"Max(total_orders.saleBalance) as saleBalance,
+                           MAX(orders.total) AS totalPaid,
+                           MAX(orders.status) AS status,
+                           MAX(orders.commentData) AS commentData,
+                           MAX(orders.created_at) AS created_at,
+                           MAX(orders.paidStatus) as paidStatus",
+                           "DownQuery"=>"
+                           INNER JOIN (
+                              SELECT SUM(total) AS saleBalance
+                              FROM orders where orders.uidCreator = :uidCreatorCount
+                              AND (YEAR(orders.created_at) = YEAR(CURDATE()) AND MONTH(orders.created_at) = MONTH(CURDATE()))
+                          ) AS total_orders
+                           WHERE orders.subscriber = :subscriber
+                           AND orders.uidCreator = :uidCreator
+                           AND admnin_records.status ='Sales'
+                           AND admnin_records.subscriber=:adminSubscriber
+                           AND (YEAR(orders.created_at) = YEAR(CURDATE()) AND MONTH(orders.created_at) = MONTH(CURDATE()))
+                           $DownQuerySearch
+                           "
+
+                           ,
+                           "params"=>array(
+                               'subscriber' =>Auth::user()->subscriber,
+                               'adminSubscriber'=>Auth::user()->subscriber,
+                               'uidCreator'=>Auth::user()->uid,
+                               'uidCreatorCount'=>Auth::user()->uid,
+
+                           )
+
+
+                           ),
+          "year"=>array(
+              "TopQuery"=>"Max(total_orders.saleBalance) as saleBalance,
+              MAX(orders.total) AS totalPaid,
+              MAX(orders.status) AS status,
+              MAX(orders.commentData) AS commentData,
+              MAX(orders.created_at) AS created_at,
+              MAX(orders.paidStatus) as paidStatus",
+              "DownQuery"=>"
+              INNER JOIN (
+                 SELECT SUM(total) AS saleBalance
+                 FROM orders where orders.uidCreator = :uidCreatorCount
+                 AND (YEAR(orders.created_at) = YEAR(CURDATE()))
+             ) AS total_orders
+               WHERE orders.subscriber = :subscriber
+               AND orders.uidCreator = :uidCreator
+               AND admnin_records.status ='Sales'
+               AND admnin_records.subscriber=:adminSubscriber
+               AND (YEAR(orders.created_at) = YEAR(CURDATE()))
+               $DownQuerySearch
+               "
+
+               ,
+               "params"=>array(
+                   'subscriber'=>Auth::user()->subscriber,
+                   'adminSubscriber'=>Auth::user()->subscriber,
+                   'uidCreator'=>Auth::user()->uid,
+                   'uidCreatorCount'=>Auth::user()->uid,
+
+               )
+
+
+               ),
+               "choosedate"=>array(
+                  "TopQuery"=>"Max(total_orders.saleBalance) as saleBalance,
+                  MAX(orders.total) AS totalPaid,
+                  MAX(orders.status) AS status,
+                  MAX(orders.commentData) AS commentData,
+                  MAX(orders.created_at) AS created_at,
+                  MAX(orders.paidStatus) as paidStatus",
+                  "DownQuery"=>"
+                  INNER JOIN (
+                     SELECT SUM(total) AS saleBalance
+                     FROM orders where orders.uidCreator = :uidCreatorCount
+                     AND (DATE(orders.created_at)=:thisDate)
+                 ) AS total_orders
+                   WHERE orders.subscriber = :subscriber
+                   AND orders.uidCreator = :uidCreator
+                   AND admnin_records.status ='Sales'
+                   AND admnin_records.subscriber=:adminSubscriber
+                   AND (DATE(orders.created_at) =:thisDate2)
+                   $DownQuerySearch
+                   "
+
+                   ,
+                   "params"=>array(
+                       'subscriber'=>Auth::user()->subscriber,
+                       'adminSubscriber'=>Auth::user()->subscriber,
+                       'uidCreator'=>Auth::user()->uid,
+                       'uidCreatorCount'=>Auth::user()->uid,
+                       'thisDate'=>$input['thisDate'],
+                       'thisDate2'=>$input['thisDate']
+
+                   )
+
+
+                   ),
+                   "choosedaterange"=>array(
+                      "TopQuery"=>"Max(total_orders.saleBalance) as saleBalance,
+                      MAX(orders.total) AS totalPaid,
+                      MAX(orders.status) AS status,
+                      MAX(orders.commentData) AS commentData,
+                      MAX(orders.created_at) AS created_at,
+                      MAX(orders.paidStatus) as paidStatus",
+                      "DownQuery"=>"
+                      INNER JOIN (
+                         SELECT SUM(total) AS saleBalance
+                         FROM orders where orders.uidCreator = :uidCreatorCount
+                         AND (DATE(orders.created_at) BETWEEN :thisDate AND :toDate)
+                     ) AS total_orders
+                       WHERE orders.subscriber = :subscriber
+                       AND orders.uidCreator = :uidCreator
+                       AND admnin_records.status ='Sales'
+                       AND admnin_records.subscriber=:adminSubscriber
+                       AND (DATE(orders.created_at) BETWEEN :thisDate2 AND :toDate2)
+                       $DownQuerySearch
+                       "
+
+                       ,
+                       "params"=>array(
+                           'subscriber'=>Auth::user()->subscriber,
+                           'adminSubscriber'=>Auth::user()->subscriber,
+                           'uidCreator'=>Auth::user()->uid,
+                           'uidCreatorCount'=>Auth::user()->uid,
+                           'thisDate'=>$input['thisDate'],
+                           'thisDate2'=>$input['thisDate'],
+                           'toDate'=>$input['toDate'],
+                           'toDate2'=>$input['toDate'],
+
+                       )
+
+
+                       ),
+
+
+
+
+
+
+
+        );
+       // $Query=$searchQuery->{$advancedSearch};
+       $topQuery=$isQuery->{$advancedSearch}["TopQuery"];
+       $downQuery=$isQuery->{$advancedSearch}["DownQuery"];
+       $paramsQuery1=$isQuery->{$advancedSearch}["params"];
+       $paramsQuery = array_merge($paramsQuery1, $paramSearch);
+       $check = DB::select("
+       SELECT
+           Max(orders.uid) as OrderId,
+           MAX(orders.status) AS status,
+           MAX(orders.commentData) AS commentData,
+           MAX(users.name) AS name,
+           $topQuery
+
+
+       FROM orders
+       INNER JOIN admnin_records ON orders.uidCreator =admnin_records.uid
+       INNER JOIN users ON orders.uidUser = users.uid
+       $downQuery
+       $groupByLimitSeach
+   ", $paramsQuery);
+
+      if($check)
+      {
+          return response([
+              "status"=>true,
+              "test"=>$this->curdate,
+              "down"=>$DownQuerySearch,
+             // "parameters"=>$paramSearch,
+              "result"=>$check
+
+
+
+          ],200);
+
+      }
+      else{
+         return response([
+          "test2"=>$this->curdate,
+             "status"=>true,
+             "result"=>0,
+
+         ],200);
+      }
+        } catch (\Exception $e) {
+          return response()->json([
+              'error' => 'An error occurred',
+              'errorPrint' => $e->getMessage(),
+              'errorCode' => $e->getLine(),
+          ], 500);
+      }
+
+
+
+
+      }
     public function utilitySubmitOrder($input){//get Token
 
         try {
@@ -296,6 +646,7 @@ admin promotion option later */
                                  "updated_at"=>$this->today
                                  ]
                              ];
+                             $token=mt_rand(1000, 9999)."-".mt_rand(1000, 9999)."-".mt_rand(1000, 9999)."-".mt_rand(1000, 9999);
                              DB::table("orders")
                              ->insert([
                                  "uid"=>$uid,//orderId
@@ -306,13 +657,15 @@ admin promotion option later */
                                  "promotionUid"=>$input['uid'],
                                  "reach"=>$input['reach'],
                                  "gain"=>$input['gain'],
+                                 "status"=>$input["ref"],
+                                 "commentData"=>$token,
                                  "systemUid"=>$systemUid,
                                  "uidUser"=>($input['uidUser']??$uidCreator),//here is card number
                                 // "uidCreator"=>$uidCreator,
                                  "uidCreator"=>Auth::user()->uid,
                                  "subscriber"=>$subscriber,
                                  "temporalData"=>json_encode($json_array),
-                                 "commentData"=>$input['commentData']??'none',
+
                                  "created_at"=>$this->today,
                                  "updated_at"=>$this->today
                              ] );
@@ -330,7 +683,12 @@ admin promotion option later */
                                     "status"=>true,
                                     "result"=>$results,
                                     "token"=>$uid,
-                                    "token2"=>mt_rand(10000, 99999)."-".mt_rand(10000, 99999)."-".mt_rand(10000, 99999)."-".mt_rand(10000, 99999)
+                                    "curDay"=>$this->curdate,
+                                    "curTime"=>$this->curTime,
+
+                                    "name"=>Auth::user()->name,
+
+                                    "token2"=>$token
 
 
                                 ];

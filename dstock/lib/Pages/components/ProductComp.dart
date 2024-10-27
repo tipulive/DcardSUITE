@@ -1,11 +1,8 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:math';
-import 'dart:typed_data';
 
 
-import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'package:image_picker/image_picker.dart';
+
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 import '../../../Utilconfig/HideShowState.dart';
@@ -20,8 +17,6 @@ import '../../Query/StockQuery.dart';
 import 'package:flutter/material.dart';
 
 import 'package:google_fonts/google_fonts.dart';
-import 'package:dio/dio.dart' as dio;
-import 'package:photo_manager/photo_manager.dart';
 
 import '../../Utilconfig/image_card_widget.dart';
 
@@ -76,84 +71,15 @@ class _ProductCompState extends State<ProductComp> {
 
   final List<String> _dropdownOptions = ['Name', 'Code'];
   String selectOption="Code";
-
+String versionN="172363500";
 
 
 
   bool showOveray=false;
 
-  /* picture upload*/
-  Future<XFile?> pickImage({required ImageSource source}) async {
-    final imagePicker = ImagePicker();
-    final pickedImage = await imagePicker.pickImage(source: source);
-    return pickedImage;
-  }
 
-  XFile? _imageFile;
 
-  Future<void> _pickImage(ImageSource source) async {
-    final pickedImage = await pickImage(source: source);
-    if (pickedImage != null) {
-      //attachPicture();
-      setState(() {
-        _imageFile = pickedImage;
-      });
-     // _compressAndUploadImage();
-    }
-  }
 
-  Future<void> _compressAndUploadImage() async {
-    if (_imageFile == null) return;
-
-    final compressedImage = await compressImage(_imageFile);
-    if (compressedImage == null) return;
-
-    // Upload or store the compressed image here.
-
-    // Create a Dio instance.
-    final dioInstance = dio.Dio();
-    String authToken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
-    dioInstance.options.headers = {
-      'Authorization': 'Bearer $authToken',
-    };
-
-    // Replace this URL with your server's endpoint for uploading images.
-    const String uploadUrl = '${ConstantClassUtil.urlLink}/upload';
-
-    try {
-      // Use Dio to upload the compressed image.
-      final response = await dioInstance.post(
-        uploadUrl,
-        data: dio.FormData.fromMap({
-          'image': dio.MultipartFile.fromBytes(
-            compressedImage,
-            filename: _imageFile!.name,
-          ),
-          'productCode':"nyota"
-        }),
-      );
-
-      // Handle the response from the server.
-      if (response.statusCode == 200) {
-        print('Image uploaded successfully');
-      } else {
-        print('Failed to upload image: ${response.statusMessage}');
-      }
-    } catch (e) {
-      print('Error during image upload: $e');
-    }
-  }
-  Future<Uint8List?> compressImage(XFile? imageFile) async {
-    if (imageFile == null) return null;
-
-    final compressedImage = await FlutterImageCompress.compressWithFile(
-      imageFile.path,
-      quality: 75,
-      format: CompressFormat.jpeg, // Use CompressFormat directly.
-    );
-
-    return compressedImage;
-  }
   /* picture upload*/
 
 final fontSizeData=13.0;
@@ -724,16 +650,22 @@ final fontSizeData=13.0;
                       right: 3,
                       child: GestureDetector(
                         onTap: () {
-                          //Map<String, dynamic> jsonObject = jsonDecode(_data[index]["img_url"]);
-                          //print("${jsonObject}");
+                          /*Map<String, dynamic> jsonObject = jsonDecode(_data[index]["img_url"]);
+                          if(jsonObject["numb3"]==null){
+                            print("null value");
+                          }
+                          else{
+                            print("${jsonObject["numb3"]}");
+                          }*/
+
                           //print(_data[index]);
                           //print(Get.put(S))
-                          attachPicture(_data[index]["productCode"]);
+                          attachPicture(_data[index]["productCode"],_data[index]["img_url"]);
                         },
                         child: Container(
                           width: 50,
                           height: 50,
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                            // color: Colors.greenAccent,
                             //shape: BoxShape.circle,
                           ),
@@ -772,6 +704,7 @@ final fontSizeData=13.0;
   @override
   void initState()
   {
+
     super.initState();
     //getapi();
 
@@ -779,6 +712,7 @@ final fontSizeData=13.0;
     _scrollController.addListener(_scrollListener);
 
   }
+
   void _scrollListener() {
     if (_scrollController.offset >= _scrollController.position.maxScrollExtent &&
         !_scrollController.position.outOfRange) {
@@ -1418,9 +1352,24 @@ final fontSizeData=13.0;
 
   }
 
-  void attachPicture(productCode){
+  void attachPicture(productCode,imgUrl){
+    Map<String, dynamic> imgVersion = jsonDecode(imgUrl);
+    //Get.put(StockQuery().updateImgVersion(imgVersion));
+   // Get.put(StockQuery()).updateImgVersion(jsonDecode(img_url));
+    /*setState(() {
+      Get.put(StockQuery()).updateImgVersion(jsonDecode(img_url));
+    });*/
 
-    print("code:${productCode}  link:${ConstantClassUtil.urlApp}/images/product/${productCode}_${(Get.put(AdminQuery()).obj)["result"][0]["subscriber"]}_1.jpg");
+    //print((Get.put(StockQuery()).imgVersion));
+    //print((Get.put(StockQuery()).imgVersion)["numb1"]);
+    String urLink='${ConstantClassUtil.urlApp}/images/product/';
+
+
+
+    // i need to add first images  with product Code
+   // print("${imgVersion["numb1"]}");
+
+    //print("code:${productCode}  link:${ConstantClassUtil.urlApp}/images/product/${productCode}_${(Get.put(AdminQuery()).obj)["result"][0]["subscriber"]}_1.jpg");
     Get.bottomSheet(
       StatefulBuilder(
         builder: (BuildContext context, StateSetter setState) {
@@ -1443,56 +1392,17 @@ final fontSizeData=13.0;
                         "productCode":productCode,
                         "editDisplay":"true",
 
+
                       },
-                      mainImageUrl: '${ConstantClassUtil.urlApp}/images/product/${productCode}_${(Get.put(AdminQuery()).obj)["result"][0]["subscriber"]}_1.jpg?Ver=12',
+                      mainImageUrl:(imgVersion["numb1"]==null)?"${urLink}api4.jpg?Ver=${imgVersion["numb1"]}&img=1&ogImg=${(Get.put(AdminQuery()).obj)["result"][0]["subscriber"]}_1.jpg":'$urLink${productCode}_${(Get.put(AdminQuery()).obj)["result"][0]["subscriber"]}_1.jpg?Ver=${imgVersion["numb1"]}&img=1',
                       smallImageUrls: [
-                        '${ConstantClassUtil.urlApp}/images/product/${productCode}_${(Get.put(AdminQuery()).obj)["result"][0]["subscriber"]}_2.jpg?Ver=',
-                        '${ConstantClassUtil.urlApp}/images/product/${productCode}_${(Get.put(AdminQuery()).obj)["result"][0]["subscriber"]}_3.jpg?Ver=',
-                        '${ConstantClassUtil.urlApp}/images/product/${productCode}_${(Get.put(AdminQuery()).obj)["result"][0]["subscriber"]}_4.jpg?ver=',
-                            
-                      ], initialImageUrl: '${ConstantClassUtil.urlApp}/images/product/${productCode}_${(Get.put(AdminQuery()).obj)["result"][0]["subscriber"]}_1.jpg?Ver=12',
+                        (imgVersion["numb2"]==null)?"${urLink}api4.jpg?Ver=${imgVersion["numb2"]}&img=2&ogImg=${(Get.put(AdminQuery()).obj)["result"][0]["subscriber"]}_2.jpg":'$urLink${productCode}_${(Get.put(AdminQuery()).obj)["result"][0]["subscriber"]}_2.jpg?Ver=${imgVersion["numb2"]}&img=2',
+                        (imgVersion["numb3"]==null)?"${urLink}api4.jpg?Ver=${imgVersion["numb3"]}&img=3&ogImg=${(Get.put(AdminQuery()).obj)["result"][0]["subscriber"]}_3.jpg":'$urLink${productCode}_${(Get.put(AdminQuery()).obj)["result"][0]["subscriber"]}_3.jpg?Ver=${imgVersion["numb1"]}&img=3',
+                        (imgVersion["numb4"]==null)?"${urLink}api4.jpg?Ver=${imgVersion["numb4"]}&img=4&ogImg=${(Get.put(AdminQuery()).obj)["result"][0]["subscriber"]}_4.jpg":'$urLink${productCode}_${(Get.put(AdminQuery()).obj)["result"][0]["subscriber"]}_4.jpg?Ver=${imgVersion["numb4"]}&img=4',
+
+                      ], initialImageUrl:(imgVersion["numb1"]==null)?"${urLink}api4.jpg?Ver=${imgVersion["numb1"]}&img=1&ogImg=${(Get.put(AdminQuery()).obj)["result"][0]["subscriber"]}_1.jpg":'$urLink${productCode}_${(Get.put(AdminQuery()).obj)["result"][0]["subscriber"]}_1.jpg?Ver=${imgVersion["numb1"]}&img=1',
                     ),
-                    Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          if (_imageFile != null)
-                            Image.file(
-                              File(_imageFile!.path),
-                              width: 200,
-                              height: 200,
-                            ),
-                          SizedBox(height: 20),
-                          Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: <Widget>[
-                              ListTile(
-                                leading: Icon(Icons.camera),
-                                title: Text('Camera'),
-                                onTap: () {
-                                  Navigator.pop(context);
-                                  _pickImage(ImageSource.camera);
-                                },
-                              ),
-                              ListTile(
-                                leading: Icon(Icons.image),
-                                title: Text('Gallery'),
-                                onTap: () {
-                                  Navigator.pop(context);
-                                  _pickImage(ImageSource.gallery);
-                                },
-                              ),
-                            ],
-                          ),
-                            
-                          SizedBox(height: 20),
-                          ElevatedButton(
-                            onPressed: _compressAndUploadImage,
-                            child: Text('Compress and upload image'),
-                          ),
-                        ],
-                      ),
-                    ),
+
                   ],
                 ),
               ),
@@ -1783,36 +1693,6 @@ final fontSizeData=13.0;
 
   }
 
-  Future<void> _showImageSourceBottomSheet(BuildContext context) async {
-    await showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              ListTile(
-                leading: Icon(Icons.camera),
-                title: Text('Camera'),
-                onTap: () {
-                  Navigator.pop(context);
-                  _pickImage(ImageSource.camera);
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.image),
-                title: Text('Gallery'),
-                onTap: () {
-                  Navigator.pop(context);
-                  _pickImage(ImageSource.gallery);
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
 
 //
 }

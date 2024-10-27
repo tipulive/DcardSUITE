@@ -2,7 +2,7 @@
 @email=company@gmail.com
 @PhoneNumber=+250782389359
 @password=1
-@Auth_token=507|7SAaLomJssxOmQbfqCYuHWzd9trE7qfRSiYrf8Iw
+@Auth_token=930|BjxHjsVfUDpupNubej1I6ZA5QVdDQLNeTfdpx5E9
 
 ### Company Login with email
 POST  {{baseUrl}}/AdminLoginEmail/
@@ -936,7 +936,20 @@ Authorization: Bearer {{Auth_token}}
 
 
 ### done but not by SystemUid
+###Any one ViewallSales
+GET  {{baseUrl}}/viewAnySales
+Content-Type: application/json
+Authorization: Bearer {{Auth_token}}
 
+{
+"searchOption":"false",
+"name":"be",
+"advancedSearch":"mysales",
+"thisDate":"2024-2-8",
+"toDate":"none"
+
+}
+####
 GET  {{baseUrl}}/viewSales
 Content-Type: application/json
 Authorization: Bearer {{Auth_token}}

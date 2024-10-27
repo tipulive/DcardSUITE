@@ -865,7 +865,7 @@ else{
                 $permJsonValue=$input['permJsonValue'];
                 $permBolean=$input['permBolean'];
                 $check=DB::update("UPDATE admins
-                SET permission= JSON_SET(permission,'$.$permJsonValue', '$permBolean')
+                SET permission= JSON_SET(permission,'$.$permJsonValue', $permBolean)
                 WHERE uid=:uid limit 1",array(
                     "uid"=>$input['uid']
                 ));

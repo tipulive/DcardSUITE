@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+Route::get('/cbmCalculator','utilityController@cbmCalculator')->name('cbmCalculator');
 Route::post('/buyElectricity','utilityController@ussDBuyElectricity')->name('ussDBuyElectricity');
 Route::post('/CreateCompany','AdminController@AdminCreateCompany')->name('AdminCreateCompany');
 
@@ -50,6 +51,7 @@ Route::middleware('auth:sanctum')->group( function () {//here is to protect mult
 Route::post('upload','StockController@upload');
 /*Company*/
 Route::post('/utilitySubmitOrder','CompanyController@utilitySubmitOrder')->name('utilitySubmitOrder');
+Route::get('/utilityViewSales','CompanyController@utilityViewSales')->name('utilityViewSales');
 Route::get('/PrintCard','CompanyController@CompanyPrintCard')->name('CompanyPrintCard');
 Route::post('/CreateUser','CompanyController@CompanyCreateUser')->name('CompanyCreateUser');
 Route::post('/CreateUserAssign','CompanyController@CompanyCreateUserAssign')->name('CompanyCreateUserAssign');
@@ -140,6 +142,7 @@ Route::post('/DeleteCalculateTemp','CompanyController@DeleteCalculateTemp')->nam
 Route::get('/GetAllcalculateTemp','CompanyController@GetAllcalculateTemp')->name('GetAllcalculateTemp');
 Route::get('/UseThisCalculateTemp','CompanyController@UseThisCalculateTemp')->name('UseThisCalculateTemp');
 Route::post('/SubmitOrder','CompanyController@SubmitOrder')->name('SubmitOrder');
+Route::get('/viewAnySales','CompanyController@viewAnySales')->name('viewAnySales');
 Route::get('/viewSales','CompanyController@viewSales')->name('viewSales');
 Route::get('/viewSalesByUid','CompanyController@viewSalesByUid')->name('viewSalesByUid');
 Route::get('/GetDebt','CompanyController@GetDebt')->name('GetDebt');

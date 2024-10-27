@@ -1,6 +1,8 @@
 class Participated {
   final int? id;
   final String? uid;
+  final String? ref;
+  final String? currency;
   final String? uidUser;
   final String? carduid;
   final String? uidCreator;
@@ -18,6 +20,8 @@ class Participated {
   Participated({
     this.id,
     this.uid,
+    this.ref,
+    this.currency,
     this.uidUser,
     this.carduid,
     this.uidCreator,
@@ -36,6 +40,8 @@ class Participated {
   factory Participated.fromMap(Map<String, dynamic> json) => new Participated(
       id: json['id'],
       uid: json['uid'],
+      ref: json['ref'],
+      currency: json['currency'],
       uidUser: json['uidUser'],
       carduid: json['carduid'],
       uidCreator:json['uidCreator'],
@@ -53,7 +59,9 @@ class Participated {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'uid': uid,
+      'uid':uid,
+      'ref':ref,
+      'currency':currency,
       'uidUser': uidUser,
       'carduid': carduid,
       'uidCreator':uidCreator,

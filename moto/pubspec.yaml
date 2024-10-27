@@ -37,6 +37,7 @@ dependencies:
   cupertino_icons: ^1.0.6
   qr_code_scanner: ^1.0.1
   animate_do: ^3.3.4
+  blue_thermal_printer: ^1.0.0
   flutter_background: ^1.1.0
   wakelock: ^0.6.2
   sqflite: ^2.3.2

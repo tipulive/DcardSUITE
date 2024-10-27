@@ -1,30 +1,21 @@
 import 'dart:io';
-import 'dart:math';
 import 'dart:typed_data';
 
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:qr_code_scanner/qr_code_scanner.dart';
 
-import '../../../Utilconfig/HideShowState.dart';
-import '../../../models/QuickBonus.dart';
 
-import '../../../models/Topups.dart';
-import '../../../models/User.dart';
 import 'package:get/get.dart';
 
 import '../../Query/AdminQuery.dart';
 import '../../Query/StockQuery.dart';
 import 'package:flutter/material.dart';
 
-import 'package:google_fonts/google_fonts.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:photo_manager/photo_manager.dart';
 
 import '../../Utilconfig/ConstantClassUtil.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 
 
@@ -41,13 +32,14 @@ class _photoCompState extends State<photoComp> {
 
   Map<String, dynamic> arguments = Get.arguments as Map<String, dynamic>;
 
-
+  int currentTimestamp = DateTime.now().millisecondsSinceEpoch;
 
   /* picture upload*/
   XFile? _imageFile;
   List<AssetPathEntity> albums = [];
   AssetPathEntity? selectedAlbum;
   List<AssetEntity> images = [];
+  @override
   void initState() {
     super.initState();
     _getPermission();
@@ -92,13 +84,15 @@ class _photoCompState extends State<photoComp> {
   Future<XFile?> pickImage({required ImageSource source}) async {
     final imagePicker = ImagePicker();
     final pickedImage = await imagePicker.pickImage(source: source);
-    //return pickedImage;
+    return pickedImage;
     //print("${arguments["title"]}");
-    setState(() {
+   /* setState(() {
       _imageFile = pickedImage;
-      //(Get.put(StockQuery()).updateImageFile(pickedImage));
+      (Get.put(StockQuery()).updateImageFile(pickedImage));
     });
-    _compressAndUploadImage();
+    Get.back();*/
+    //_compressAndUploadImage();
+
   }
 
 
@@ -110,13 +104,15 @@ class _photoCompState extends State<photoComp> {
      // print("${arguments["title"]}");
       setState(() {
         _imageFile = pickedImage;
-        //(Get.put(StockQuery()).updateImageFile(pickedImage));
+        (Get.put(StockQuery()).updateImageFile(pickedImage));
       });
       _compressAndUploadImage();
-     // Get.toNamed('/home');
+
+
     }
   }
   Future<void> _compressAndUploadImage() async {
+    (Get.put(StockQuery()).updateHideLoader(false));
     if (_imageFile == null) return;
 
     final compressedImage = await compressImage(_imageFile);
@@ -144,20 +140,21 @@ class _photoCompState extends State<photoComp> {
             filename: _imageFile!.name,
           ),
           'productCode':arguments["productCode"],
-          'fileNam':arguments["fileNam"],
-          'versionN':"4",
+          'fileNam':arguments["CFileName"],
+          'NumbVer':arguments["CNumberCaption"],
+          'versionN':currentTimestamp,
           'actionStatus':arguments["actionStatus"],
         }),
       );
 
       // Handle the response from the server.
       if (response.statusCode == 200) {
-        print('Image uploaded successfully');
+        (Get.put(StockQuery()).updateHideLoader(true));
+        Get.back(result:'$currentTimestamp');
+        //print('Image uploaded successfully ${response}');
       } else {
-        print('Failed to upload image: ${response.statusMessage}');
       }
     } catch (e) {
-      print('Error during image upload: $e');
     }
   }
   Future<Uint8List?> compressImage(XFile? imageFile) async {
@@ -165,7 +162,9 @@ class _photoCompState extends State<photoComp> {
 
     final compressedImage = await FlutterImageCompress.compressWithFile(
       imageFile.path,
-      quality: 75,
+      minWidth: 600, // Adjust these to lower values if needed
+      minHeight: 600,
+      quality: 50, // Lower quality for faster compression
       format: CompressFormat.jpeg, // Use CompressFormat directly.
     );
 
@@ -179,103 +178,127 @@ class _photoCompState extends State<photoComp> {
 
     return Scaffold(
 
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      body: Stack(
         children: [
-         Column(
-           children: [
-             if ((Get.put(StockQuery()).imageFile) != null)
-               Image.file(
-                 File((Get.put(StockQuery()).imageFile)!.path),
-                 width: 200,
-                 height: 200,
-               ),
-             SizedBox(height: 20),
-           ],
-         ),
-          Padding(
-            padding: EdgeInsets.only(left: 16.0,right: 16.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: DropdownButton<AssetPathEntity>(
-                    isExpanded: true,
-                    value: selectedAlbum,
-                    items: albums.map((album) {
-                      return DropdownMenuItem<AssetPathEntity>(
-                        value: album,
-                        child: Text(album.name ?? 'Unknown'),
-                      );
-                    }).toList(),
-                    onChanged: (selected) {
-                      setState(() {
-                        selectedAlbum = selected;
-                        _loadPhotos(selectedAlbum!);
-                      });
-                    },
-                  ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Column(
+                children: [
+                  if ((Get.put(StockQuery()).imageFile) != null)
+                    Image.file(
+                      File((Get.put(StockQuery()).imageFile)!.path),
+                      width: 200,
+                      height: 200,
+                    ),
+                  const SizedBox(height: 20),
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 16.0,right: 16.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: DropdownButton<AssetPathEntity>(
+                        isExpanded: true,
+                        value: selectedAlbum,
+                        items: albums.map((album) {
+                          return DropdownMenuItem<AssetPathEntity>(
+                            value: album,
+                            child: Text(album.name),
+                          );
+                        }).toList(),
+                        onChanged: (selected) {
+                          setState(() {
+                            selectedAlbum = selected;
+                            _loadPhotos(selectedAlbum!);
+                          });
+                        },
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: GridView.count(
-              crossAxisCount: 3,
-              children: images.map((AssetEntity asset) {
-                return FutureBuilder<Uint8List?>(
-                  future: asset.thumbnailData,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.done &&
-                        snapshot.data != null) {
-                      return GestureDetector(
-                        onTap: () async{
-                          File? file = await asset.file;
-                          if (file != null) {
-                            String filePath = file.path;
-                            setState(() {
-                              _imageFile = XFile(filePath);
-                            });
-                           print(arguments["productCode"]);
-                            _compressAndUploadImage();
+              ),
+              Expanded(
+                child: GridView.count(
+                  crossAxisCount: 3,
+                  children: images.map((AssetEntity asset) {
+                    return FutureBuilder<Uint8List?>(
+                      future: asset.thumbnailData,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.done &&
+                            snapshot.data != null) {
+                          return GestureDetector(
+                            onTap: () async{
+                              File? file = await asset.file;
+                              if (file != null) {
+                                String filePath = file.path;
+                                setState(() {
+                                  _imageFile = XFile(filePath);
+                                });
+
+                                // print(arguments);
+                                //Get.back();
+                                _compressAndUploadImage();
 
 
-                            //await CachedNetworkImage.evictFromCache("https://sanboxstock.appdev.live/images/product/nyota_TEALTD_1.jpg");
-                            //Get.toNamed('/home');
+                                //await CachedNetworkImage.evictFromCache("https://sanboxstock.appdev.live/images/product/nyota_TEALTD_1.jpg");
+                                //Get.toNamed('/home');
 
-                            /*DefaultCacheManager().removeFile("https://sanboxstock.appdev.live/images/product/nyota_TEALTD_1.jpg").then((value) {
+                                /*DefaultCacheManager().removeFile("https://sanboxstock.appdev.live/images/product/nyota_TEALTD_1.jpg").then((value) {
                               print('File removed');
                             }).onError((error, stackTrace) {
 
                             });*/
-                            //await DefaultCacheManager().removeFile('https://sanboxstock.appdev.live/images/product/nyota_TEALTD_1.jpg');
+                                //await DefaultCacheManager().removeFile('https://sanboxstock.appdev.live/images/product/nyota_TEALTD_1.jpg');
 
-                          }
-                          // Handle tap on image
-                        },
-                        child: Image.memory(
-                          snapshot.data!,
-                          fit: BoxFit.cover,
-                        ),
-                      );
-                    } else {
-                      return Container(); // Placeholder widget
-                    }
-                  },
-                );
-              }).toList(),
-            ),
+                              }
+                              // Handle tap on image
+                            },
+                            child: Image.memory(
+                              snapshot.data!,
+                              fit: BoxFit.cover,
+                            ),
+                          );
+                        } else {
+                          return Container(); // Placeholder widget
+                        }
+                      },
+                    );
+                  }).toList(),
+                ),
+              ),
+
+            ],
+
           ),
-
+          GetBuilder<StockQuery>(
+            builder: (myLoadercontroller) {
+              //return Text('Data: ${_controller.data}');
+              return
+                (myLoadercontroller.hideLoader)?
+                const Text(""):
+                Positioned.fill(
+                  child: Center(
+                    child: Container(
+                      alignment: Alignment.center,
+                      color: Colors.white70,
+                      child: const CircularProgressIndicator(),
+                    ),
+                  ),
+                );
+            },
+          ),
         ],
-
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           // Handle onPressed for FloatingActionButton
           ////_pickImage(); // Call method to pick image when FloatingActionButton is pressed
+
           _pickImage(ImageSource.camera);
         },
-        child: Icon(Icons.photo_camera),
+        child: const Icon(Icons.photo_camera),
       ),
 
     );

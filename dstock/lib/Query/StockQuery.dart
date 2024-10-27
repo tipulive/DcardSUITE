@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
@@ -29,6 +30,27 @@ class StockQuery extends GetxController{
     update();
 
   }
+  Map<String, dynamic> imgVersion = {};
+  updateImgVersion(valData){
+    //usersPick.clear();
+
+    if (valData != null) {
+      imgVersion=valData;
+    }
+
+    update();
+
+  }
+  updateImgVersion2(valData,number){
+    //usersPick.clear();
+
+    if (valData != null) {
+      imgVersion[number]=valData;
+    }
+
+    update();
+
+  }
   List<dynamic> usersPick = [];
   updateusersPick(valData){
     usersPick.clear();
@@ -50,6 +72,12 @@ class StockQuery extends GetxController{
   updateImageFile(valData){
     imageFile=valData;
     update();
+  }
+  String versN="English";
+  updateversN(valData){
+    versN=valData;
+    update();
+
   }
   String selectedOption = 'Code';
   updateSelected(valData){
@@ -570,7 +598,9 @@ class StockQuery extends GetxController{
       var params =  {
         "uid":participatedData.uid,
         "uidUser":participatedData.uidUser,
+
         "OrderId":participatedData.subscriber,
+        //"OrderId":"eric-05",
         "inputData":participatedData.inputData,
         "all_total":promotionData.token,
         "reach":promotionData.reach,
@@ -642,6 +672,46 @@ class StockQuery extends GetxController{
       //return false;
     }
   }
+  viewAnySales(Topups topupData) async{//balance and Bonus Widthdraw History
+    try {
+
+      var params =  {
+
+        "LimitStart":topupData.endlimit,  //page
+        "LimitEnd":topupData.startlimit,//limit
+        "name":topupData.name,
+        "searchOption":topupData.optionCase,
+        "advancedSearch":topupData.advancedSearch,
+        "thisDate":topupData.created_at,
+        "toDate":topupData.updated_at??'none'
+
+      };
+      //print(params);
+      String authToken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
+      var url="${ConstantClassUtil.urlLink}/viewAnySales";
+      var response = await Dio().get(url,
+        options: Options(headers: {
+          HttpHeaders.contentTypeHeader: "application/json",
+          HttpHeaders.authorizationHeader:"Bearer $authToken"
+        }),
+        queryParameters: params,
+      );
+      if (response.statusCode == 200) {
+
+
+
+        return response;
+
+
+      } else {
+        return false;
+        //print(false);
+      }
+    } catch (e) {
+      //return false;
+
+    }
+  }//
   viewSales(Topups topupData) async{//balance and Bonus Widthdraw History
     try {
 

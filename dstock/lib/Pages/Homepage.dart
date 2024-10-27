@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 
 
@@ -17,6 +18,7 @@ import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 //import 'package:wakelock/wakelock.dart';
 import 'package:get/get.dart';
+import '../Utilconfig/ConstantClassUtil.dart';
 import '../Utilconfig/language/language.dart';
 
 
@@ -231,6 +233,9 @@ class _HomepageState extends State<Homepage> {
                 Expanded(
                   child: ProductSearchList(addCartMethod:(dynamicData){
                     addCartPlus(dynamicData);
+
+                  },viewPictureMethod:(productCode,imgUrl){
+                    viewPicture(productCode,imgUrl);
 
                   },searchResult:(Get.put(StockQuery()).dataSearch)),
                 ),
@@ -595,6 +600,9 @@ class _HomepageState extends State<Homepage> {
                 print("oldQty:${thisQty}");
 
                 changeQtyMethod(index,price,valueData,checkHide);
+
+              },viewPictureM:(productCode,imgUrl){
+                viewPicture(productCode,imgUrl);
 
               },saveChangeQtyCheckout:(productCode,indexData,currentEditQty){
                 saveChangeQtyMethod(productCode,indexData,currentEditQty);
@@ -1433,7 +1441,61 @@ class _HomepageState extends State<Homepage> {
 
 
   }
+  void viewPicture(productCode,imgUrl){
+    Map<String, dynamic> imgVersion = jsonDecode(imgUrl);
+    String urLink='${ConstantClassUtil.urlApp}/images/product/';
 
+
+
+    // i need to add first images  with product Code
+    // print("${imgVersion["numb1"]}");
+
+    //print("code:${productCode}  link:${ConstantClassUtil.urlApp}/images/product/${productCode}_${(Get.put(AdminQuery()).obj)["result"][0]["subscriber"]}_1.jpg");
+    Get.bottomSheet(
+      StatefulBuilder(
+        builder: (BuildContext context, StateSetter setState) {
+          return
+            Container(
+              padding:const EdgeInsets.all(5.0),
+              height: 600,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(30),
+                  topRight: Radius.circular(30),
+                ),
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    ImageCardWidget(
+                      imgArguments:{
+                        "productCode":productCode,
+                        "editDisplay":"false",
+
+
+                      },
+                      mainImageUrl:(imgVersion["numb1"]==null)?"${urLink}api4.jpg?Ver=${imgVersion["numb1"]}&img=1":'$urLink${productCode}_${(Get.put(AdminQuery()).obj)["result"][0]["subscriber"]}_1.jpg?Ver=${imgVersion["numb1"]}&img=1',
+                      smallImageUrls: [
+                        (imgVersion["numb2"]==null)?"${urLink}api4.jpg?Ver=${imgVersion["numb2"]}&img=2":'$urLink${productCode}_${(Get.put(AdminQuery()).obj)["result"][0]["subscriber"]}_2.jpg?Ver=${imgVersion["numb2"]}&img=2',
+                        (imgVersion["numb3"]==null)?"${urLink}api4.jpg?Ver=${imgVersion["numb3"]}&img=3":'$urLink${productCode}_${(Get.put(AdminQuery()).obj)["result"][0]["subscriber"]}_3.jpg?Ver=${imgVersion["numb3"]}&img=3',
+                        (imgVersion["numb4"]==null)?"${urLink}api4.jpg?Ver=${imgVersion["numb4"]}&img=4":'$urLink${productCode}_${(Get.put(AdminQuery()).obj)["result"][0]["subscriber"]}_4.jpg?Ver=${imgVersion["numb4"]}&img=4',
+
+                      ], initialImageUrl:(imgVersion["numb1"]==null)?"${urLink}api4.jpg?Ver=${imgVersion["numb1"]}&img=1":'$urLink${productCode}_${(Get.put(AdminQuery()).obj)["result"][0]["subscriber"]}_1.jpg?Ver=${imgVersion["numb1"]}&img=1',
+                    ),
+
+                  ],
+                ),
+              ),
+            );
+        },
+      ),
+    ).whenComplete(() {
+      // Get.put(HideShowState()).isDelivery(0);
+      //do whatever you want after closing the bottom sheet
+    });
+
+  }
   void addCartPlus(dynamic dynamicData) async{
     if((Get.put(StockQuery()).userProfile)["uid"]=="none")
     {
@@ -2093,6 +2155,9 @@ class _HomepageState extends State<Homepage> {
 
                                 addCartPlus(dynamicData);
 
+                              },viewPictureMethod:(productCode,imgUrl){
+                                viewPicture(productCode,imgUrl);
+
                               },searchResult:(Get.put(StockQuery()).dataSearch)),
                             );
 
@@ -2413,9 +2478,10 @@ class ProductSearchList extends StatelessWidget {
   const ProductSearchList({
     super.key,
     required this.addCartMethod,
-    required this.searchResult,
+    required this.searchResult, required this.viewPictureMethod,
   });
   final void Function(dynamic) addCartMethod;
+  final void Function(String,String) viewPictureMethod;
   final dynamic searchResult;
   @override
 
@@ -2594,7 +2660,7 @@ class ProductSearchList extends StatelessWidget {
                                     color: Colors.orange
                                 ),
                                 onPressed: () {
-
+                                  viewPictureMethod(searchResult[index]["productCode"],searchResult[index]["img_url"]);
 
                                 },
                               ),
@@ -2643,11 +2709,13 @@ class CheckoutPage extends StatelessWidget {
     required this.changeQtyCheckout,
     required this.saveChangeQtyCheckout,
     required this.deleteCheckout,
-    required this.addcomentCheckout,
+    required this.addcomentCheckout, required this.viewPictureM,
   });
 
   final dynamic chekoutResult;
+  final void Function(String,String) viewPictureM;
   final void Function(int,int,int,bool,int) changeQtyCheckout;
+
   final void Function(String,int,String) saveChangeQtyCheckout;
   final void Function(String) deleteCheckout;
   final void Function(String,String) addcomentCheckout;
@@ -2692,9 +2760,14 @@ class CheckoutPage extends StatelessWidget {
                     children: [
                       // Text("sum:${orderSum}"),
                       ListTile(
-                          leading: CircleAvatar(
-                            backgroundColor:getRandomColor(),
-                            child: Icon(_getRandomIcon()),
+                          leading: GestureDetector(
+                            onTap: (){
+                              viewPictureM(chekoutResult[index]["productCode"],chekoutResult[index]["img_url"]);
+                            },
+                            child: CircleAvatar(
+                              backgroundColor:getRandomColor(),
+                              child: Icon(_getRandomIcon()),
+                            ),
                           ),
                           title:Row(
                             children: [

@@ -1,6 +1,9 @@
 import 'dart:math';
 
 
+
+import 'package:flutter/cupertino.dart';
+
 import '../../../Utilconfig/HideShowState.dart';
 
 import '../../../models/Topups.dart';
@@ -13,6 +16,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../Utilconfig/ConstantClassUtil.dart';
 import '../../models/QuickBonus.dart';
+import 'custom_popup_menu.dart';
 
 
 
@@ -79,7 +83,16 @@ class _SetSaleCompState extends State<SetSaleComp> {
     return Stack(
       children: [
 
+
+        const Positioned(
+          right: 0,
+          top: -60,
+          width: 80,
+          height: 150,
+          child: CustomPopupMenu(iconColor: Colors.black),
+        ),
         listdata(),
+
         if(showOveray)
           Positioned.fill(
             child: Center(
@@ -101,8 +114,11 @@ class _SetSaleCompState extends State<SetSaleComp> {
   Widget listdata(){
     return  Column(
       children: [
+        Center(child: Text("Sales",style:GoogleFonts.abel(fontSize:15,color: Colors.teal,fontWeight: FontWeight.w700))),
+        const SizedBox(height: 10.0,),
         //ProfilePic().profile(),
         Center(child: Text(viewTitle)),
+
 
         Padding(
           padding:const EdgeInsets.fromLTRB(8,10,8,0),
@@ -589,7 +605,7 @@ class _SetSaleCompState extends State<SetSaleComp> {
                                         padding: const EdgeInsets.fromLTRB(0, 10, 0, 2),
                                         child: RichText(
                                           text: TextSpan(
-                                            text: "${_data[index]['name']}:",
+                                            text: "${_data[index]['name']=='none'?'':_data[index]['name']}",
                                             style: DefaultTextStyle.of(context).style,
                                             children: const <TextSpan>[
 
@@ -627,6 +643,28 @@ class _SetSaleCompState extends State<SetSaleComp> {
 
                                     ],
                                   ),
+                                  Wrap(
+                                    crossAxisAlignment: WrapCrossAlignment.center,
+                                    children: [
+
+                                      const Icon(Icons.segment,color:Colors.orange,size:13,),
+                                      Text("${ConstantClassUtil().truncateWithEllipsis(_data[index]['status'],25)}",style: const TextStyle(
+                                        fontSize:12.0, // Set the font size here
+                                      ),),
+
+                                    ],
+                                  ),
+                                  Wrap(
+                                    crossAxisAlignment: WrapCrossAlignment.center,
+                                    children: [
+
+                                      const Icon(Icons.segment,color:Colors.orange,size:13,),
+                                      Text("${ConstantClassUtil().truncateWithEllipsis(_data[index]['commentData'],25)}",style: const TextStyle(
+                                        fontSize:12.0, // Set the font size here
+                                      ),),
+
+                                    ],
+                                  ),
 
                                   Wrap(
                                     crossAxisAlignment: WrapCrossAlignment.center,
@@ -653,114 +691,56 @@ class _SetSaleCompState extends State<SetSaleComp> {
                             Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                IconButton(
-                                  icon: const Icon(Icons.edit),
-                                  onPressed: () {
-                                    // Handle the first icon tap
-                                    Get.dialog(
-                                      AlertDialog(
-                                        title: const Text('Confirmation'),
-                                        content: Text('Do you want to Edit ${_data[index]['OrderId']} ?'),
-                                        actions: [
-                                          ElevatedButton(
-                                            style: ElevatedButton.styleFrom(
-
-                                              //primary: Colors.grey[300],
-                                              backgroundColor: Colors.red,
-                                              elevation:0,
-                                            ),
-                                            onPressed: () async{
 
 
-                                              var resultData=(await StockQuery().editOrder(Topups(uid:_data[index]['OrderId']))).data;
-
-                                              if(resultData["status"])
-                                              {
-
-
-
-                                                if(resultData["result"]!=0)
-                                                {
-                                                  Get.toNamed('/home');
-                                                }
-                                                else{
-                                                  setState(() {
-                                                    isLoading=false;
-                                                    hasMoreData=false;
-                                                    _data.clear();
-
-
-                                                  });
-                                                }
-
-
-
-
-                                              }
-                                              else{
-                                                setState(() {
-                                                  isLoading=false;
-                                                  hasMoreData=false;
-                                                  _data.clear();
-
-
-                                                });
-                                              }
-
-
-                                            },
-                                            child: const Text('Yes'),
-                                          ),
-                                          ElevatedButton(
-                                            onPressed: () {
-                                              Get.back(); // close the alert dialog
-                                            },
-                                            child: const Text('Close'),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                ),
-
-                                IconButton(
-                                  icon: const Icon(Icons.grid_view,color:Colors.orange),
-                                  onPressed: () async{
-                                    // This function will be called when the icon is tapped.
-                                    // thisOrder(_data[index],index);
-
-                                    setState(() {
-
-                                      showOveray=true;
-
-
-
-                                    });
-
-
-
-                                    orderData=_data[index].values.toList();
-
-
-                                    //print((await thisOrder())["result"]);
-                                    var resultData=(await thisOrder());
-                                    //print(resultData);
-                                    if(resultData["status"]){
-
+                                Visibility(
+                                  visible:false,
+                                  child: IconButton(
+                                    icon: const Icon(Icons.grid_view,color:Colors.orange),
+                                    onPressed: () async{
+                                      // This function will be called when the icon is tapped.
+                                      // thisOrder(_data[index],index);
 
                                       setState(() {
-                                        isLoading=false;
-                                        showOveray=false;
 
-                                        thisListOrder.clear();
+                                        showOveray=true;
 
-                                        thisListOrder.addAll(resultData["result"]);
 
 
                                       });
-                                      viewThisOrder();
-                                    }
-                                  },
+
+
+
+                                      orderData=_data[index].values.toList();
+
+                                      //print((await thisOrder())["result"]);
+                                      var resultData=(await thisOrder());
+                                      //print(resultData);
+                                      if(resultData["status"]){
+
+
+                                        setState(() {
+                                          isLoading=false;
+                                          showOveray=false;
+
+                                          thisListOrder.clear();
+
+                                          thisListOrder.addAll(resultData["result"]);
+
+
+                                        });
+                                        if (thisListOrder != null && thisListOrder.isNotEmpty)
+                                          {
+                                            viewThisOrder();
+                                          }
+
+
+                                      }
+
+
+                                      //print(orderData);
+                                    },
+                                  ),
                                 ),
                               ],
                             ),
@@ -944,7 +924,7 @@ class _SetSaleCompState extends State<SetSaleComp> {
 
     var resultData=(await StockQuery().viewSalesByUid(Topups(uid:"${orderData[0]}",startlimit:limit,endlimit:_page))).data;
     // var resultData=(await StockQuery().orderViewByUid(Topups(uid:"0s",startlimit:limit,endlimit:_page))).data;
-    //print(resultData);
+    //print(orderData[0]);
     if(resultData["status"])
     {
 
@@ -1202,7 +1182,7 @@ class _SetSaleCompState extends State<SetSaleComp> {
       backgroundColor: Colors.white,
     );
   }
-  void viewThisOrder() {
+  viewThisOrder() {
 
     Get.bottomSheet(
 
@@ -1222,138 +1202,97 @@ class _SetSaleCompState extends State<SetSaleComp> {
               ),
               child: Column(
                 children: [
+                  Center(child: Text("Client: Time")), // Assuming you wanted "Time" as a placeholder
+                  if (orderData != null && orderData.isNotEmpty)
+                    Center(child: Text("UID: ${orderData[0]}")),
 
-                  Center(child: Text("Client:${orderData[1]}")),
-                  Center(child: Text("UID:${orderData[0]}")),
+                  if (thisListOrder != null && thisListOrder.isNotEmpty)
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: thisListOrder.length + 1,
+                        itemBuilder: (context, index) {
+                          if (index < thisListOrder.length) {
+                            // Ensure Get.put(HideShowState()) is initialized once and used correctly
+                            final hideShowState = Get.put(HideShowState());
+                            hideShowState.isDelivery(thisListOrder);
 
-                  Expanded(
-                    child: ListView.builder(
-
-
-                      itemCount:thisListOrder.length+1,
-                      itemBuilder: (context, index) {
-
-                        if(index<thisListOrder.length)
-                        {
-
-                          (Get.put(HideShowState())).isDelivery(thisListOrder);
-
-
-
-                          //Get.put(HideShowState())).isDelivery(thisListOrder[index]);
-
-
-                          return Stack(
-                            children: [
-                              Container(
-                                margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                child: Card(
-                                  elevation:0.5,
-                                  //margin: EdgeInsets.symmetric(vertical:1,horizontal:5),
-                                  color:Colors.white,
-                                  //color:Colors.white70,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(7),
-                                    //side: BorderSide(color:_data[index]["color_var"]??true?Colors.white:Colors.green, width: 2),
-                                  ),
-
-                                  child: Column(
-                                    children: [
-                                      // Text("sum:${orderSum}"),
-                                      ListTile(
-                                        leading: CircleAvatar(
-                                          backgroundColor:getRandomColor(),
-                                          child: Icon(_getRandomIcon()),
-                                        ),
-                                        title:Row(
-                                          children: [
-                                            Expanded(
-
-                                              child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-
-                                                  RichText(
-                                                    text: TextSpan(
-                                                      text:"${thisListOrder[index]["productCode"]} (${thisListOrder[index]["pcs"]} pcs):",
-                                                      style: DefaultTextStyle.of(context).style,
-                                                      children: const <TextSpan>[
-
-
+                            return Stack(
+                              children: [
+                                Container(
+                                  margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                  child: Card(
+                                    elevation: 0.5,
+                                    color: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(7),
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        ListTile(
+                                          leading: CircleAvatar(
+                                            backgroundColor: getRandomColor(),
+                                            child: Icon(_getRandomIcon()),
+                                          ),
+                                          title: Row(
+                                            children: [
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    RichText(
+                                                      text: TextSpan(
+                                                        text: "${thisListOrder[index]["productCode"]} (${thisListOrder[index]["pcs"]} pcs):",
+                                                        style: DefaultTextStyle.of(context).style,
+                                                      ),
+                                                    ),
+                                                    Text("Price: ${(thisListOrder[index]["price"])}"),
+                                                    Text.rich(
+                                                      TextSpan(
+                                                        children: [
+                                                          TextSpan(
+                                                            text: 'Qty: ${thisListOrder[index]["totalQty"]}',
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    Wrap(
+                                                      crossAxisAlignment: WrapCrossAlignment.center,
+                                                      children: [
+                                                        Text(
+                                                            "Deliver: ${((hideShowState.delivery[index]["totalQty"]) != (hideShowState.delivery[index]["totalCount"])) ? (num.parse(hideShowState.delivery[index]["totalQty"]) - num.parse(hideShowState.delivery[index]["totalCount"])) : 0}"
+                                                        ),
+                                                        const SizedBox(width: 8),
+                                                        ((hideShowState.delivery[index]["totalQty"]) != (hideShowState.delivery[index]["totalCount"]))
+                                                            ? InkWell(
+                                                          onTap: () async {
+                                                            setState(() {
+                                                              productExist = "true";
+                                                            });
+                                                            await deliverStockView(
+                                                                hideShowState.delivery[index]["productCode"],
+                                                                hideShowState.delivery[index]["uid"]);
+                                                          },
+                                                          child: const Icon(Icons.local_shipping, color: Colors.red, size: 25),
+                                                        )
+                                                            : const Text(""),
                                                       ],
                                                     ),
-                                                  ),
-                                                  Text("Price:${(thisListOrder[index]["price"])}"),
-
-
-                                                  Text.rich(
-                                                      TextSpan(
-                                                          children: [
-                                                            TextSpan(
-                                                              text: 'Qty ${thisListOrder[index]["totalQty"]}:',
-
-                                                            ),
-
-
-
-                                                          ]
-                                                      )
-                                                  ),
-
-                                                  Wrap(
-                                                    crossAxisAlignment: WrapCrossAlignment.center,
-                                                    children: [
-
-                                                      Text("Deliver:${(((Get.put(HideShowState()).delivery)[index]["totalQty"])!=((Get.put(HideShowState()).delivery)[index]["totalCount"]))?((num.parse((Get.put(HideShowState()).delivery)[index]["totalQty"])-num.parse((Get.put(HideShowState()).delivery)[index]["totalCount"]))):0}"),
-                                                      const SizedBox(width:8,),
-                                                      (((Get.put(HideShowState()).delivery)[index]["totalQty"])!=((Get.put(HideShowState()).delivery)[index]["totalCount"]))?
-                                                      InkWell(
-                                                          onTap: () async{
-                                                            setState(() {
-                                                              productExist="true";
-
-                                                            });
-
-
-                                                            //
-                                                            await deliverStockView((Get.put(HideShowState()).delivery)[index]["productCode"],(Get.put(HideShowState()).delivery)[index]["uid"]);
-                                                          },
-
-
-                                                          child: const Icon(Icons.local_shipping,color:Colors.red,size:25,)):const Text("")
-                                                    ],
-                                                  ),
-
-                                                ],
+                                                  ],
+                                                ),
                                               ),
-                                            )
-
-
-
-
-
-
-                                          ],
+                                            ],
+                                          ),
+                                          trailing: Text("${thisListOrder[index]["totalAmount"]}"),
                                         ),
-
-
-                                        trailing:Text("${thisListOrder[index]["totalAmount"]}"),
-
-                                        //trailing: Text()
-                                      ),
-
-
-                                    ],
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                              GetBuilder<StockQuery>(
-                                builder: (myLoadercontroller) {
-                                  //return Text('Data: ${_controller.data}');
-                                  return
-                                    (myLoadercontroller.hideLoader)?
-                                    const Text(""):
-                                    Positioned.fill(
+                                GetBuilder<StockQuery>(
+                                  builder: (myLoadercontroller) {
+                                    return (myLoadercontroller.hideLoader)
+                                        ? const Text("")
+                                        : Positioned.fill(
                                       child: Center(
                                         child: Container(
                                           alignment: Alignment.center,
@@ -1362,19 +1301,22 @@ class _SetSaleCompState extends State<SetSaleComp> {
                                         ),
                                       ),
                                     );
-                                },
-                              ),
-                            ],
-                          );
-
-                        }
-                        else{
-                          return Container();
-                        }
-
-                      },
+                                  },
+                                ),
+                              ],
+                            );
+                          } else {
+                            return Container();
+                          }
+                        },
+                      ),
+                    )
+                  else
+                    const Expanded(
+                      child: Center(
+                        child: Text("No orders available"),
+                      ),
                     ),
-                  ),
                 ],
               ),
             );

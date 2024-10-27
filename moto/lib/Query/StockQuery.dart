@@ -529,6 +529,55 @@ class StockQuery extends GetxController{
     }
 
   }
+  buyUtility(Participated participatedData,Promotions promotionData) async{
+
+    try {
+
+      var params =  {
+        "productCode":"snel",
+        "uid":participatedData.uid,
+        "uidUser":participatedData.uidUser,
+        "ref":participatedData.ref,
+        "currency":participatedData.currency,
+        "OrderId":participatedData.subscriber,
+        "inputData":participatedData.inputData,
+        "all_total":promotionData.token,
+        "reach":promotionData.reach,
+        "gain":promotionData.gain,
+        "systemUid":promotionData.uid
+
+        //"options": [1,2,3],
+      };
+
+      //return false;
+      String authToken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
+      var url="${ConstantClassUtil.urlLink}/utilitySubmitOrder";
+      var response = await Dio().post(url,
+        options: Options(headers: {
+          HttpHeaders.contentTypeHeader: "application/json",
+          HttpHeaders.authorizationHeader:"Bearer $authToken"
+        }),
+        data: jsonEncode(params),
+      );
+
+      if (response.statusCode == 200) {
+
+        //updateParticipateState(response.data);
+        return response;
+
+
+
+
+      } else {
+        return false;
+       // print(false);
+      }
+    } catch (e) {
+      print(e);
+      //return false;
+    }
+
+  }
   submitOrder(Participated participatedData,Promotions promotionData) async{
 
     try {
@@ -624,7 +673,7 @@ class StockQuery extends GetxController{
       };
       //print(params);
       String authToken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
-      var url="${ConstantClassUtil.urlLink}/viewSales";
+      var url="${ConstantClassUtil.urlLink}/utilityViewSales";
       var response = await Dio().get(url,
         options: Options(headers: {
           HttpHeaders.contentTypeHeader: "application/json",

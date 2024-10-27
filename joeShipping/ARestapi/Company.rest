@@ -24,6 +24,54 @@ Content-Type: application/json
 }
 
 
+### USSD ###
+
+POST  {{baseUrl}}/DataUssD/
+Content-Type: application/json
+
+{
+"sessionId": "45",
+"serviceCode": "^384*4#",
+"phoneNumber": "0782389359",
+"text": "165"
+}
+### Register Vehicle
+
+POST  {{baseUrl}}/registerVehicle/
+Content-Type: application/json
+Authorization: Bearer {{Auth_token}}
+
+{
+"numberPlate": "UAV-900",
+"carsName": "ToyoTa",
+"numberSeat": "40",
+"commentData": "none"
+}
+
+### Create Location
+POST  {{baseUrl}}/createLocation/
+Content-Type: application/json
+Authorization: Bearer {{Auth_token}}
+
+{
+"origin":"BUTARE",
+"destination":"RUSIZI",
+"price":"5500",
+"commentData":"Nyungwe"
+}
+### Create Location
+POST  {{baseUrl}}/addDashboardTrip/
+Content-Type: application/json
+Authorization: Bearer {{Auth_token}}
+
+{
+"location":"loc_yM_1720370519",
+"seatAv":"40",
+"seatCount":"KIGALI",
+"dateOn":"2024-07-03 11:00",
+"commentData":"Nyungwe"
+}
+### USSD ###
 
 ###shipping
 ###Advanced Search
@@ -51,6 +99,20 @@ Authorization: Bearer {{Auth_token}}
 "origin": "Mombasa",
 "destination": "Rusizi",
 "commentData": "none"
+}
+###View Shipping
+
+GET  {{baseUrl}}/viewAllShipping
+content-type: application/json;charset=UTF-8
+Authorization: Bearer {{Auth_token}}
+
+{
+"uid":"SID",
+"liveLocation":"Kibogora",
+"eta": "Date",
+"status": "plateNumb",
+"commentData": "none"
+
 }
 
 ###Edit Shipping Status

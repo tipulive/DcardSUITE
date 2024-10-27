@@ -36,6 +36,33 @@ class CompanyController extends Controller
         $this->platform1=env('PLATFORM3');
     }
     /*Utility Code */
+    public function utilityViewSales(Request $request) {
+        if(Auth::check())
+        {
+        if(Auth::user()->platform==$this->platform1)
+            {
+                $input=$request->all();
+
+                return (new utilityController)->utilityViewSales($input);
+            }
+            else{
+                return response([
+                    "status"=>false,
+                    "result"=>$this->Admin_Auth_result_error,
+                    "error"=>$this->Admin_Auth_error,
+
+                ],200);
+            }
+        }
+        else{
+            return response([
+                "status"=>false,
+                "result"=>$this->Admin_Auth_result_error,
+                "error"=>$this->Admin_Auth_error,
+
+            ],200);
+        }
+    }
     public function utilitySubmitOrder(Request $request) {
         if(Auth::check())
         {
@@ -1038,6 +1065,34 @@ class CompanyController extends Controller
                 $input=$request->all();
 
                 return (new StockController)->SubmitOrder($input);
+            }
+            else{
+                return response([
+                    "status"=>false,
+                    "result"=>$this->Admin_Auth_result_error,
+                    "error"=>$this->Admin_Auth_error,
+
+                ],200);
+            }
+        }
+        else{
+            return response([
+                "status"=>false,
+                "result"=>$this->Admin_Auth_result_error,
+                "error"=>$this->Admin_Auth_error,
+
+            ],200);
+        }
+    }
+    public function viewAnySales(Request $request){
+        if(Auth::check())
+        {
+
+            if(Auth::user()->platform==$this->platform1)
+            {
+                $input=$request->all();
+
+                return (new StockController)->viewAnySales($input);
             }
             else{
                 return response([
