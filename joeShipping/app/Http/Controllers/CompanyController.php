@@ -17,6 +17,7 @@ use App\Http\Controllers\MyHistoryController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\utilityController;
 use App\Http\Controllers\shippingController;
+use App\Http\Controllers\TransportController;
 
 
 class CompanyController extends Controller
@@ -37,6 +38,114 @@ class CompanyController extends Controller
         $this->platform1=env('PLATFORM3');
     }
     /*travel Company*/
+    public function viewTravelSales(Request $request){
+        if(Auth::check())
+        {
+        if(Auth::user()->platform==$this->platform1)
+            {
+                $input=$request->all();
+
+                return (new TransportController)->viewTravelSales($input);
+            }
+            else{
+                return response([
+                    "status"=>false,
+                    "result"=>$this->Admin_Auth_result_error,
+                    "error"=>$this->Admin_Auth_error,
+
+                ],200);
+            }
+        }
+        else{
+            return response([
+                "status"=>false,
+                "result"=>$this->Admin_Auth_result_error,
+                "error"=>$this->Admin_Auth_error,
+
+            ],200);
+        }
+    }
+    public function SearchTransport(Request $request){
+        if(Auth::check())
+        {
+        if(Auth::user()->platform==$this->platform1)
+            {
+                $input=$request->all();
+
+                return (new TransportController)->SearchTransport($input);
+            }
+            else{
+                return response([
+                    "status"=>false,
+                    "result"=>$this->Admin_Auth_result_error,
+                    "error"=>$this->Admin_Auth_error,
+
+                ],200);
+            }
+        }
+        else{
+            return response([
+                "status"=>false,
+                "result"=>$this->Admin_Auth_result_error,
+                "error"=>$this->Admin_Auth_error,
+
+            ],200);
+        }
+    }
+    public function searchLocation(Request $request){
+        if(Auth::check())
+        {
+        if(Auth::user()->platform==$this->platform1)
+            {
+                $input=$request->all();
+
+                return (new TransportController)->searchLocation($input);
+            }
+            else{
+                return response([
+                    "status"=>false,
+                    "result"=>$this->Admin_Auth_result_error,
+                    "error"=>$this->Admin_Auth_error,
+
+                ],200);
+            }
+        }
+        else{
+            return response([
+                "status"=>false,
+                "result"=>$this->Admin_Auth_result_error,
+                "error"=>$this->Admin_Auth_error,
+
+            ],200);
+        }
+    }
+    public function BookTicket(Request $request){
+        if(Auth::check())
+        {
+        if(Auth::user()->platform==$this->platform1)
+            {
+                $input=$request->all();
+
+                return (new TransportController)->BookTicket($input);
+            }
+            else{
+                return response([
+                    "status"=>false,
+                    "result"=>$this->Admin_Auth_result_error,
+                    "error"=>$this->Admin_Auth_error,
+
+                ],200);
+            }
+        }
+        else{
+            return response([
+                "status"=>false,
+                "result"=>$this->Admin_Auth_result_error,
+                "error"=>$this->Admin_Auth_error,
+
+            ],200);
+        }
+    }
     public function registerVehicle(Request $request) {
         if(Auth::check())
         {

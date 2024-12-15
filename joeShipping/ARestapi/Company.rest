@@ -2,7 +2,7 @@
 @email=company@gmail.com
 @PhoneNumber=+250782389359
 @password=1
-@Auth_token=505|rxUffsqIsVszyERDXLDTtxLNuyq2FkxViI4Jm8qy
+@Auth_token=683|YoR4CGlgVfchUpgkK7O2JNMMJ9SS10HyiR497PoQ
 
 ### Company Login with email
 POST  {{baseUrl}}/AdminLoginEmail/
@@ -35,6 +35,8 @@ Content-Type: application/json
 "phoneNumber": "0782389359",
 "text": "165"
 }
+
+
 ### Register Vehicle
 
 POST  {{baseUrl}}/registerVehicle/
@@ -54,21 +56,87 @@ Content-Type: application/json
 Authorization: Bearer {{Auth_token}}
 
 {
-"origin":"BUTARE",
-"destination":"RUSIZI",
+"origin":"RUSIZI",
+"destination":"KIGALI",
+"tag":"icanyngwe",
 "price":"5500",
 "commentData":"Nyungwe"
 }
-### Create Location
+### Add Location On Dashboard is ,this will load from locations,you can have option to change price
 POST  {{baseUrl}}/addDashboardTrip/
 Content-Type: application/json
 Authorization: Bearer {{Auth_token}}
 
 {
-"location":"loc_yM_1720370519",
+"location":"loc_ae_1730832431",
+"origin":"RUSIZI",
+"destination":"KIGALI",
+"tag":"icanyungwe",
 "seatAv":"40",
+"price":"7600",
 "seatCount":"KIGALI",
 "dateOn":"2024-07-03 11:00",
+"commentData":"Nyungwe"
+}
+### Search Location searchOption(origin,destination)
+GET  {{baseUrl}}/searchLocation/
+Content-Type: application/json
+Authorization: Bearer {{Auth_token}}
+
+{
+"searchItem":"RUSIZI",
+"searchOption":"destination"
+
+}
+### Search origin and destination in dashtrips
+GET  {{baseUrl}}/viewSearchLocation/
+Content-Type: application/json
+Authorization: Bearer {{Auth_token}}
+
+{
+"searchItem":"RUSIZI",
+"searchOption":"origin"
+
+}
+
+
+### Search Ticket(SeachOption (origin,destination,dateON,tags,searchCombine(origine,destination,dateOn),SearchDateDefault means Today(origine,destination,todayDate)
+GET  {{baseUrl}}/SearchTransport/
+Content-Type: application/json
+Authorization: Bearer {{Auth_token}}
+
+{
+"origin":"RUSIZI",
+"destination":"KIGALI",
+"dateOn":"2024-07-03 11:00",
+"searchOption":"combine"
+
+}
+
+###### View Seat this will show number of seatAv,taken and all Seat
+### then if seatAv=seatCount no available Seat
+### take SeatAv make loop then compare to seatTaken to get real Available Seat
+GET  {{baseUrl}}/viewSeat/
+Content-Type: application/json
+Authorization: Bearer {{Auth_token}}
+
+{
+"uid":"uid_Hp_1730839465",
+"seatAv":"40"
+
+
+}
+
+### Book Ticket
+POST  {{baseUrl}}/BookTicket/
+Content-Type: application/json
+Authorization: Bearer {{Auth_token}}
+
+{
+"uid":"uid_Hp_1730839465",
+"seat":"6",
+"name":"eric",
+"phone":"0782389359",
 "commentData":"Nyungwe"
 }
 ### USSD ###

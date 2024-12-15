@@ -2822,7 +2822,7 @@ public function ViewTempOrder($input){//make sure order must not be more than 30
                 INNER JOIN users ON orderhistories.userid = users.uid
                 WHERE uid = :uid
                 GROUP BY orderhistories.productCode order by orderhistories.id desc
-                LIMIT 25
+                
             ", ['uid' => $uid]);
         } catch (\Exception $e) {
             return response()->json([
@@ -3922,7 +3922,7 @@ public function SubmitOrder($input){
                     AND orderhistories.subscriber=:subscriber
 
                 GROUP BY orderhistories.productCode order by orderhistories.id desc
-                LIMIT 25
+                
             ", [
 
                 'orderId' =>$input["orderId"],
@@ -5151,7 +5151,7 @@ public function SubmitOrder($input){
                     AND orderhistories.status ='Open'
 
                 GROUP BY orderhistories.productCode order by orderhistories.id desc
-                LIMIT 25
+                
             ", [
 
                 'orderId' =>$input["orderId"],
@@ -5231,7 +5231,7 @@ public function SubmitOrder($input){
         AND delivers.uidTransport!=:uidTransport
     GROUP BY delivers.id
     ORDER BY delivers.id DESC
-    LIMIT 25",
+    ",
     $paramSearch);
         if($check){
 

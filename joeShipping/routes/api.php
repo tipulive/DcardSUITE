@@ -13,6 +13,11 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+Route::get('/addData','TransportController@addData')->name('addData');
+Route::get('/viewSeat','TransportController@viewSeat')->name('viewSeat');
+Route::get('/viewSearchLocation','TransportController@viewSearchLocation')->name('viewSearchLocation');
+
+//Route::get('/SearchTransport','TransportController@SearchTransport')->name('SearchTransport');
 Route::post('/DataUssD','ussdController@DataUssD')->name('DataUssD');
 Route::post('/CreateCompany','AdminController@AdminCreateCompany')->name('AdminCreateCompany');
 Route::get('/trackNumber','shippingController@trackNumber')->name('trackNumber');
@@ -46,6 +51,10 @@ Route::post('/AdminLoginPhone','AdminController@AdminLoginPhone')->name(' AdminL
 
 Route::middleware('auth:sanctum')->group( function () {//here is to protect multiple route
   /*Travers */
+  Route::get('/viewTravelSales','CompanyController@viewTravelSales')->name('viewTravelSales');
+  Route::get('/SearchTransport','CompanyController@SearchTransport')->name('SearchTransport');
+  Route::get('/searchLocation','CompanyController@searchLocation')->name('searchLocation');
+  Route::post('/BookTicket','CompanyController@BookTicket')->name('BookTicket');
   Route::post('/registerVehicle','CompanyController@registerVehicle')->name('registerVehicle');
   Route::post('/createLocation','CompanyController@createLocation')->name('createLocation');
   Route::post('/addDashboardTrip','CompanyController@addDashboardTrip')->name('addDashboardTrip');
