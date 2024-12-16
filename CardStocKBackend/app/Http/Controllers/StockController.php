@@ -2822,7 +2822,7 @@ public function ViewTempOrder($input){//make sure order must not be more than 30
                 INNER JOIN users ON orderhistories.userid = users.uid
                 WHERE uid = :uid
                 GROUP BY orderhistories.productCode order by orderhistories.id desc
-                
+
             ", ['uid' => $uid]);
         } catch (\Exception $e) {
             return response()->json([
@@ -2883,6 +2883,7 @@ public function ViewUserTempOrder($input){//make sure order must not be more tha
                 SUM(orderhistories.qty_count) AS totalCount
             FROM orderhistories
             INNER JOIN products ON orderhistories.productCode = products.productCode
+                                  AND  orderhistories.subscriber=products.subscriber
             INNER JOIN users ON orderhistories.userid = users.uid
             WHERE orderhistories.order_creator=:orderCreator
                 AND orderhistories.subscriber=:subscriber
@@ -3285,7 +3286,7 @@ public function SubmitOrder($input){
               "DownQuery"=>"
               INNER JOIN (
                  SELECT SUM(total) AS saleBalance
-                 FROM orders where  (DATE(orders.created_at) =CURDATE())
+                 FROM orders where orders.subscriber=:orderSubscriber and (DATE(orders.created_at) =CURDATE())
              ) AS total_orders
              WHERE orders.subscriber = :subscriber
 
@@ -3298,6 +3299,7 @@ public function SubmitOrder($input){
                ,
                "params"=>array(
                   'subscriber' =>Auth::user()->subscriber,
+                  'orderSubscriber'=>Auth::user()->subscriber,
                   'adminSubscriber'=>Auth::user()->subscriber,
                   //'uidCreator'=>Auth::user()->uid,
                   //'uidCreatorCount'=>Auth::user()->uid,
@@ -3315,7 +3317,7 @@ public function SubmitOrder($input){
               "DownQuery"=>"
               INNER JOIN (
                  SELECT SUM(total) AS saleBalance
-                 FROM orders where (YEARWEEK(orders.created_at) = YEARWEEK(NOW()))
+                 FROM orders where orders.subscriber=:orderSubscriber and (YEARWEEK(orders.created_at) = YEARWEEK(NOW()))
              ) AS total_orders
              WHERE orders.subscriber = :subscriber
 
@@ -3328,6 +3330,7 @@ public function SubmitOrder($input){
                ,
                "params"=>array(
                   'subscriber' =>Auth::user()->subscriber,
+                  'orderSubscriber'=>Auth::user()->subscriber,
                   'adminSubscriber'=>Auth::user()->subscriber,
                   //'uidCreator'=>Auth::user()->uid,
                   //'uidCreatorCount'=>Auth::user()->uid,
@@ -3346,7 +3349,7 @@ public function SubmitOrder($input){
                            "DownQuery"=>"
                            INNER JOIN (
                               SELECT SUM(total) AS saleBalance
-                              FROM orders where  (YEAR(orders.created_at) = YEAR(CURDATE()) AND MONTH(orders.created_at) = MONTH(CURDATE()))
+                              FROM orders where orders.subscriber=:orderSubscriber and  (YEAR(orders.created_at) = YEAR(CURDATE()) AND MONTH(orders.created_at) = MONTH(CURDATE()))
                           ) AS total_orders
                            WHERE orders.subscriber = :subscriber
 
@@ -3359,6 +3362,7 @@ public function SubmitOrder($input){
                            ,
                            "params"=>array(
                                'subscriber' =>Auth::user()->subscriber,
+                               'orderSubscriber'=>Auth::user()->subscriber,
                                'adminSubscriber'=>Auth::user()->subscriber,
                                //'uidCreator'=>Auth::user()->uid,
                                //'uidCreatorCount'=>Auth::user()->uid,
@@ -3375,7 +3379,7 @@ public function SubmitOrder($input){
               "DownQuery"=>"
               INNER JOIN (
                  SELECT SUM(total) AS saleBalance
-                 FROM orders where  (YEAR(orders.created_at) = YEAR(CURDATE()))
+                 FROM orders where orders.subscriber=:orderSubscriber and (YEAR(orders.created_at) = YEAR(CURDATE()))
              ) AS total_orders
                WHERE orders.subscriber = :subscriber
 
@@ -3388,6 +3392,7 @@ public function SubmitOrder($input){
                ,
                "params"=>array(
                    'subscriber'=>Auth::user()->subscriber,
+                   'orderSubscriber'=>Auth::user()->subscriber,
                    'adminSubscriber'=>Auth::user()->subscriber,
                    //'uidCreator'=>Auth::user()->uid,
                    //'uidCreatorCount'=>Auth::user()->uid,
@@ -3404,7 +3409,7 @@ public function SubmitOrder($input){
                   "DownQuery"=>"
                   INNER JOIN (
                      SELECT SUM(total) AS saleBalance
-                     FROM orders where
+                     FROM orders where orders.subscriber=:orderSubscriber and
                       (DATE(orders.created_at)=:thisDate)
                  ) AS total_orders
                    WHERE orders.subscriber = :subscriber
@@ -3418,6 +3423,7 @@ public function SubmitOrder($input){
                    ,
                    "params"=>array(
                        'subscriber'=>Auth::user()->subscriber,
+                       'orderSubscriber'=>Auth::user()->subscriber,
                        'adminSubscriber'=>Auth::user()->subscriber,
                       // 'uidCreator'=>Auth::user()->uid,
                        //'uidCreatorCount'=>Auth::user()->uid,
@@ -3436,7 +3442,7 @@ public function SubmitOrder($input){
                       "DownQuery"=>"
                       INNER JOIN (
                          SELECT SUM(total) AS saleBalance
-                         FROM orders where
+                         FROM orders where orders.subscriber=:orderSubscriber and
                          (DATE(orders.created_at) BETWEEN :thisDate AND :toDate)
                      ) AS total_orders
                        WHERE orders.subscriber = :subscriber
@@ -3450,6 +3456,7 @@ public function SubmitOrder($input){
                        ,
                        "params"=>array(
                            'subscriber'=>Auth::user()->subscriber,
+                           'orderSubscriber'=>Auth::user()->subscriber,
                            'adminSubscriber'=>Auth::user()->subscriber,
                            //'uidCreator'=>Auth::user()->uid,
                            //'uidCreatorCount'=>Auth::user()->uid,
@@ -3917,15 +3924,17 @@ public function SubmitOrder($input){
                     SUM(orderhistories.qty_count) AS totalCount
                 FROM orderhistories
                 INNER JOIN products ON orderhistories.productCode = products.productCode
+                                    AND  orderhistories.subscriber=products.subscriber
 
                 WHERE orderhistories.uid =:orderId
                     AND orderhistories.subscriber=:subscriber
 
                 GROUP BY orderhistories.productCode order by orderhistories.id desc
-                
+
             ", [
 
                 'orderId' =>$input["orderId"],
+
                 'subscriber' => Auth::user()->subscriber,
             ]);
             } catch (\Exception $e) {
@@ -5144,14 +5153,14 @@ public function SubmitOrder($input){
                     SUM(orderhistories.qty_count) AS totalCount
                 FROM orderhistories
                 INNER JOIN products ON orderhistories.productCode = products.productCode
-
+                AND  orderhistories.subscriber=products.subscriber
                 WHERE orderhistories.uid =:orderId
                     AND orderhistories.subscriber = :subscriber
                     AND orderhistories.paidStatus='checked'
                     AND orderhistories.status ='Open'
 
                 GROUP BY orderhistories.productCode order by orderhistories.id desc
-                
+
             ", [
 
                 'orderId' =>$input["orderId"],

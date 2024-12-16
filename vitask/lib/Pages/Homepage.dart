@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
-import 'package:mdrivers/models/Transport.dart';
+import '../models/Transport.dart';
 
 import '../Query/AdminQuery.dart';
 
