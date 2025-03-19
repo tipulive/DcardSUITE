@@ -17,7 +17,12 @@ Route::get('/addData','TransportController@addData')->name('addData');
 Route::get('/viewSeat','TransportController@viewSeat')->name('viewSeat');
 Route::get('/viewSearchLocation','TransportController@viewSearchLocation')->name('viewSearchLocation');
 
+//Appointment//
+Route::post('/ussdView','appointmentController@ussdView')->name('ussdView');
+Route::post('/chooseOption','appointmentController@chooseOption')->name('chooseOption');
+//Appointment//
 //Route::get('/SearchTransport','TransportController@SearchTransport')->name('SearchTransport');
+
 Route::post('/DataUssD','ussdController@DataUssD')->name('DataUssD');
 Route::post('/CreateCompany','AdminController@AdminCreateCompany')->name('AdminCreateCompany');
 Route::get('/trackNumber','shippingController@trackNumber')->name('trackNumber');
@@ -51,6 +56,9 @@ Route::post('/AdminLoginPhone','AdminController@AdminLoginPhone')->name(' AdminL
 
 Route::middleware('auth:sanctum')->group( function () {//here is to protect multiple route
   /*appointment*/
+
+  Route::get('/loadCode','CompanyController@loadCode')->name('loadCode');
+  Route::post('/service','CompanyController@service')->name('service');
   Route::get('/getCode','CompanyController@getCode')->name('getCode');
   Route::post('/code','CompanyController@code')->name('code');
   Route::get('/applicationAppointment','CompanyController@applicationAppointment')->name('applicationAppointment');//get a

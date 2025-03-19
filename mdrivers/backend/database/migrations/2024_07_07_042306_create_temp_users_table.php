@@ -18,7 +18,7 @@ class CreateTempUsersTable extends Migration
             $table->string('uid')->index('uid')->unique();
             $table->string('sessionKey')->default('0')->index('sessionKey');
             $table->string('location')->default('none')->index('location');
-            $table->string('name')->default('none')->index('location');
+            $table->string('name')->default('none')->index('name');
 
             $table->dateTime('dateOn')->nullable()->index('dateOn');
             $table->timestamps();

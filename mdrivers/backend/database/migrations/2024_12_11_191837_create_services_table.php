@@ -16,7 +16,8 @@ class CreateServicesTable extends Migration
         Schema::create('services', function (Blueprint $table) {
             $table->id();
             $table->String('uid')->index('uid');
-            $table->String('codeb')->default('none')->index('codeb');
+            //$table->String('codeb')->default('none')->index('codeb');
+            $table->String('uidCode')->default('none')->index('uidCode');
             $table->String('name')->default('none')->index('name');
             $table->String('status')->default('none')->index('status');
             $table->String('serviceType')->default('none')->index('serviceType');

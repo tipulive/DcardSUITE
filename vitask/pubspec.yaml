@@ -54,6 +54,7 @@ dependencies:
   cool_alert: ^2.0.1
   dotted_line: ^3.1.0
   auto_size_text_field: ^2.2.3
+  showcaseview: ^3.0.0
     #firebase_core: ^2.24.2
   #firebase_auth: ^4.15.3
   #firebase_messaging: ^14.7.21

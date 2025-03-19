@@ -16,7 +16,8 @@ class CreateQuickbosubmitsTable extends Migration
         Schema::create('quickbosubmits', function (Blueprint $table) {
             $table->id();
             $table->string('uid')->default('none')->index('uid');//id generated when submitted data
-            $table->string('quickUid')->default('none')->index('quickUid');//this will make us trace quickBonuse
+            //$table->string('quickUid')->default('none')->index('quickUid');//this will make us trace quickBonuse
+            $table->string('quickUid')->default('none')->index('quickUid');
             $table->string('uidUser')->default('none')->index('uidUser');
             $table->string('productName')->default('none')->index('productName');
             $table->string('qty')->default('none');

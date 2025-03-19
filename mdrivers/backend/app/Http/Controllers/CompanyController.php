@@ -39,6 +39,60 @@ class CompanyController extends Controller
         $this->platform1=env('PLATFORM3');
     }
     /*Appointment Company */
+    public function service(Request $request){
+        if(Auth::check())
+        {
+        if(Auth::user()->platform==$this->platform1)
+            {
+                $input=$request->all();
+
+                return (new appointmentController)->service($input);
+            }
+            else{
+                return response([
+                    "status"=>false,
+                    "result"=>$this->Admin_Auth_result_error,
+                    "error"=>$this->Admin_Auth_error,
+
+                ],200);
+            }
+        }
+        else{
+            return response([
+                "status"=>false,
+                "result"=>$this->Admin_Auth_result_error,
+                "error"=>$this->Admin_Auth_error,
+
+            ],200);
+        }
+    }
+    public function loadCode(Request $request){
+        if(Auth::check())
+        {
+        if(Auth::user()->platform==$this->platform1)
+            {
+                $input=$request->all();
+
+                return (new appointmentController)->loadCode($input);
+            }
+            else{
+                return response([
+                    "status"=>false,
+                    "result"=>$this->Admin_Auth_result_error,
+                    "error"=>$this->Admin_Auth_error,
+
+                ],200);
+            }
+        }
+        else{
+            return response([
+                "status"=>false,
+                "result"=>$this->Admin_Auth_result_error,
+                "error"=>$this->Admin_Auth_error,
+
+            ],200);
+        }
+    }
     public function getCode(Request $request){
         if(Auth::check())
         {

@@ -2,7 +2,7 @@
 @email=company@gmail.com
 @PhoneNumber=+250782389359
 @password=1
-@Auth_token=683|YoR4CGlgVfchUpgkK7O2JNMMJ9SS10HyiR497PoQ
+@Auth_token=2|LlC1IRs8GpomOwsZ8EeUSJpCRJwwEJ5X6S6TfPEV
 
 ### Company Login with email
 POST  {{baseUrl}}/AdminLoginEmail/
@@ -25,6 +25,50 @@ Content-Type: application/json
 
 ### Appointment ###
 
+#### loadCode,loadCode
+
+GET  {{baseUrl}}/loadCode
+Content-Type: application/json
+Authorization: Bearer {{Auth_token}}
+
+{
+"uidCreator":"required"
+}
+
+#### Create Service, actionStatus:createService
+
+POST  {{baseUrl}}/service/
+Content-Type: application/json
+Authorization: Bearer {{Auth_token}}
+
+{
+"actionStatus":"createService",
+"uid":"GahundaMisa_1737059556",
+"codeb":"8",
+"name":"Game",
+"serviceType":"Play",
+"optionKey":"5500",
+"status":"5500",
+"commentData":"Nyungwe"
+}
+
+#### Create Service, actionStatus:createService
+
+POST  {{baseUrl}}/service/
+Content-Type: application/json
+Authorization: Bearer {{Auth_token}}
+
+{
+"actionStatus":"createService",
+"uid":"required",
+"code":"icanyngwe",
+"name":"icanyngwe",
+"serviceType":"icanyngwe",
+"optionKey":"5500",
+"status":"5500",
+"commentData":"Nyungwe"
+}
+
 #### Create Appointment, actionStatus:createappointment
 
 POST  {{baseUrl}}/appointment/
@@ -33,16 +77,40 @@ Authorization: Bearer {{Auth_token}}
 
 {
 "actionStatus":"createappointment",
-"uid":"required",
-"codeb":"icanyngwe",
-"name":"icanyngwe",
-"limitb":"icanyngwe",
-"startDate":"5500",
-"endDate":"5500",
+"uid":"DOctorAppointment_1735430577",
+"codeb":"8",
+"name":"DOctor Appointment",
+"limitb":6,
+"startDate":"2024-12-01 09:05:00",
+"endDate":"2024-12-01 09:30:00",
 "status":"5500",
 "commentData":"Nyungwe"
 }
 
+### Display Option ussd ##
+
+POST  {{baseUrl}}/ussdView/
+Content-Type: application/json
+
+{
+"sessionId": "46",
+"serviceCode": "test",
+"phoneNumber": "0782389359",
+"text":3
+
+}
+### Display Option ussd ##
+#### user Choose Appointment using USSD
+
+POST  {{baseUrl}}/chooseOption/
+Content-Type: application/json
+Authorization: Bearer {{Auth_token}}
+
+{
+"sessionId": "46",
+"text":2
+
+}
 
 ### on Dashboard When user go in his dashboard
 

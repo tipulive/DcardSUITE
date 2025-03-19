@@ -17,6 +17,7 @@ class CreateAdminsTable extends Migration
             $table->id();
             $table->string('uid')->unique();
             $table->string('uidCreator')->default('none')->index('uidCreator');
+
             $table->string('photo_url')->default('none');
             $table->string('name')->default('none');
             $table->string('email')->default('none')->index('email');
@@ -33,7 +34,7 @@ class CreateAdminsTable extends Migration
             $table->string('status')->default('none');
             $table->string('CompanyName')->default('none')->index('CompanyName');
             $table->string('subscriber')->default('none')->index("subscriber");//company Name
-            $table->string('country')->default('none');
+
             $table->timestamps();
         });
     }

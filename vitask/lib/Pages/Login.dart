@@ -32,251 +32,95 @@ class _LoginState extends State<Login> {
   bool _canShowButton=true;
   bool isValid=false;
 
+  //show preview ussd //
+  final List<String> carList = ['Toyota', 'Benz', 'Hyundai'];
+  final TextEditingController _textController = TextEditingController();
+  String selectedCar = '';
+  bool isAutomating = false;
+
+  changeSelection() async {
+   // Get.back();
+   // await Future.delayed(Duration(seconds: 1));
+    selectedCar = '${carList[0]} Selected';
+    /*setState(() {
+      selectedCar = '${carList[0]} Selected';
+    });*/
+   // _showModal();
+  }
+  void _automateSelection() async {
+    setState(() {
+      isAutomating = true;
+    });
+
+    // Loop through the car list with a delay between each selection
+    for (int i = 0; i < carList.length; i++) {
+      await Future.delayed(Duration(seconds: 1));  // Add a delay of 2 seconds
+      setState(() {
+        selectedCar = '${carList[i]} Selected';
+      });
+    }
+
+    setState(() {
+      isAutomating = false;
+    });
+  }
+
+  void _showModal() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return  AlertDialog(
+
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('choose car'),
+                  Text('1) Toyota\n2) Benz\n3) Hyundai'),
+                  SizedBox(height: 20),
+                  SizedBox(height: 20),
+                  TextField(
+                    controller: _textController,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(hintText: 'Enter 1, 2, or 3'),
+                  ),
+                  ElevatedButton(
+                    // onPressed: isAutomating ? null : _automateSelection, // Disable while automating
+                    onPressed: (){
+            setModalState(() {
+              _textController.text="1";
+             // _automateSelection();
+                      changeSelection();
+            });
+                     /* setModalState(() {
+                        selectedCar = "Updated Text at ${DateTime.now()}";
+                      });*/
+                    },
+                    child: Text('Submit'),
+                  ),
+                  SizedBox(height: 20),
+                  Text(selectedCar),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+  //show preview USSD
 
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
-
-      body: Stack(
-        children: [
-          GestureDetector(
-            onTap: () {
-              // Dismiss the keyboard when tapping outside of text field
-              FocusScope.of(context).unfocus();
-            },
-            child: SingleChildScrollView(
-              // padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-              // Ensure that content is pushed above the keyboard
-                reverse: true,
-                child: Container(
-                  child: Column(
-                    children: <Widget>[
-                      Container(
-                        height: 400,
-                        decoration: BoxDecoration(
-                            image: DecorationImage(
-                                image: AssetImage('images/background.png'),
-                                fit: BoxFit.fill
-                            )
-                        ),
-                        child: Stack(
-                          children: <Widget>[
-                            Positioned(
-                              left: 30,
-                              width: 80,
-                              height: 200,
-                              child: FadeInUp(duration: Duration(seconds: 1), child: Container(
-                                decoration: BoxDecoration(
-                                    image: DecorationImage(
-                                        image: AssetImage('images/light-1.png')
-                                    )
-                                ),
-                              )),
-                            ),
-                            Positioned(
-                              left: 140,
-                              width: 80,
-                              height: 150,
-                              child: FadeInUp(duration: Duration(milliseconds: 1200), child: Container(
-                                decoration: BoxDecoration(
-                                    image: DecorationImage(
-                                        image: AssetImage('images/light-2.png')
-                                    )
-                                ),
-                              )),
-                            ),
-                            Positioned(
-                              right: 40,
-                              top: 40,
-                              width: 80,
-                              height: 150,
-                              child: FadeInUp(duration: Duration(milliseconds: 1300), child: Container(
-                                decoration: BoxDecoration(
-                                    image: DecorationImage(
-                                        image: AssetImage('images/clock.png')
-                                    )
-                                ),
-                              )),
-                            ),
-                            Positioned(
-                              child: FadeInUp(duration: Duration(milliseconds: 1600), child: Container(
-                                margin: EdgeInsets.only(top: 50),
-                                child: Center(
-                                  child:Text("Login", style: TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.bold),),
-                                ),
-                              )),
-                            )
-                          ],
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
-                        child: Image.asset(
-                          'images/playstore.png',
-                          width: 60,
-                          height: 60,
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(left:15,right:15),
-                        child: Column(
-                          children: <Widget>[
-                            FadeInUp(duration: Duration(milliseconds: 1800), child: Container(
-                              padding: EdgeInsets.all(30),
-                              decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(10),
-
-                                  boxShadow: [
-                                    BoxShadow(
-                                        color: Color.fromRGBO(143, 148, 251, .2),
-                                        blurRadius: 20.0,
-                                        offset: Offset(0, 10)
-                                    )
-                                  ]
-                              ),
-                              child: Column(
-                                children: <Widget>[
-                                  Container(
-
-                                    child: IntlPhoneField(
-
-                                      controller: uidInput,
-                                      keyboardType: TextInputType.number,
-                                      initialCountryCode: 'RW',
-                                      decoration: InputDecoration(
-                                          labelText: 'Phone Number',
-                                          border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(5.0),
-                                          ),
-                                          //suffixIcon:Obx(() => Get.put(HideShowState()).isNumberValid.value?Icon(Icons.done,color:Colors.green,):Icon(Icons.dangerous,color:Colors.red,)),
-                                          suffixIcon:isValid?const Icon(Icons.done,color:Colors.green,):const Icon(Icons.dangerous,color:Colors.red,)
-
-                                      ),
-
-                                      onChanged: (phone) {
-
-                                        if((uidInput.text).isPhoneNumber)
-                                        {
-                                          // Get.put(HideShowState()).isValid(true);
-                                          setState(() {
-                                            isValid=true;
-                                          });
-
-
-                                        }
-                                        else{
-                                          // Get.put(HideShowState()).isValid(false);
-
-                                          setState(() {
-                                            isValid=false;
-                                          });
-                                          // print("not empty");
-                                        }
-                                      },
-                                      onCountryChanged: (country) {
-
-
-                                        uidInput2.text="+${country.dialCode}";
-                                        if((uidInput.text).isPhoneNumber)
-                                        {
-                                          //Get.put(HideShowState()).isValid(true);
-                                          setState(() {
-                                            isValid=true;
-                                          });
-                                        }
-                                        else{
-                                          // Get.put(HideShowState()).isValid(false);
-                                          setState(() {
-                                            isValid=false;
-                                          });
-                                        }
-                                      },
-                                    ),
-                                  ),
-                                  Visibility(
-                                    visible: false,
-                                    child: TextField(
-                                      controller: uidInput2,
-                                      decoration: InputDecoration(
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(90.0),
-                                        ),
-                                        labelText: 'Ccode',
-                                      ),
-                                    ),
-                                  ),
-
-                                  Container(
-
-                                    child: TextField(
-
-                                      controller: uidInput3,
-                                      obscureText: true,
-                                      decoration: InputDecoration(
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(5.0),
-                                        ),
-                                        labelText: 'Password',
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            )),
-                            SizedBox(height: 30,),
-
-                            Visibility(
-                              visible: isValid,
-                              child: FadeInUp(duration: Duration(milliseconds: 1900), child: Container(
-                                height: 50,
-                                padding: EdgeInsets.only(left: 10,right: 10),
-                                child: ElevatedButton(
-
-                                  style: ElevatedButton.styleFrom(
-
-                                      minimumSize: const Size.fromHeight(50),
-                                      backgroundColor:Color.fromRGBO(143, 148, 251, 1),
-                                      foregroundColor: Colors.white
-
-                                  ),
-
-                                  child: const Text('Log In'),
-                                  onPressed: () async{
-                                    //print(uidInput.text);
-                                    //print(await loginOnline());
-                                    await loginOnline();
-                                    // Get.to(() =>Aboutpage());
-                                  },
-                                ),
-                              )),
-                            ),
-
-                            SizedBox(height: 20,),
-                            Padding(padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom)),
-                            FadeInUp(duration: Duration(milliseconds: 2000), child: Text("Forgot Password?", style: TextStyle(color: Color.fromRGBO(143, 148, 251, 1)),)),
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
-                )
-
-            ),
-          ),
-          if(showOveray)
-            Positioned.fill(
-              child: Center(
-                child: Container(
-                  alignment: Alignment.center,
-                  color: Colors.white70,
-                  child: const CircularProgressIndicator(),
-                ),
-              ),
-            ),
-        ],
+      appBar: AppBar(title: Text('Car Selector')),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: _showModal,
+          child: Text('Start Automation'),
+        ),
       ),
     );
   }

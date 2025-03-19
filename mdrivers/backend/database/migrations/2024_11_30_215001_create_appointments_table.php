@@ -16,7 +16,11 @@ class CreateAppointmentsTable extends Migration
         Schema::create('appointments', function (Blueprint $table) {
             $table->id();
             $table->String('uid')->index('uid');
-            $table->String('codeb')->default('none')->index('codeb');
+            $table->String('limitUid')->index('limitUid');
+           // $table->String('codeb')->default('none')->index('codeb');
+            $table->String('uidCode')->default('none')->index('uidCode');
+            $table->String('name')->default('none');
+            $table->String('serviceType')->default('none')->index('serviceType');
             $table->String('limitb')->default('none')->index('limitb');
             $table->integer('limitCounter')->default(0);
             $table->json('limitJson')->nullable();
