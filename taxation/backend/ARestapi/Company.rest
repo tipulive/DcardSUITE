@@ -33,6 +33,11 @@ Authorization: Bearer {{Auth_token}}
 
 {
 
+"searchOption":"false",
+"name":"be",
+"advancedSearch":"mysales",
+"thisDate":"2025-3-16",
+"toDate":"none"
 
 }
 ### Create Category actionInput:create_category,
@@ -1040,8 +1045,8 @@ Authorization: Bearer {{Auth_token}}
 {
 "searchOption":"false",
 "name":"be",
-"advancedSearch":"today",
-"thisDate":"2024-2-8",
+"advancedSearch":"choosedate",
+"thisDate":"2025-3-16",
 "toDate":"none"
 
 }

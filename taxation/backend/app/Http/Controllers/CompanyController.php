@@ -67,14 +67,14 @@ class CompanyController extends Controller
             ],200);
         }
     }
-    public function load_category(Request $request) {
+    public function LoadCategory(Request $request) {
         if(Auth::check())
         {
         if(Auth::user()->platform==$this->platform1)
             {
                 $input=$request->all();
 
-                return (new TaxationController)->load_category($input);
+                return (new TaxationController)->LoadCategory($input);
             }
             else{
                 return response([

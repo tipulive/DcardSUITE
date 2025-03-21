@@ -52,7 +52,7 @@ Route::middleware('auth:sanctum')->group( function () {//here is to protect mult
 Route::post('upload','StockController@upload');
 /*Taxation */
 Route::get('/SumReportTotal','CompanyController@SumReportTotal')->name('SumReportTotal');
-Route::get('/load_category','CompanyController@load_category')->name('load_category');
+Route::get('/LoadCategory','CompanyController@LoadCategory')->name('LoadCategory');
 Route::post('/TaxCategory','CompanyController@TaxCategory')->name('TaxCategory');
 Route::post('/TaxMeasurement','CompanyController@TaxMeasurement')->name('TaxMeasurement');
 Route::post('/Taxproduct','CompanyController@Taxproduct')->name('Taxproduct');

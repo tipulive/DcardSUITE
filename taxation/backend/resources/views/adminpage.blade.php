@@ -13,6 +13,12 @@
 
 <!--Menu Css-->
 <style>
+      @media only screen and (min-width: 1024px) {
+    .customizeContainer{
+        padding-right:15% !important;
+        padding-left:15% !important;
+    }
+}
 span.Formchange {
     /* width: 200px; */
     padding-top: 10px;
@@ -301,70 +307,26 @@ table th {
 
 <div class="app-sidebar__inner">
                         <ul class="vertical-nav-menu metismenu">
-                        <li class="app-sidebar__heading">Report</li>
-                            <li>
-                                <a href="#View All Sales" onclick="return AllOpenSaleReport()">
-                                    <i class="metismenu-icon pe-7s-graph2"></i> All Sales
-                                </a>
-                            </li>
 
 
-
-                         <!--Taxation-->
-                         <li class="app-sidebar__heading">Taxation</li>
+      <!--Capturing Taxation-->
+      <li class="app-sidebar__heading">Sales</li>
                             <li class="mm-active">
                                 <a href="#" aria-expanded="true">
-                                    <i class="metismenu-icon pe-7s-rocket"></i>Taxation
-                                    <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
-                                </a>
-                            </li>
-                                <ul class="mm-collapse mm-show" style="">
-
-                                    <li class="app-sidebar__heading mm-active"><a href="#" class="p-0" onclick="return CategoryForm()">Add Category  </a></li>
-                            <li class="mm-active">
-                                <a href="#" aria-expanded="true" onclick="return ViewTaxCategory()">
-                                    <i class="metismenu-icon pe-7s-rocket"></i>View Category
-
-                                </a>
-                            </li>
-
-                            <li class="app-sidebar__heading"><a href="#" class="p-0" onclick="return TaxProductCreateForm()">Add Product</a></li>
-                            <li class="mm-active">
-                                <a href="#" aria-expanded="true" onclick="return ViewTaxProduct()">
-                                    <i class="metismenu-icon pe-7s-rocket"></i>View Product
-
-                                </a>
-                            </li>
-
-
-                                    </ul>
-                                    <li class="mm-active">
-                                <a href="#" aria-expanded="true">
-                                    <i class="metismenu-icon pe-7s-rocket"></i>Taxation
-                                    <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
-                                </a>
-                            </li>
-                         <!--Taxation-->
-
-
-                             <!--Capturing Taxation-->
-                             <li class="app-sidebar__heading">Capturing Tax</li>
-                            <li class="mm-active">
-                                <a href="#" aria-expanded="true">
-                                    <i class="metismenu-icon pe-7s-rocket"></i>Data
+                                    <i class="metismenu-icon pe-7s-rocket"></i>Sales Data
                                     <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
                                 </a>
                             </li>
                                 <ul class="mm-collapse mm-show" style="">
                                     <li>
                                         <a href="#View All Products" onclick="return CaptureData()" aria-expanded="false">
-                                            <i class="metismenu-icon"></i>Capture Data
+                                            <i class="metismenu-icon"></i>Capture Sales
                                         </a>
                                     </li>
 
                                     <li>
-                                        <a  href="/ViewCard" aria-expanded="false">
-                                            <i class="metismenu-icon"></i>Add Product
+                                        <a  href="#ViewCard" aria-expanded="false"  onclick="return viewDataSales()">
+                                            <i class="metismenu-icon"></i>Sales
                                         </a>
                                     </li>
 
@@ -372,20 +334,85 @@ table th {
                                     </ul>
                                     <li class="mm-active">
                                 <a href="#" aria-expanded="true">
-                                    <i class="metismenu-icon pe-7s-rocket"></i>items Safari
+                                    <i class="metismenu-icon pe-7s-graph2"></i>Report Sales
+                                    <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
+                                </a>
+                            </li>
+
+                         <!--Capturing Sales-->
+
+                           <!--Reports Taxation-->
+                           <ul class="mm-collapse mm-show" style="">
+                                    <li>
+                                        <a href="#View All Products" onclick="return TaxReportTotal()" aria-expanded="false">
+                                            <i class="metismenu-icon"></i>Report
+                                        </a>
+                                    </li>
+
+
+
+
+                            </ul>
+                            <li class="mm-active">
+                                <a href="#" aria-expanded="true">
+                                    <i class="metismenu-icon pe-7s-rocket"></i>Sales Data
+
+                                </a>
+                            </li>
+                         <!--Reports Taxation-->
+
+                        <!--Create Taxation-->
+
+                            <li class="app-sidebar__heading">Add Taxation</li>
+                            <li class="mm-active">
+                                <a href="#" aria-expanded="true">
+                                    <i class="metismenu-icon pe-7s-rocket"></i>Category
+                                    <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
+                                </a>
+                            </li>
+                                <ul class="mm-collapse mm-show" style="">
+                                    <li>
+                                        <a href="#Add Category" onclick="return CategoryForm()" aria-expanded="false">
+                                            <i class="metismenu-icon"></i>Add Category
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a  href="#ViewCard" aria-expanded="false"  onclick="return ViewTaxCategory()">
+                                            <i class="metismenu-icon"></i>View Category
+                                        </a>
+                                    </li>
+
+
+                                    </ul>
+                                    <li class="mm-active">
+                                <a href="#" aria-expanded="true">
+                                    <i class="metismenu-icon pe-7s-rocket"></i>Products
                                     <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
                                 </a>
                             </li>
                          <!--Capturing Taxation-->
 
                            <!--Reports Taxation-->
-                           <li class="app-sidebar__heading">Reports</li>
-                            <li>
-                                <a href="#View All Users" onclick="return ViewAllUsers()">
-                                    <i class="metismenu-icon pe-7s-graph2"></i>Reports
-                                </a>
-                            </li>
-                         <!--Reports Taxation-->
+                           <ul class="mm-collapse mm-show" style="">
+                                    <li>
+                                        <a href="#View All Products" onclick="return TaxProductCreateForm()" aria-expanded="false">
+                                            <i class="metismenu-icon"></i>Add Products
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a  href="#ViewCard" aria-expanded="false"  onclick="return ViewTaxProduct()">
+                                            <i class="metismenu-icon"></i>View Product
+                                        </a>
+                                    </li>
+
+
+                            </ul>
+                         <!--Taxation-->
+
+
+
 
                          <li class="app-sidebar__heading">Users</li>
                             <li>
@@ -403,130 +430,9 @@ table th {
 
 
                               <!--Sponsoship-->
-                              <li class="app-sidebar__heading">Sponsorship</li>
-                            <li>
-                                <a href="#View All Users" onclick="return ViewAllUsers()">
-                                    <i class="metismenu-icon pe-7s-graph2"></i>Sponsorship
-                                </a>
-                            </li>
-                         <!--Sponsoship-->
-
-                          <!--CardCode-->
-                          <li class="app-sidebar__heading">Card</li>
-                            <li class="mm-active">
-                                <a href="#" aria-expanded="true">
-                                    <i class="metismenu-icon pe-7s-rocket"></i>Card
-                                    <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
-                                </a>
-                            </li>
-                                <ul class="mm-collapse mm-show" style="">
-                                    <li>
-                                        <a href="#View All Products" onclick="return CreateMultipleCardMenu()" aria-expanded="false">
-                                            <i class="metismenu-icon"></i>Generate
-                                        </a>
-                                    </li>
-
-                                    <li>
-                                        <a  href="/ViewCard" aria-expanded="false">
-                                            <i class="metismenu-icon"></i>Print Card
-                                        </a>
-                                    </li>
 
 
-                                    </ul>
-                                    <li class="mm-active">
-                                <a href="#" aria-expanded="true">
-                                    <i class="metismenu-icon pe-7s-rocket"></i>items Safari
-                                    <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
-                                </a>
-                            </li>
-                            <li class="app-sidebar__heading">Stock</li>
 
-                                <ul class="mm-collapse mm-show" style="">
-                                    <li>
-                                        <a href="#View All Products" onclick="return CheckSafariStock()" aria-expanded="false">
-                                            <i class="metismenu-icon"></i>Create Safari
-                                        </a>
-                                    </li>
-
-                                    <li>
-                                        <a  href="#Create Product" onclick="return ViewSafariStock('name',false)" aria-expanded="false">
-                                            <i class="metismenu-icon"></i>View
-                                        </a>
-                                    </li>
-
-                                    <li>
-                                        <a href="/ViewQrProduct" aria-expanded="false">
-                                            <i class="metismenu-icon"></i>Product Qr
-                                        </a>
-                                    </li>
-                                    <!--Combine Create Safari and View Safari -->
-                                   <!-- <li>
-                                        <a  href="#Create Product" onclick="return ViewSafari()" aria-expanded="false">
-                                            <i class="metismenu-icon"></i>Safari
-                                        </a>
-                                    </li>-->
-                                    <!--here you can edit Products Price -->
-                                    <!--Sell your Stock -->
-                                    <!--<li>
-                                        <a  href="#Create Product" onclick="return ViewSafari()" aria-expanded="false">
-                                            <i class="metismenu-icon"></i>Products
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a  href="#Create Product" onclick="return ViewSafari()" aria-expanded="false">
-                                            <i class="metismenu-icon"></i>Sell
-                                        </a>
-                                    </li>-->
-
-
-                                    </ul>
-
-                                    <li class="app-sidebar__heading">Promotion</li>
-                            <li class="mm-active">
-                                <a href="#" aria-expanded="true">
-                                    <i class="metismenu-icon pe-7s-rocket"></i>Promotion
-                                    <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
-                                </a>
-                            </li>
-
-                                <ul class="mm-collapse mm-show" style="">
-                                    <li>
-                                        <a href="#View All Products" onclick="return CreatePromotionEventMenu()" aria-expanded="false">
-                                            <i class="metismenu-icon"></i>Create
-                                        </a>
-                                    </li>
-
-                                    <li>
-                                        <a  href="#Create Product" onclick="return ViewAllPromotionEvent()" aria-expanded="false">
-                                            <i class="metismenu-icon"></i>View
-                                        </a>
-                                    </li>
-
-
-                                    </ul>
-                                    <!--Quick Bonus -->
-                                    <li class="mm-active">
-                                <a href="#" aria-expanded="true">
-                                    <i class="metismenu-icon pe-7s-rocket"></i>Quick Bonus
-                                    <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
-                                </a>
-                            </li>
-                                <ul class="mm-collapse mm-show" style="">
-                                    <li>
-                                        <a href="#Setup Bonus" onclick="return SetupQuickBonusMenu()" aria-expanded="false">
-                                            <i class="metismenu-icon"></i>Setup Bonus
-                                        </a>
-                                    </li>
-
-                                    <li>
-                                        <a  href="#Create Product" onclick="return GetAllPromotionEvent()" aria-expanded="false">
-                                            <i class="metismenu-icon"></i>View
-                                        </a>
-                                    </li>
-
-
-                                    </ul>
                                     <!--Quick Bonus -->
 
 
@@ -556,7 +462,7 @@ table th {
                                     </li>-->
 
 
-                                    </ul>
+
 
                                     <!--SafariCode-->
                                 <li class="app-sidebar__heading mylogout" style="color:rgb(195 211 88);" onclick="logout()">
@@ -631,8 +537,8 @@ table th {
 <body>
 
 <!--search form-->
-<div class="container">
-
+<!--<div class="container-fluid customizeContainer">-->
+<div class="container ">
 <!--form -->
 
 <div class="modal fade bd-example-modal-lg viewOrder" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
@@ -675,11 +581,17 @@ table th {
 
 
 </div>
-<div class="MainForm">
+<div class="main-card card">
+    <div class="card-body">
+
+    <div class="MainForm ">
 
 
 
 </div>
+    </div>
+</div>
+
 
 
 
@@ -755,6 +667,13 @@ function onCopy() {
 
 }
 
+/*charts script */
+let chart;
+
+
+/*charts script */
+
+
     //copy Link //
 //search page
 
@@ -769,6 +688,373 @@ $(function() {
 })
 
 /*Taxation */
+/*autocomplete script*/
+const countriesData =[
+  { id: 1, code: "+93", country: "Afghanistan" },
+  { id: 2, code: "+355", country: "Albania" },
+  { id: 3, code: "+213", country: "Algeria" },
+  { id: 4, code: "+376", country: "Andorra" },
+  { id: 5, code: "+244", country: "Angola" },
+  { id: 6, code: "+1-268", country: "Antigua and Barbuda" },
+  { id: 7, code: "+54", country: "Argentina" },
+  { id: 8, code: "+374", country: "Armenia" },
+  { id: 9, code: "+61", country: "Australia" },
+  { id: 10, code: "+43", country: "Austria" },
+  { id: 11, code: "+994", country: "Azerbaijan" },
+  { id: 12, code: "+1-242", country: "Bahamas" },
+  { id: 13, code: "+973", country: "Bahrain" },
+  { id: 14, code: "+880", country: "Bangladesh" },
+  { id: 15, code: "+1-246", country: "Barbados" },
+  { id: 16, code: "+375", country: "Belarus" },
+  { id: 17, code: "+32", country: "Belgium" },
+  { id: 18, code: "+501", country: "Belize" },
+  { id: 19, code: "+229", country: "Benin" },
+  { id: 20, code: "+975", country: "Bhutan" },
+  { id: 21, code: "+591", country: "Bolivia" },
+  { id: 22, code: "+387", country: "Bosnia and Herzegovina" },
+  { id: 23, code: "+267", country: "Botswana" },
+  { id: 24, code: "+55", country: "Brazil" },
+  { id: 25, code: "+673", country: "Brunei" },
+  { id: 26, code: "+359", country: "Bulgaria" },
+  { id: 27, code: "+226", country: "Burkina Faso" },
+  { id: 28, code: "+257", country: "Burundi" },
+  { id: 29, code: "+238", country: "Cabo Verde" },
+  { id: 30, code: "+855", country: "Cambodia" },
+  { id: 31, code: "+237", country: "Cameroon" },
+  { id: 32, code: "+1", country: "Canada" },
+  { id: 33, code: "+236", country: "Central African Republic" },
+  { id: 34, code: "+235", country: "Chad" },
+  { id: 35, code: "+56", country: "Chile" },
+  { id: 36, code: "+86", country: "China" },
+  { id: 37, code: "+57", country: "Colombia" },
+  { id: 38, code: "+269", country: "Comoros" },
+  { id: 39, code: "+242", country: "Congo (Congo-Brazzaville)" },
+  { id: 40, code: "+243", country: "Congo (Congo-Kinshasa)" },
+  { id: 41, code: "+506", country: "Costa Rica" },
+  { id: 42, code: "+385", country: "Croatia" },
+  { id: 43, code: "+53", country: "Cuba" },
+  { id: 44, code: "+357", country: "Cyprus" },
+  { id: 45, code: "+420", country: "Czechia" },
+  { id: 46, code: "+45", country: "Denmark" },
+  { id: 47, code: "+253", country: "Djibouti" },
+  { id: 48, code: "+1-767", country: "Dominica" },
+  { id: 49, code: "+1-809", country: "Dominican Republic" },
+  { id: 50, code: "+593", country: "Ecuador" },
+  { id: 51, code: "+20", country: "Egypt" },
+  { id: 52, code: "+503", country: "El Salvador" },
+  { id: 53, code: "+240", country: "Equatorial Guinea" },
+  { id: 54, code: "+291", country: "Eritrea" },
+  { id: 55, code: "+372", country: "Estonia" },
+  { id: 56, code: "+268", country: "Eswatini" },
+  { id: 57, code: "+251", country: "Ethiopia" },
+  { id: 58, code: "+679", country: "Fiji" },
+  { id: 59, code: "+358", country: "Finland" },
+  { id: 60, code: "+33", country: "France" },
+  { id: 61, code: "+241", country: "Gabon" },
+  { id: 62, code: "+220", country: "Gambia" },
+  { id: 63, code: "+995", country: "Georgia" },
+  { id: 64, code: "+49", country: "Germany" },
+  { id: 65, code: "+233", country: "Ghana" },
+  { id: 66, code: "+30", country: "Greece" },
+  { id: 67, code: "+1-473", country: "Grenada" },
+  { id: 68, code: "+502", country: "Guatemala" },
+  { id: 69, code: "+224", country: "Guinea" },
+  { id: 70, code: "+245", country: "Guinea-Bissau" },
+  { id: 71, code: "+592", country: "Guyana" },
+  { id: 72, code: "+509", country: "Haiti" },
+  { id: 73, code: "+504", country: "Honduras" },
+  { id: 74, code: "+36", country: "Hungary" },
+  { id: 75, code: "+354", country: "Iceland" },
+  { id: 76, code: "+91", country: "India" },
+  { id: 77, code: "+62", country: "Indonesia" },
+  { id: 78, code: "+98", country: "Iran" },
+  { id: 79, code: "+964", country: "Iraq" },
+  { id: 80, code: "+353", country: "Ireland" },
+  { id: 81, code: "+972", country: "Israel" },
+  { id: 82, code: "+39", country: "Italy" },
+  { id: 83, code: "+1-876", country: "Jamaica" },
+  { id: 84, code: "+81", country: "Japan" },
+  { id: 85, code: "+962", country: "Jordan" },
+  { id: 86, code: "+7", country: "Kazakhstan" },
+  { id: 87, code: "+254", country: "Kenya" },
+  { id: 88, code: "+686", country: "Kiribati" },
+  { id: 89, code: "+965", country: "Kuwait" },
+  { id: 90, code: "+996", country: "Kyrgyzstan" },
+  { id: 91, code: "+856", country: "Laos" },
+  { id: 92, code: "+371", country: "Latvia" },
+  { id: 93, code: "+961", country: "Lebanon" },
+  { id: 94, code: "+266", country: "Lesotho" },
+  { id: 95, code: "+231", country: "Liberia" },
+  { id: 96, code: "+218", country: "Libya" },
+  { id: 97, code: "+423", country: "Liechtenstein" },
+  { id: 98, code: "+370", country: "Lithuania" },
+  { id: 99, code: "+352", country: "Luxembourg" },
+  { id: 100, code: "+261", country: "Madagascar" },
+  { id: 101, code: "+265", country: "Malawi" },
+  { id: 102, code: "+60", country: "Malaysia" },
+  { id: 103, code: "+960", country: "Maldives" },
+  { id: 104, code: "+223", country: "Mali" },
+  { id: 105, code: "+356", country: "Malta" },
+  { id: 106, code: "+692", country: "Marshall Islands" },
+  { id: 107, code: "+222", country: "Mauritania" },
+  { id: 108, code: "+230", country: "Mauritius" },
+  { id: 109, code: "+52", country: "Mexico" },
+  { id: 110, code: "+691", country: "Micronesia" },
+  { id: 111, code: "+373", country: "Moldova" },
+  { id: 112, code: "+377", country: "Monaco" },
+  { id: 113, code: "+976", country: "Mongolia" },
+  { id: 114, code: "+382", country: "Montenegro" },
+  { id: 115, code: "+212", country: "Morocco" },
+  { id: 116, code: "+258", country: "Mozambique" },
+  { id: 117, code: "+95", country: "Myanmar" },
+  { id: 118, code: "+264", country: "Namibia" },
+  { id: 119, code: "+674", country: "Nauru" },
+  { id: 120, code: "+977", country: "Nepal" },
+  { id: 121, code: "+31", country: "Netherlands" },
+  { id: 122, code: "+64", country: "New Zealand" },
+  { id: 123, code: "+505", country: "Nicaragua" },
+  { id: 124, code: "+227", country: "Niger" },
+  { id: 125, code: "+234", country: "Nigeria" },
+  { id: 126, code: "+850", country: "North Korea" },
+  { id: 127, code: "+389", country: "North Macedonia" },
+  { id: 128, code: "+47", country: "Norway" },
+  { id: 129, code: "+968", country: "Oman" },
+  { id: 130, code: "+92", country: "Pakistan" },
+  { id: 131, code: "+680", country: "Palau" },
+  { id: 132, code: "+970", country: "Palestine State" },
+  { id: 133, code: "+507", country: "Panama" },
+  { id: 134, code: "+675", country: "Papua New Guinea" },
+  { id: 135, code: "+595", country: "Paraguay" },
+  { id: 136, code: "+51", country: "Peru" },
+  { id: 137, code: "+63", country: "Philippines" },
+  { id: 138, code: "+48", country: "Poland" },
+  { id: 139, code: "+351", country: "Portugal" },
+  { id: 140, code: "+974", country: "Qatar" },
+  { id: 141, code: "+40", country: "Romania" },
+  { id: 142, code: "+7", country: "Russia" },
+  { id: 143, code: "+250", country: "Rwanda" },
+  { id: 144, code: "+1-869", country: "Saint Kitts and Nevis" },
+  { id: 145, code: "+1-758", country: "Saint Lucia" },
+  { id: 146, code: "+1-784", country: "Saint Vincent and the Grenadines" },
+  { id: 147, code: "+685", country: "Samoa" },
+  { id: 148, code: "+378", country: "San Marino" },
+  { id: 149, code: "+239", country: "Sao Tome and Principe" },
+  { id: 150, code: "+966", country: "Saudi Arabia" },
+  { id: 151, code: "+221", country: "Senegal" },
+  { id: 152, code: "+381", country: "Serbia" },
+  { id: 153, code: "+248", country: "Seychelles" },
+  { id: 154, code: "+232", country: "Sierra Leone" },
+  { id: 155, code: "+65", country: "Singapore" },
+  { id: 156, code: "+421", country: "Slovakia" },
+  { id: 157, code: "+386", country: "Slovenia" },
+  { id: 158, code: "+677", country: "Solomon Islands" },
+  { id: 159, code: "+252", country: "Somalia" },
+  { id: 160, code: "+27", country: "South Africa" },
+  { id: 161, code: "+82", country: "South Korea" },
+  { id: 162, code: "+211", country: "South Sudan" },
+  { id: 163, code: "+34", country: "Spain" },
+  { id: 164, code: "+94", country: "Sri Lanka" },
+  { id: 165, code: "+249", country: "Sudan" },
+  { id: 166, code: "+597", country: "Suriname" },
+  { id: 167, code: "+46", country: "Sweden" },
+  { id: 168, code: "+41", country: "Switzerland" },
+  { id: 169, code: "+963", country: "Syria" },
+  { id: 170, code: "+992", country: "Tajikistan" },
+  { id: 171, code: "+255", country: "Tanzania" },
+  { id: 172, code: "+66", country: "Thailand" },
+  { id: 173, code: "+670", country: "Timor-Leste" },
+  { id: 174, code: "+228", country: "Togo" },
+  { id: 175, code: "+676", country: "Tonga" },
+  { id: 176, code: "+1-868", country: "Trinidad and Tobago" },
+  { id: 177, code: "+216", country: "Tunisia" },
+  { id: 178, code: "+90", country: "Turkey" },
+  { id: 179, code: "+993", country: "Turkmenistan" },
+  { id: 180, code: "+688", country: "Tuvalu" },
+  { id: 181, code: "+256", country: "Uganda" },
+  { id: 182, code: "+380", country: "Ukraine" },
+  { id: 183, code: "+971", country: "United Arab Emirates" },
+  { id: 184, code: "+44", country: "United Kingdom" },
+  { id: 185, code: "+1", country: "United States" },
+  { id: 186, code: "+598", country: "Uruguay" },
+  { id: 187, code: "+998", country: "Uzbekistan" },
+  { id: 188, code: "+678", country: "Vanuatu" },
+  { id: 189, code: "+379", country: "Vatican City" },
+  { id: 190, code: "+58", country: "Venezuela" },
+  { id: 191, code: "+84", country: "Vietnam" },
+  { id: 192, code: "+967", country: "Yemen" },
+  { id: 193, code: "+260", country: "Zambia" },
+  { id: 194, code: "+263", country: "Zimbabwe" }
+
+];
+var MeasurementData=[
+  { "id": 1, "code": "kg", "name": "kilogram" },
+  { "id": 2, "code": "g", "name": "gram" },
+  { "id": 3, "code": "mg", "name": "milligram" },
+  { "id": 4, "code": "t", "name": "tonne" },
+  { "id": 5, "code": "lb", "name": "pound" },
+  { "id": 6, "code": "oz", "name": "ounce" },
+  { "id": 7, "code": "st", "name": "stone" },
+  { "id": 8, "code": "ton", "name": "ton (US)" },
+  { "id": 9, "code": "l", "name": "liter" },
+  { "id": 10, "code": "ml", "name": "milliliter" },
+  { "id": 11, "code": "gal", "name": "gallon (US)" },
+  { "id": 12, "code": "qt", "name": "quart (US)" },
+  { "id": 13, "code": "pt", "name": "pint (US)" },
+  { "id": 14, "code": "fl oz", "name": "fluid ounce (US)" },
+  { "id": 15, "code": "m", "name": "meter" },
+  { "id": 16, "code": "cm", "name": "centimeter" },
+  { "id": 17, "code": "mm", "name": "millimeter" },
+  { "id": 18, "code": "km", "name": "kilometer" },
+  { "id": 19, "code": "in", "name": "inch" },
+  { "id": 20, "code": "ft", "name": "foot" },
+  { "id": 21, "code": "yd", "name": "yard" },
+  { "id": 22, "code": "mi", "name": "mile" },
+  { "id": 23, "code": "m²", "name": "square meter" },
+  { "id": 24, "code": "cm²", "name": "square centimeter" },
+  { "id": 25, "code": "mm²", "name": "square millimeter" },
+  { "id": 26, "code": "km²", "name": "square kilometer" },
+  { "id": 27, "code": "ft²", "name": "square foot" },
+  { "id": 28, "code": "in²", "name": "square inch" },
+  { "id": 29, "code": "yd²", "name": "square yard" },
+  { "id": 30, "code": "acre", "name": "acre" },
+  { "id": 31, "code": "ha", "name": "hectare" },
+  { "id": 32, "code": "m³", "name": "cubic meter" },
+  { "id": 33, "code": "cm³", "name": "cubic centimeter" },
+  { "id": 34, "code": "mm³", "name": "cubic millimeter" },
+  { "id": 35, "code": "ft³", "name": "cubic foot" },
+  { "id": 36, "code": "in³", "name": "cubic inch" },
+  { "id": 37, "code": "yd³", "name": "cubic yard" },
+  { "id": 38, "code": "s", "name": "second" },
+  { "id": 39, "code": "min", "name": "minute" },
+  { "id": 40, "code": "h", "name": "hour" },
+  { "id": 41, "code": "day", "name": "day" },
+  { "id": 42, "code": "week", "name": "week" },
+  { "id": 43, "code": "month", "name": "month" },
+  { "id": 44, "code": "year", "name": "year" },
+  { "id": 45, "code": "°C", "name": "degree Celsius" },
+  { "id": 46, "code": "°F", "name": "degree Fahrenheit" },
+  { "id": 47, "code": "K", "name": "Kelvin" },
+  { "id": 48, "code": "N", "name": "Newton" },
+  { "id": 49, "code": "Pa", "name": "Pascal" },
+  { "id": 50, "code": "J", "name": "Joule" },
+  { "id": 51, "code": "W", "name": "Watt" },
+  { "id": 52, "code": "A", "name": "Ampere" },
+  { "id": 53, "code": "V", "name": "Volt" },
+  { "id": 54, "code": "Ω", "name": "Ohm" },
+  { "id": 55, "code": "Hz", "name": "Hertz" },
+  { "id": 56, "code": "Bq", "name": "Becquerel" },
+  { "id": 57, "code": "Gy", "name": "Gray" },
+  { "id": 58, "code": "Sv", "name": "Sievert" },
+  { "id": 59, "code": "mol", "name": "mole" },
+  { "id": 60, "code": "cd", "name": "candela" },
+  { "id": 61, "code": "%", "name": "percent" },
+  { "id": 62, "code": "ppm", "name": "parts per million" },
+  { "id": 63, "code": "ppb", "name": "parts per billion" },
+  { "id": 64, "code": "bps", "name": "bits per second" },
+  { "id": 65, "code": "kbps", "name": "kilobits per second" },
+  { "id": 66, "code": "Mbps", "name": "megabits per second" },
+  { "id": 67, "code": "GBps", "name": "gigabits per second" },
+  { "id": 68, "code": "B", "name": "byte" },
+  { "id": 69, "code": "KB", "name": "kilobyte" },
+  { "id": 70, "code": "MB", "name": "megabyte" },
+  { "id": 71, "code": "GB", "name": "gigabyte" },
+  { "id": 72, "code": "TB", "name": "terabyte" },
+  { "id": 73, "code": "PB", "name": "petabyte" },
+  { "id": 74, "code": "EB", "name": "exabyte" },
+  { "id": 75, "code": "ZB", "name": "zettabyte" },
+  { "id": 76, "code": "YB", "name": "yottabyte" },
+  { "id": 77, "code": "rad", "name": "radian" },
+  { "id": 78, "code": "deg", "name": "degree (angle)" },
+  { "id": 79, "code": "sr", "name": "steradian" },
+  { "id": 80, "code": "lm", "name": "lumen" },
+  { "id": 81, "code": "lx", "name": "lux" },
+  { "id": 82, "code": "Oe", "name": "oersted" },
+  { "id": 83, "code": "Gs", "name": "gauss" },
+  { "id": 84, "code": "T", "name": "tesla" },
+  { "id": 85, "code": "Wb", "name": "weber" },
+  { "id": 86, "code": "H", "name": "henry" },
+  { "id": 87, "code": "kat", "name": "katal" },
+  { "id": 88, "code": "Da", "name": "dalton" },
+  { "id": 89, "code": "u", "name": "unified atomic mass unit" },
+  { "id": 90, "code": "AU", "name": "astronomical unit" },
+  { "id": 91, "code": "ly", "name": "light-year" },
+  { "id": 92, "code": "pc", "name": "parsec" },
+  { "id": 93, "code": "knot", "name": "knot (nautical mile per hour)" },
+  { "id": 94, "code": "pH", "name": "pH" },
+  { "id": 95, "code": "dB", "name": "decibel" },
+  { "id": 96, "code": "cal", "name": "calorie" },
+  { "id": 97, "code": "kcal", "name": "kilocalorie" }
+];
+function initializeCountryAutocomplete(inputSelector, suggestionBoxSelector, ObjectData,combineData) {
+  const input = document.querySelector(inputSelector);
+  const suggestionBox = document.querySelector(suggestionBoxSelector);
+  const autocompleteContainer = input.closest(".autocomplete-container"); // Assuming a container exists
+
+  input.addEventListener("input", () => {
+    const query = input.value.toLowerCase();
+    suggestionBox.innerHTML = "";
+
+    if (query.length === 0) {
+      suggestionBox.style.display = "none";
+      return;
+    }
+     var ag4=combineData[0].dataArgument["arg3"];;
+    const filtered = ObjectData.filter(item =>
+
+      item[ag4].toLowerCase().includes(query)
+    );
+    var funct1=combineData[0].funct["funct1"];
+    window[funct1](filtered, input, suggestionBox,combineData);//dynnamic
+
+    suggestionBox.style.display = filtered.length ? "block" : "none";
+  });
+
+  document.addEventListener("click", function (e) {
+    if (autocompleteContainer && !autocompleteContainer.contains(e.target)) {
+      suggestionBox.style.display = "none";
+    } else if (!autocompleteContainer && !suggestionBox.contains(e.target) && e.target !== input) {
+      suggestionBox.style.display = "none";
+    }
+  });
+}
+
+function dynamicF(filteredItems, input, suggestionBox,combineData) {
+  var arg1=combineData[0].dataArgument["arg1"];
+  var arg2=combineData[0].dataArgument["arg2"];
+  var arg3=combineData[0].dataArgument["arg3"];
+  var stateV=combineData[0].stateV;
+
+  filteredItems.forEach(item => {
+    const div = document.createElement("div");
+    $checkArg2a=arg2===""?"":(item[arg2]);
+  $checkArg2=arg2==="exist"?"Data Exist":$checkArg2a;
+    div.textContent = `${item[arg3]} ${$checkArg2}`;
+    div.style.cursor = "pointer"; // Add some visual feedback for clickability
+    div.addEventListener("click", () => {
+      input.value = item[arg3];
+      suggestionBox.style.display = "none";
+      //alert(item[arg3]);
+     // console.log("Selected data:", item); // Handle selected data
+    });
+    suggestionBox.appendChild(div);
+  });
+}
+/*var combineData = [
+  {
+    "stateV": 1,
+    "funct": {
+      "funct1": "dynamicF",
+      "funct2": ""
+    },
+    "dataArgument": {
+      "arg1": "id",
+      "arg2": "code",
+      "arg3": "country"
+    }
+  }
+];
+initializeCountryAutocomplete(".countryInput", ".suggestions", countriesData,combineData);*/
+/*autocomplete script*/
 function CategoryForm(){
 
 $('.viewOrder').modal('show');
@@ -777,10 +1063,12 @@ $('.MyTitleModal').html(`<h5 class="text-center">  <strong>Create Category</stro
 $('.ModalPassword').html(`
 <form class="formSafariCreate" onsubmit="return CategoryCreate()">
 <div class="p-2">
-<div class="form-group ">
-<label>Enter Name</label>
+<div class="form-group autocomplete-container">
+<label>Category</label>
 <input type="hidden" class="form-control" name="isActionInput" value="create_category" required placeholder="Enter Category Name"/>
-<input type="text" class="form-control" name="name" required placeholder="Enter Category Name"/>
+<input type="text"   name="name"  placeholder="Enter Category" class="form-control cat">
+  <div class="catSuggestions  suggestions"></div>
+
 </div>
 <div class="form-group ">
 <label>Enter Tax percentage</label>
@@ -802,6 +1090,7 @@ $('.ModalPassword').html(`
 </form>
 
 `)
+LoadCategory("exist");
 }
 
 function CategoryCreate(){
@@ -843,12 +1132,78 @@ return false;
 }
 
 
+function LoadCategory(checkExist)
+{
+    console.log(checkExist);
+
+var Usertoken=localStorage.getItem("Usertoken");
+   //search products
+   $.ajax({
+
+url:`./api/LoadCategory`,
+type:'get',
+headers: {
+        "Content-Type": "application/json;charset=UTF-8",
+
+    },
+    headers: {
+    "Content-Type": "application/json;charset=UTF-8",
+    "Authorization": `Bearer ${Usertoken}`
+},
+data:{
+
+    isActionInput:"load_category"
+},
+success:function(data){
+if(data.status){//return data as true
+
+
+
+myCatData=data.result;
+//window.LoadCatData="hello pepe";
+//console.log(LoadCatData);
+//c//onsole.log(LoadCatData);
+
+var combineData3 = [
+  {
+    "stateV": 1,
+    "funct": {
+      "funct1": "dynamicF",
+      "funct2": ""
+    },
+    "dataArgument": {
+      "arg1": "id",
+      "arg2":checkExist,
+      "arg3": "name"
+    }
+  }
+];
+
+initializeCountryAutocomplete(".cat", ".catSuggestions",myCatData,combineData3);
+
+
+
+}
+else{
+
+}
+
+
+
+},
+error:function(data){
+//alert("errors occured please retry this process again or contact system Admin");
+//window.location.href = "./login";
+}
+});
+    return false;
+}
 function ViewTaxCategory(){
     var Usertoken=localStorage.getItem("Usertoken");
 
 $.ajax({
 
-url:`./api/load_category`,
+url:`./api/LoadCategory`,
 type:'get',
 headers: {
     "Content-Type": "application/json;charset=UTF-8",
@@ -944,16 +1299,19 @@ $('.MyTitleModal').html(`<h5 class="text-center">  <strong>Add Tax On Product</s
 $('.ModalPassword').html(`
 <form class="formSafariCreate" onsubmit="return TaxProductCreate()">
 <div class="p-2">
-<div class="form-group ">
-<label>import From(Country)</label>
 
-<input type="text" class="form-control" name="cat" placeholder="Enter Product Name"/>
+<div class="form-group autocomplete-container">
+<label>import From(Country)</label>
+<input type="text"  name="catName"  placeholder="Start typing country..." class="form-control countryInput">
+  <div class="suggestions"></div>
+
 </div>
 
-<div class="form-group ">
+<div class="form-group autocomplete-container">
 <label>Category</label>
+<input type="text"  name="cat"  placeholder="Enter Category" class="form-control cat">
+  <div class="catSuggestions  suggestions"></div>
 
-<input type="text" class="form-control" name="cat" placeholder="Enter Category"/>
 </div>
 <div class="form-group ">
 <label>Enter Product Code</label>
@@ -967,10 +1325,12 @@ $('.ModalPassword').html(`
 <input type="text" class="form-control" name="productName" placeholder="Enter Product Name"/>
 </div>
 
-<div class="form-group ">
-<label>Enter product Tax Measure</label>
 
-<input type="text" class="form-control" name="measurement" placeholder="Enter  product Tax measurement"/>
+<div class="form-group autocomplete-container">
+<label>Enter product Tax Measure</label>
+<input type="text"  name="measurement"  placeholder="Enter  product Tax measurement" class="form-control measureInput">
+  <div class="meSuggestions  suggestions"></div>
+
 </div>
 
 <div class="form-group ">
@@ -1004,6 +1364,55 @@ $('.ModalPassword').html(`
 </form>
 
 `)
+var combineData = [
+  {
+    "stateV": 1,
+    "funct": {
+      "funct1": "dynamicF",
+      "funct2": ""
+    },
+    "dataArgument": {
+      "arg1": "id",
+      "arg2": "code",
+      "arg3": "country"
+    }
+  }
+];
+initializeCountryAutocomplete(".countryInput", ".suggestions", countriesData,combineData);
+var combineData2 = [
+  {
+    "stateV": 1,
+    "funct": {
+      "funct1": "dynamicF",
+      "funct2": ""
+    },
+    "dataArgument": {
+      "arg1": "id",
+      "arg2": "code",
+      "arg3": "name"
+    }
+  }
+];
+initializeCountryAutocomplete(".measureInput", ".meSuggestions",MeasurementData,combineData2);
+
+LoadCategory("");
+/*var combineData3 = [
+  {
+    "stateV": 1,
+    "funct": {
+      "funct1": "dynamicF",
+      "funct2": ""
+    },
+    "dataArgument": {
+      "arg1": "id",
+      "arg2": "percentage",
+      "arg3": "name"
+    }
+  }
+];
+
+initializeCountryAutocomplete(".cat", ".catSuggestions",LoadCatData,combineData3);*/
+
 }
 
 function TaxProductCreate(){
@@ -1103,7 +1512,7 @@ for(var i=0;i<resultData.length;i++){
  <tr>
   <td data-label="#">${i+1}</td>
   <td data-label="Name">${resultData[i].productCode }</td>
-  <td data-label="Category">${resultData[i].cat}</td>
+  <td data-label="Category">${resultData[i].catName}</td>
   <td data-label="Charge">${resultData[i].price}/${resultData[i].qty}${resultData[i].measurement}</td>
   <td data-label="CreatedAt">${resultData[i].created_at}</td>
   <td data-label="Action"><i class="fas fa-eye text-primary mylogout" title="View Safari Items Load" onClick="return ViewItemSafariStock('${btoa(encodeURIComponent(JSON.stringify(resultData[i])))}')"></i> <i class="fas fa-edit text-primary mylogout" title="Edit this Safari" onClick="return ViewEditSafari('${btoa(encodeURIComponent(JSON.stringify(resultData[i])))}')"></i> <i class="fas fa-trash text-dark mylogout " title="Delete This Safari" onClick="return DeleteSafari('${btoa(encodeURIComponent(JSON.stringify(resultData[i])))}')"></i></td>
@@ -1191,8 +1600,22 @@ loadTaxCart();
 
     //
 
-}
 
+}
+function viewDataSales(){
+    var dataR={
+"searchOption":"false",
+"name":"be",
+"advancedSearch":"today",
+"thisDate":"2024-2-8",
+"toDate":"none",
+"saleStatus":"Today Sales"
+};
+
+var dataString=JSON.stringify(dataR);
+viewSales(btoa(encodeURIComponent(dataString)));
+
+}
 function autoCompleteTax(thisdata)
 {
     $('.autocompleteIcon').html(`<i class="fas fa-exclamation-triangle text-danger onclick="hidePopup()"></i>`);
@@ -1233,10 +1656,14 @@ var data=data.result;
     // console.log(data);
 
     getdata+=`
-    <li class="list-group-item d-flex justify-content-between align-items-center mylogout myhover" onclick="return addItemTaxInCart('${btoa(encodeURIComponent(JSON.stringify(data[i])))}')">
-    ${data[i].productCode}=>${data[i].ProductName}${data[i].pcs} Pcs=>${data[i].tags}
+
+   <li class="list-group-item d-flex justify-content-between align-items-center mylogout myhover" onclick="return addItemTaxInCart('${btoa(encodeURIComponent(JSON.stringify(data[i])))}')">
+
+   ${data[i].productCode}(${data[i].ProductName}):(${data[i].price}$/${data[i].qty}${data[i].measurement})=>Category(${data[i].cat})=>Country(${data[i].catName})=>${data[i].pcs}pcs
+
     <span class="badge "></span>
   </li>
+
     `;
 
  }
@@ -1442,6 +1869,726 @@ error:function(data){
 
 return false;
 }
+/*Loading chats */
+function todayChart(dataPass,todayDate,advancedSearch){
+ //console.log(dataPass);
+
+ var transactions = dataPass;
+
+  const today = todayDate;
+  const hourLabels = Array.from({ length: 24 }, (_, i) =>
+    `${i.toString().padStart(2, "0")}:00`
+  );
+  const hourlyCounts = Array(24).fill(0);
+  const userDetailsByHour = {};
+
+  transactions.forEach(tx => {
+    const [date, time] = tx.created_at.split(" ");
+    const hour = parseInt(time.split(":")[0]);
+
+    if (date === today) {
+      hourlyCounts[hour]++;
+      if (!userDetailsByHour[hour]) {
+        userDetailsByHour[hour] = [];
+      }
+      userDetailsByHour[hour].push({
+        name: tx.name,
+        paid: tx.totalPaid
+      });
+    }
+  });
+
+  const ctx = document.getElementById("salesChart").getContext("2d");
+  const chart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: hourLabels,
+      datasets: [{
+        label: 'Number of Sales Per Hour',
+        data: hourlyCounts,
+        backgroundColor: 'rgba(75, 192, 192, 0.7)',
+        borderColor: 'rgba(75, 192, 192, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      interaction: {
+        mode: 'nearest',
+        intersect: true
+      },
+      plugins: {
+        tooltip: {
+          callbacks: {
+            title: (tooltipItems) => {
+              const hour = tooltipItems[0].label;
+              return `Details for ${today} at ${hour}`;
+            },
+            label: (tooltipItem) => {
+              const hourIndex = tooltipItem.dataIndex;
+              const count = tooltipItem.dataset.data[hourIndex];
+              return `Number of Sales: ${count}`;
+            },
+            afterLabel: (tooltipItem) => {
+              const hourIndex = tooltipItem.dataIndex;
+              const users = userDetailsByHour[hourIndex] || [];
+              return users.map((u, i) => `#${i + 1}. ${u.name} paid $${u.paid}`);
+            }
+          }
+        },
+        title: {
+          display: true,
+          text: `Sales Breakdown for ${today}`
+        }
+      },
+      scales: {
+        x: {
+          title: { display: true, text: 'Hour of Day' }
+        },
+        y: {
+          beginAtZero: true,
+          title: { display: true, text: 'Number of Sales' }
+        }
+      }
+    }
+  });
+}
+function weekChart(dataPass,todayDate,advancedSearch){
+    var transactions = dataPass;
+
+     // Helper: Get start and end of the current week (Sunday to Saturday)
+  const now = new Date(todayDate); // You can use new Date() in real app
+  const startOfWeek = new Date(now);
+  startOfWeek.setDate(now.getDate() - now.getDay());
+  startOfWeek.setHours(0, 0, 0, 0);
+
+  const endOfWeek = new Date(startOfWeek);
+  endOfWeek.setDate(startOfWeek.getDate() + 6);
+  endOfWeek.setHours(23, 59, 59, 999);
+
+  // Initialize data
+  const dailyCounts = {};
+  const userDetailsByDate = {};
+
+  // Prepare weekday labels
+  const daysOfWeek = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(startOfWeek);
+    d.setDate(startOfWeek.getDate() + i);
+    const dateStr = d.toISOString().split("T")[0];
+    dailyCounts[dateStr] = 0;
+    userDetailsByDate[dateStr] = [];
+    daysOfWeek.push(dateStr);
+  }
+
+  // Group transactions by day in the current week
+  transactions.forEach(tx => {
+    const dateTime = new Date(tx.created_at);
+    const dateStr = tx.created_at.split(" ")[0];
+
+    if (dateTime >= startOfWeek && dateTime <= endOfWeek) {
+      dailyCounts[dateStr]++;
+      userDetailsByDate[dateStr].push({
+        time: tx.created_at.split(" ")[1].slice(0, 5), // Extract time like "03:53"
+        name: tx.name,
+        paid: tx.totalPaid
+      });
+    }
+  });
+
+  const ctx = document.getElementById("salesChart").getContext("2d");
+  const chart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: daysOfWeek,
+      datasets: [{
+        label: 'Number of Sales Per Day (This Week)',
+        data: daysOfWeek.map(date => dailyCounts[date]),
+        backgroundColor: 'rgba(153, 102, 255, 0.7)',
+        borderColor: 'rgba(153, 102, 255, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      interaction: {
+        mode: 'nearest',
+        intersect: true
+      },
+      plugins: {
+        tooltip: {
+          callbacks: {
+            title: (tooltipItems) => {
+              const date = tooltipItems[0].label;
+              return `Details for ${date}`;
+            },
+            label: (tooltipItem) => {
+              const date = tooltipItem.label;
+              const count = dailyCounts[date];
+              return `Number of Sales: ${count}`;
+            },
+            afterLabel: (tooltipItem) => {
+              const date = tooltipItem.label;
+              const users = userDetailsByDate[date] || [];
+              return users.map((u, i) => `#${i + 1}. ${u.time}: ${u.name} paid $${u.paid}`);
+            }
+          }
+        },
+        title: {
+          display: true,
+          text: `Weekly Sales Breakdown (${startOfWeek.toISOString().split('T')[0]} to ${endOfWeek.toISOString().split('T')[0]})`
+        }
+      },
+      scales: {
+        x: {
+          title: { display: true, text: 'Date' }
+        },
+        y: {
+          beginAtZero: true,
+          title: { display: true, text: 'Number of Sales' }
+        }
+      }
+    }
+  });
+}
+function otherChatDisplay(dataPass,todayDate,advancedSearch)
+{
+   // advancedSearch="today,week,month,year,all,lastyear"
+    updateChart(advancedSearch,dataPass);
+}
+function formatDate(dateStr) {
+    return new Date(dateStr.replace(" ", "T"));
+  }
+
+  function updateChart(filter,dataPass) {
+    const ctx = document.getElementById("salesChart").getContext("2d");
+
+    var transactions=dataPass;
+    let filteredData = [];
+    let now = new Date();
+    let labels = [];
+    let dataMap = new Map();
+    let userDetailsByLabel = {};
+
+    const formatMap = {
+      "day": { label: "hour", getLabel: d => `${d.getHours().toString().padStart(2, "0")}:00` },
+      "week": { label: "day", getLabel: d => d.toLocaleDateString() },
+      "month": { label: "day", getLabel: d => d.toLocaleDateString() },
+      "year": { label: "month", getLabel: d => `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}` },
+      "lastYear": { label: "month", getLabel: d => `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}` },
+      "all": { label: "month", getLabel: d => `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}` },
+    };
+
+    const { getLabel } = formatMap[filter];
+
+    transactions.forEach(tx => {
+      const txDate = formatDate(tx.created_at);
+      let include = false;
+
+      switch (filter) {
+        case "day":
+          include = isSameDay(txDate, now);
+          break;
+        case "week":
+          include = isSameWeek(txDate, now);
+          break;
+        case "month":
+          include = isSameMonth(txDate, now);
+          break;
+        case "year":
+          include = txDate.getFullYear() === now.getFullYear();
+          break;
+        case "lastYear":
+          include = txDate.getFullYear() === now.getFullYear() - 1;
+          break;
+        case "all":
+          include = true;
+          break;
+      }
+
+      if (include) {
+        const label = getLabel(txDate);
+        if (!dataMap.has(label)) {
+          dataMap.set(label, 0);
+          userDetailsByLabel[label] = [];
+        }
+        dataMap.set(label, dataMap.get(label) + 1);
+        userDetailsByLabel[label].push({ name: tx.name, paid: tx.totalPaid,time:tx.created_at });
+      }
+    });
+
+    labels = Array.from(dataMap.keys());
+    const counts = Array.from(dataMap.values());
+
+    if (chart) chart.destroy();
+
+    chart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Number of Sales',
+          data: counts,
+          backgroundColor: 'rgba(75, 192, 192, 0.7)',
+          borderColor: 'rgba(75, 192, 192, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        plugins: {
+          tooltip: {
+            callbacks: {
+              title: (tooltipItems) => {
+                const label = tooltipItems[0].label;
+                return `Sales on ${label}`;
+              },
+              label: (tooltipItem) => {
+                return `Sales: ${tooltipItem.formattedValue}`;
+              },
+              afterLabel: (tooltipItem) => {
+                const label = tooltipItem.label;
+                const users = userDetailsByLabel[label] || [];
+                return users.map((u, i) => `#${i + 1}.${u.time}:  ${u.name} paid $${u.paid}`);
+              }
+            }
+          },
+          title: {
+            display: true,
+            text: `Sales Breakdown (${filter})`
+          }
+        },
+        scales: {
+          x: { title: { display: true, text: formatMap[filter].label.toUpperCase() } },
+          y: { beginAtZero: true, title: { display: true, text: 'Number of Sales' } }
+        }
+      }
+    });
+  }
+
+  function isSameDay(d1, d2) {
+    return d1.toDateString() === d2.toDateString();
+  }
+
+  function isSameWeek(d1, d2) {
+    const oneJan = new Date(d2.getFullYear(), 0, 1);
+    const week1 = Math.ceil((((d1 - oneJan) / 86400000) + oneJan.getDay() + 1) / 7);
+    const week2 = Math.ceil((((d2 - oneJan) / 86400000) + oneJan.getDay() + 1) / 7);
+    return d1.getFullYear() === d2.getFullYear() && week1 === week2;
+  }
+
+  function isSameMonth(d1, d2) {
+    return d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth();
+  }
+/*Loading chats */
+function TaxReportTotal(){
+    var dataR={
+"searchOption":"false",
+"name":"be",
+"advancedSearch":"today",
+"thisDate":"2024-2-8",
+"toDate":"none",
+"saleStatus":"Today Sales",
+"functionName":"todayChart"
+};
+
+var dataString=JSON.stringify(dataR);
+SumReportTotal(btoa(encodeURIComponent(dataString)));
+}
+function SumReportTotal(dataPass){
+
+//console.log(atob(dataPass));
+    var dataR=atob(dataPass);
+    dataR=JSON.parse(decodeURIComponent(dataR));
+    console.log(dataR);
+    var Usertoken=localStorage.getItem("Usertoken");
+
+$.ajax({
+
+url:`./api/SumReportTotal`,
+type:'get',
+headers: {
+    "Content-Type": "application/json;charset=UTF-8",
+    "Authorization": `Bearer ${Usertoken}`
+},
+data:{
+searchOption:dataR.searchOption,
+name:dataR.name,
+advancedSearch:dataR.advancedSearch,
+thisDate:dataR.thisDate,
+toDate:dataR.toDate
+},
+
+success:function(data){
+
+
+if(data.status){//return data as true
+
+//console.log(data)
+var resultData=data.Charts.original.result;
+var sumData=data.result;
+//console.log(resultData);
+
+$('.MainbigTitle').html(`
+<h5 class="text-center">Sales Report </h5>
+
+<div class="d-flex justify-content-end mb-3">
+<div class="d-inline-block dropdown">
+                                        <button type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="btn-shadow dropdown-toggle btn btn-info">
+
+                                            <span class="btn-icon-wrapper pr-2 opacity-7">
+                                                <i class="fa fa-search fa-w-20"></i>
+                                            </span>
+                                            Search
+                                        </button>
+                                        <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(107px, 33px, 0px);">
+                                            <ul class="nav flex-column list-group">
+                                            <li class="nav-item ">
+                                                <div class="input-group p-2">
+  <input type="text" class="form-control border-right-0" placeholder="Search...">
+  <div class="input-group-append">
+    <span class="input-group-text bg-white border-left-0">
+      <i class="fa fa-search"></i>
+    </span>
+  </div>
+</div>
+                                                </li>
+                                                <li class="nav-item list-group-item list-group-item-action p-0">
+                                                    <a href="javascript:void(0);" class="nav-link" onclick="return SumReportTotal('${btoa(
+                                                        encodeURIComponent(JSON.stringify({
+"searchOption":"false",
+"name":"be",
+"advancedSearch":"today",
+"thisDate":"2024-2-8",
+"toDate":"none",
+"saleStatus":"Today Sales",
+"functionName":"todayChart"
+}))
+                                                    )}')">
+                                                        <i class="nav-link-icon lnr-inbox"></i>
+                                                        <span>
+                                                            Today
+                                                        </span>
+
+                                                    </a>
+                                                </li>
+                                                <li class="nav-item list-group-item list-group-item-action p-0">
+                                                    <a href="javascript:void(0);" class="nav-link" onclick="return SumReportTotal('${btoa(
+                                                        encodeURIComponent(JSON.stringify({
+"searchOption":"false",
+"name":"be",
+"advancedSearch":"week",
+"thisDate":"2024-2-8",
+"toDate":"none",
+"saleStatus":"Week Sales",
+"functionName":"weekChart"
+}))
+                                                    )}')">
+                                                        <i class="nav-link-icon lnr-book"></i>
+                                                        <span>
+                                                            This Week
+                                                        </span>
+
+                                                    </a>
+                                                </li>
+
+                                                <li class="nav-item list-group-item list-group-item-action p-0">
+                                                    <a href="javascript:void(0);" class="nav-link" onclick="return SumReportTotal('${btoa(
+                                                        encodeURIComponent(JSON.stringify({
+"searchOption":"false",
+"name":"be",
+"advancedSearch":"month",
+"thisDate":"2024-2-8",
+"toDate":"none",
+"saleStatus":"Monthly Sales",
+"functionName":"otherChatDisplay"
+}))
+                                                    )}')">
+                                                        <i class="nav-link-icon lnr-book"></i>
+                                                        <span>
+                                                            This Month
+                                                        </span>
+
+                                                    </a>
+                                                </li>
+
+                                                <li class="nav-item list-group-item list-group-item-action p-0">
+                                                    <a href="javascript:void(0);" class="nav-link" onclick="return SumReportTotal('${btoa(
+                                                        encodeURIComponent(JSON.stringify({
+"searchOption":"false",
+"name":"be",
+"advancedSearch":"year",
+"thisDate":"2024-2-8",
+"toDate":"none",
+"saleStatus":"Year Sales",
+"functionName":"otherChatDisplay"
+}))
+                                                    )}')">
+                                                        <i class="nav-link-icon lnr-book"></i>
+                                                        <span>
+                                                            This Year
+                                                        </span>
+
+                                                    </a>
+                                                </li>
+
+                                                <li class="nav-item list-group-item list-group-item-action p-0 " >
+
+                                                <div class="form-group p-2">
+                                                <input type="text" class="form-control chooseTaxDate" placeholder="choose Date">
+                                                </div>
+
+
+                                                </li>
+                                                <li class="nav-item list-group-item list-group-item-action p-0">
+                                                <div class="form-group p-2">
+                                                <input type="text" class="form-control rangeTaxDate" placeholder="choose Range">
+                                                </div>
+                                                </li>
+
+                                                <li class="nav-item list-group-item list-group-item-action p-0">
+                                                    <a href="javascript:void(0);" class="nav-link" onclick="return SumReportTotal('${btoa(
+                                                        encodeURIComponent(JSON.stringify({
+"searchOption":"false",
+"name":"be",
+"advancedSearch":"all",
+"thisDate":"2024-2-8",
+"toDate":"none",
+"saleStatus":"All Sales",
+"functionName":"otherChatDisplay"
+}))
+                                                    )}')">
+                                                        <i class="nav-link-icon lnr-book"></i>
+                                                        <span>
+                                                            All My Sale
+                                                        </span>
+
+                                                    </a>
+                                                </li>
+
+
+                                            </ul>
+                                        </div>
+                                    </div>
+</div>
+<h5 class="text-center text-success">${dataR.saleStatus}</h5>
+
+
+<div class="main-card card mb-3">
+    <div class="card-body">
+	<div class="row TaxReport">
+    <div class="col-md-6 col-xl-4">
+        <div class="card mb-3 widget-content bg-midnight-bloom">
+            <div class="widget-content-wrapper text-white">
+                <div class="widget-content-left">
+                    <div class="widget-heading">Today Orders</div>
+                    <div class="widget-subheading">Total Today Earn</div>
+                </div>
+                <div class="widget-content-right">
+                    <div class="widget-numbers text-white"><span>$${Math.round(sumData[0].today_sales)}</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-4">
+        <div class="card mb-3 widget-content bg-arielle-smile">
+            <div class="widget-content-wrapper text-white">
+                <div class="widget-content-left">
+                    <div class="widget-heading">Weekly Orders</div>
+                    <div class="widget-subheading">Total Week Earn</div>
+                </div>
+                <div class="widget-content-right">
+                    <div class="widget-numbers text-white"><span>$${Math.round(sumData[0].week_sales)}</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-4">
+        <div class="card mb-3 widget-content bg-grow-early">
+            <div class="widget-content-wrapper text-white">
+                <div class="widget-content-left">
+                    <div class="widget-heading">Monthly Orders</div>
+                    <div class="widget-subheading">Total Month Earn</div>
+                </div>
+                <div class="widget-content-right">
+                    <div class="widget-numbers text-white"><span>$${Math.round(sumData[0].month_sales)}</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6 col-xl-4">
+        <div class="card mb-3 widget-content bg-asteroid">
+            <div class="widget-content-wrapper text-white">
+                <div class="widget-content-left">
+                    <div class="widget-heading">Years Orders</div>
+                    <div class="widget-subheading">Total Year Earns</div>
+                </div>
+                <div class="widget-content-right">
+                    <div class="widget-numbers text-warning"><span>$${Math.round(sumData[0].year_sales)}</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6 col-xl-4">
+        <div class="card mb-3 widget-content bg-love-kiss">
+            <div class="widget-content-wrapper text-white">
+                <div class="widget-content-left">
+                    <div class="widget-heading">Last years Orders</div>
+                    <div class="widget-subheading">Total Last years Earn</div>
+                </div>
+                <div class="widget-content-right">
+                    <div class="widget-numbers text-warning"><span>$${Math.round(sumData[0].last_year_sales)}</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6 col-xl-4">
+        <div class="card mb-3 widget-content bg-premium-dark">
+            <div class="widget-content-wrapper text-white">
+                <div class="widget-content-left">
+                    <div class="widget-heading">All Sales Orders</div>
+                    <div class="widget-subheading">All Total Earn</div>
+                </div>
+                <div class="widget-content-right">
+                    <div class="widget-numbers text-warning"><span>$${Math.round(sumData[0].all_sales)}</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+	</div>
+
+   </div>
+
+                        <div class="main-card card mb-4 ${resultData!=0?"":"d-none"}">
+    <div class="card-body">
+	<canvas id="salesChart" width="600" height="300"></canvas>
+	</div>
+
+   </div>
+
+
+   <div class="d-flex justify-content-end ${resultData!=0?"":"d-none"}">
+<ul class="list-group ${resultData!=0?"":"d-none"}">
+      <li class="list-group-item"><strong>Total ~ :</strong>${Math.round(resultData!=0?resultData[0].saleBalance:0)}$</li>
+
+    </ul>
+  </div>
+`);
+$('.MyRequest_table').html("");
+getData=`
+
+
+<table class="viewReqTable ${resultData!=0?"":"d-none"}">
+<thead>
+<tr>
+<th scope="col">#</th>
+<th scope="col">UID</th>
+<th scope="col">name</th>
+<th scope="col">Total</th>
+<th scope="col">Created At</th>
+
+
+</tr>
+</thead>
+<tbody>
+`;
+
+for(var i=0;i<resultData.length;i++){
+
+ getData+=`
+
+ <tr>
+  <td data-label="#">${i+1}</td>
+  <td data-label="UID">${resultData[i].OrderId}</td>
+  <td data-label="name">${resultData[i].name}</td>
+  <td data-label="Total">${resultData[i].totalPaid}$</td>
+  <td data-label="CreatedAt">${resultData[i].created_at}</td>
+
+</tr>`;
+
+}
+getData+=`
+</tbody>
+</table>`;
+
+$('.MainForm').html(getData);
+//this is todayChart, weekChart
+(resultData!=0)?window[dataR.functionName](resultData,(data.Charts.original.test),(dataR.advancedSearch)):0;
+
+
+$('.chooseTaxDate').flatpickr(
+    {
+    onChange:function(selectedDates,dateStr,instance){
+     console.log(dateStr);
+
+     var dataR={
+"searchOption":"false",
+"name":"be",
+"advancedSearch":"choosedate",
+"thisDate":dateStr,
+"toDate":"none",
+"saleStatus":`${dateStr} Sales`
+};
+
+var dataString=JSON.stringify(dataR);
+viewSales(btoa(encodeURIComponent(dataString)));
+    },
+
+    dateFormat: "Y-m-d ",
+}
+);
+
+$('.rangeTaxDate').flatpickr(
+    {
+    onChange:function(selectedDates,dateStr,instance){
+     //console.log(dateStr);
+
+     if(selectedDates.length===2){
+        var startDate=instance.formatDate(selectedDates[0],"Y-m-d");
+        var endDate=instance.formatDate(selectedDates[1],"Y-m-d");
+       console.log(startDate);
+       var dataR={
+"searchOption":"false",
+"name":"be",
+"advancedSearch":"choosedaterange",
+"thisDate":startDate,
+"toDate":endDate,
+"saleStatus":`From ${startDate} to ${endDate} Sales`
+};
+
+var dataString=JSON.stringify(dataR);
+viewSales(btoa(encodeURIComponent(dataString)));
+       //console.log(dateStr[0]);
+     }
+
+    },
+    mode: "range",
+
+    dateFormat: "Y-m-d ",
+}
+);
+
+
+
+
+
+}
+else{
+
+$('.MyRequest_table').html("");
+}
+
+
+
+},
+error:function(data){
+//alert("errors occured please retry this process again or contact system Admin");
+//window.location.href = "./login";
+}
+});
+
+return false;
+
+}
 function viewSales(dataPass){
 
 //console.log(atob(dataPass));
@@ -1604,89 +2751,7 @@ $('.MainbigTitle').html(`
                                     </div>
 </div>
 <h5 class="text-center text-success">${dataR.saleStatus}</h5>
-<div class="row TaxReport">
-<div class="col-md-6 col-xl-4">
-                                <div class="card mb-3 widget-content bg-midnight-bloom">
-                                    <div class="widget-content-wrapper text-white">
-                                        <div class="widget-content-left">
-                                            <div class="widget-heading">Today Orders</div>
-                                            <div class="widget-subheading">Total Today Earn</div>
-                                        </div>
-                                        <div class="widget-content-right">
-                                            <div class="widget-numbers text-white"><span>$1896</span></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6 col-xl-4">
-                                <div class="card mb-3 widget-content bg-arielle-smile">
-                                    <div class="widget-content-wrapper text-white">
-                                        <div class="widget-content-left">
-                                            <div class="widget-heading">Week Orders</div>
-                                            <div class="widget-subheading">Total Week Earn</div>
-                                        </div>
-                                        <div class="widget-content-right">
-                                            <div class="widget-numbers text-white"><span>$568</span></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6 col-xl-4">
-                                <div class="card mb-3 widget-content bg-grow-early">
-                                    <div class="widget-content-wrapper text-white">
-                                        <div class="widget-content-left">
-                                            <div class="widget-heading">Month Orders</div>
-                                            <div class="widget-subheading">Total Month Earn</div>
-                                        </div>
-                                        <div class="widget-content-right">
-                                            <div class="widget-numbers text-white"><span>$46</span></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
 
-                                <div class="col-lg-6 col-xl-4">
-                                    <div class="card mb-3 widget-content bg-asteroid">
-                                        <div class="widget-content-wrapper text-white">
-                                            <div class="widget-content-left">
-                                                <div class="widget-heading">Products Sold</div>
-                                                <div class="widget-subheading">Total revenue streams</div>
-                                            </div>
-                                            <div class="widget-content-right">
-                                                <div class="widget-numbers text-warning"><span>$14M</span></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-6 col-xl-4">
-                                    <div class="card mb-3 widget-content bg-love-kiss">
-                                        <div class="widget-content-wrapper text-white">
-                                            <div class="widget-content-left">
-                                                <div class="widget-heading">Last years Orders</div>
-                                                <div class="widget-subheading">Total Last years Earn</div>
-                                            </div>
-                                            <div class="widget-content-right">
-                                                <div class="widget-numbers text-warning"><span>$14M</span></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-								 <div class="col-lg-6 col-xl-4">
-                                    <div class="card mb-3 widget-content bg-premium-dark">
-                                        <div class="widget-content-wrapper text-white">
-                                            <div class="widget-content-left">
-                                                <div class="widget-heading">All Sales Orders</div>
-                                                <div class="widget-subheading">All Total Earn</div>
-                                            </div>
-                                            <div class="widget-content-right">
-                                                <div class="widget-numbers text-warning"><span>$14M</span></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                        </div>
 
 <div class="d-flex justify-content-end ">
 <ul class="list-group">
@@ -1826,7 +2891,7 @@ var dataR={
 };
 
 var dataString=JSON.stringify(dataR);
-//viewSales(btoa(encodeURIComponent(dataString)));
+viewSales(btoa(encodeURIComponent(dataString)));
 //
 
 var Usertoken=localStorage.getItem("Usertoken");
@@ -1893,9 +2958,10 @@ function addDataInCart(){
         getData+=`<li class="list-group-item">
       <div class="d-flex justify-content-between align-items-center">
         <div>
-          <div><strong>Id:</strong> ${data[i].id}</div>
-          <div><strong>Code:</strong> ${data[i].productCode}</div>
-          <div><strong>Name:</strong> ${data[i].productName}</div>
+          <div><strong>Code:</strong> ${data[i].productCode}(${data[i].productName})</div>
+          <div><strong>Qty:</strong>${data[i].totalQty}</div>
+          <div><strong>Price:</strong>${data[i].price}$ </div>
+          <div><strong>Total:</strong>${data[i].totalAmount}</div>
 
         </div>
         <button class="btn btn-sm btn-danger ms-3" onclick="removeItem(this)">Remove</button>

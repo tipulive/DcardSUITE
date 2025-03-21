@@ -1,3 +1,39 @@
+/*new Autocomplete */
+
+.autocomplete-container {
+    position: relative;
+    width: 100%;
+  }
+
+
+
+  .suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    border: 1px solid #ccc;
+    border-top: none;
+    z-index: 1000;
+    background: #fff;
+    max-height: 200px;
+    overflow-y: auto;
+    display: none;
+  }
+
+  .suggestions div {
+    padding: 10px;
+    cursor: pointer;
+  }
+
+  .suggestions div:hover {
+    background-color: #f0f0f0;
+  }
+/*new Autocomplete */
+
+
+
+
 .autoCompleteFacture{
     position: absolute;
     width: 90%;

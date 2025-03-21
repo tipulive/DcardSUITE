@@ -874,7 +874,7 @@ public function deleteImage($fileNam){
     public function isViewProduct($input){
           $subscriber=Auth::user()->subscriber;
         $withTotal=($input["withTotal"]==="true")?",(SELECT sum(price *(qty-qty_sold)) from products where subscriber='$subscriber' and qty>0) as totalStock":"";
-        $check = DB::select("select productCode,ProductName,price,qty,qty_sold,pcs,tags,img_url $withTotal from products where subscriber=:subscriber LIMIT :perPage OFFSET :offset", array(
+        $check = DB::select("select productCode,catName,created_at,measurement,ProductName,price,qty,qty_sold,pcs,tags,img_url $withTotal from products where subscriber=:subscriber LIMIT :perPage OFFSET :offset", array(
             "subscriber" =>$subscriber,
             "perPage"=>$input["LimitEnd"]??0,
             "offset"=>$input["LimitStart"]??10
