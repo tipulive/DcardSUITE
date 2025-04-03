@@ -351,6 +351,11 @@ table th {
                                 </a>
                             </li>
                             <ul class="mm-collapse mm-show" style="">
+                                   <li>
+                                        <a href="#View Shipping" onclick="return ussdService()" aria-expanded="false">
+                                            <i class="metismenu-icon"></i>UssdView
+                                        </a>
+                                    </li>
                                     <li>
                                         <a href="#View Shipping" onclick="return loadCars('LoadCars','uidNone','true')" aria-expanded="false">
                                             <i class="metismenu-icon"></i>Cars
@@ -589,8 +594,47 @@ table th {
 
 
 $(function() {
-    viewAllShipping();
+    //viewAllShipping();
         });
+
+
+/*USSD  */
+function ussdService(){
+
+    var Usertoken=localStorage.getItem("Usertoken");
+   //search products
+   $.ajax({
+
+url:`./api/service`,
+type:'get',
+headers: {
+        "Content-Type": "application/json;charset=UTF-8",
+        //"Authorization": `Bearer ${Usertoken}`
+    },
+    headers: {
+    "Content-Type": "application/json;charset=UTF-8",
+    "Authorization": `Bearer ${Usertoken}`
+},
+data:{
+    actionStatus:"getservice"
+
+
+},
+success:function(data){
+
+//service
+
+},
+error:function(data){
+//alert("errors occured please retry this process again or contact system Admin");
+//window.location.href = "./login";
+}
+});
+
+
+}
+/*USSD  */
+
     /*shipping Code */
     var searchItemData="clientName";
 

@@ -43,13 +43,40 @@ Authorization: Bearer {{Auth_token}}
 
 {
 "actionStatus":"createService",
-"uid":"GahundaMisa_1737059556",
-"codeb":"8",
-"name":"Game",
-"serviceType":"Play",
-"optionKey":"5500",
-"status":"5500",
-"commentData":"Nyungwe"
+"name":"AppointMent",
+"serviceType":"dispAppoint",
+
+"status":"Open",
+"commentData":"Display Appointment"
+}
+
+#### getService, actionStatus:createService
+
+POST  {{baseUrl}}/service/
+Content-Type: application/json
+Authorization: Bearer {{Auth_token}}
+
+{
+"actionStatus":"getservice",
+"name":"AppointMent",
+"serviceType":"dispAppoint",
+
+"status":"Open",
+"commentData":"Display Appointment"
+}
+
+#### Assign Service, actionStatus:assignservice  //uid:uidService uidCode :stars Code
+
+POST  {{baseUrl}}/service/
+Content-Type: application/json
+Authorization: Bearer {{Auth_token}}
+
+{
+"actionStatus":"assignservice",
+"uid":"AppointMent_1743535187",
+"uidCode":"8",
+
+"commentData":"Appointment Assign"
 }
 
 #### Create Service, actionStatus:createService
@@ -77,13 +104,16 @@ Authorization: Bearer {{Auth_token}}
 
 {
 "actionStatus":"createappointment",
-"uid":"DOctorAppointment_1735430577",
-"codeb":"8",
+"uid":"DOctorAppointment_1743535707",
+"uidCode":"8",
+"serviceType":"dispAppoint",
+"serviceUid":"AppointMent_1743535187",
 "name":"DOctor Appointment",
 "limitb":6,
-"startDate":"2024-12-01 09:05:00",
-"endDate":"2024-12-01 09:30:00",
-"status":"5500",
+"limitb":6,
+"startDate":"2024-12-01 13:55:00",
+"endDate":"2024-12-01 14:30:00",
+"status":"open",
 "commentData":"Nyungwe"
 }
 
@@ -96,8 +126,7 @@ Content-Type: application/json
 "sessionId": "46",
 "serviceCode": "test",
 "phoneNumber": "0782389359",
-"text":3
-
+"text":0
 }
 ### Display Option ussd ##
 #### user Choose Appointment using USSD
