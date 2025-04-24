@@ -59,6 +59,7 @@ Route::middleware('auth:sanctum')->group( function () {//here is to protect mult
 
   Route::get('/loadCode','CompanyController@loadCode')->name('loadCode');
 
+  Route::get('/ussdViewCreate','CompanyController@ussdViewCreate')->name('ussdViewCreate');
   Route::post('/service','CompanyController@service')->name('service');
   Route::get('/service','CompanyController@service')->name('service');
   Route::get('/getCode','CompanyController@getCode')->name('getCode');

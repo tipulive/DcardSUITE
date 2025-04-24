@@ -27,6 +27,10 @@ class appointmentController extends Controller
         $this->platform1=env('PLATFORM3');
     }
 
+
+
+
+
     public function ussdView(Request $request){
         $sessionId=$request->input("sessionId");
         $serviceCode=$request->input("serviceCode");
@@ -198,8 +202,23 @@ class appointmentController extends Controller
             $response.=($counterLoop==0)?"": $back.".back"."\n";
             $response.=($counterLoop==0)?"": $exit.".exit";
 
-            header('Content-type: text/plain');
-            echo $response;
+
+            $jsonResult=$request->input("jsonResult")??'none';
+    if($jsonResult==="true"){
+        return response([
+            "status"=>true,
+            "next"=>$next,
+            "back"=>$back,
+            "result"=>$check,
+
+
+            //"status"=>$response,
+        ],200);
+    }
+    else{
+        header('Content-type: text/plain');
+        echo $response;
+    }
     }
     else{
 
@@ -225,6 +244,7 @@ class appointmentController extends Controller
 
     }
 
+
     public function chooseOption(Request $request){
        // $sessionId=$request->input("sessionId");
         $text=$request->input("text");
@@ -232,13 +252,20 @@ class appointmentController extends Controller
         $sessionId=$request->input("sessionId");
 
         $service=Cache::get($sessionId);
-        $service[0]["serUid"]=Cache::get($sessionId)[0]["mapId"][$textNum];
+        $checkArrExist=isset(Cache::get($sessionId)[0]["mapId"][$textNum])?Cache::get($sessionId)[0]["mapId"][$textNum]:"none";
 
-        $service[0]["serName"]=Cache::get($sessionId)[0]["name"][$textNum];
+        if($checkArrExist!='none'){
+            $service[0]["serUid"]=Cache::get($sessionId)[0]["mapId"][$textNum];
 
-        Cache::put($sessionId,$service,now()->addMinutes(10));
-        $Method=Cache::get($sessionId)[0]["serviceId"][$textNum];//dynamic function or method
-        return $this->$Method($request);
+            $service[0]["serName"]=Cache::get($sessionId)[0]["name"][$textNum];
+
+            Cache::put($sessionId,$service,now()->addMinutes(10));
+            $Method=Cache::get($sessionId)[0]["serviceId"][$textNum];//dynamic function or method
+            return $this->$Method($request);
+        }else{
+            echo"this Option Choosen is not exist enter 0 To reset";
+        }
+
         /*return response([
 
             //"textM"=>Cache::get($sessionId)[0]["mapId"][$textNum],
@@ -277,6 +304,82 @@ public function dispAppoint($request){
         }else{
 
          //send request in case input is available//
+        /* return response([
+            "result"=>true,
+
+            "status"=>Cache::get($sessionId),
+        ],200);*/
+
+        $service=Cache::get($sessionId);
+
+
+        $response="";
+
+       $checkArrExist=isset(Cache::get($sessionId)[0]["connectSer"][$textNum])?Cache::get($sessionId)[0]["connectSer"][$textNum]:"none";
+
+       if($checkArrExist!='none'){
+        //Cache::put($sessionId,$service,now()->addMinutes(10));
+        //dynamic function or method
+
+
+       if($service[0]["menuState"]==1)
+       {
+
+         $serviceName=$service[0]["name"][$textNum];
+        $response  = "CON You Choose $serviceName ? \n";
+        $response .="1)Yes \n";
+        $response .="2)No \n";
+        $response .="3)Itangazo \n";
+        $service[0]["newMethod"]=$service[0]["connectSer"][$textNum];
+        $service[0]["conServType"][0]=$service[0]["conServType"][$textNum];
+        $service[0]["connectSer"]=[];
+        $service[0]["connectSer"][0]="Yes";
+        $service[0]["connectSer"][1]="No";
+        $service[0]["connectSer"][2]="connected";
+        $service[0]["name"][]=[];
+        $service[0]["name"][0]="Yes";
+        $service[0]["name"][1]="No";
+        $service[0]["name"][2]="connected";
+        $service[0]["menuState"]=6;
+
+        Cache::put($sessionId,$service,now()->addMinutes(10));
+
+
+       }
+       else if($service[0]["menuState"]==6){
+
+
+        if($service[0]["connectSer"][$textNum]==="connected")//connected
+        {
+
+            $service[0]["serUid"]=$service[0]["newMethod"];
+            $service[0]["menuState"]=0;
+            $Method=$service[0]["conServType"][0];
+            Cache::put($sessionId,$service,now()->addMinutes(10));
+            return $this->$Method($request);
+
+        }else{
+
+            $confirm=$service[0]["connectSer"][$textNum];
+            $response  .= "CON You Choose $confirm ? \n";
+        }
+
+       }else{
+        $response  .= "There is no data selected \n";
+       }
+
+       /*return response([
+            "result"=>true,
+
+            "return2"=>Cache::get($sessionId),
+        ],200);*/
+       }else{
+        $response .="this Option you have selected is not exist enter 0 To reset";
+       }
+       header('Content-type: text/plain');
+       echo $response;
+        //return $this->chooseOption($request);
+
         }
     }
     else{
@@ -324,10 +427,15 @@ public function displayAppointFunct($request,$limitPage,$pageNumber){
        $questions[]=[];
        $replyQ[]=[];
        $rewards[]=[];
+       $connectSer[]=[];
+       $conServType[]=[];
         $num1=0;
           for($i=0;$i<count($check);$i++){
               $num1=$i+1;
               $num=$i+1;
+              $connectSer[$i]=$check[$i]->connectSer;
+              $conServType[$i]=$check[$i]->serviceType;
+
               $mapId[$i]=$check[$i]->serviceUid;
               $mapId[$i+1]=$check[0]->serviceUid;
               $mapId[$i+2]=$check[0]->serviceUid;
@@ -336,7 +444,7 @@ public function displayAppointFunct($request,$limitPage,$pageNumber){
               $serviceArr[$i+2]="dispAppoint";
               $rewards[$i]=$check[$i]->rewards;
               $questions[$i]=$check[$i]->name;
-              $replyQ[$i]=$check[$i]->reply;
+              $replyQ[$i]=$check[$i]->startDate."->".$check[$i]->endDate;
               $replyQ[$i+1]="next";
               $replyQ[$i+2]="back";
              // $name[$i]=$check[$i]->name;
@@ -345,8 +453,11 @@ public function displayAppointFunct($request,$limitPage,$pageNumber){
           }
           $response .=($num+1).")Next"."\n";
           $response .=($pageNumber!=0)?($num+2).")Back"."\n":"";
+          $response .="0)Reset"."\n";
           $data1=Cache::get($sessionId);
 
+          $data1[0]["connectSer"]=$connectSer;
+          $data1[0]["conServType"]=$conServType;
           $data1[0]["mapId"]=$mapId;
 
 
@@ -385,12 +496,26 @@ public function displayAppointFunct($request,$limitPage,$pageNumber){
 
         "status"=>Cache::get($sessionId),
     ],200);*/
-    header('Content-type: text/plain');
-  echo $response;
+    $jsonResult=$request->input("jsonResult")??'none';
+    if($jsonResult==="true"){
+        return response([
+            "result"=>true,
+
+
+            "status"=>$response,
+        ],200);
+    }
+    else{
+        header('Content-type: text/plain');
+        echo $response;
+    }
+
 }
 /* Appointment Service Pluggin */
       /* display Service Pluggin */
       public function dispapp($request){
+
+
         $text=$request->input("text");
         //$text-1;
         $textNum=$text-1;
@@ -441,6 +566,7 @@ public function displayAppointFunct($request,$limitPage,$pageNumber){
 
 
         if($check){
+        echo $pageNumber;
             $serviceName=($pageNumber==0)?Cache::get($sessionId)[0]["serName"]:Cache::get($sessionId)[0]["serTitle"];
 
             $response  = "CON $serviceName Service \n";
@@ -519,12 +645,74 @@ public function displayAppointFunct($request,$limitPage,$pageNumber){
 
             "status"=>Cache::get($sessionId),
         ],200);*/
+        $jsonResult=$request->input("jsonResult")??'none';
+    if($jsonResult==="true"){
+        return response([
+            "result"=>true,
+             "check"=>"yes",
+             "all"=>Cache::get($sessionId),
+            "status"=>$response,
+        ],200);
+    }
+    else{
         header('Content-type: text/plain');
-      echo $response;
+        echo $response;
+    }
       }
       /* display Service Pluggin */
 /*Job Pluggin*/
 public function jobapp($request){
+
+    $text=$request->input("text");
+    //$text-1;
+    $sessionId=$request->input("sessionId");
+    //Cache::forget($sessionId);
+    if((Cache::get($sessionId)[0]["menuState"])%2!=0)//choose Option
+    {
+       /*$data1[0]["menuState"]=Cache::get($sessionId)[0]["menuState"]+1;
+
+       // $data1[0]["uidCode"]=$check[0]["uidCode"];
+
+        Cache::put($sessionId,$data1,now()->addMinutes(60));*/
+        return $this->DisplayJobService($request);
+
+        /*return response([
+            //"test"=>Cache::get($sessionId)[0]["mapId"][0],
+            //"num"=>$textNum,
+
+
+            "test"=>"playserv",
+            "serUid"=>Cache::get($sessionId)[0]["serUid"],
+            "status"=>Cache::get($sessionId),
+
+
+
+
+
+        ],200);*/
+
+
+    }
+    else{
+
+        /*return response([
+            //"status"=>Cache::get($sessionId)[0]["mapId"][0],
+
+
+            "status"=>Cache::get($sessionId)
+
+
+
+
+        ],200);*/
+        return $this->DisplayJobService($request);
+    }
+
+
+
+}
+
+public function DisplayJobService($request){
     $text=$request->input("text");
     //$text-1;
     $textNum=$text-1;
@@ -545,13 +733,178 @@ public function jobapp($request){
             "status"=>"open"
         ]);
 
+        $serviceName=Cache::get($sessionId)[0]["serName"];
+        $point=Cache::get($sessionId)[0]["point"];
+        $response  = "CON $serviceName Service \n";
+        $rand=rand(0,count($check)-1);
+        $randN=$rand;
+        $nameLabel=$check[$randN]->name;
+        $replyLabel=$check[$randN]->reply;
+        $rewardPoint=$check[$randN]->rewards;
 
-        return response([
+
+        $response .= "CON  $nameLabel Points $point \n";
+       $mapId[]=[];
+       $serviceArr[]=[];
+       $name[]=[];
+       $questions[]=[];
+       $replyQ[]=[];
+       $rewards[]=[];
+        $num1=0;
+          for($i=0;$i<count($check);$i++){
+              $num1=$i+1;
+              $num=$i+1;
+              $mapId[$i]=$check[$i]->serviceUid;
+              $serviceArr[$i]="jobapp";//to make sure this function will continue to call again and again
+              $rewards[$i]=$check[$i]->rewards;
+              $questions[$i]=$check[$i]->name;
+              $replyQ[$i]=$check[$i]->reply;
+             // $name[$i]=$check[$i]->name;
+
+              $response .=$num.")".$check[$i]->reply."\n";
+          }
+
+          $data1=Cache::get($sessionId);
+
+          $data1[0]["mapId"]=$mapId;
+          $data1[0]["name"]=$replyQ; //reply question
+          $data1[0]["replyLabel"]=$replyLabel;
+
+          $data1[0]["pointAdded"]=$data1[0]["name"];
+        $data1[0]["rewards"]=$rewardPoint;
+        $data1[0]["nameLabel"]=$nameLabel;
+        //$data1[0]["point"]=(Cache::get($sessionId)[0]["menuState"]!=0)?($point+($questions[$textNum]===$nameLabel?$rewards[$textNum]:0)):0;
+        $data1[0]["mappingNo"]=count($check);
+        $data1[0]["serviceId"]=$serviceArr;
+        $data1[0]["method"]="jobapp";
+        $data1[0]["menuState"]=Cache::get($sessionId)[0]["menuState"]+1;
+
+        //$data1[0]["uidCode"]=$check[0]["uidCode"];
+
+        Cache::put($sessionId,$data1,now()->addMinutes(60));
+       /* return response([
             "result"=>true,
-            "status"=>$check,
-        ],200);
+            "status"=>Cache::get($sessionId),
+        ],200);*/
+        $jsonResult=$request->input("jsonResult")??'none';
+if($jsonResult==="true"){
+    return response([
+        "result"=>true,
 
-    }
+        "status"=>$response,
+    ],200);
+}
+else{
+    header('Content-type: text/plain');
+    echo $response;
+}
+      }
+      else{
+        $data1=Cache::get($sessionId);
+        $point=((Cache::get($sessionId)[0]["name"][$textNum]===Cache::get($sessionId)[0]["replyLabel"])?Cache::get($sessionId)[0]["point"]+Cache::get($sessionId)[0]["rewards"]:Cache::get($sessionId)[0]["point"]+0);
+        $data1[0]["point"]=$point;
+        Cache::put($sessionId,$data1,now()->addMinutes(60));
+        $check=DB::select("SELECT *
+        FROM appointments where serviceUid=:serviceUid and uidCode=:uidCode and status=:status
+        ORDER BY RAND()
+        LIMIT 3
+        ",[
+            "serviceUid"=>Cache::get($sessionId)[0]["serUid"],
+            "uidCode"=>Cache::get($sessionId)[0]["uidCode"],
+
+
+            "status"=>"open"
+        ]);
+
+
+
+        $serviceName=Cache::get($sessionId)[0]["serName"];
+
+        $response  = "CON $serviceName Service \n";
+        $rand=rand(0,count($check)-1);
+        $randN=$rand;
+        $nameLabel=$check[$randN]->name;
+        $replyLabel=$check[$randN]->reply;
+        $rewardPoint=$check[$randN]->rewards;
+
+
+
+        $response .= "CON  $nameLabel Points $point \n";
+       $mapId[]=[];
+       $serviceArr[]=[];
+       $name[]=[];
+       $questions[]=[];
+       $replyQ[]=[];
+       $rewards[]=[];
+        $num1=0;
+          for($i=0;$i<count($check);$i++){
+              $num1=$i+1;
+              $num=$i+1;
+              $mapId[$i]=$check[$i]->serviceUid;
+              $serviceArr[$i]="jobapp";//to make sure this function will continue to call again and again
+              $rewards[$i]=$check[$i]->rewards;
+              $questions[$i]=$check[$i]->name;
+              $replyQ[$i]=$check[$i]->reply;
+             // $name[$i]=$check[$i]->name;
+
+              $response .=$num.")".$check[$i]->reply."\n";
+          }
+
+
+
+          $data1[0]["mapId"]=$mapId;
+          $data1[0]["name"]=$replyQ; //reply question
+          $data1[0]["replyLabel"]=$replyLabel;
+
+          $data1[0]["pointAdded"]=$data1[0]["name"];
+        $data1[0]["rewards"]=$rewardPoint;
+      $data1[0]["nameLabel"]=$nameLabel;
+     // $data1[0]["point"]=(Cache::get($sessionId)[0]["menuState"]!=0)?($point+($questions[$textNum]===$nameLabel?$rewards[$textNum]:0)):0;
+
+     $data1[0]["mappingNo"]=count($check);
+      $data1[0]["serviceId"]=$serviceArr;
+      $data1[0]["method"]="jobapp";
+      $data1[0]["menuState"]=Cache::get($sessionId)[0]["menuState"]+1;
+
+      //$data1[0]["uidCode"]=$check[0]["uidCode"];
+
+      Cache::put($sessionId,$data1,now()->addMinutes(60));
+
+
+
+
+     /* return response([
+
+        "status"=>Cache::get($sessionId),
+    ],200);*/
+    $jsonResult=$request->input("jsonResult")??'none';
+if($jsonResult==="true"){
+    return response([
+        "result"=>true,
+
+        "status"=>$response,
+    ],200);
+}
+else{
+    header('Content-type: text/plain');
+    echo $response;
+}
+      }
+
+
+     // $pointAdded=($data1[0]["name"][$textNum]===$replyLabel)?$point+$rewardPoint:$point+0;
+      //$pointAdded=$data1[0]["name"][$textNum];
+      //$data1[0]["point"]=$pointAdded;
+
+      //$response.=(Cache::get($sessionId)[0]["menuState"]!=0)?$questions[$textNum]:"none";
+     // $response.= $num1.".Exit";
+
+      /*header('Content-type: text/plain');
+      echo $response;*/
+
+// Get a random key
+
+
 }
 /*Job Pluggin*/
       /*Game Plugin */
@@ -682,8 +1035,18 @@ public function jobapp($request){
                 "result"=>true,
                 "status"=>Cache::get($sessionId),
             ],200);*/
-            header('Content-type: text/plain');
-          echo $response;
+            $jsonResult=$request->input("jsonResult")??'none';
+    if($jsonResult==="true"){
+        return response([
+            "result"=>true,
+
+            "status"=>$response,
+        ],200);
+    }
+    else{
+        header('Content-type: text/plain');
+        echo $response;
+    }
           }
           else{
             $data1=Cache::get($sessionId);
@@ -763,8 +1126,18 @@ public function jobapp($request){
 
             "status"=>Cache::get($sessionId),
         ],200);*/
+        $jsonResult=$request->input("jsonResult")??'none';
+    if($jsonResult==="true"){
+        return response([
+            "result"=>true,
+
+            "status"=>$response,
+        ],200);
+    }
+    else{
         header('Content-type: text/plain');
-          echo $response;
+        echo $response;
+    }
           }
 
 
@@ -847,8 +1220,18 @@ public function jobapp($request){
         }
 
 
+        $jsonResult=$request->input("jsonResult")??'none';
+    if($jsonResult==="true"){
+        return response([
+            "result"=>true,
+
+            "status"=>$response,
+        ],200);
+    }
+    else{
         header('Content-type: text/plain');
         echo $response;
+    }
     }
     public function displayService(){//this method will be displayed when there is more menu on service
 
@@ -866,10 +1249,16 @@ public function jobapp($request){
             //echo"hello";
          return $this->createService($input);
         }
+
         else if($actionStatus=='getservice')
         {
 
           return $this->getService($input);
+        }
+        else if($actionStatus=='getbothserviceassign')
+        {
+
+          return $this->getbothserviceassign($input);
         }
         else if($actionStatus==='editservice')
         {
@@ -915,6 +1304,37 @@ public function jobapp($request){
 
         ],200);
       }
+    }
+    public function getbothserviceassign($input){
+        $check=DB::select("
+        SELECT
+  uid,name,serviceType,
+  IF(uid IN (SELECT uid FROM assign_services where uidCode=:uidCode and status=:assignStatus ), 'Assign', 'not Assign') AS statusAssign
+FROM services where status=:servStatus limit 50;
+        ",[
+            "uidCode"=>$input['uidCode'],
+            "assignStatus"=>'open',
+            "servStatus"=>'open',
+        ]);
+        if($check){
+            $uidCode=$input['uidCode'];
+          return response([
+              "status"=>true,
+              "result"=>$check,
+              "uidCode"=>"$uidCode"
+
+
+
+          ],200);
+        }else{
+          return response([
+              "status"=>false,
+              "result"=>$check
+
+
+
+          ],200);
+        }
     }
     public function AssignService($input){
 
@@ -1050,6 +1470,48 @@ public function jobapp($request){
                 "uid"=>false,
             ]);
         }
+    }
+
+    public function connectedservice($input){
+
+        $check=DB::select("select id,connectSer,serviceType from appointments where id=:id limit 1",[
+            "id"=>$input['id']
+        ]);
+        if($check){
+            if($check[0]->connectSer=='none')
+            {
+                $connectSer="conn"."_".Str::random(3).""."_".date(time());
+                $checkUpdate=DB::update("update appointments set connectSer=:connectSer,serviceType=:serviceType where id=:id",[
+                  "connectSer"=>$connectSer,
+                  "serviceType"=>$input['serviceType'],
+                  "id"=>$input["id"]
+
+                ]);
+                if($checkUpdate){
+                    $input['id_connected']=$input['id'];
+                    $input['connectSer']=$connectSer;
+
+
+                    return $this->createAppoint($input);
+                }else{
+
+                        return response([
+                            "status" =>false,
+                            "uid"=>false,
+                        ]);
+
+                }
+
+            }else if(($check[0]->connectSer!='none') && ($check[0]->serviceType===$input['serviceType'])){
+                $input['id_connected']=$input['id'];
+                $input['connectSer']=$check[0]->connectSer;
+
+
+                return $this->createAppoint($input);
+            }
+
+        }
+
     }
     public function editService($input){
 
@@ -1200,6 +1662,9 @@ public function jobapp($request){
         {
          return $this->createAppointment($input);
         }
+        else if($actionStatus=='connectedservice'){//service that is connected to another example disap connect to survey
+            return $this->connectedservice($input);
+        }
         else if($actionStatus==='editappointment')
         {
             return $this->editAppointment($input);
@@ -1268,17 +1733,17 @@ public function jobapp($request){
         $check=DB::table("appointments")
             ->insert([
                 "uid"=>$input['uid'],
-                "limitUid"=>"uid"."_".Str::random(3).""."_".date(time()),
+                "limitUid"=>$input['id_connected']??"uid"."_".Str::random(3).""."_".date(time()),
                 //"codeb"=>$input['codeb'],//codeb is equal to ID of code_creators//depricated is equal to uid
                 "uidCode"=>$input['uidCode'],
                 "name"=>$input['name'],
-                "serviceType"=>$input['serviceType'],
-                "serviceUid"=>$input['serviceUid'],
+                "serviceType"=>$input['serviceType']??'none',
+                "serviceUid"=>$input['connectSer']??$input['serviceUid'],
                 "limitb"=>$input['limitb'], //number of people in the meeting to participate
                 "limitJson"=>json_encode(range(1, $input['limitb'])),
                 "startDate"=>$input['startDate'],
                 "endDate"=>$input['endDate'],
-                "optionKey"=>$input['optionKey'],//that will be used on USSD key
+                "optionKey"=>$input['optionKey']??'none',//that will be used on USSD key
                 "status"=>'open',//open,close,testing,preview
                 'commentData'=>$input["CommentData"]??'none',
                 "uidCreator"=>Auth::user()->uid,
@@ -1317,6 +1782,38 @@ public function jobapp($request){
     "newEndDateTime" => $input["endDate"]
 ]);
 
+    }
+
+    public function ussdViewCreate($input){
+        $actionStatus=strtolower($input['actionStatus']);
+
+        if($actionStatus==strtolower('dispAppoint')){
+
+         return $this->getdispAppoint($input);
+        }
+
+    }
+    public function getdispAppoint($input){
+        $check=DB::select("select *from appointments where uidCode=:uidCode and status=:status and serviceUid=:serviceUid and subscriber=:subscriber order by startDate asc",[
+         "uidCode"=>$input["uidCode"],
+         "subscriber"=>Auth::user()->subscriber,
+         "serviceUid"=>$input['serviceUid'],
+         "status"=>"open"
+        ]);//here i will add country as well
+        if($check){
+            return response([
+                "status" =>true,
+                "result"=>$check,
+
+                "uid"=>$check[0]->uid
+            ]);
+        }
+        else{
+            return response([
+                "status" =>false,
+                "uid"=>false,
+            ]);
+        }
     }
     public function EditAppointmentStatus($input){
         $check=DB::update("update appointments set status=:status where uid=:uid and uidCreator=:uidCreator ",[

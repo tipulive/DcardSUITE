@@ -13,6 +13,130 @@
 
 <!--Menu Css-->
 <style>
+
+/*preview css*/
+.phoneFrame{
+    display:none !important;
+}
+
+.phone-frame {
+            width: 360px;
+            height: 700px;
+            background-color: white;
+            border-radius: 40px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            position: relative;
+            border: 12px solid #000;
+        }
+
+        .status-bar {
+            height: 30px;
+            background-color: #000;
+            color: white;
+        }
+
+        .ussd-input {
+            font-size: 24px;
+            text-align: center;
+            border: none;
+            outline: none;
+            background: transparent;
+        }
+
+        .keyboard {
+            background-color: #f0f0f0;
+            border-top: 1px solid #ddd;
+            padding: 20px 15px;
+        }
+
+        .key {
+            height: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: white;
+            border-radius: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            user-select: none;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: all 0.1s;
+            margin-bottom: 15px;
+        }
+
+        .key:active {
+            background-color: #e0e0e0;
+            transform: scale(0.95);
+        }
+
+        .key-sub {
+            font-size: 10px;
+            color: #666;
+            margin-top: 2px;
+        }
+
+        .call-key {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .del-key {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .ussd-modal {
+            position: absolute;
+            bottom: -100%;
+            left: 0;
+            right: 0;
+            background-color: rgba(0, 0, 0, 0.9);
+            color: white;
+            border-radius: 20px 20px 0 0;
+            padding: 20px;
+            transition: bottom 0.3s ease;
+            z-index: 100;
+        }
+
+        .ussd-modal.active {
+            bottom: 0;
+        }
+
+        .menu-option {
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+        }
+
+        .menu-option:last-child {
+            border-bottom: none;
+        }
+
+        .menu-option span {
+            color: #4CAF50;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .modal-input {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+        }
+
+        .modal-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+/*preview css*/
+
+
+    .scrollable-dropdown {
+  max-height: 600px;
+  overflow-y: auto;
+}
 .disNone{
     display:none;
 }
@@ -503,8 +627,8 @@ table th {
 <body>
 
 <!--search form-->
-<div class="container-fluid customizeContainer">
-
+<!--<div class="container-fluid customizeContainer">-->
+<div class="container">
 <!--form -->
 
 
@@ -512,7 +636,9 @@ table th {
   <div class="modal-dialog modal-lg">
     <div class="modal-content ">
 
-<div class="modal-header MyTitleModal"></div>
+<div class="modal-header MyTitleModal">
+
+</div>
 
       <!--Order Request table-->
 <div class="ModalPassword">
@@ -542,7 +668,144 @@ table th {
 
 
 <div class="main-card mb-3 card p-4">
+<!--preview phone -->
 
+<div class="phoneFrame">
+<div class="phone-frame">
+        <!-- Status Bar -->
+        <div class="status-bar d-flex justify-content-between align-items-center px-3">
+            <span>Huawei</span>
+            <span>4G</span>
+            <span>100%</span>
+        </div>
+
+        <!-- USSD Display -->
+        <div class="ussd-display d-flex flex-column justify-content-center align-items-center" style="height: 150px;">
+            <input type="text" class="ussd-input form-control text-center" id="ussd-input" placeholder="Enter USSD code">
+        </div>
+
+        <!-- Keyboard -->
+        <div class="keyboard">
+            <div class="row g-2 mb-2">
+                <div class="col-4">
+                    <div class="key" onclick="pressKey('1')">
+                        <div>1</div>
+                        <div class="key-sub"></div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="key" onclick="pressKey('2')">
+                        <div>2</div>
+                        <div class="key-sub">ABC</div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="key" onclick="pressKey('3')">
+                        <div>3</div>
+                        <div class="key-sub">DEF</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-2 mb-2">
+                <div class="col-4">
+                    <div class="key" onclick="pressKey('4')">
+                        <div>4</div>
+                        <div class="key-sub">GHI</div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="key" onclick="pressKey('5')">
+                        <div>5</div>
+                        <div class="key-sub">JKL</div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="key" onclick="pressKey('6')">
+                        <div>6</div>
+                        <div class="key-sub">MNO</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-2 mb-2">
+                <div class="col-4">
+                    <div class="key" onclick="pressKey('7')">
+                        <div>7</div>
+                        <div class="key-sub">PQRS</div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="key" onclick="pressKey('8')">
+                        <div>8</div>
+                        <div class="key-sub">TUV</div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="key" onclick="pressKey('9')">
+                        <div>9</div>
+                        <div class="key-sub">WXYZ</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-2 mb-2">
+                <div class="col-4">
+                    <div class="key" onclick="pressKey('*')">
+                        <div>*</div>
+                        <div class="key-sub">+</div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="key" onclick="pressKey('0')">
+                        <div>0</div>
+                        <div class="key-sub"></div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="key" onclick="pressKey('#')">
+                        <div>#</div>
+                        <div class="key-sub">^</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-2">
+                <div class="col-8">
+                    <div class="key call-key" onclick="return callUssd()">
+                        <div>CALL</div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="key del-key" onclick="deleteChar()">
+                        <div>DEL</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- USSD Modal -->
+        <div class="ussd-modal" id="ussd-modal">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>USSD Session</div>
+                <div class="fs-4" style="cursor: pointer;" onclick="closeModal()">×</div>
+            </div>
+
+            <div id="ussd-content" class="mb-3" style="white-space: pre-line;"></div>
+
+            <div class="mt-4">
+                <input type="text" class="modal-input form-control mb-2" id="modal-input" placeholder="Enter your response">
+                <div class="d-grid gap-2 d-flex">
+                    <button class="btn btn-danger flex-grow-1" onclick="cancelResponse()">Cancel</button>
+                    <button class="btn btn-success flex-grow-1" onclick="submitResponse()">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--preview phone -->
 
 <div class="MainbigTitle">
 
@@ -560,6 +823,26 @@ table th {
 
 <!--Modal table-->
 
+<!--Modal Form Order -->
+<div class="modal fade bd-example-modal-md formOrder" id="myModal2" tabindex="-2" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <!-- Modal Header -->
+      <div class="modal-header formOrderTitle">
+
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body formOrderBody">
+
+      </div>
+
+      <!-- Modal Footer -->
+
+    </div>
+  </div>
+</div>
+<!--Modal Form Order -->
 <div class="Count_table">
 <h6 class="text-center orderIdDsp"></h6>
 <div class="float-left pt-2 pb-2">
@@ -598,6 +881,106 @@ $(function() {
         });
 
 
+
+
+        /*phone frame preview*/
+       /* const ussdInput = document.getElementById('ussd-input');
+        const ussdModal = document.getElementById('ussd-modal');
+        const modalInput = document.getElementById('modal-input');*/
+        const ussdInput = document.querySelector('.ussd-input');
+const ussdModal = document.querySelector('.ussd-modal');
+const modalInput = document.querySelector('.modal-input');
+
+        // Focus on input when page loads
+        ussdInput.focus();
+
+        // Handle physical keyboard input
+        ussdInput.addEventListener('keydown', function(e) {
+            // Allow only numbers and #, *
+            if (!/[0-9*#]/.test(e.key) &&
+                e.key !== 'Backspace' &&
+                e.key !== 'Delete' &&
+                e.key !== 'ArrowLeft' &&
+                e.key !== 'ArrowRight') {
+                e.preventDefault();
+            }
+
+            // Handle Enter key as CALL
+            if (e.key === 'Enter') {
+                callUssd();
+                e.preventDefault();
+            }
+        });
+
+        // Also handle keyup for better physical keyboard support
+        ussdInput.addEventListener('keyup', function(e) {
+            if (e.key === 'Backspace') {
+                deleteChar();
+            }
+        });
+
+        function pressKey(key) {
+            ussdInput.value += key;
+            ussdInput.focus();
+        }
+
+        function deleteChar() {
+            ussdInput.value = ussdInput.value.slice(0, -1);
+            ussdInput.focus();
+        }
+
+        function callUssd() {
+            if (ussdInput.value) {
+
+                ussdView(btoa(encodeURIComponent(ussdInput.value)))
+                ussdModal.classList.add('active');
+                modalInput.focus();
+            }
+        }
+
+        function closeModal() {
+            ussdModal.classList.remove('active');
+            ussdInput.value = '';
+            ussdInput.focus();
+        }
+
+        function selectOption(option) {
+            if (option === 3) {
+                closeModal();
+            } else {
+                // Add the selected option to the input
+                modalInput.value = option;
+                modalInput.focus();
+            }
+        }
+
+        function submitResponse() {
+            if (modalInput.value.trim() !== '') {
+                //alert(`Response sent: ${modalInput.value}`);
+                //closeModal();
+                ussdView(btoa(encodeURIComponent(modalInput.value)))
+            }
+        }
+
+        function cancelResponse() {
+            modalInput.value = '';
+            closeModal();
+        }
+
+        // Allow keyboard input in modal
+        modalInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                submitResponse();
+                e.preventDefault();
+            }
+            if (e.key === 'Escape') {
+                cancelResponse();
+                e.preventDefault();
+            }
+        });
+
+        /*phone frame preview*/
+
 /*USSD  */
 function ussdService(){
 
@@ -616,13 +999,128 @@ headers: {
     "Authorization": `Bearer ${Usertoken}`
 },
 data:{
-    actionStatus:"getservice"
+    actionStatus:"getbothserviceassign",
+    uidCode:"8"
 
 
 },
 success:function(data){
+    if(data.status){
+        var resultData=data.result;
+
+$('.MyRequest_table').html("");
+$('.MainbigTitle').html(`
+<h5 class="text-center mainTitle"><strong>USSD</strong></h5>
+
+`);
+$('.MainForm').html(`
+<div class="p-2">
+
+<div class=" form-group chooseService">
+
+
+
+</div>
+
+</div>
+    <div class="MainFormTable"></div>
+    `);
+//console.log(resultData);
+const checkAssign = resultData.find(result => result.statusAssign === 'not Assign');
+var hideDropdown=(checkAssign)?'d-inline-block':"d-none";
+var getdata=`
+
+
+<div class="${hideDropdown}  dropdown ">
+                                        <button type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="btn-shadow dropdown-toggle btn btn-info">
+                                            <span class="btn-icon-wrapper pr-2 opacity-7">
+                                                <i class="fa fa-business-time fa-w-20"></i>
+                                            </span>
+                                           <strong class="textChooseService"> choose Services .......</strong>
+                                        </button>
+                                        <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu dropdown-menu-right scrollable-dropdown">
+                                            <ul class="nav flex-column ">
+`;
+var AssignServ=[];
+
+ for(var i=0;i<resultData.length;i++){
+
+if(resultData[i].statusAssign!='Assign'){
+
+    getdata+=`
+    <div tabindex="-1" class="dropdown-divider"></div>
+    <li class="nav-item ">
+                                                    <a href="javascript:void(0);" class="nav-link">
+
+                                                        <span onclick="return chooseThisService('${btoa(encodeURIComponent(JSON.stringify(resultData[i])))}')" class="text-danger">
+                                                        ${resultData[i].name} ${resultData[i].statusAssign}
+                                                        </span>
+
+                                                        <div class="ml-auto badge badge-pill badge-secondary">86</div>
+
+
+
+                                                    </a>
+                                                </li>
+
+    `;
+}else{
+
+    AssignServ.push(resultData[i]);
+
+}
+
+
+ }
+
+
+
+var hideAssign=(AssignServ.length>0)?"":"d-none";
+ var getAssign=`
+ <div class="d-flex justify-content-end pb-2">
+  <button class="btn btn-primary" onClick="previewUssd()">Right Aligned</button>
+</div>
+
+ <div class="main-card mb-3 card ${hideAssign}">
+                                            <div class="card-body"><h5 class="card-title">List OF Services</h5>
+                                                <ul class="list-group">
+ `;
+ var AssignN=0;
+ for(var iAss=0;iAss<AssignServ.length;iAss++){
+    AssignN=AssignN+1;
+
+    getAssign+=`
+    <li class="list-group-item d-flex justify-content-between align-items-center">${AssignN}) ${AssignServ[iAss].name}
+
+
+    <div>
+
+      <button class="btn btn-sm btn-primary me-2" onclick="return addServices('${btoa(encodeURIComponent(JSON.stringify(AssignServ[iAss])))}','${btoa(encodeURIComponent(data.uidCode))}')">Add</button>
+
+      <button class="btn btn-sm btn-danger">Delete</button>
+    </div>
+    </li>
+
+
+    `;
+ }
+ getAssign+=`</ul>
+                                            </div>
+                                        </div>`;
+//console.log(AssignServ[0].name);
+
+ getdata+=`</ul>
+ </div>
+</div>
+
+${getAssign}
+
+`;
+
+ $('.chooseService').html(getdata);
 
 //service
+    }
 
 },
 error:function(data){
@@ -632,6 +1130,296 @@ error:function(data){
 });
 
 
+}
+function addServices(dataPass,uidCode){
+    dataString=atob(dataPass);
+
+
+data=JSON.parse(decodeURIComponent(dataString));
+
+//console.log(data);
+ussdViewCreate(dataPass,uidCode);
+
+}
+
+
+function ussdViewCreate(dataPass,uidCode){
+
+    dataString=atob(dataPass);
+    uCode=atob(uidCode);
+
+dataSend=JSON.parse(decodeURIComponent(dataString));
+    var Usertoken=localStorage.getItem("Usertoken");
+   //search products
+   $.ajax({
+
+url:`./api/ussdViewCreate`,
+type:'get',
+headers: {
+        "Content-Type": "application/json;charset=UTF-8",
+        //"Authorization": `Bearer ${Usertoken}`
+    },
+    headers: {
+    "Content-Type": "application/json;charset=UTF-8",
+    "Authorization": `Bearer ${Usertoken}`
+},
+data:{
+    actionStatus:dataSend.serviceType,
+    serviceUid:dataSend.uid,
+    uidCode:decodeURIComponent(uCode)
+},
+success:function(data){
+    if(data.status){
+         getResult=data.result;
+$('.viewOrder').modal('show');
+
+        console.log("yes");
+        getResultEncrypt=btoa(encodeURIComponent(JSON.stringify(getResult)))
+      window[dataSend.serviceType](getResultEncrypt,dataPass,uidCode);
+
+
+    }else{
+        console.log("not");
+        var getResult=[];
+        getResultEncrypt=btoa(encodeURIComponent(JSON.stringify(getResult)))
+      window[dataSend.serviceType](getResultEncrypt,dataPass,uidCode);
+    }
+
+},
+error:function(data){
+//alert("errors occured please retry this process again or contact system Admin");
+//window.location.href = "./login";
+}
+});
+}
+
+/*appointment Plugin*/
+function dispAppoint(getResultEncrypt,dataPass,uidCode){
+    dataString=atob(dataPass);
+
+
+data=JSON.parse(decodeURIComponent(dataString));
+
+    uCode=atob(uidCode);
+
+myUidCode=decodeURIComponent(uCode);
+returnResult=atob(getResultEncrypt);
+resultData=JSON.parse(decodeURIComponent(returnResult));
+
+//console.log(data);
+$('.formOrder').modal('show');
+
+
+
+
+$('.formOrderTitle').html(`<h5 class="modal-title ">Modal Title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>`)
+$('.formOrderBody').html(`
+
+<form class="AppointMent" onsubmit="return AppointMent()">
+<div class="p-2">
+
+
+
+
+<div class="form-group ">
+<label>Name <span class="text-danger">*</span></label>
+<input type="text" class="form-control" name="name" placeholder="Appointment Name" required/>
+<input type="hidden" class="form-control uid" name="uid" value="none" required/>
+<input type="hidden" class="form-control" name="uidCode" value="${myUidCode}" required/>
+<input type="hidden" class="form-control" name="serviceType" value="${data.serviceType}" required/>
+<input type="hidden" class="form-control" name="serviceUid" value="${data.uid}" required/>
+
+
+</div>
+
+<div class="form-group ">
+<label>Start and End Time <span class="text-danger">*</span></label>
+<input type="text" class="form-control rangeMeetingDate"  placeholder="Choose Start and End Time" required/>
+<input type="text" class="form-control startDate"  placeholder="Start" required/>
+<input type="text" class="form-control endDate"  placeholder="endDate" required/>
+
+</div>
+
+
+ <div class="form-group">
+    <label for="">Choose Status</label>
+<select  name="status"  class="form-control">
+     <option value="open" selected>open</option>
+     <option value="close">close</option>
+
+</select>
+</div>
+
+
+<div class="form-group">
+  <label for="exampleFormControlTextarea3">Enter Comment</label>
+  <textarea class="form-control" name="commentData" placeholder="Enter Comment" rows="7"></textarea>
+</div>
+
+
+
+
+</div>
+</form>
+
+`)
+
+
+
+
+/*$('.rangeMeetingDate').flatpickr(
+    {
+    onChange:function(selectedDates,dateStr,instance){
+     //console.log(dateStr);
+
+     if(selectedDates.length===2){
+        var startDate=instance.formatDate(selectedDates[0],"Y-m-d H:i:S");
+        var endDate=instance.formatDate(selectedDates[1],"Y-m-d H:i:S");
+
+       console.log(From ${startDate} to ${endDate});
+
+     }
+
+    },
+     mode: "range",
+    enableTime: true,
+	time_24hr: true,
+    dateFormat: "Y-m-d H:i:S",
+}
+);*/
+
+if(resultData.length===0) return 0;
+$('.MyTitleModal').html(`<h5 class="text-center">  <strong>Edit Item ${data.name} </strong></h5> <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>`)
+        $('.ModalPassword').html(`
+        <div class="dispussdData"></div>
+        `);
+var getData=`
+ <div class="main-card mb-3 card ">
+                                            <div class="card-body"><h5 class="card-title">List OF Services</h5>
+                                                <ul class="list-group">
+ `;
+ var AssignN=0;
+ for(var i=0;i<resultData.length;i++){
+    AssignN=AssignN+1;
+
+    getData+=`
+    <li class="list-group-item d-flex justify-content-between align-items-center">${AssignN}) ${resultData[i].startDate}=>${resultData[i].endDate}
+
+
+    <div>
+
+      <button class="btn btn-sm btn-primary me-2" onclick="return addServices('${btoa(encodeURIComponent(JSON.stringify(resultData[i])))}')">Add</button>
+
+      <button class="btn btn-sm btn-danger">Delete</button>
+    </div>
+    </li>
+
+
+    `;
+ }
+ getData+=`</ul>
+                                            </div>
+                                        </div>`;
+
+$('.dispussdData').html(getData);
+}
+
+function previewUssd(){
+    $('.MyRequest_table').html("");
+$('.MainbigTitle').html(`
+<h5 class="text-center mainTitle"><strong>Preview</strong></h5>
+
+`);
+$('.MainForm').html(`
+<div class="p-2">
+
+<div class=" form-group chooseService  d-flex justify-content-center">
+
+
+
+</div>
+
+</div>
+    <div class="MainFormTable"></div>
+    `);
+   $('.phoneFrame').addClass('d-flex justify-content-center').show();
+
+    //$('.chooseService').html(phoneFrame);
+    //$('.phoneFrame').html("");
+
+}
+
+function ussdView(uidCode){
+    uCode=atob(uidCode);
+    ussdReq=decodeURIComponent(uCode);
+
+    $('.cover-spin').show();
+       // $('.cover-spin').show();
+       var Usertoken=localStorage.getItem("Usertoken");
+$.ajax({
+
+url:`./api/ussdView`,
+type:'post',
+beforeSend: function (xhr) {
+xhr.setRequestHeader('Authorization', `Bearer ${Usertoken}`);
+},
+//dataType: "json",
+data:{
+sessionId:"46",
+serviceCode:'test',
+phoneNumber:"0782389359",
+text:ussdReq
+},
+success:function(data){
+if(data){//return data as true
+    console.log(data);
+    $('.cover-spin').hide();
+    //$('.viewOrder').modal('hide');
+   // console.log(`done $${CalculateDeclClass}`);
+
+    //$('.formEditStatShipping .form-control').val("");
+    const cleanedText = data.replace(/^CON\s*/gm, '');
+    document.getElementById('ussd-content').textContent = cleanedText;
+        document.getElementById('ussd-modal').style.display = 'block';
+
+
+
+}
+else{
+    $('.cover-spin').hide();
+    alert("something Went Wrong ");
+}
+
+
+
+},
+error:function(data){
+//alert("errors occured please retry this process again or contact system Admin");
+//window.location.href = "./login";
+}
+});
+
+return false;
+
+
+
+}
+/*appointment Plugin*/
+function chooseThisService(dataPass)
+{
+    dataString=atob(dataPass);
+
+
+    data=JSON.parse(decodeURIComponent(dataString));
+    $('.textChooseService').text(`${data.name} .....`)
+}
+function AssignStatus(){
+    alert("assign");
 }
 /*USSD  */
 

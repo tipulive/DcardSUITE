@@ -35,6 +35,19 @@ Authorization: Bearer {{Auth_token}}
 "uidCreator":"required"
 }
 
+#### to view what we create as USSD Data, getappointment,
+
+GET  {{baseUrl}}/ussdViewCreate/
+Content-Type: application/json
+Authorization: Bearer {{Auth_token}}
+
+{
+"actionStatus":"serviceType",
+"serviceUid":"serviceUid",
+"uidCode":"8"
+
+}
+
 #### Create Service, actionStatus:createService
 
 POST  {{baseUrl}}/service/
@@ -50,14 +63,15 @@ Authorization: Bearer {{Auth_token}}
 "commentData":"Display Appointment"
 }
 
-#### getService, actionStatus:createService
+#### getService,getbothserviceassign, actionStatus:createService
 
 POST  {{baseUrl}}/service/
 Content-Type: application/json
 Authorization: Bearer {{Auth_token}}
 
 {
-"actionStatus":"getservice",
+"actionStatus":"getbothserviceassign",
+"uidCode":"8",
 "name":"AppointMent",
 "serviceType":"dispAppoint",
 
@@ -96,25 +110,30 @@ Authorization: Bearer {{Auth_token}}
 "commentData":"Nyungwe"
 }
 
-#### Create Appointment, actionStatus:createappointment
+#### Create Appointment,connectedservice, actionStatus:createappointment
 
 POST  {{baseUrl}}/appointment/
 Content-Type: application/json
 Authorization: Bearer {{Auth_token}}
 
 {
-"actionStatus":"createappointment",
-"uid":"DOctorAppointment_1743535707",
+"actionStatus":"connectedservice",
+"uid":"none",
 "uidCode":"8",
-"serviceType":"dispAppoint",
-"serviceUid":"AppointMent_1743535187",
-"name":"DOctor Appointment",
+//"serviceType":"dispAppoint",
+//"serviceUid":"AppointMent_1743535187",*/
+"serviceType":"dispapp",
+
+"name":"Kuza Kare Cyane",
 "limitb":6,
 "limitb":6,
 "startDate":"2024-12-01 13:55:00",
 "endDate":"2024-12-01 14:30:00",
 "status":"open",
-"commentData":"Nyungwe"
+"commentData":"Nyungwe",
+//this down is only when is connectedservice as action status is unique id*/
+"id":10
+
 }
 
 ### Display Option ussd ##
@@ -123,10 +142,11 @@ POST  {{baseUrl}}/ussdView/
 Content-Type: application/json
 
 {
+"jsonResult":"false",
 "sessionId": "46",
 "serviceCode": "test",
 "phoneNumber": "0782389359",
-"text":0
+"text":1
 }
 ### Display Option ussd ##
 #### user Choose Appointment using USSD
