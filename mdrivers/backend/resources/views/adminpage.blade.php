@@ -15,6 +15,17 @@
 <style>
 
 /*preview css*/
+.editable-dotline {
+      border-bottom: 1px dotted #333;
+      display: inline-block;
+      min-width: 15px;
+      padding-top: 2px;
+      padding-bottom: 2px;
+    }
+    .editable-dotline:focus {
+      outline: none;
+      border-bottom: 1px solid #007bff;
+    }
 .phoneFrame{
     display:none !important;
 }
@@ -1078,7 +1089,7 @@ if(resultData[i].statusAssign!='Assign'){
 var hideAssign=(AssignServ.length>0)?"":"d-none";
  var getAssign=`
  <div class="d-flex justify-content-end pb-2">
-  <button class="btn btn-primary" onClick="previewUssd()">Right Aligned</button>
+  <button class="btn btn-primary" onClick="previewUssd()">Preview</button>
 </div>
 
  <div class="main-card mb-3 card ${hideAssign}">
@@ -1165,24 +1176,27 @@ headers: {
 },
 data:{
     actionStatus:dataSend.serviceType,
-    serviceUid:dataSend.uid,
+    serviceType:dataSend.serviceType,
+    serviceUid:dataSend.serviceUid,
     uidCode:decodeURIComponent(uCode)
 },
 success:function(data){
     if(data.status){
          getResult=data.result;
-$('.viewOrder').modal('show');
+
 
         console.log("yes");
         getResultEncrypt=btoa(encodeURIComponent(JSON.stringify(getResult)))
-      window[dataSend.serviceType](getResultEncrypt,dataPass,uidCode);
+        var methodyn="getUssdView"+(dataSend.serviceType).toLowerCase();
+      window[methodyn](getResultEncrypt,dataPass,uidCode);
 
 
     }else{
         console.log("not");
         var getResult=[];
         getResultEncrypt=btoa(encodeURIComponent(JSON.stringify(getResult)))
-      window[dataSend.serviceType](getResultEncrypt,dataPass,uidCode);
+        var methodyn="getUssdView"+(dataSend.serviceType).toLowerCase();
+      window[methodyn](getResultEncrypt,dataPass,uidCode);
     }
 
 },
@@ -1194,7 +1208,8 @@ error:function(data){
 }
 
 /*appointment Plugin*/
-function dispAppoint(getResultEncrypt,dataPass,uidCode){
+function getUssdViewdispappoint(getResultEncrypt,dataPass,uidCode){
+    $('.viewOrder').modal('show');
     dataString=atob(dataPass);
 
 
@@ -1329,6 +1344,658 @@ var getData=`
 $('.dispussdData').html(getData);
 }
 
+/*appointment Plugin*/
+
+/* display Service Pluggin  Tangazo*/
+function getUssdViewdispapp(getResultEncrypt,dataPass,uidCode){
+    $('.viewOrder').modal('show');
+    dataString=atob(dataPass);
+
+
+data=JSON.parse(decodeURIComponent(dataString));
+
+    uCode=atob(uidCode);
+
+myUidCode=decodeURIComponent(uCode);
+returnResult=atob(getResultEncrypt);
+resultData=JSON.parse(decodeURIComponent(returnResult));
+
+//console.log(data);
+$('.formOrder').modal('show');
+
+
+
+
+$('.formOrderTitle').html(`<h5 class="modal-title ">Modal Title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>`)
+$('.formOrderBody').html(`
+
+<form class="AppointMent" onsubmit="return AppointMent()">
+<div class="p-2">
+
+
+
+
+<div class="form-group ">
+<label>Name <span class="text-danger">*</span></label>
+<input type="text" class="form-control" name="name" placeholder="Appointment Name" required/>
+<input type="hidden" class="form-control uid" name="uid" value="none" required/>
+<input type="hidden" class="form-control" name="uidCode" value="${myUidCode}" required/>
+<input type="hidden" class="form-control" name="serviceType" value="${data.serviceType}" required/>
+<input type="hidden" class="form-control" name="serviceUid" value="${data.uid}" required/>
+
+
+</div>
+
+<div class="form-group ">
+<label>Start and End Time <span class="text-danger">*</span></label>
+<input type="text" class="form-control rangeMeetingDate"  placeholder="Choose Start and End Time" required/>
+<input type="text" class="form-control startDate"  placeholder="Start" required/>
+<input type="text" class="form-control endDate"  placeholder="endDate" required/>
+
+</div>
+
+
+ <div class="form-group">
+    <label for="">Choose Status</label>
+<select  name="status"  class="form-control">
+     <option value="open" selected>open</option>
+     <option value="close">close</option>
+
+</select>
+</div>
+
+
+<div class="form-group">
+  <label for="exampleFormControlTextarea3">Enter Comment</label>
+  <textarea class="form-control" name="commentData" placeholder="Enter Comment" rows="7"></textarea>
+</div>
+
+
+
+
+</div>
+</form>
+
+`)
+
+
+
+
+/*$('.rangeMeetingDate').flatpickr(
+    {
+    onChange:function(selectedDates,dateStr,instance){
+     //console.log(dateStr);
+
+     if(selectedDates.length===2){
+        var startDate=instance.formatDate(selectedDates[0],"Y-m-d H:i:S");
+        var endDate=instance.formatDate(selectedDates[1],"Y-m-d H:i:S");
+
+       console.log(From ${startDate} to ${endDate});
+
+     }
+
+    },
+     mode: "range",
+    enableTime: true,
+	time_24hr: true,
+    dateFormat: "Y-m-d H:i:S",
+}
+);*/
+
+if(resultData.length===0) return 0;
+$('.MyTitleModal').html(`<h5 class="text-center">  <strong>Edit Item ${data.name} </strong></h5> <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>`)
+        $('.ModalPassword').html(`
+        <div class="dispussdData"></div>
+        `);
+var getData=`
+ <div class="main-card mb-3 card ">
+                                            <div class="card-body"><h5 class="card-title">List OF Services</h5>
+                                                <ul class="list-group">
+ `;
+ var AssignN=0;
+ for(var i=0;i<resultData.length;i++){
+    AssignN=AssignN+1;
+
+    getData+=`
+    <li class="list-group-item d-flex justify-content-between align-items-center">${AssignN}) ${resultData[i].name}
+
+
+    <div>
+
+      <button class="btn btn-sm btn-primary me-2" onclick="return addServices('${btoa(encodeURIComponent(JSON.stringify(resultData[i])))}')">Add</button>
+
+      <button class="btn btn-sm btn-danger">Delete</button>
+    </div>
+    </li>
+
+
+    `;
+ }
+ getData+=`</ul>
+                                            </div>
+                                        </div>`;
+
+$('.dispussdData').html(getData);
+}
+
+/* display Service Pluggin  Tangazo*/
+
+/*Job Pluggin*/
+function getUssdViewjobapp(getResultEncrypt,dataPass,uidCode){
+    $('.viewOrder').modal('show');
+    dataString=atob(dataPass);
+
+
+data=JSON.parse(decodeURIComponent(dataString));
+
+    uCode=atob(uidCode);
+
+myUidCode=decodeURIComponent(uCode);
+returnResult=atob(getResultEncrypt);
+resultData=JSON.parse(decodeURIComponent(returnResult));
+
+//console.log(data);
+$('.formOrder').modal('show');
+
+
+
+
+$('.formOrderTitle').html(`<h5 class="modal-title ">Modal Title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>`)
+$('.formOrderBody').html(`
+
+<form class="AppointMent" onsubmit="return AppointMent()">
+<div >
+
+
+
+
+<div class="form-group ">
+
+<input type="hidden" class="form-control uid" name="uid" value="none" required/>
+<input type="hidden" class="form-control" name="uidCode" value="${myUidCode}" required/>
+<input type="hidden" class="form-control" name="serviceType" value="${data.serviceType}" required/>
+<input type="hidden" class="form-control" name="serviceUid" value="${data.uid}" required/>
+
+
+</div>
+
+<div class="input-group">
+   <input type="text" class="form-control addQuestion" placeholder="Add Question">
+   <button class="btn btn-primary" onclick="return addJob('${getResultEncrypt}','${dataPass}','${uidCode}')">Add Question</button>
+</div>
+<div class="card-body QestionAnswer">
+
+<div>
+
+
+
+
+
+
+</div>
+</form>
+
+`)
+
+
+
+
+/*$('.rangeMeetingDate').flatpickr(
+    {
+    onChange:function(selectedDates,dateStr,instance){
+     //console.log(dateStr);
+
+     if(selectedDates.length===2){
+        var startDate=instance.formatDate(selectedDates[0],"Y-m-d H:i:S");
+        var endDate=instance.formatDate(selectedDates[1],"Y-m-d H:i:S");
+
+       console.log(From ${startDate} to ${endDate});
+
+     }
+
+    },
+     mode: "range",
+    enableTime: true,
+	time_24hr: true,
+    dateFormat: "Y-m-d H:i:S",
+}
+);*/
+
+
+if(resultData.length===0) return 0;
+$('.MyTitleModal').html(`<h5 class="text-center">  <strong>Edit Item ${data.name} </strong></h5> <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>`)
+        $('.ModalPassword').html(`
+        <div class="dispussdData"></div>
+        `);
+var getData=`
+ <div class="main-card mb-3 card ">
+                                            <div class="card-body"><h5 class="card-title">List OF Services</h5>
+                                                <ul class="list-group">
+ `;
+ var AssignN=0;
+ for(var i=0;i<resultData.length;i++){
+    AssignN=AssignN+1;
+
+    getData+=`
+    <li class="list-group-item d-flex justify-content-between align-items-center">${AssignN}) ${resultData[i].name}
+
+
+    <div>
+
+      <button class="btn btn-sm btn-primary me-2" onclick="return addServices('${btoa(encodeURIComponent(JSON.stringify(resultData[i])))}')">Add</button>
+
+      <button class="btn btn-sm btn-danger">Delete</button>
+    </div>
+    </li>
+
+
+    `;
+ }
+ getData+=`</ul>
+                                            </div>
+                                        </div>`;
+
+$('.dispussdData').html(getData);
+
+dispQuestionAnswer(getResultEncrypt);
+
+
+
+
+
+}
+function dispQuestionAnswer(getResultEncrypt){
+    returnResult=atob(getResultEncrypt);
+resultData=JSON.parse(decodeURIComponent(returnResult));
+
+//console.log(JSON.parse(resultData[0].replyJson));
+var getData=`<ul class="list-group">`;
+var AssignN=0;
+ for(var i=0;i<resultData.length;i++){
+    AssignN=AssignN+1;
+
+    var subAnswer=JSON.parse(resultData[i].replyJson);
+    var jobanswer="jobanswer"+resultData[i].id;
+    var buttonJclass="buttonj"+resultData[i].id;
+    var getData1=`<ul class="list-group mt-2 mb-3">`;
+
+for(var m=0;m<subAnswer.length;m++)
+{
+
+    var buttonclass="button"+i+"_"+m;
+    var indexV=i+"_"+m;
+    var editableClass="editable"+i+"_"+m;
+    getData1+=`  <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <span >${m+1}) <span contenteditable="true" class="editable-dotline  ${editableClass}" onkeyup="return myupdateDataJob(this,'${buttonclass}')">${subAnswer[m].answer}</span></span>
+
+                                        <div>
+                                            <button class="btn btn-sm btn-outline-success me-1 d-none ${buttonclass}" onclick="return updatemyJobAnswer('${btoa(encodeURIComponent(JSON.stringify(resultData[i])))}','${[m]}','${indexV}')">Save</button>
+                                            <button class="btn btn-sm btn-outline-danger" onclick="return removemyanswer('${btoa(encodeURIComponent(JSON.stringify(resultData[i])))}','${[m]}','${indexV}')">Delete</button>
+                                        </div>
+                                    </li>`;
+}
+getData1+=`
+<li class="list-group-item">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control ${jobanswer}" placeholder="New answer">
+                                            <button class="btn btn-primary" onclick="return addmyJobAnswer('${btoa(encodeURIComponent(JSON.stringify(resultData[i])))}','${resultData[i].id}')">Answer</button>
+                                        </div>
+                                    </li>
+</ul>`;
+editableClass="editableJ"+resultData[i].id;
+    getData+=`
+    <strong class="d-flex justify-content-between align-items-center w-100">
+  <div class="d-flex align-items-center">
+    Questions: ${AssignN})
+    <span contenteditable="true" class="editable-dotline ms-2 ${editableClass}" onkeyup="return myupdateDataJob(this,'${buttonJclass}')">
+      ${resultData[i].name}
+    </span>
+  </div>
+
+  <div>
+    <button class="btn btn-sm btn-outline-primary me-1 d-none ${buttonJclass}"
+      onclick="return updatemyJobquestion('${btoa(encodeURIComponent(JSON.stringify(resultData[i])))}','${[m]}','${resultData[i].id}')">
+      Save
+    </button>
+    <button class="btn btn-sm btn-danger"
+      onclick="return removemyJobquestion('${btoa(encodeURIComponent(JSON.stringify(resultData[i])))}','${[m]}','${resultData[i].id}')">
+      Delete
+    </button>
+  </div>
+</strong>
+
+
+                        <ul class="list-group mt-2">
+                            <li class="list-group-item text-primary mb-2">Answers
+
+                          ${getData1}
+
+                            </li>
+                        </ul>
+    `;
+
+ }
+
+ getData+=` </ul>`;
+    $('.QestionAnswer').html(getData);
+}
+function updatemyJobquestion(dataPass,indexArr,indexV){
+    dataString=atob(dataPass);
+
+
+data=JSON.parse(decodeURIComponent(dataString));
+var editableClass="editableJ"+indexV;
+var answer=$(`.${editableClass}`).text();
+myJobAction(dataPass,"updatemyquestion",answer,indexArr)
+return false;
+}
+function removemyJobquestion(dataPass,indexArr,indexV){
+    dataString=atob(dataPass);
+
+
+data=JSON.parse(decodeURIComponent(dataString));
+var editableClass="editableJ"+indexV;
+var answer=$(`.${editableClass}`).text();
+myJobAction(dataPass,"removemyquestion",answer,indexArr)
+return false;
+}
+function updatemyJobAnswer(dataPass,indexArr,indexV){
+    dataString=atob(dataPass);
+
+
+data=JSON.parse(decodeURIComponent(dataString));
+var editableClass="editable"+indexV;
+var answer=$(`.${editableClass}`).text();
+myJobAction(dataPass,"updatemyanswer",answer,indexArr)
+return false;
+}
+
+function removemyanswer(dataPass,indexArr,indexV){
+    dataString=atob(dataPass);
+
+
+data=JSON.parse(decodeURIComponent(dataString));
+var editableClass="editable"+indexV;
+var answer=$(`.${editableClass}`).text();
+myJobAction(dataPass,"removemyanswer",answer,indexArr)
+return false;
+}
+function myupdateDataJob(thisData,buttonclass){
+    //console.log(thisData.textContent);
+    /*buttonclass="button"+indexarr;
+    console.log(buttonclass);*/
+    if(thisData.textContent!=""){
+     $(`.${buttonclass}`).removeClass("d-none");
+    }else{
+        $(`.${buttonclass}`).addClass("d-none");
+    }
+
+
+
+    return false;
+}
+function addmyJobAnswer(dataPass,indexArr){
+    var jobanswer="jobanswer"+indexArr;
+    var answer=$(`.${jobanswer}`).val()
+    myJobAction(dataPass,"addmyanswer",answer,1);
+    return false;
+}
+function myJobAction(dataPass,inputaction,answer,indexArr){
+    dataString=atob(dataPass);
+
+
+data=JSON.parse(decodeURIComponent(dataString));
+uidCode=btoa(encodeURIComponent(data.uidCode))
+
+
+    $('.cover-spin').show();
+       // $('.cover-spin').show();
+       var Usertoken=localStorage.getItem("Usertoken");
+$.ajax({
+
+url:`./api/appointment`,
+type:'post',
+beforeSend: function (xhr) {
+xhr.setRequestHeader('Authorization', `Bearer ${Usertoken}`);
+},
+//dataType: "json",
+data:{
+actionStatus:"myserviceaction",
+uidCode:data.uidCode,
+inputaction:inputaction,
+indexArray:indexArr,
+id:data.id,
+answer:answer,
+name:answer,
+serviceType:data.serviceType,
+serviceUid:data.serviceUid
+
+},
+success:function(data){
+if(data){//return data as true
+   // console.log(data);
+    $('.cover-spin').hide();
+    ussdViewCreate(dataPass,uidCode);
+
+}
+else{
+    $('.cover-spin').hide();
+    alert("something Went Wrong ");
+}
+
+
+
+},
+error:function(data){
+//alert("errors occured please retry this process again or contact system Admin");
+//window.location.href = "./login";
+}
+});
+
+return false;
+}
+function addJob(getResultEncrypt,dataPass,uidCode){
+    dataString=atob(dataPass);
+
+
+data=JSON.parse(decodeURIComponent(dataString));
+
+    uCode=atob(uidCode);
+    myUidCode=decodeURIComponent(uCode);
+    $('.cover-spin').show();
+       // $('.cover-spin').show();
+       var Usertoken=localStorage.getItem("Usertoken");
+$.ajax({
+
+url:`./api/appointment`,
+type:'post',
+beforeSend: function (xhr) {
+xhr.setRequestHeader('Authorization', `Bearer ${Usertoken}`);
+},
+//dataType: "json",
+data:{
+actionStatus:"myserviceaction",
+inputaction:"createmy",
+uidCode:myUidCode,
+name:$('.addQuestion').val(),
+serviceType:data.serviceType,
+serviceUid:data.serviceUid
+
+},
+success:function(data){
+if(data){//return data as true
+   // console.log(data);
+    $('.cover-spin').hide();
+    ussdViewCreate(dataPass,uidCode);
+
+}
+else{
+    $('.cover-spin').hide();
+    alert("something Went Wrong ");
+}
+
+
+
+},
+error:function(data){
+//alert("errors occured please retry this process again or contact system Admin");
+//window.location.href = "./login";
+}
+});
+
+return false;
+
+
+}
+/*Job Pluggin*/
+
+/*Game Plugin */
+function getUssdViewplayservice(getResultEncrypt,dataPass,uidCode){
+    $('.viewOrder').modal('show');
+    dataString=atob(dataPass);
+
+
+data=JSON.parse(decodeURIComponent(dataString));
+
+    uCode=atob(uidCode);
+
+myUidCode=decodeURIComponent(uCode);
+returnResult=atob(getResultEncrypt);
+resultData=JSON.parse(decodeURIComponent(returnResult));
+
+//console.log(data);
+$('.formOrder').modal('show');
+
+
+
+
+$('.formOrderTitle').html(`<h5 class="modal-title ">Modal Title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>`)
+$('.formOrderBody').html(`
+
+<form class="AppointMent" onsubmit="return AppointMent()">
+<div class="p-2">
+
+
+
+
+<div class="form-group ">
+<label>Name <span class="text-danger">*</span></label>
+<input type="text" class="form-control" name="name" placeholder="Appointment Name" required/>
+<input type="hidden" class="form-control uid" name="uid" value="none" required/>
+<input type="hidden" class="form-control" name="uidCode" value="${myUidCode}" required/>
+<input type="hidden" class="form-control" name="serviceType" value="${data.serviceType}" required/>
+<input type="hidden" class="form-control" name="serviceUid" value="${data.uid}" required/>
+
+
+</div>
+
+<div class="form-group ">
+<label>Start and End Time <span class="text-danger">*</span></label>
+<input type="text" class="form-control rangeMeetingDate"  placeholder="Choose Start and End Time" required/>
+<input type="text" class="form-control startDate"  placeholder="Start" required/>
+<input type="text" class="form-control endDate"  placeholder="endDate" required/>
+
+</div>
+
+
+ <div class="form-group">
+    <label for="">Choose Status</label>
+<select  name="status"  class="form-control">
+     <option value="open" selected>open</option>
+     <option value="close">close</option>
+
+</select>
+</div>
+
+
+<div class="form-group">
+  <label for="exampleFormControlTextarea3">Enter Comment</label>
+  <textarea class="form-control" name="commentData" placeholder="Enter Comment" rows="7"></textarea>
+</div>
+
+
+
+
+</div>
+</form>
+
+`)
+
+
+
+
+/*$('.rangeMeetingDate').flatpickr(
+    {
+    onChange:function(selectedDates,dateStr,instance){
+     //console.log(dateStr);
+
+     if(selectedDates.length===2){
+        var startDate=instance.formatDate(selectedDates[0],"Y-m-d H:i:S");
+        var endDate=instance.formatDate(selectedDates[1],"Y-m-d H:i:S");
+
+       console.log(From ${startDate} to ${endDate});
+
+     }
+
+    },
+     mode: "range",
+    enableTime: true,
+	time_24hr: true,
+    dateFormat: "Y-m-d H:i:S",
+}
+);*/
+
+if(resultData.length===0) return 0;
+$('.MyTitleModal').html(`<h5 class="text-center">  <strong>Edit Item ${data.name} </strong></h5> <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>`)
+        $('.ModalPassword').html(`
+        <div class="dispussdData"></div>
+        `);
+var getData=`
+ <div class="main-card mb-3 card ">
+                                            <div class="card-body"><h5 class="card-title">List OF Services</h5>
+                                                <ul class="list-group">
+ `;
+ var AssignN=0;
+ for(var i=0;i<resultData.length;i++){
+    AssignN=AssignN+1;
+
+    getData+=`
+    <li class="list-group-item d-flex justify-content-between align-items-center">${AssignN}) ${resultData[i].name}
+
+
+    <div>
+
+      <button class="btn btn-sm btn-primary me-2" onclick="return addServices('${btoa(encodeURIComponent(JSON.stringify(resultData[i])))}')">Add</button>
+
+      <button class="btn btn-sm btn-danger">Delete</button>
+    </div>
+    </li>
+
+
+    `;
+ }
+ getData+=`</ul>
+                                            </div>
+                                        </div>`;
+
+$('.dispussdData').html(getData);
+}
+/*Game Plugin */
 function previewUssd(){
     $('.MyRequest_table').html("");
 $('.MainbigTitle').html(`

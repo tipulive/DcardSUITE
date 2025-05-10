@@ -35,7 +35,7 @@ Authorization: Bearer {{Auth_token}}
 "uidCreator":"required"
 }
 
-#### to view what we create as USSD Data, getappointment,
+#### to view what we create as USSD Data, getappointment,actionStatus :service Type,serviceUid:serviceUid,service zidasaba gutweaking ziba ari general
 
 GET  {{baseUrl}}/ussdViewCreate/
 Content-Type: application/json
@@ -110,25 +110,31 @@ Authorization: Bearer {{Auth_token}}
 "commentData":"Nyungwe"
 }
 
-#### Create Appointment,connectedservice, actionStatus:createappointment
-
+#### myserviceaction(to go,connectedservice, actionStatus:createappointment
+###inputaction(createmy,addmyanswer,updatemyquestion,removemyquestion,removemyanswer,updatemyanswer,editmy,deletemy):to determine what my serviceaction will do
 POST  {{baseUrl}}/appointment/
 Content-Type: application/json
 Authorization: Bearer {{Auth_token}}
 
 {
-"actionStatus":"connectedservice",
-"uid":"none",
+"actionStatus":"myserviceaction",
+"inputaction":"createmy",
+"uid":"testJob",
 "uidCode":"8",
-//"serviceType":"dispAppoint",
-//"serviceUid":"AppointMent_1743535187",*/
-"serviceType":"dispapp",
+"serviceType":"jobapp",
+"serviceUid":"Job_1743110111",
+//"serviceType":"dispapp",*/
+//addmyanswer,*/
+"id":1,
+"point":40,
+"answer":"test",
+//addmyanswer,*/
 
-"name":"Kuza Kare Cyane",
+"name":"Ese Uzi Gufura",
 "limitb":6,
 "limitb":6,
-"startDate":"2024-12-01 13:55:00",
-"endDate":"2024-12-01 14:30:00",
+"startDate":"2024-12-04 13:55:00",
+"endDate":"2024-12-04 14:30:00",
 "status":"open",
 "commentData":"Nyungwe",
 //this down is only when is connectedservice as action status is unique id*/
@@ -143,10 +149,10 @@ Content-Type: application/json
 
 {
 "jsonResult":"false",
-"sessionId": "46",
+"sessionId": "48",
 "serviceCode": "test",
 "phoneNumber": "0782389359",
-"text":1
+"text":2
 }
 ### Display Option ussd ##
 #### user Choose Appointment using USSD
