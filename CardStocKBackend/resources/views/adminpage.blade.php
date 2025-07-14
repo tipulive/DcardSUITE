@@ -366,6 +366,11 @@ table th {
                                             <i class="metismenu-icon"></i>View
                                         </a>
                                     </li>
+                                    <li>
+                                        <a  href="#Create Product" onclick="return ProductSafariStock()" aria-expanded="false">
+                                            <i class="metismenu-icon"></i>Products
+                                        </a>
+                                    </li>
 
                                     <li>
                                         <a href="/ViewQrProduct" aria-expanded="false">
@@ -1797,7 +1802,7 @@ getData+=`
 <table class="viewReqTable">
 <thead>
 <tr>
-<th scope="col">#</th>
+<th scope="col" >#</th>
 <th scope="col">Name</th>
 <th scope="col">Fact Price $</th>
 <th scope="col">Init qty</th>
@@ -1809,8 +1814,8 @@ getData+=`
 
 
 </tr>
-</thead>
-<tbody>
+</thead >
+<tbody >
 `;
 var resultData=data["result"];
 console.log(resultData);
@@ -1818,8 +1823,9 @@ for(var i=0;i<resultData.length;i++){
 var resultObject=resultData[i];
  getData+=`
 
- <tr>
-  <td data-label="#"><i class="fas fa-trash text-danger mylogout " title="Delete This Product in Safari" onclick="return deleteStockQty('${btoa(JSON.stringify(resultObject))}',this,'${safariName}')"></i>  ${i+1}</td>
+ <tr >
+
+  <td data-label="#" ><i class="fas fa-trash text-danger mylogout " title="Delete This Product in Safari" onclick="return deleteStockQty('${btoa(JSON.stringify(resultObject))}',this,'${safariName}')"></i>  ${i+1}</td>
   <td data-label="Name">${resultData[i].productCode}</td>
   <td data-label="Fact Price $">
   ${(resultData[i].status!='spendSafaris')?`<span class="Formchange" id="CustomPrice_Add_1" onchange="return  OnChangeFactPrice('${btoa(JSON.stringify(resultObject))}',this,'${safariName}')" onkeyup="return OnChangeFactPrice('${btoa(JSON.stringify(resultObject))}',this,'${safariName}')" contenteditable="true">${resultData[i].price}</span><span class="${"Price_"+(resultData[i].productCode).replace(/[-!"#$%&'()*+,.\/:;<=>?@[\\\]^`{|}~_.\s'`]/g, '')}"></span>`:'Spending'}
@@ -1842,6 +1848,7 @@ getData+=`
 </table>`;
 
 $('.MainForm').html(getData);
+
 
 
     //
@@ -2976,6 +2983,331 @@ error:function(data){
 });
 return false;
 
+}
+function ProductSafariStock(){
+    $('.viewOrder').modal('show');
+    $('.MyTitleModal').html(`<h5 class="text-center">  <strong>Dump Or Restore Product Quantity</strong></h5>`)
+    $('.ModalPassword ').html(`
+    <div class="card-body">
+    <div class="form-group right-inner-addon ">
+<label>Search Product<span class="text-danger">*</span></label>
+<input type="text" class="form-control productCodeClass"  autocomplete="off" onkeyup="autoCompleteProductQty(this)" name="productCode" placeholder="Enter Product Code" required/>
+<span class="autocompleteIcon" onclick="hidePopup()"><i class="fas fa-exclamation-triangle text-danger" ></i></span>
+</div>
+
+
+<div class="autoCompleteTopItemData"></div>
+
+
+<div class="dumpRest"></div>
+</div>
+    `);
+}
+function autoCompleteProductQty(thisdata)
+{
+    $('.autocompleteIcon').html(`<i class="fas fa-exclamation-triangle text-danger onclick="hidePopup()"></i>`);
+    //
+        if(thisdata.value=="") return EmptyautoCompleteTopItem();
+//
+
+var Usertoken=localStorage.getItem("Usertoken");
+   //search products
+   $.ajax({
+
+url:`./api/Products`,
+type:'get',
+headers: {
+        "Content-Type": "application/json;charset=UTF-8",
+        //"Authorization": `Bearer ${Usertoken}`
+    },
+    headers: {
+    "Content-Type": "application/json;charset=UTF-8",
+    "Authorization": `Bearer ${Usertoken}`
+},
+data:{
+    productCode:thisdata.value,
+    productName:"none",
+    productQr:"none",
+    isProductAction:"search",//product get Action(search,edit,view)
+    LimitStart:1,  //page
+    LimitEnd:10,
+},
+success:function(data){
+if(data.status){//return data as true
+
+    $('.autoCompleteTopItem').show();
+
+var data=data.result;
+ var getdata=`<ul class="list-group">`;
+ for(var i=0;i<data.length;i++){
+     console.log(data);
+     var reqQty1=`reqQty_${[i]}`;
+     var productClass1=`product_${[i]}`;
+
+    getdata+=`
+    <ul class="list-group ">
+  <li class="list-group-item text-primary mb-2">
+   <strong class="d-flex justify-content-between align-items-center">
+   <span>${data[i].productCode}(${data[i].pcs}pcs)</span>
+
+    <div>
+
+  <button class="btn btn-sm btn-danger" >
+    Qty Left:<span class="QtyLeft_${[i]}">${data[i].qty-data[i].qty_sold}</span>
+  </button>
+</div>
+</strong>
+    <ul class="list-group">
+      <!-- Existing Answer -->
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span>
+          a) <span contenteditable="true" class="editable-dotline editable0_0" onkeyup="return myupdateDataJob(this,'button0_0')">${data[i].ProductName} (TotQty:<span class="totQty_${[i]}">${data[i].qty}</span>)</span>
+        </span>
+        <div>
+          <button class="btn btn-sm btn-outline-success me-1 button0_0" onclick="return updatemyJobAnswer('ENCODED_DATA','0','0_0')">Save</button>
+          <button class="btn btn-sm btn-outline-danger" onclick="return removemyanswer('ENCODED_DATA','0','0_0')">Delete</button>
+        </div>
+      </li>
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span>
+          b) <span contenteditable="true" class="editable-dotline editable0_0" onkeyup="return myupdateDataJob(this,'button0_0')">${data[i].tags}</span>
+        </span>
+
+      </li>
+
+      <!-- Add New Answer -->
+      <li class="list-group-item">
+        <div class="input-group">
+          <input type="number" class="form-control ${reqQty1}" placeholder="Enter Qty to reduce or Restore">
+          <input type="hidden" class="form-control ${productClass1}" placeholder="New answer" value="${data[i].productCode}">
+          <input type="hidden" class="form-control cQty_${i}" placeholder="New answer" value="${data[i].qty}">
+          <button class="btn btn-primary me-1" onclick="return stoleRestore('${[i]}','1')">Reduce Stock</button>
+          <button class="btn btn-secondary" onclick="return stoleRestore('${[i]}','2')">Restore Stock</button>
+        </div>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+    `;
+
+ }
+ getdata+=` </ul>`;
+ $('.autoCompleteTopItemData').html(getdata);
+
+
+
+
+
+
+
+}
+else{
+
+
+}
+
+
+
+},
+error:function(data){
+//alert("errors occured please retry this process again or contact system Admin");
+//window.location.href = "./login";
+}
+});
+    return false;
+}
+
+function stoleRestore(indexData,Action,cQty)
+{
+var inputAction=(Action==="1")?'stocklose':"stockrestore";
+var inputAction1=(Action==="1")?'Reduce':"Restore";
+
+var reqQty1=parseInt($(`.reqQty_${indexData}`).val());
+var QtyLeft=parseInt($(`.QtyLeft_${indexData}`).text());
+var totQty=$(`.totQty_${indexData}`).text();
+var cQty=$(`.cQty_${indexData}`).val();
+var remain1=parseInt(cQty)-parseInt(reqQty1);
+var remain2=parseInt(cQty)+parseInt(reqQty1);
+var remaining=(Action==="1")?remain1:remain2;
+var Qty_left=(Action==="1")?(QtyLeft-reqQty1):(QtyLeft+reqQty1);
+var productClass1=$(`.product_${indexData}`).val();
+
+if(confirm(`Are you Sure you want to ${inputAction1}  ${reqQty1} Quantity of ${productClass1}? Qty will be ${remaining} `))
+{
+    if((Action==="1")&&(parseInt(cQty)<parseInt(reqQty1)))
+    {
+        //$(`.QtyLeft_${indexData}`).text(cQty-reqQty1);
+       // $(`.totQty_${indexData}`).text(cQty-reqQty1);
+      alert("Quantity you are requesting is greater than actual Quantity");
+    }
+    else{
+        var Usertoken=localStorage.getItem("Usertoken");
+   //search products
+   $.ajax({
+
+url:`./api/Products`,
+type:'get',
+headers: {
+        "Content-Type": "application/json;charset=UTF-8",
+        //"Authorization": `Bearer ${Usertoken}`
+    },
+    headers: {
+    "Content-Type": "application/json;charset=UTF-8",
+    "Authorization": `Bearer ${Usertoken}`
+},
+data:{
+    productCode:productClass1,
+    req_qty:reqQty1,
+    productName:"none",
+    productQr:"none",
+    isProductAction:"stockloserestore",
+    inputAction:inputAction,
+    LimitStart:1,  //page
+    LimitEnd:10,
+},
+success:function(data){
+if(data.status){//return data as true
+    $(`.totQty_${indexData}`).text(remaining);
+    $(`.cQty_${indexData}`).val(remaining);
+    $(`.QtyLeft_${indexData}`).text(Qty_left);
+
+alert("Action executed Successfully");
+
+
+
+
+
+}
+else{
+alert("Something Wrong");
+
+}
+
+
+
+},
+error:function(data){
+//alert("errors occured please retry this process again or contact system Admin");
+//window.location.href = "./login";
+}
+});
+    }
+
+}
+
+    return false;
+
+}
+function dumprestore(productCode,loadDumporRest)
+{
+
+
+var Usertoken=localStorage.getItem("Usertoken");
+   //search products
+   $.ajax({
+
+url:`./api/Products`,
+type:'get',
+headers: {
+        "Content-Type": "application/json;charset=UTF-8",
+        //"Authorization": `Bearer ${Usertoken}`
+    },
+    headers: {
+    "Content-Type": "application/json;charset=UTF-8",
+    "Authorization": `Bearer ${Usertoken}`
+},
+data:{
+    productCode:atob(productCode),
+    productName:"none",
+    productQr:"none",
+    isProductAction:loadDumporRest,//product get Action(search,edit,view)
+    LimitStart:1,  //page
+    LimitEnd:10,
+},
+success:function(data){
+if(data.status){//return data as true
+
+
+    window[loadDumporRest](data);
+
+
+
+
+
+
+}
+else{
+
+
+}
+
+
+
+},
+error:function(data){
+//alert("errors occured please retry this process again or contact system Admin");
+//window.location.href = "./login";
+}
+});
+    return false;
+}
+function viewbackupstocktable($data){
+
+}
+function viewstockproducttable(data){
+    hidePopup();
+    getData=`
+
+
+<table class="viewReqTable">
+<thead>
+<tr>
+<th scope="col" >#</th>
+<th scope="col">Name</th>
+<th scope="col">Fact Price $</th>
+<th scope="col">Init qty</th>
+<th scope="col">Spending</th>
+<th scope="col">SoldOut Qty</th>
+<th scope="col">SoldOut $</th>
+<th scope="col">updated_at</th>
+
+
+
+</tr>
+</thead >
+<tbody >
+`;
+var resultData=data["result"];
+console.log(resultData);
+for(var i=0;i<resultData.length;i++){
+var resultObject=resultData[i];
+ getData+=`
+
+ <tr >
+
+  <td data-label="#" ><i class="fas fa-trash text-danger mylogout " title="Delete This Product in Safari" onclick="return deleteStockQty('${btoa(JSON.stringify(resultObject))}',this)"></i>  ${i+1}</td>
+  <td data-label="Name">${resultData[i].productCode}</td>
+  <td data-label="Fact Price $">
+  ${(resultData[i].status!='spendSafaris')?`<span class="Formchange" id="CustomPrice_Add_1" onchange="return  OnChangeFactPrice('${btoa(JSON.stringify(resultObject))}',this)" onkeyup="return OnChangeFactPrice('${btoa(JSON.stringify(resultObject))}',this)" contenteditable="true">${resultData[i].price}</span><span class="${"Price_"+(resultData[i].productCode).replace(/[-!"#$%&'()*+,.\/:;<=>?@[\\\]^`{|}~_.\s'`]/g, '')}"></span>`:'Spending'}
+  </td>
+  <td data-label="Init qty">
+  ${(resultData[i].status!='spendSafaris')?`<span class="Formchange" id="CustomPrice_Add_1 test" onchange="return  OnChangeInitQty('${btoa(JSON.stringify(resultObject))}',this)" onkeyup="return OnChangeInitQty('${btoa(JSON.stringify(resultObject))}',this)" contenteditable="true">${resultData[i].totQty}</span><span class="${"Qty_"+(resultData[i].productCode).replace(/[-!"#$%&'()*+,.\/:;<=>?@[\\\]^`{|}~_.\s'`]/g, '')}"></span>`:'Spending'}
+ </td>
+  <td data-label="Spending">${resultData[i].TotBuyAmount}</td>
+  <td data-label="SoldOut Qty">${resultData[i].SoldOut}</td>
+  <td data-label="SoldOut $">${resultData[i].TotSoldAmount}</td>
+  <td data-label="updated_at">${resultData[i].updated_at}</td>
+
+
+
+</tr>`;
+
+}
+getData+=`
+</tbody>
+</table>`;
+$('.dumpRest').html(getData);
 }
 function ViewEditSafariStock(uid,name,comment,uidCreator,subscriber){
     $('.viewOrder').modal('show');

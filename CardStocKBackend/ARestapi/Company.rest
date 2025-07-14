@@ -727,6 +727,27 @@ Authorization: Bearer {{Auth_token}}
 
 
 }
+
+### product lose req_qty
+GET  {{baseUrl}}/Products
+content-type: application/json;charset=UTF-8
+Authorization: Bearer {{Auth_token}}
+
+{
+"productCode":"meka tashi tashi superone",
+"productName":"none",
+"req_qty":31,
+"productQr":"none",
+"LimitStart":1,
+"LimitEnd":10,
+"isProductAction":"stockloserestore",
+"inputAction":"stockrestore",
+//"inputAction":"stocklose",
+"withTotal":"true"
+
+
+
+}
 ### print Qr code on product
 GET  {{baseUrl}}/printQrProduct
 content-type: application/json;charset=UTF-8

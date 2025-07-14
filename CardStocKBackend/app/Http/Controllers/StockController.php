@@ -659,6 +659,65 @@ public function deleteImage($fileNam){
             {
                 return $this->isSearchProduct($input);
             }
+            else if($isProductAction=='stockloserestore')
+            {
+
+                if(strtolower($input["inputAction"])==='stocklose')
+                {
+
+                  return $this->stockLose($input);
+                }
+                else{
+                    return $this->stockRestore($input);
+                }
+
+
+            }
+            else if($isProductAction=='viewstockproducttable')//fwhen to dump stock
+            {
+                ///return $this->viewProductStock($input);
+                $check=DB::select("select *from safariproducts where productCode=:productCode and subscriber=:subscriber order by qty desc",[
+                    "productCode"=>$input["productCode"],
+                    "subscriber" =>Auth::user()->subscriber,
+                ]);
+                if ($check) {
+                    return response([
+                        "status" => true,
+
+                        "result" => $check
+                    ]);
+                } else {
+                    return response([
+                        "status" => false,
+
+
+                    ]);
+                }
+
+            }
+
+            else if($isProductAction=='viewstockproducttable')//fwhen to view data to be able to restore
+            {
+                ///return $this->viewProductStock($input);
+                $check=DB::select("select *from backsafariproducts where productCode=:productCode and subscriber=:subscriber order by qty desc",[
+                    "productCode"=>$input["productCode"],
+                    "subscriber" =>Auth::user()->subscriber,
+                ]);
+                if ($check) {
+                    return response([
+                        "status" => true,
+
+                        "result" => $check
+                    ]);
+                } else {
+                    return response([
+                        "status" => false,
+
+
+                    ]);
+                }
+
+            }
             else if($isProductAction==strtolower('searchInStock'))
             {
                 $input["safariId"]=$input["productName"];
@@ -700,6 +759,394 @@ public function deleteImage($fileNam){
             ], 500);
         }
 
+
+
+    }
+    public function testTransaction($input){
+        $checkExist=DB::update("UPDATE users SET name = :name WHERE uid = :uid", [
+            'name' => $input["name"],
+            'uid' =>'kokomuna_1686764237',
+        ]);
+
+           if($checkExist){
+            $checkSafari=DB::select("select uid from safaris where uid=:uid",[
+                "uid"=>$input["uid"]
+            ]);
+            if($checkSafari)
+            {
+                DB::commit();
+                echo"done";
+            }
+            else{
+                DB::rollBack();
+                echo"failed safari";
+            }
+
+
+           }
+           else{
+            echo"failed users";
+            DB::rollBack();
+           }
+    }
+    public function stockLose($input)
+    {
+        try {
+            DB::beginTransaction();
+            //code...
+            $req_qty=$input['req_qty'];
+            $productCode=$input['productCode'];
+            $check=DB::update("update products set qty=qty-:qty where subscriber=:subscriber and productCode=:productCode and qty>=qty_sold+$req_qty limit 1",array(
+                "qty"=>$req_qty,
+                "productCode"=>$productCode,
+                "subscriber"=>Auth::user()->subscriber
+             ));
+             if($check){
+
+            // $this->testTransaction($input);
+
+            $subscriber=Auth::user()->subscriber;
+            DB::select("SET @requested_qty = ?", [$req_qty]);
+
+            $results = DB::select("
+                SELECT
+                    id,
+                    safariId,
+                    price,
+                    CASE
+                        WHEN @requested_qty >= qty THEN qty
+                        ELSE @requested_qty
+                    END AS qty,
+                    CASE
+                        WHEN @requested_qty >= qty THEN 0
+                        ELSE @requested_qty - qty
+                    END AS remaining,
+                    @requested_qty := GREATEST(@requested_qty - qty, 0) AS updated_requested_qty
+                FROM
+                safariproducts
+                WHERE
+                    subscriber='$subscriber' and
+                    productCode='$productCode' AND
+                    qty != 0 AND
+                    @requested_qty > 0
+                ORDER BY
+                    id;
+            ");
+         if($results)
+         {
+             return $this->safariLose($results,$input);
+         }
+         else{
+            DB::rollBack();
+            return response([
+                "status"=>false,
+                "message"=>'something Wrong 714',
+                 ],200);
+
+         }
+
+
+             }
+             else{
+                DB::rollBack();
+                return response([
+    "status"=>false,
+    "message"=>'something Wrong 725',
+     ],200);
+             }
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'error' => 'An error occurred',
+                'errorPrint' => $e->getMessage(),
+                'errorCode' => $e->getLine(),
+            ], 500);
+        }
+    }
+    public function safariLose($results,$input){
+        $req_qty=$input['req_qty'];
+        $productCode=$input['productCode'];
+        $data=[];
+        $ids=[];
+          $limitData=count($results);
+    for($i=0;$i<$limitData;$i++)
+    {
+            if($results[$i]->qty>0)
+            {
+            $id=$results[$i]->id;
+            $ids[]=$results[$i]->id;
+            $data[] = [
+                //'uid' =>$input["orderIdFromEdit"]??$uid,
+                'uid' =>"done",
+                'userid'=>"client",
+                'safariId'=>$results[$i]->safariId,
+                "order_creator"=>Auth::user()->uid,
+                "subscriber"=>Auth::user()->subscriber,
+                'productCode'=>$productCode,
+                'price'=>$results[$i]->price,
+                'qty'=>$results[$i]->qty,
+                'qty_count'=>$results[$i]->qty,
+                'total'=>$results[$i]->qty*$results[$i]->price,
+                'OrderData'=>json_encode([]),
+                'comment_count'=>json_encode([]),
+                "created_at"=>$this->today,
+                "updated_at"=>$this->today
+
+
+                // Add more rows here if needed
+            ];
+
+            $SoldOut=$results[$i]->qty;
+            $totAm=$SoldOut*$results[$i]->price;
+            $qtyData=abs($results[$i]->remaining);
+           DB::update("update safariproducts set qty=:qty,totQty=:totQty,TotBuyAmount=TotBuyAmount-$totAm where safariId=:safariId and productCode=:productCode and subscriber=:subscriber limit $limitData",array(
+           "qty"=>$qtyData,
+           "totQty"=>$qtyData,
+           "subscriber"=>Auth::user()->subscriber,
+           "safariId"=>$results[$i]->safariId,
+           "productCode"=>$productCode,
+
+           ));
+        }
+
+    }
+        $checkInsert=DB::table("saf_productloses")
+        ->insert($data);
+        /*DB::update("update orders set userid=:userid where uid='1' limit 1",array(
+            'userid' =>'kati6'
+            ));*/
+
+
+if($checkInsert)
+{
+
+    DB::commit();
+    return response([
+
+        "status"=>true,
+        //"data"=>$data,
+        "result"=>$results,
+
+        "OrderId"=>"done",
+        //"data"=>$data
+
+
+
+        ],200);
+}
+else{
+    DB::rollback();
+    return response([
+
+        "status"=>false,
+        //"result"=>$results,
+
+
+        //"data"=>$data
+
+
+
+        ],200);
+}
+
+
+    }
+    public function stockRestore($input)
+    {
+        try {
+            DB::beginTransaction();
+            //code...
+            $req_qty=$input['req_qty'];
+            $productCode=$input['productCode'];
+
+
+            // $this->testTransaction($input);
+
+            $subscriber=Auth::user()->subscriber;
+            DB::select("SET @requested_qty = ?", [$req_qty]);
+
+            $results = DB::select("
+                SELECT
+                    id,
+                    safariId,
+                    price,
+                    CASE
+                        WHEN @requested_qty >= qty THEN qty
+                        ELSE @requested_qty
+                    END AS qty,
+                    CASE
+                        WHEN @requested_qty >= qty THEN 0
+                        ELSE @requested_qty - qty
+                    END AS remaining,
+                    @requested_qty := GREATEST(@requested_qty - qty, 0) AS updated_requested_qty
+                FROM
+                saf_productloses
+                WHERE
+                    subscriber='$subscriber' and
+                    productCode='$productCode' AND
+                    qty != 0 AND
+                    status='Open' AND
+                    @requested_qty > 0
+                ORDER BY
+                    id;
+            ");
+         if($results)
+         {
+            return $this->safariRestore($results,$input);
+         }
+         else{
+            DB::rollBack();
+            return response([
+                "status"=>false,
+                "message"=>'something Wrong 1005',
+                 ],200);
+
+         }
+
+
+
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'error' => 'An error occurred',
+                'errorPrint' => $e->getMessage(),
+                'errorCode' => $e->getLine(),
+            ], 500);
+        }
+    }
+    public function safariRestore($results,$input){
+        $req_qty=$input['req_qty'];
+        $productCode=$input['productCode'];
+        $data=[];
+        $ids=[];
+        $qty_get=0;
+          $limitData=count($results);
+        for($i=0;$i<$limitData;$i++)
+        {
+            if($results[$i]->qty>0)
+            {
+            $id=$results[$i]->id;
+            $ids[]=$results[$i]->id;
+            $qty_get=$qty_get+$results[$i]->qty;
+            $data[] = [
+                //'uid' =>$input["orderIdFromEdit"]??$uid,
+                'uid' =>"done",
+                'userid'=>"client",
+                'safariId'=>$results[$i]->safariId,
+                "order_creator"=>Auth::user()->uid,
+                "subscriber"=>Auth::user()->subscriber,
+                'productCode'=>$productCode,
+                'status'=>'restore',
+                'price'=>$results[$i]->price,
+                'qty'=>$results[$i]->qty,
+               // 'qty_count'=>$results[$i]->qty,
+                'total'=>$results[$i]->qty*$results[$i]->price,
+                'OrderData'=>json_encode([]),
+                'comment_count'=>json_encode([]),
+                "created_at"=>$this->today,
+                "updated_at"=>$this->today
+
+
+                // Add more rows here if needed
+            ];
+
+            $SoldOut=$results[$i]->qty;
+            $totAm=$SoldOut*$results[$i]->price;
+            $qtyData=abs($results[$i]->remaining);
+            DB::update("update safariproducts set qty=qty+:qty,totQty=totQty+:totQty,TotBuyAmount=TotBuyAmount+$totAm where safariId=:safariId and productCode=:productCode and subscriber=:subscriber limit $limitData",array(
+           "qty"=>$results[$i]->qty,
+           "totQty"=>$results[$i]->qty,
+           "subscriber"=>Auth::user()->subscriber,
+           "safariId"=>$results[$i]->safariId,
+           "productCode"=>$productCode,
+
+           ));
+           DB::update("update saf_productloses set qty=:qty where safariId=:safariId and productCode=:productCode and subscriber=:subscriber and id=:id limit $limitData",array(
+            "qty"=>$qtyData,
+            "id"=>$results[$i]->id,
+            "subscriber"=>Auth::user()->subscriber,
+            "safariId"=>$results[$i]->safariId,
+            "productCode"=>$productCode,
+
+            ));
+        }
+
+    }
+
+    $checkInsert=DB::table("saf_productloses")
+    ->insert($data);
+    /*DB::update("update orders set userid=:userid where uid='1' limit 1",array(
+        'userid' =>'kati6'
+        ));*/
+
+
+if($checkInsert)
+{
+
+    if($req_qty<=$qty_get)
+    {
+        $checkQty=DB::update("update products set qty=qty+:qty where subscriber=:subscriber and productCode=:productCode  limit 1",array(
+            "qty"=>$req_qty,
+            "productCode"=>$productCode,
+            "subscriber"=>Auth::user()->subscriber
+         ));
+         if($checkQty){
+            DB::commit();
+            return response([
+                //"qtyData"=>$qty_get,
+                //"req_qty"=>$req_qty,
+                "status"=>true,
+
+                "result"=>$results,
+
+                "OrderId"=>"done",
+                //"data"=>$data
+
+
+
+                ],200);
+         }
+         else{
+            DB::rollback();
+    return response([
+
+        "status"=>false,
+
+
+        ],200);
+         }
+    }
+    else{
+            DB::rollback();
+            return response([
+
+                "status"=>false,
+                "message"=>"something Wrong 1126 requested '$req_qty' is greater than available qty '$qty_get'"
+                ],200);
+
+    }
+
+
+
+}
+else{
+DB::rollback();
+return response([
+
+    "status"=>false,
+    //"result"=>$results,
+
+
+    //"data"=>$data
+
+
+
+    ],200);
+}
 
 
     }
@@ -2157,8 +2604,8 @@ else{
         $data=[];
         $ids=[];
           $limitData=count($results);
-        for($i=0;$i<$limitData;$i++)
-        {
+    for($i=0;$i<$limitData;$i++)
+    {
             if($results[$i]->qty>0)
             {
             $id=$results[$i]->id;
@@ -2196,7 +2643,7 @@ else{
            ));
         }
 
-        }
+    }
 
 
 
@@ -2375,7 +2822,7 @@ else{
                           ));
                         }
 
-                       }
+                    }
 
 
                        $checkInsert=DB::table("orderhistories")

@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/gymapp/gymapp.iml" filepath="$PROJECT_DIR$/gymapp/gymapp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gymapp/android/gymapp_android.iml" filepath="$PROJECT_DIR$/gymapp/android/gymapp_android.iml" />
     </modules>
   </component>
 </project>
