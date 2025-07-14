@@ -117,6 +117,7 @@ Route::get('/createQrProduct','CompanyController@createQrProduct')->name('create
 Route::get('/PrintQrProduct','CompanyController@PrintQrProduct')->name('PrintQrProduct');
 Route::get('/SearchUser','CompanyController@SearchUser')->name('SearchUser');
 Route::get('/Products','CompanyController@Products')->name('Products');
+//Route::match(['get', 'post'], '/Products', 'CompanyController@Products')->name('Products');
 Route::get('/IsProductExist','CompanyController@IsProductExist')->name('IsProductExist');
 Route::post('/CreateStockProduct','CompanyController@CreateStockProduct')->name('CreateStockProduct');
 Route::get('/updateProducts','CompanyController@updateProducts')->name('updateProducts');

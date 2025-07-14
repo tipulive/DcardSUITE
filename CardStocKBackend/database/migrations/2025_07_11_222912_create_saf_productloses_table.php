@@ -15,6 +15,19 @@ class CreateSafProductlosesTable extends Migration
     {
         Schema::create('saf_productloses', function (Blueprint $table) {
             $table->id();
+
+            $table->string('SafariId')->default('none')->index();
+            $table->string('productCode')->index();
+            $table->string('subscriber', 21)->default('none')->index();
+            $table->string('order_creator')->default('none')->index();
+
+            $table->string('price')->default("0"); // More appropriate for monetary values
+            $table->string('qty')->index();
+            $table->string('qty_count')->default("0");
+            $table->string('total');
+            $table->longtext('commentData')->nullable();
+
+            $table->string('status')->default('Open')->index();
             $table->timestamps();
         });
     }

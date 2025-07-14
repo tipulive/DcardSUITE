@@ -662,7 +662,7 @@ public function deleteImage($fileNam){
             else if($isProductAction=='stockloserestore')
             {
 
-                if(strtolower($input["inputAction"])==='stocklose')
+               if(strtolower($input["inputAction"])==='stocklose')
                 {
 
                   return $this->stockLose($input);
@@ -673,7 +673,7 @@ public function deleteImage($fileNam){
 
 
             }
-            else if($isProductAction=='viewstockproducttable')//fwhen to dump stock
+            else if($isProductAction=='views_this_stock')//fwhen to dump stock
             {
                 ///return $this->viewProductStock($input);
                 $check=DB::select("select *from safariproducts where productCode=:productCode and subscriber=:subscriber order by qty desc",[
@@ -696,11 +696,15 @@ public function deleteImage($fileNam){
 
             }
 
-            else if($isProductAction=='viewstockproducttable')//fwhen to view data to be able to restore
+            else if($isProductAction=='view_stock_lose_restore')//fwhen to view data to be able to restore
             {
-                ///return $this->viewProductStock($input);
-                $check=DB::select("select *from backsafariproducts where productCode=:productCode and subscriber=:subscriber order by qty desc",[
+
+               //lose :status is Open
+               //restore status is restore
+
+                $check=DB::select("select *from saf_productloses where productCode=:productCode and status=:status and subscriber=:subscriber and qty!=0 order by id desc",[
                     "productCode"=>$input["productCode"],
+                    "status"=>$input["status"],
                     "subscriber" =>Auth::user()->subscriber,
                 ]);
                 if ($check) {
@@ -791,10 +795,12 @@ public function deleteImage($fileNam){
     }
     public function stockLose($input)
     {
+
         try {
             DB::beginTransaction();
             //code...
-            $req_qty=$input['req_qty'];
+            //$req_qty=(int)$input['req_qty'];
+            $req_qty=(int)$input['req_qty'];
             $productCode=$input['productCode'];
             $check=DB::update("update products set qty=qty-:qty where subscriber=:subscriber and productCode=:productCode and qty>=qty_sold+$req_qty limit 1",array(
                 "qty"=>$req_qty,
@@ -879,8 +885,7 @@ public function deleteImage($fileNam){
             $ids[]=$results[$i]->id;
             $data[] = [
                 //'uid' =>$input["orderIdFromEdit"]??$uid,
-                'uid' =>"done",
-                'userid'=>"client",
+
                 'safariId'=>$results[$i]->safariId,
                 "order_creator"=>Auth::user()->uid,
                 "subscriber"=>Auth::user()->subscriber,
@@ -889,8 +894,7 @@ public function deleteImage($fileNam){
                 'qty'=>$results[$i]->qty,
                 'qty_count'=>$results[$i]->qty,
                 'total'=>$results[$i]->qty*$results[$i]->price,
-                'OrderData'=>json_encode([]),
-                'comment_count'=>json_encode([]),
+                "commentData"=>$input["commentData"]??'none',
                 "created_at"=>$this->today,
                 "updated_at"=>$this->today
 
@@ -926,6 +930,7 @@ if($checkInsert)
     return response([
 
         "status"=>true,
+        "qty"=> $req_qty,
         //"data"=>$data,
         "result"=>$results,
 
@@ -958,7 +963,7 @@ else{
         try {
             DB::beginTransaction();
             //code...
-            $req_qty=$input['req_qty'];
+            $req_qty=(int)$input['req_qty'];
             $productCode=$input['productCode'];
 
 
@@ -1034,8 +1039,8 @@ else{
             $qty_get=$qty_get+$results[$i]->qty;
             $data[] = [
                 //'uid' =>$input["orderIdFromEdit"]??$uid,
-                'uid' =>"done",
-                'userid'=>"client",
+
+
                 'safariId'=>$results[$i]->safariId,
                 "order_creator"=>Auth::user()->uid,
                 "subscriber"=>Auth::user()->subscriber,
@@ -1045,8 +1050,7 @@ else{
                 'qty'=>$results[$i]->qty,
                // 'qty_count'=>$results[$i]->qty,
                 'total'=>$results[$i]->qty*$results[$i]->price,
-                'OrderData'=>json_encode([]),
-                'comment_count'=>json_encode([]),
+                "commentData"=>$input["commentData"]??'none',
                 "created_at"=>$this->today,
                 "updated_at"=>$this->today
 

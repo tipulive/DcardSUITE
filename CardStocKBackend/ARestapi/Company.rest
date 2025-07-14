@@ -729,14 +729,14 @@ Authorization: Bearer {{Auth_token}}
 }
 
 ### product lose req_qty
-GET  {{baseUrl}}/Products
+POST  {{baseUrl}}/Products
 content-type: application/json;charset=UTF-8
 Authorization: Bearer {{Auth_token}}
 
 {
 "productCode":"meka tashi tashi superone",
 "productName":"none",
-"req_qty":31,
+"req_qty":9,
 "productQr":"none",
 "LimitStart":1,
 "LimitEnd":10,

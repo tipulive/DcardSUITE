@@ -2999,7 +2999,23 @@ function ProductSafariStock(){
 <div class="autoCompleteTopItemData"></div>
 
 
-<div class="dumpRest"></div>
+
+<div class="modal fade ModaldumpT" id="largeModal" tabindex="-1" aria-labelledby="largeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="largeModalLabel">Large Modal</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+      <div class="dumpRest">
+
+</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 </div>
     `);
 }
@@ -3035,7 +3051,9 @@ data:{
 success:function(data){
 if(data.status){//return data as true
 
-    $('.autoCompleteTopItem').show();
+    //$('.autoCompleteTopItem').show();
+
+
 
 var data=data.result;
  var getdata=`<ul class="list-group">`;
@@ -3052,8 +3070,8 @@ var data=data.result;
 
     <div>
 
-  <button class="btn btn-sm btn-danger" >
-    Qty Left:<span class="QtyLeft_${[i]}">${data[i].qty-data[i].qty_sold}</span>
+  <button class="btn btn-sm btn-danger" onclick="return stockdumprestore('${i}','${'views_this_stock'}','${'none'}')">
+   TotQty:<span class="totQty_${[i]}">${data[i].qty}</span>
   </button>
 </div>
 </strong>
@@ -3061,11 +3079,11 @@ var data=data.result;
       <!-- Existing Answer -->
       <li class="list-group-item d-flex justify-content-between align-items-center">
         <span>
-          a) <span contenteditable="true" class="editable-dotline editable0_0" onkeyup="return myupdateDataJob(this,'button0_0')">${data[i].ProductName} (TotQty:<span class="totQty_${[i]}">${data[i].qty}</span>)</span>
+          a) <span contenteditable="true" class="editable-dotline editable0_0 " onkeyup="return myupdateDataJob(this,'button0_0')">${truncScreen(data[i].ProductName)} (Qty Left:<span class="QtyLeft_${[i]}">${data[i].qty-data[i].qty_sold}</span>)</span>
         </span>
         <div>
-          <button class="btn btn-sm btn-outline-success me-1 button0_0" onclick="return updatemyJobAnswer('ENCODED_DATA','0','0_0')">Save</button>
-          <button class="btn btn-sm btn-outline-danger" onclick="return removemyanswer('ENCODED_DATA','0','0_0')">Delete</button>
+          <button class="btn btn-sm btn-outline-success me-1 button0_0" onclick="return stockdumprestore('${i}','${'view_stock_lose_restore'}','${'Open'}')"><i class="fas fa-eye"></i> Deduct</button>
+          <button class="btn btn-sm btn-outline-danger" onclick="return stockdumprestore('${i}','${'view_stock_lose_restore'}','${'restore'}')"><i class="fas fa-eye"></i> Restock</button>
         </div>
       </li>
       <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -3077,23 +3095,30 @@ var data=data.result;
 
       <!-- Add New Answer -->
       <li class="list-group-item">
+      <div class="relat">
         <div class="input-group">
-          <input type="number" class="form-control ${reqQty1}" placeholder="Enter Qty to reduce or Restore">
+          <input type="number" class="form-control ${reqQty1}" placeholder="Enter Qty to reduce or Restore Stock">
           <input type="hidden" class="form-control ${productClass1}" placeholder="New answer" value="${data[i].productCode}">
           <input type="hidden" class="form-control cQty_${i}" placeholder="New answer" value="${data[i].qty}">
-          <button class="btn btn-primary me-1" onclick="return stoleRestore('${[i]}','1')">Reduce Stock</button>
-          <button class="btn btn-secondary" onclick="return stoleRestore('${[i]}','2')">Restore Stock</button>
+          <button class="btn btn-sm btn-outline-primary me-1" onclick="return stoleRestore('${[i]}','1')">Deduct</button>
+          <button class="btn btn-sm btn-outline-secondary" onclick="return stoleRestore('${[i]}','2')">Restock</button>
+        </div>
+        <i class="fas fa-comments text-danger d-flex justify-content-center mylogout" onclick="return showComment('${i}')"></i>
+        <textarea  class="form-control commentDataForm commentData_${i}"  rows="4"></textarea>
         </div>
       </li>
     </ul>
   </li>
 </ul>
 
+
     `;
 
  }
  getdata+=` </ul>`;
  $('.autoCompleteTopItemData').html(getdata);
+ $(`.commentDataForm`).hide();
+
 
 
 
@@ -3118,6 +3143,25 @@ error:function(data){
     return false;
 }
 
+function showComment(indexData){
+    $(`.commentDataForm`).hide();
+    $(`.commentData_${indexData}`).show();
+
+}
+function truncScreen(str)
+{
+   // console.log(str);
+    if (window.innerWidth <= 600) {
+  //console.log("Mobile screen");
+  return truncateString(str,5);
+} else {
+   return truncateString(str,20);
+}
+}
+function truncateString(str, maxLength) {
+  if (str.length <= maxLength) return str;
+  return str.substring(0, maxLength) + '...';
+}
 function stoleRestore(indexData,Action,cQty)
 {
 var inputAction=(Action==="1")?'stocklose':"stockrestore";
@@ -3133,7 +3177,11 @@ var remaining=(Action==="1")?remain1:remain2;
 var Qty_left=(Action==="1")?(QtyLeft-reqQty1):(QtyLeft+reqQty1);
 var productClass1=$(`.product_${indexData}`).val();
 
-if(confirm(`Are you Sure you want to ${inputAction1}  ${reqQty1} Quantity of ${productClass1}? Qty will be ${remaining} `))
+
+if(!(Number.isNaN(reqQty1)))
+{
+
+    if(confirm(`Are you Sure you want to ${inputAction1}  ${reqQty1} Quantity of ${productClass1}? Qty will be ${remaining} `))
 {
     if((Action==="1")&&(parseInt(cQty)<parseInt(reqQty1)))
     {
@@ -3158,11 +3206,12 @@ headers: {
 },
 data:{
     productCode:productClass1,
-    req_qty:reqQty1,
+    req_qty:`${reqQty1}`,
     productName:"none",
     productQr:"none",
     isProductAction:"stockloserestore",
     inputAction:inputAction,
+    commentData:$(`.commentData_${indexData}`).val(),
     LimitStart:1,  //page
     LimitEnd:10,
 },
@@ -3173,6 +3222,7 @@ if(data.status){//return data as true
     $(`.QtyLeft_${indexData}`).text(Qty_left);
 
 alert("Action executed Successfully");
+//console.log("Action executed Successfully")
 
 
 
@@ -3180,7 +3230,8 @@ alert("Action executed Successfully");
 
 }
 else{
-alert("Something Wrong");
+//alert("Something Wrong");
+console.log("Something Wrong")
 
 }
 
@@ -3196,12 +3247,18 @@ error:function(data){
 
 }
 
+}
+else{
+    alert("Requested Quantity must be Valid Number")
+}
+
     return false;
 
 }
-function dumprestore(productCode,loadDumporRest)
+function stockdumprestore(indexData,loadDumporRest,statusPost)
 {
 
+    var productClass1=$(`.product_${indexData}`).val();
 
 var Usertoken=localStorage.getItem("Usertoken");
    //search products
@@ -3210,25 +3267,22 @@ var Usertoken=localStorage.getItem("Usertoken");
 url:`./api/Products`,
 type:'get',
 headers: {
-        "Content-Type": "application/json;charset=UTF-8",
-        //"Authorization": `Bearer ${Usertoken}`
-    },
-    headers: {
     "Content-Type": "application/json;charset=UTF-8",
     "Authorization": `Bearer ${Usertoken}`
 },
 data:{
-    productCode:atob(productCode),
+    productCode:productClass1,
     productName:"none",
     productQr:"none",
     isProductAction:loadDumporRest,//product get Action(search,edit,view)
     LimitStart:1,  //page
     LimitEnd:10,
+    status:statusPost
 },
 success:function(data){
 if(data.status){//return data as true
 
-
+    $('.ModaldumpT').modal('show');
     window[loadDumporRest](data);
 
 
@@ -3238,6 +3292,8 @@ if(data.status){//return data as true
 
 }
 else{
+
+    alert("No Result Found")
 
 
 }
@@ -3252,11 +3308,9 @@ error:function(data){
 });
     return false;
 }
-function viewbackupstocktable($data){
-
-}
-function viewstockproducttable(data){
+function views_this_stock(data){
     hidePopup();
+
     getData=`
 
 
@@ -3309,6 +3363,55 @@ getData+=`
 </table>`;
 $('.dumpRest').html(getData);
 }
+function view_stock_lose_restore(data){
+    console.log(data);
+
+    hidePopup();
+
+    getData=`
+
+
+<table class="viewReqTable">
+<thead>
+<tr>
+<th scope="col" >#</th>
+<th scope="col">Name</th>
+<th scope="col">Fact Price $</th>
+<th scope="col">Init qty</th>
+<th scope="col">created_at</th>
+
+
+
+</tr>
+</thead >
+<tbody >
+`;
+var resultData=data["result"];
+console.log(resultData);
+for(var i=0;i<resultData.length;i++){
+var resultObject=resultData[i];
+ getData+=`
+
+ <tr >
+
+
+  <td data-label="Name">${i+1}</td>
+  <td data-label="Name">${resultData[i].productCode}</td>
+  <td data-label="SoldOut Qty">${resultData[i].price}</td>
+  <td data-label="SoldOut $">${resultData[i].qty}</td>
+  <td data-label="updated_at">${resultData[i].created_at}</td>
+
+
+
+</tr>`;
+
+}
+getData+=`
+</tbody>
+</table>`;
+$('.dumpRest').html(getData);
+}
+
 function ViewEditSafariStock(uid,name,comment,uidCreator,subscriber){
     $('.viewOrder').modal('show');
 
