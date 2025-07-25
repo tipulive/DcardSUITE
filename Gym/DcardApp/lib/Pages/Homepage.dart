@@ -21,6 +21,7 @@ import 'package:dcard/models/Participated.dart';
 import 'package:dcard/models/Promotions.dart';
 import '../Query/AdminQuery.dart';
 import '../Pages/components/BottomNavigator/HomeNavigator.dart';
+import '../../Utilconfig/ConstantClassUtil.dart';
 
 
 import 'package:cool_alert/cool_alert.dart';
@@ -29,6 +30,7 @@ import 'package:cool_alert/cool_alert.dart';
 import 'package:dcard/Query/PromotionQuery.dart';
 import '../Query/ParticipatedQuery.dart';
 import '../Utilconfig/HideShowState.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 
 
@@ -75,6 +77,7 @@ class _HomepageState extends State<Homepage> {
   List items=["male","female","others","Keb2"];
 
   bool Cameravalue=false;
+  String urLink='${ConstantClassUtil.urlApp}/images/userProfile/';
   bool Flashvalue=false;
   var ResultDatas;
   late Map<String, dynamic> passData;
@@ -446,9 +449,14 @@ submitParticipate() async{
 
                     },
                     tooltip: 'Increment',
-                    child: CircleAvatar(
-                      radius: 50,
-                      backgroundImage: AssetImage("images/profile.jpg",
+                    child: ClipOval(
+                      child: CachedNetworkImage(
+                        imageUrl: "$urLink/${passData['photo_url']}",
+                        height: 200,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => Center(child: CircularProgressIndicator()),
+                        errorWidget: (context, url, error) => Icon(Icons.error),
                       ),
                     ),
                   ),
@@ -786,59 +794,82 @@ submitParticipate() async{
     );
   }
   Widget ScanUser(passData){
+    print(passData.toString());
     return
-      Card(
-        elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(5.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Center(child: Text("Recently In:${passData["recentIn"]} ")),
-              Text(passData["name"], style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              SizedBox(height: 2),
-              Center(child: Text("Weight:${passData["weight"]} Kg")),
-              (passData["statusValid"]=="0")?
-              Center(
-                child: Text(
-                  "Please Pay for New Subscription!",
-                  style: TextStyle(color: Colors.red,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
+      Column(
+        children: [
+          Card(
+            elevation: 2,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(5.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Center(child: Text("Recently In:${passData["recentIn"]} ")),
+                  Text(passData["name"], style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  SizedBox(height: 2),
+                  Center(child: Text("Weight:${passData["weight"]} Kg")),
+                  (passData["statusValid"]=="0")?
+                  Center(
+                    child: Text(
+                      "Please Pay for New Subscription!",
+                      style: TextStyle(color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ):
+                  Center(
+                    child: Text(
+                      "Valid: ${passData["statusValid"]} days Left",
+                      style: TextStyle(
+                        color: int.parse(passData["statusValid"]) <= 5 ? Colors.red:Colors.green,
+                        fontSize:int.parse(passData["statusValid"]) <= 5 ?18:16,
+                      ),
+                    ),
                   ),
-                ),
-              ):
-              Center(
-                child: Text(
-                  "Valid: ${passData["statusValid"]} days Left",
-                  style: TextStyle(
-                    color: int.parse(passData["statusValid"]) <= 5 ? Colors.red:Colors.green,
-                    fontSize:int.parse(passData["statusValid"]) <= 5 ?18:16,
+                  (passData["statusValid"]!="0")?Center(child: Text("Type:${passData["packType"]}")):
+                  Visibility(
+                      visible: false,
+                      child: Text("")),
+                  Text(PromoMsg),
+
+                  (passData["expiredIn"]=="yes")?Visibility(
+                    visible: false,
+                      child: Text("submit again")):Text(
+                    "${passData["name"] } Is In Gym Mode",
+                    style: TextStyle(color: Colors.blue,
+                      fontSize:16,
+                    ),
                   ),
-                ),
-              ),
-              (passData["statusValid"]!="0")?Center(child: Text("Type:${passData["packType"]}")):
-              Visibility(
-                  visible: false,
-                  child: Text("")),
-              Text(PromoMsg),
 
-              (passData["expiredIn"]=="yes")?Visibility(
-                visible: false,
-                  child: Text("submit again")):Text(
-                "${passData["name"] } Is In Gym Mode",
-                style: TextStyle(color: Colors.blue,
-                  fontSize:16,
-                ),
+                ],
               ),
-
-            ],
+            ),
           ),
-        ),
+          Card(
+            elevation: 4,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            child: Column(
+              children: [
+                CachedNetworkImage(
+                  imageUrl: "$urLink/${passData['photo_url']}",
+                  height: 200,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => Center(child: CircularProgressIndicator()),
+                  errorWidget: (context, url, error) => Icon(Icons.error),
+                ),
+
+              ],
+            ),
+          )
+
+        ],
       );
   }
 choosePromo(){

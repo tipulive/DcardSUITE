@@ -1,5 +1,7 @@
 
+import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:dcard/Query/CardQuery.dart';
 import 'package:dcard/Utilconfig/HideShowState.dart';
@@ -18,11 +20,17 @@ import 'package:dcard/models/Admin.dart';
 
 
 import '../../models/CardModel.dart';
-
+import '../../Query/AdminQuery.dart';
+import '../../Query/StockQuery.dart';
 
 
 import '../../Pages/components/BottomNavigator/HomeNavigator.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:dio/dio.dart' as dio;
+import '../../Utilconfig/ConstantClassUtil.dart';
+
 
 
 
@@ -39,6 +47,8 @@ class AddCardPage extends StatefulWidget {
 class _AddCardPageState extends State<AddCardPage> {
 
 
+// Before Get.bottomSheet(...)
+  final cardController = Get.put(CardQuery());
 
 
   TextEditingController uidInput=TextEditingController();
@@ -56,6 +66,10 @@ class _AddCardPageState extends State<AddCardPage> {
   bool Flashvalues=false;
   bool showOveray=false;
   bool isValid = false;
+
+  /* picture upload*/
+  XFile? _imageFile;
+
 
   @override
 
@@ -207,6 +221,220 @@ class _AddCardPageState extends State<AddCardPage> {
     );
 
   }
+  //image
+  Future<XFile?> pickImage({required ImageSource source}) async {
+    final imagePicker = ImagePicker();
+    final pickedImage = await imagePicker.pickImage(source: source);
+    return pickedImage;
+    //print("${arguments["title"]}");
+    /* setState(() {
+      _imageFile = pickedImage;
+      (Get.put(StockQuery()).updateImageFile(pickedImage));
+    });
+    Get.back();*/
+    //_compressAndUploadImage();
+
+  }
+  Future<void> _pickImage(ImageSource source) async {
+    final pickedImage = await pickImage(source: source);
+    if (pickedImage != null) {
+
+      // print("${arguments["title"]}");
+      setState(() {
+        _imageFile = pickedImage;
+        //_imageFile
+        (Get.put(CardQuery()).updateImageFile(pickedImage));
+        //(Get.put(StockQuery()).updateImageFile(pickedImage));
+      });
+
+     // _compressAndUploadImage();
+      Get.dialog(
+        AlertDialog(
+          title: const Text('Confirm?'),
+          content:Text('Are you Sure ${uidInput2.text} have this Number ${uidInput4.text+""+uidInput.text}? '),
+          actions: [
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+
+                //primary: Colors.grey[300],
+                backgroundColor: const Color(0xff9a1c55),
+                foregroundColor: Colors.white,
+                elevation:0,
+              ),
+              onPressed: () async{
+                Get.back();
+                _compressAndUploadImage();
+              },
+              child: const Text('Yes'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Get.back(); // close the alert dialog
+              },
+              child: const Text('Close'),
+            ),
+          ],
+        ),
+      );
+
+
+    }
+  }
+  Map<String, dynamic>? extractJson(String raw) {
+    try {
+      // Find the position of the first {
+      int startIndex = raw.indexOf('{');
+      if (startIndex == -1) return null;
+
+      // Try to decode from that position
+      String jsonString = raw.substring(startIndex);
+      return json.decode(jsonString);
+    } catch (e) {
+      print("Failed to parse JSON: $e");
+      return null;
+    }
+  }
+  Future<void> _compressAndUploadImage() async {
+    //(Get.put(StockQuery()).updateHideLoader(false));
+    setState(() {
+      showOveray=true;
+    });
+    if (_imageFile == null) return;
+
+    final compressedImage = await compressImage(_imageFile);
+    if (compressedImage == null) return;
+
+    // Upload or store the compressed image here.
+
+    // Create a Dio instance.
+    final dioInstance = dio.Dio();
+    String authToken =(Get.put(AdminQuery()).obj)["result"][0]["AuthToken"];
+    dioInstance.options.headers = {
+      'Authorization': 'Bearer $authToken',
+      'Content-Type': 'multipart/form-data',
+
+    };
+
+    // Replace this URL with your server's endpoint for uploading images.
+     String uploadUrl = '${ConstantClassUtil.urlLink}/CreateUserAssign';
+
+    try {
+      // Use Dio to upload the compressed image.
+      final response = await dioInstance.post(
+        uploadUrl,
+        data: dio.FormData.fromMap({
+          'image': dio.MultipartFile.fromBytes(
+            compressedImage as List<int>,
+            filename: _imageFile!.name,
+          ),
+          "name":uidInput2.text,
+          "email":uidInput3.text??'none',
+          "Ccode":uidInput4.text,
+          "phone":uidInput.text,
+          "initCountry":initCountry.text,
+          "country":uidInput5.text,
+          "password":uidInput6.text??'none',
+          //"carduid":"TEALTD_7hEnj_1672352175",
+          "carduid":uidInput7.text
+
+
+
+        }),
+        options: dio.Options(
+          responseType: dio.ResponseType.plain, // 👈 Add this line
+        ),
+      );
+
+      // Handle the response from the server.
+      if (response.statusCode == 200) {
+
+
+        final result = extractJson(response.data);
+        if (result != null) {
+          /*print("Status: ${result['status']}");
+          print("Phone: ${result['phone']}");
+          print("Email: ${result['Email']}");*/
+          if(result['status'])
+            {
+              setState(() {
+                showOveray=false;
+              });
+    uidInput7.text="";
+    Get.close(1);
+    controller!.resumeCamera();
+    Get.snackbar("Success", "Card Addedd",backgroundColor: Color(0xff9a1c55),
+    colorText: Color(0xffffffff),
+    titleText: const Text("Card User",style:TextStyle(color:Color(
+    0xffffffff),fontSize:18,fontWeight:FontWeight.w500,fontStyle: FontStyle.normal),),
+
+    icon: Icon(Icons.access_alarm),
+    duration: Duration(seconds: 4));
+
+            }
+          else{
+            setState(() {
+              showOveray=false;
+            });
+    uidInput7.text="";
+    Get.close(1);
+    controller!.resumeCamera();
+    Get.snackbar("Error", "Card ,Card Can't be assigned please Contact System Admin",backgroundColor: Color(
+    0xffdc2323),
+    colorText: Color(0xffffffff),
+    titleText: const Text("Card User",style:TextStyle(color:Color(
+    0xffffffff),fontSize:18,fontWeight:FontWeight.w500,fontStyle: FontStyle.normal),),
+
+    icon: Icon(Icons.access_alarm),
+    duration: Duration(seconds: 4));
+
+    }
+        } else {
+          Get.close(1);
+          setState(() {
+            showOveray=false;
+          });
+        }
+        //(Get.put(StockQuery()).updateHideLoader(true));
+        //Get.back(result:'$currentTimestamp');
+        //print('Image uploaded successfully ${response}');
+      } else {
+        Get.close(1);
+        setState(() {
+          showOveray=false;
+        });
+        //print("something Wrong");
+      }
+    } catch (e) {
+      Get.close(1);
+      setState(() {
+        showOveray=false;
+      });
+      if (e is dio.DioException) {
+        print('DioException: ${e.response?.statusCode}');
+        print('DioException: ${e.message}');
+        print('Response: ${e.response?.data}');
+
+      } else {
+        print('Unknown error: $e');
+      }
+    }
+  }
+  Future<Uint8List?> compressImage(XFile? imageFile) async {
+    if (imageFile == null) return null;
+
+    final compressedImage = await FlutterImageCompress.compressWithFile(
+      imageFile.path,
+      minWidth: 600, // Adjust these to lower values if needed
+      minHeight: 600,
+      quality: 50, // Lower quality for faster compression
+      format: CompressFormat.jpeg, // Use CompressFormat directly.
+    );
+
+    return compressedImage;
+  }
+
+
+  //image
   void _onQRViewCreated(QRViewController controller)
   {
     this.controller=controller;
@@ -483,67 +711,43 @@ uidInput7.text=checkcode;
 
                     ],
                   ),
-                  SizedBox(height: 10.0,),
-                  Obx(() =>
-                      Visibility(
-                        visible:Get.put(HideShowState()).isNumberValid.value,
-                        child: FloatingActionButton.extended(
-                          label: Text('Add Card'), // <-- Text
-                          backgroundColor: Color(0xff940e4b),
-                          icon: Icon( // <-- Icon
-                            Icons.add_card,
-                            size: 24.0,
-                          ),
-                          onPressed: ()async =>{
-                            setState(() {
-                              showOveray=true;
-                            }),
-                            //print(uidInput2.text),
 
-                            // print( (await ParticipatedQuery().getAllParticipateEventOnline()).data["status"])
-                            //print( (await PromotionQuery().getAllPromotionEventOnline()),
+                  Container(
+                    color: Colors.white,
+                    padding: EdgeInsets.all(16),
+                    child: GetBuilder<CardQuery>(
+                      builder: (controller) {
+                        return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (controller.imageFile != null)
+                              Image.file(
+                                File(controller.imageFile!.path),
+                                width: 200,
+                                height: 200,
+                                fit: BoxFit.cover,
+                              ),
 
-                            if((await CardQuery().CreateAssignCardEventOnline(CardModel(uid:uidInput7.text),Admin(phone:uidInput.text,name:uidInput2.text,email:uidInput3.text,Ccode:uidInput4.text,initCountry:initCountry.text,country:uidInput5.text,password:uidInput6.text,uid: "no need", subscriber:"no need"))).data["status"])
-                              {
-                                setState(() {
-                                  showOveray=false;
-                                }),
-                                uidInput7.text="",
-                                Get.close(1),
-                                controller!.resumeCamera(),
-                                Get.snackbar("Success", "Card Addedd",backgroundColor: Color(0xff9a1c55),
-                                    colorText: Color(0xffffffff),
-                                    titleText: const Text("Card User",style:TextStyle(color:Color(
-                                        0xffffffff),fontSize:18,fontWeight:FontWeight.w500,fontStyle: FontStyle.normal),),
-
-                                    icon: Icon(Icons.access_alarm),
-                                    duration: Duration(seconds: 4))
-                              }
-                            else{
-                              setState(() {
-                                showOveray=false;
-                              }),
-                              uidInput7.text="",
-                              Get.close(1),
-                              controller!.resumeCamera(),
-                              Get.snackbar("Error", "Card ,Card Can't be assigned please Contact System Admin",backgroundColor: Color(
-                                  0xffdc2323),
-                                  colorText: Color(0xffffffff),
-                                  titleText: const Text("Card User",style:TextStyle(color:Color(
-                                      0xffffffff),fontSize:18,fontWeight:FontWeight.w500,fontStyle: FontStyle.normal),),
-
-                                  icon: Icon(Icons.access_alarm),
-                                  duration: Duration(seconds: 4))
-
-                            }
-
-
-                          },
-
-                        ),
-                      )
-
+                          ],
+                        );
+                      },
+                    ),
                   ),
+              Obx(() =>
+                  Visibility(
+                    visible:Get.put(HideShowState()).isNumberValid.value ,
+                    child: IconButton(
+                      onPressed: (
+                          //_pickImage(ImageSource.camera);
+
+                          ) {
+                        _pickImage(ImageSource.camera);
+                      },
+                      icon: Icon(Icons.camera),
+                    ),
+                  ),
+              ),
+                  SizedBox(height: 10.0,),
 
 
 
@@ -554,6 +758,7 @@ uidInput7.text=checkcode;
 
         ],
       ),
+
     );
   }
   loadData() async{

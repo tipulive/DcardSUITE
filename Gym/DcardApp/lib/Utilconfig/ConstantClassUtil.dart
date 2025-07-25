@@ -11,7 +11,11 @@ class ConstantClassUtil extends GetxController
   //static final urlLink="https://0529-105-178-104-163.ngrok-free.app/api";//
   //static final urlLink="https://card.appdev.live/api"; //production Link
 
-  static final urlLink="https://thedo.yegob.com/api";
+
+  //static final urlApp="https://62e7c0bdaec4.ngrok-free.app";
+  static final urlApp="https://thedo.yegob.com";
+  static final urlLink="$urlApp/api";
+  //static final urlLink="https://thedo.yegob.com/api";
 
 
   //static final StockLink="http://10.0.2.2:8050/api";//Testing Link

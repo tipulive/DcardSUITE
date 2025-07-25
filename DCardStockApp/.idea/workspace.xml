@@ -14,15 +14,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fe13c1e5-b7ca-4b84-a854-5c4e0fd95bcb" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/../dstock/images/cart.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../dstock/images/cart2.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../dstock/images/off.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../dstock/images/on.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../dstock/images/playstore.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../dstock/images/profile.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../dstock/images/profile2.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../dstock/images/shop.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../App Features.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../CardStocKBackend/resources/views/PrintProduct.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/../CardStocKBackend/resources/views/PrintProduct.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/android/app/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/build.gradle" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/android/app/src/debug/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/debug/AndroidManifest.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/android/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/AndroidManifest.xml" afterDir="false" />
@@ -38,7 +30,19 @@
       <change beforePath="$PROJECT_DIR$/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/windows/flutter/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/windows/flutter/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app doc 2.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Gym/DcardApp/lib/Pages/Card/AddCardPage.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../Gym/DcardApp/lib/Pages/Card/AddCardPage.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Gym/DcardApp/lib/Pages/Homepage.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../Gym/DcardApp/lib/Pages/Homepage.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Gym/DcardApp/lib/Query/CardQuery.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../Gym/DcardApp/lib/Query/CardQuery.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Gym/DcardApp/lib/Utilconfig/ConstantClassUtil.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../Gym/DcardApp/lib/Utilconfig/ConstantClassUtil.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Gym/DcardApp/linux/flutter/generated_plugin_registrant.cc" beforeDir="false" afterPath="$PROJECT_DIR$/../Gym/DcardApp/linux/flutter/generated_plugin_registrant.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Gym/DcardApp/linux/flutter/generated_plugins.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/../Gym/DcardApp/linux/flutter/generated_plugins.cmake" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Gym/DcardApp/macos/Flutter/GeneratedPluginRegistrant.swift" beforeDir="false" afterPath="$PROJECT_DIR$/../Gym/DcardApp/macos/Flutter/GeneratedPluginRegistrant.swift" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Gym/DcardApp/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/../Gym/DcardApp/pubspec.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Gym/DcardApp/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/../Gym/DcardApp/pubspec.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Gym/DcardApp/windows/flutter/generated_plugin_registrant.cc" beforeDir="false" afterPath="$PROJECT_DIR$/../Gym/DcardApp/windows/flutter/generated_plugin_registrant.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Gym/DcardApp/windows/flutter/generated_plugins.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/../Gym/DcardApp/windows/flutter/generated_plugins.cmake" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Gym/GymBackend" beforeDir="false" afterPath="$PROJECT_DIR$/../Gym/GymBackend" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../dstock/lib/Pages/components/SettingComp.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../dstock/lib/Pages/components/SettingComp.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,29 +68,29 @@
     </file-type-list>
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$PROJECT_DIR$/lib/Pages/routes.dart" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/lib/Pages/components/SetOrderComp.dart" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/lib/models/Topups.dart" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/lib/Pages/Card/AddCardPage.dart" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/lib/Pages/components/SetRepayComp.dart" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/lib/Utilconfig/HideShowState.dart" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/lib/Query/CardQuery.dart" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/lib/Pages/routes.dart" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/lib/Pages/components/ContactComp.dart" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/lib/Utilconfig/ConstantClassUtil.dart" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/lib/main.dart" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/lib/Query/CardQuery.dart" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/lib/Query/StockQuery.dart" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/lib/Pages/Homepage.dart" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/README.md" root0="FORCE_HIGHLIGHTING" root1="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/android/settings.gradle" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/lib/Pages/components/SetOrderComp.dart" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/lib/Pages/components/SettingComp.dart" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/android/gradlew" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/lib/Pages/ProfilePage.dart" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/android/gradlew.bat" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/lib/api/firebaseApi.dart" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/pubspec.yaml" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/android/key.properties" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/lib/Pages/Card/AddCardPage.dart" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/android/build.gradle" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/lib/Pages/components/SetRepayComp.dart" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/android/settings.gradle" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/README.md" root0="FORCE_HIGHLIGHTING" root1="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/android/gradlew" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/pubspec.yaml" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/lib/main.dart" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/lib/api/firebaseApi.dart" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/android/key.properties" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/android/gradlew.bat" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/lib/Pages/Homepage.dart" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/lib/Pages/ProfilePage.dart" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/android/app/build.gradle" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/lib/models/Topups.dart" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/lib/Query/StockQuery.dart" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/lib/Pages/components/SettingComp.dart" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="ProjectId" id="2KM8oolxcjqMHK5xLv0mT4p9XSw" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -104,7 +108,7 @@
     <property name="cidr.known.project.marker" value="true" />
     <property name="dart.analysis.tool.window.visible" value="false" />
     <property name="io.flutter.reload.alreadyRun" value="true" />
-    <property name="last_opened_file_path" value="$USER_HOME$/Desktop/aaeric" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../dstock" />
     <property name="project.structure.last.edited" value="Facets" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />

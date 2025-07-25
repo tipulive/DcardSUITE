@@ -210,6 +210,7 @@ width: 100% !important;
 
         // Send the form data to the server using an AJAX request
         $.ajax({
+           // url: '/api/upload', // Replace with the URL for your server-side script
             url: '/api/upload', // Replace with the URL for your server-side script
             method: 'POST',
             beforeSend: function (xhr) {

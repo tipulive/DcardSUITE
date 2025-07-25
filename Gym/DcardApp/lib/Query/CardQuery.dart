@@ -11,9 +11,15 @@ import 'package:get/get.dart';
 import '../Query/AdminQuery.dart';
 import '../DatabaseHelper.dart';
 import '../models/Admin.dart';
+import 'package:image_picker/image_picker.dart';
 
 class CardQuery extends GetxController{
 
+  XFile? imageFile;
+  updateImageFile(valData){
+    imageFile=valData;
+    update();
+  }
 
 
   AdminQuery adminStatedata=Get.put(AdminQuery());
