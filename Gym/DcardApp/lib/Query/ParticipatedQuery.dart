@@ -964,24 +964,26 @@ getPreviousPriceOnline(Topups topupData,BonusModel bonusData)async{
     }
   }
 
-  participantGetPayment(Topups topupData,User userData) async{
+  participantGetPayment(Topups topupData) async{
     try {
 
       var params =  {
         //"kebineericMuna_1668935593",
         "inputAction":"getmembership",
-       "advancedSearch":"today",
-       "searchOption":"false",
+       "advancedSearch":topupData.advancedSearch,
+       "searchOption":topupData.optionCase,
        "uidUser":"kebineericMuna_1676390572",
        "userStatus":"member",
         "commentData":"Option",
         "LimitStart":topupData.endlimit,  //page
         "LimitEnd":topupData.startlimit,//limit
-        "name":userData.name??'none'
+        "name":topupData.name??'none',
+        "thisDate":topupData.created_at,
+        "toDate":topupData.updated_at??'none'
 
         //"options": [1,2,3],
       };
-
+//print(params);
       String Authtoken =(adminStateData.obj)["result"][0]["AuthToken"];
       var url="${ConstantClassUtil.urlLink}/payment";
       var response = await Dio().get(url,

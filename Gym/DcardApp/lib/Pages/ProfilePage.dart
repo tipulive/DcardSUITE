@@ -24,7 +24,7 @@ class ProfilePage extends StatelessWidget {
           ),
         ),
       ),
-      backgroundColor: Colors.yellow,
+
       //backgroundColor: Color(0xff010a0e),
 
       body: ProfileComp(),

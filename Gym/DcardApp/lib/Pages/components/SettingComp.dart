@@ -57,20 +57,15 @@ class _SettingCompState extends State<SettingComp> {
                 onTap: (){
                   gymLive();
                 },
-                child: detailsProfile("Gym Live",Icons.calendar_month_outlined,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff, gymLive)),//Last Time Purchase
+                child: detailsProfile("Gym Live",Icons.sports,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff, gymLive)),//Last Time Purchase
             const SizedBox(height:5,),
             GestureDetector(
                 onTap: (){
                   payments();
                 },
-                child: detailsProfile("payments",Icons.calendar_month_outlined,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,payments)),//Last Time Purchase
+                child: detailsProfile("Payments",Icons.payments,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,payments)),//Last Time Purchase
             const SizedBox(height:5,),
-            GestureDetector(
-                onTap: (){
-                  viewStock();
-                },
-                child: detailsProfile("Stocks",Icons.calendar_month_outlined,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,viewStock)),//Last Time Purchase
-            const SizedBox(height:5,),
+
 
             GestureDetector(
                 onTap: (){
@@ -84,27 +79,17 @@ class _SettingCompState extends State<SettingComp> {
                   partfunc();
                 },
                 child: detailsProfile("Participate",Icons.calendar_month_outlined,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,partfunc)),//Last Time Purchase
-            const SizedBox(height:5,),
-            GestureDetector(
-                onTap: (){
-                  quickBoHistfunc();
-                },
-                child: detailsProfile("QuickBonus",Icons.paid,"",0xbfebf1ef,"textright",Icons.arrow_forward,"200\$",0xffffffff,quickBoHistfunc)),
-            const SizedBox(height:5,),
 
+
+            const SizedBox(height:5,),
             GestureDetector(
                 onTap: (){
                   editCardfunc();
                 },
-                child: detailsProfile("Edit Card",Icons.account_balance,"",0xbfebf1ef,"textright",Icons.arrow_forward,"200\$",0xffffffff,editCardfunc)),
+                child: detailsProfile("Edit Card",Icons.add_card,"",0xbfebf1ef,"textright",Icons.arrow_forward,"200\$",0xffffffff,editCardfunc)),
 
             const SizedBox(height:5,),
-            GestureDetector(
-              onTap: (){
-                withdrawBalanceFunc();
-              },
-                child: detailsProfile('WithDraw Balance',Icons.payments_rounded,"$balance",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,withdrawBalanceFunc)),
-            const SizedBox(height:5,),
+
             GestureDetector(
                 onTap: (){
                   withdrawBonusFunc();
@@ -123,6 +108,7 @@ class _SettingCompState extends State<SettingComp> {
 
                             //primary: Colors.grey[300],
                             backgroundColor: const Color(0xff9a1c55),
+                            foregroundColor:Colors.white,
                             elevation:0,
                           ),
                           onPressed: () async{
@@ -143,7 +129,7 @@ class _SettingCompState extends State<SettingComp> {
                   );
 
                 },
-                child: detailsProfile("Logout",Icons.account_balance,"",0xbfebf1ef,"textright",Icons.power,"200\$",0xffffffff,logout)),
+                child: detailsProfile("Logout",Icons.power,"",0xbfebf1ef,"textright",Icons.power,"200\$",0xffffffff,logout)),
 
 
 
@@ -267,8 +253,8 @@ Widget detailsProfile(iconText,icon,iconDescr,listBackground,iconrightText,iconr
       margin: const EdgeInsets.fromLTRB(8,0,8,0),
       width: 400,
       height: 50,
-      //color:Color(0xffffffff),
-      color:Color(listBackground),
+      color:Colors.white70,
+      //color:Color(listBackground),
 
       child: Row(
 
@@ -279,18 +265,18 @@ Widget detailsProfile(iconText,icon,iconDescr,listBackground,iconrightText,iconr
             decoration: BoxDecoration(
 
               shape: BoxShape.circle,
-              border: Border.all(color: Colors.yellow,width: 1.5),
+              border: Border.all(color: Colors.yellow,width: 2),
 
 
 
             ),
             child: Icon(
               icon,color:
-            Colors.amber,size: 22,),
+            Colors.black,size: 17,),
 
           ),
           const SizedBox(width:3,),
-          Text(iconText+":",style:GoogleFonts.pacifico(fontSize:15,color: Colors.teal,fontWeight: FontWeight.w700)),
+          Text(iconText+":",style:GoogleFonts.inter(fontSize:13,color: Colors.black,fontWeight: FontWeight.w400)),
           const SizedBox(width:5,),
           Expanded(
             child: Container(
@@ -380,6 +366,7 @@ logout() async{
 
             //primary: Colors.grey[300],
             backgroundColor: Color(0xff9a1c55),
+            foregroundColor: Colors.white,
             elevation:0,
           ),
           onPressed: () async{

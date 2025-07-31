@@ -156,7 +156,11 @@ class _SetPaymentCompState extends State<SetPaymentComp> {
 
                         Column(
                           children: [
-
+                          Center(
+                            child: Text("$viewTitle", style: GoogleFonts.abel(fontSize: 11,
+                                color: Colors.red,
+                                fontWeight: FontWeight.w700)),
+                          ),
                             Center(
                               child: RichText(
                                 text: TextSpan(
@@ -355,12 +359,12 @@ class _SetPaymentCompState extends State<SetPaymentComp> {
                   PopupMenuItem(
                       child: InkWell(
                         onTap: () async {
-                          /*setState(() {
+                          setState(() {
 
                               advancedSearch="year";
                               viewTitle="This Year";
                             });
-                            await viewData('test',"false");*/
+                            await viewData('test',"false");
                           final DateTime? datetime = await showDatePicker(
                               context: context,
                               initialDate: selectedDate,
@@ -409,12 +413,12 @@ class _SetPaymentCompState extends State<SetPaymentComp> {
                   PopupMenuItem(
                       child: InkWell(
                         onTap: () async {
-                          /*setState(() {
+                          setState(() {
 
                               advancedSearch="year";
                               viewTitle="This Year";
                             });
-                            await viewData('test',"false");*/
+                            await viewData('test',"false");
                           final DateTimeRange? datetimeRange = await showDateRangePicker(
                               context: context,
                               firstDate: DateTime(2024),
@@ -461,41 +465,7 @@ class _SetPaymentCompState extends State<SetPaymentComp> {
                         ),
                       )
                   ),
-                  PopupMenuItem(
-                      child: InkWell(
-                        onTap: () async {
-                          setState(() {
-                            advancedSearch = "mysales";
-                            viewTitle = "My Sales";
-                          });
-                          await viewData('test', "false");
-                        },
-                        child: const Column(
-                          children: [
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.apartment,
-                                  color: Colors.orange,
-                                ),
 
-                                Padding(
-                                  padding: EdgeInsets.only(left: 10.0),
-                                  child: Text("All My Sales"),
-                                ),
-
-                              ],
-                            ),
-                            Divider(
-                              height: 20, // Adjust the height as needed
-                              thickness: 0.2, // Adjust the thickness as needed
-                              color: Colors.grey,
-                            ),
-
-                          ],
-                        ),
-                      )
-                  ),
 
                 ],
                 offset: const Offset(0, 40),
@@ -608,7 +578,7 @@ class _SetPaymentCompState extends State<SetPaymentComp> {
                                 Text(
                                     "${ConstantClassUtil().truncateWithEllipsis(
                                         (_data[index]['name']).toUpperCase(),
-                                        6)}"),
+                                        6)}",style:GoogleFonts.inter(fontSize:13,color: Colors.black,fontWeight: FontWeight.w400)),
                               ],
                             ),
 
@@ -617,8 +587,7 @@ class _SetPaymentCompState extends State<SetPaymentComp> {
                         ),
                         subtitle: Row(
                           children: [
-                            Text("${(_data[index]['userStatus']=="notmember")?"Cash":"Member"} ",
-                              style: TextStyle(color: Colors.pinkAccent),),
+                            Text("${(_data[index]['userStatus']=="notmember")?"Cash":"Member"} ",style:GoogleFonts.inter(fontSize:13,color: Colors.red,fontWeight: FontWeight.w600)),
                             //Text("${_data[index]["actionName"]}"),
                             (_data[index]["actionName"] == "reverse")
                                 ? Tooltip(
@@ -643,7 +612,7 @@ class _SetPaymentCompState extends State<SetPaymentComp> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
 
-                              Text("${(_data[index]['userStatus']=="notmember")?1:_data[index]['packValid']} days"),
+                              Text("${(_data[index]['userStatus']=="notmember")?1:_data[index]['packValid']} days (${_data[index]['packPrice']})"),
                               Text("${_data[index]['created_at']}"),
 
 
@@ -931,35 +900,62 @@ class _SetPaymentCompState extends State<SetPaymentComp> {
   }
 
   viewData(nameVal, searchVal) async {
+/*
+    _data.clear();
+    if (isLoading) return;
+    isLoading = true;
+    int limit = 10;*/
+    if(isLoading) return;
+    isLoading=true;
+    int limit=10;
+
+
+    var resultData=(await ParticipatedQuery().participantGetPayment(Topups(startlimit:limit,endlimit:_page,name:nameVal,optionCase:"$searchVal",advancedSearch:advancedSearch,created_at:thisDate,updated_at:toDate))).data;
+    if(resultData["status"])
+    {
+
+
+
+      if(resultData["result"]!=0)
+      {
+        setState(() {
+          isLoading=false;
+          hasMoreData=false;
+          _data.clear();
+          _data.addAll(resultData["result"]);
+
+        });
+      }
+      else{
+        setState(() {
+          isLoading=false;
+          hasMoreData=false;
+          _data.clear();
+
+
+        });
+      }
+
+
+
+
+    }
+    else{
+      setState(() {
+        isLoading=false;
+        hasMoreData=false;
+        _data.clear();
+
+
+      });
+    }
 
   }
 
   scrolldata() async // iyi ndaza kuyisimbuza
       {
-    _data.clear();
-    if (isLoading) return;
-    isLoading = true;
-    int limit = 10;
-    //var resul=(await ParticipatedQuery().getAllParticipateHistEventOnline(Topups(startlimit:limit,endlimit:_page),User(uid: "none",name:"none"))).data;
-    var resul = (await ParticipatedQuery().participantGetPayment(
-        Topups(startlimit: limit, endlimit: _page),
-        User(uid: "none", name: "none"))).data;
-    if(resul!["status"]) {
-      setState(() {
-        isLoading = false;
-        if (resul["result"].length < limit) {
-          hasMoreData = false;
-        }
-        _data.addAll(resul["result"]);
-      });
-    }
-    else{
-      setState(() {
-        isLoading = true;
-        hasMoreData = false;
+    await viewData('test',"false");
 
-      });
-    }
   }
 
   //popup

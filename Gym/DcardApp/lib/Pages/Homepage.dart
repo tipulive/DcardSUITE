@@ -427,37 +427,47 @@ submitParticipate() async{
                 HomeNavigator(),
 
                 Positioned(
-                  right: 15.0,
-                  bottom:70,
-                  child: FloatingActionButton(
-                    onPressed:()async {
-                      Get.put(HideShowState()).isVisible(true);
-                      ResultDatas=(await Get.put(TopupQuery()).GetBalance(Topups(uid:"${(Get.put(CardQuery()).obj)["resultData"]["UserDetail"]["uid"]??'none'}"))).data;
-                      if(ResultDatas["status"])
-                      {
-                        await Get.put(TopupQuery()).updateTopupState(ResultDatas);
-                        Get.put(HideShowState()).isVisible(false);
-                        Get.to(() => ProfilePage());
-                      }
-                      else{
+                  right: 8.0,
+                  bottom:62,
+                  child: SizedBox(
+                    height: 100,
+                    width: 100,
+                    child: FloatingActionButton(
+                      onPressed:()async {
+                        Get.put(HideShowState()).isVisible(true);
+                        ResultDatas=(await Get.put(TopupQuery()).GetBalance(Topups(uid:"${(Get.put(CardQuery()).obj)["resultData"]["UserDetail"]["uid"]??'none'}"))).data;
+                        if(ResultDatas["status"])
+                        {
+                          await Get.put(TopupQuery()).updateTopupState(ResultDatas);
+                          Get.put(HideShowState()).isVisible(false);
+                          Get.to(() => ProfilePage());
+                        }
+                        else{
 
-                        await Get.put(TopupQuery()).updateTopupState(ResultDatas);
-                        Get.put(HideShowState()).isVisible(false);
-                        Get.to(() => ProfilePage());
-                      }
+                          await Get.put(TopupQuery()).updateTopupState(ResultDatas);
+                          Get.put(HideShowState()).isVisible(false);
+                          Get.to(() => ProfilePage());
+                        }
 
 
-                    },
-                    tooltip: 'Increment',
-                    child: ClipOval(
-                      child: CachedNetworkImage(
-                        imageUrl: "$urLink/${passData['photo_url']}",
-                        height: 200,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                        placeholder: (context, url) => Center(child: CircularProgressIndicator()),
-                        errorWidget: (context, url, error) => Icon(Icons.error),
-                      ),
+                      },
+                      tooltip: 'View Profile',
+                        backgroundColor: Colors.transparent, // remove default color
+                        elevation: 0,
+                      child: Container(
+                        width: 100,
+                        height: 100,
+
+                        child: ClipOval(
+                          child: CachedNetworkImage(
+                            imageUrl: '$urLink/${passData['photo_url']}',
+                            fit: BoxFit.cover,
+                            placeholder: (context, url) => CircularProgressIndicator(),
+                            errorWidget: (context, url, error) => Icon(Icons.error),
+                          ),
+                        ),
+                      )
+
                     ),
                   ),
                 ),
@@ -851,7 +861,7 @@ submitParticipate() async{
               ),
             ),
           ),
-          Card(
+          /*Card(
             elevation: 4,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             child: Column(
@@ -867,7 +877,7 @@ submitParticipate() async{
 
               ],
             ),
-          )
+          )*/
 
         ],
       );

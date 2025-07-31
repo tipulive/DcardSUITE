@@ -61,31 +61,10 @@ class _ProfileCompState extends State<ProfileComp> {
     const SizedBox(height:5,),
     //   detailsProfile("Status",Icons.track_changes,"Redeemed",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,Statusfunc),
           //Top Up
-    GestureDetector(
-        onTap: (){
-          topupFunc();
-        },
-        child: detailsProfile("Top Up",Icons.paid,"",0xbfebf1ef,"textright",Icons.arrow_forward,"200\$",0xffffffff,topupFunc)),
-    const SizedBox(height:5,),
-    GestureDetector(
-        onTap: (){
-          editTopupfunc();
-        },
-        child: detailsProfile("Edit Balance",Icons.account_balance,"",0xbfebf1ef,"textright",Icons.arrow_forward,"200\$",0xffffffff,editTopupfunc)),
-    const SizedBox(height:5,),
-    GestureDetector(
-        onTap: (){
-          withdrawFunc();
-        },
-        child: detailsProfile("WithDraw Balance",Icons.payments_rounded,"",0xbfebf1ef,"textright",Icons.arrow_forward,"200\$",0xffffffff,withdrawFunc)),
-    const SizedBox(height:5,),
-    //withdraw Bonus
-    GestureDetector(
-        onTap: (){
-          redeemBonus();
-        },
-        child: detailsProfile("Widraw Bonus",Icons.redeem,"",0xbfebf1ef,"textright",Icons.arrow_forward,"200\$",0xffffffff,redeemBonus)),
-          const SizedBox(height:5,),
+
+
+
+
           GestureDetector(
               onTap: (){
                 bonusHistory();
@@ -705,7 +684,7 @@ Widget divLine(){
 
                 constraints: const BoxConstraints(maxWidth: 200,maxHeight: 5),
                 //color: Color.fromRGBO(13,44,64, 0.4),
-                color: Colors.white70
+                color: Colors.white
             ),
           ),
         )
@@ -720,13 +699,13 @@ Widget detailsProfile(iconText,icon,iconDescr,listBackground,iconrightText,iconr
  return ClipRRect(
    //borderRadius: BorderRadius.circular(32),
    child: Container(
-      padding: EdgeInsets.all(8),
-      //margin: const EdgeInsets.all(8),
-     margin: EdgeInsets.fromLTRB(8,0,8,0),
+     padding: const EdgeInsets.all(8),
+     //margin: const EdgeInsets.all(8),
+     margin: const EdgeInsets.fromLTRB(8,0,8,0),
       width: 400,
       height: 50,
      //color:Color(0xffffffff),
-     color:Color(listBackground),
+     color:Colors.white,
 
      child: Row(
 
@@ -737,18 +716,19 @@ Widget detailsProfile(iconText,icon,iconDescr,listBackground,iconrightText,iconr
           decoration: BoxDecoration(
 
               shape: BoxShape.circle,
-              border: Border.all(color: Colors.yellow,width: 1.5),
+              border: Border.all(color: Colors.yellow,width: 2),
 
 
 
           ),
           child: Icon(
               icon,color:
-          Colors.amber,size: 22,),
+          Colors.black,size: 17,),
 
         ),
          SizedBox(width:3,),
-         Text("$iconText:",style:GoogleFonts.pacifico(fontSize:15,color: Colors.teal,fontWeight: FontWeight.w700)),
+         Text(iconText+":",style:GoogleFonts.inter(fontSize:13,color: Colors.black,fontWeight: FontWeight.w400)),
+
          SizedBox(width:5,),
          Expanded(
            child: Container(
