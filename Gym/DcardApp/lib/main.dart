@@ -14,14 +14,16 @@ import 'package:get/get.dart';
 
 
 import 'Query/AdminQuery.dart';
+import 'Utilconfig/AppInfo.dart';
 
 
 
-void main() {
+void main() async{
   /*this will make apps not going to sleep Mode*/
 
   WidgetsFlutterBinding.ensureInitialized();
   WakelockPlus.enable();
+  await AppInfo.init();
 
   //i may add  Wakelock.disable(); // to make apps to go on sleep mode
   /*this will make apps not going to sleep Mode*/

@@ -80,7 +80,7 @@ class _AllEventCompState extends State<AllEventComp> {
 
                       ],
                     ),
-                    subtitle: Text("${_data[index]['inputData']}"),
+                    subtitle: Text("${(_data[index]['inputData']!='0')?_data[index]['inputData']:'Weight->'}"),
 
                     trailing: IconButton(
                       icon:Icon(Icons.arrow_forward),

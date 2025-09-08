@@ -50,7 +50,7 @@ class _HomepageState extends State<Homepage> {
   PromotionQuery promotionState=Get.put(PromotionQuery());
   AdminQuery adminStatedata=Get.put(AdminQuery());
 
-  TextEditingController PromoName=TextEditingController();
+  TextEditingController promoName=TextEditingController();
   TextEditingController uidInput=TextEditingController(text:'nopromotion');//uid promo
   TextEditingController uidInput2=TextEditingController(text:'kebineericMuna_1668935593');//userid of user that will be available after qr scan
   TextEditingController uidInput3=TextEditingController();//input data to submit
@@ -59,15 +59,15 @@ class _HomepageState extends State<Homepage> {
   TextEditingController uidInput6=TextEditingController();
   TextEditingController uidInput7=TextEditingController();
   TextEditingController uidInput8=TextEditingController();
-  TextEditingController ClientName=TextEditingController();
-  String PromoMsg="nopromotion";
+  TextEditingController clientName=TextEditingController();
+  String promoMsg="nopromotion";
   String subscriberText="DOROTHELTD";
   String startedDate="none";
   String endedDate="none";
   String subscriberPromo="none";
   bool showprofile=false;
   bool showOveray=false;
-  bool IsSubmitted=false;
+  bool isSubmitted=false;
   final GlobalKey qrkey = GlobalKey(debugLabel: 'QR');
   Barcode?result;
   QRViewController?controller;
@@ -76,10 +76,10 @@ class _HomepageState extends State<Homepage> {
   bool optionVal=true;
   List items=["male","female","others","Keb2"];
 
-  bool Cameravalue=false;
+  bool cameraValue=false;
   String urLink='${ConstantClassUtil.urlApp}/images/userProfile/';
-  bool Flashvalue=false;
-  var ResultDatas;
+  bool flashvalue=false;
+  var resultDatas;
   late Map<String, dynamic> passData;
 
 
@@ -135,13 +135,13 @@ class _HomepageState extends State<Homepage> {
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
 
-                                  CameraSwitch(),
+                                  cameraSwitch(),
                                   //SizedBox(width: 10.0,),
 
                                   // SizedBox(width: 10.0,),
-                                  FlashSwitch(),
+                                  flashSwitch(),
                                   Image.asset(
-                                    Flashvalue ? 'images/on.png' : 'images/off.png',
+                                    flashvalue ? 'images/on.png' : 'images/off.png',
                                     height: 30,
                                   ),
                                 ],
@@ -211,48 +211,44 @@ class _HomepageState extends State<Homepage> {
       (passData["expiredIn"]=="yes")?Container(
         child:(passData["statusValid"]!="0")?Column(
           children: [
-            Container(
-
-              child: TextField(
-                controller: uidInput6,
-                keyboardType: TextInputType.number,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.black87,
+            TextField(
+              controller: uidInput6,
+              keyboardType: TextInputType.number,
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.black87,
+              ),
+              decoration: InputDecoration(
+                labelText: 'Enter your Weight',
+                hintText: 'Enter your Weight',
+                labelStyle: TextStyle(
+                  color: Colors.blueGrey,
+                  fontWeight: FontWeight.w500,
                 ),
-                decoration: InputDecoration(
-                  labelText: 'Enter your Weight',
-                  hintText: 'Enter your Weight',
-                  labelStyle: TextStyle(
+
+                contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+                isDense: true,
+                filled: true,
+                fillColor: Colors.grey[100],
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(
                     color: Colors.blueGrey,
-                    fontWeight: FontWeight.w500,
+                    width: 1.0,
                   ),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(
+                    color: Colors.grey.shade400,
+                    width: 1.0,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
 
-                  contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-                  isDense: true,
-                  filled: true,
-                  fillColor: Colors.grey[100],
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(
-                      color: Colors.blueGrey,
-                      width: 1.0,
-                    ),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(
-                      color: Colors.grey.shade400,
-                      width: 1.0,
-                    ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-
-                  ),
                 ),
               ),
-
             ),
             SizedBox(height:10.0,),
 
@@ -291,7 +287,7 @@ submitParticipate() async{
   if(uidInput5.text=="0")
   {
 
-    await Get.put(ParticipatedQuery()).ParticipateEventOnline(Participated(uid:uidInput.text,uidUser:uidInput2.text,inputData:uidInput3.text,weight:uidInput6.text,inputAction:uidInput7.text),Promotions(reach:uidInput4.text,gain:uidInput5.text,promo_msg:PromoMsg));
+    await Get.put(ParticipatedQuery()).ParticipateEventOnline(Participated(uid:uidInput.text,uidUser:uidInput2.text,inputData:uidInput3.text,weight:uidInput6.text,inputAction:uidInput7.text),Promotions(reach:uidInput4.text,gain:uidInput5.text,promo_msg:promoMsg));
     if((Get.put(ParticipatedQuery()).obj)["resultData"]["status"])
     {
       /*setState(() {
@@ -330,7 +326,7 @@ submitParticipate() async{
   }
   else{
     //
-    await Get.put(ParticipatedQuery()).ParticipateEventOnline(Participated(uid:uidInput.text,uidUser:uidInput2.text,inputData:uidInput3.text,weight:uidInput6.text,inputAction:uidInput7.text),Promotions(reach:uidInput4.text,gain:uidInput5.text,promo_msg:PromoMsg));
+    await Get.put(ParticipatedQuery()).ParticipateEventOnline(Participated(uid:uidInput.text,uidUser:uidInput2.text,inputData:uidInput3.text,weight:uidInput6.text,inputAction:uidInput7.text),Promotions(reach:uidInput4.text,gain:uidInput5.text,promo_msg:promoMsg));
     //print((Get.put(ParticipatedQuery()).obj)),
     if((Get.put(ParticipatedQuery()).obj)["resultData"]["reach"]!=null)
     {
@@ -378,16 +374,16 @@ submitParticipate() async{
 
 
 
-      };
+      }
 
 
       //print((Get.put(ParticipatedQuery()).obj)),
-    };
+    }
     //
     //
   }
 }
-  ScanPopup(encodedData){
+  scanPopup(encodedData){
 
     Get.bottomSheet(
       StatefulBuilder(
@@ -416,7 +412,7 @@ submitParticipate() async{
                           child: ListView(
                             children: [
 
-                              SingleChildScrollView(child: MyTextWidget(encodedData))
+                              SingleChildScrollView(child: myTextWidget(encodedData))
                             ],
                           ),
                         ),
@@ -435,16 +431,16 @@ submitParticipate() async{
                     child: FloatingActionButton(
                       onPressed:()async {
                         Get.put(HideShowState()).isVisible(true);
-                        ResultDatas=(await Get.put(TopupQuery()).GetBalance(Topups(uid:"${(Get.put(CardQuery()).obj)["resultData"]["UserDetail"]["uid"]??'none'}"))).data;
-                        if(ResultDatas["status"])
+                        resultDatas=(await Get.put(TopupQuery()).GetBalance(Topups(uid:"${(Get.put(CardQuery()).obj)["resultData"]["UserDetail"]["uid"]??'none'}"))).data;
+                        if(resultDatas["status"])
                         {
-                          await Get.put(TopupQuery()).updateTopupState(ResultDatas);
+                          await Get.put(TopupQuery()).updateTopupState(resultDatas);
                           Get.put(HideShowState()).isVisible(false);
                           Get.to(() => ProfilePage());
                         }
                         else{
 
-                          await Get.put(TopupQuery()).updateTopupState(ResultDatas);
+                          await Get.put(TopupQuery()).updateTopupState(resultDatas);
                           Get.put(HideShowState()).isVisible(false);
                           Get.to(() => ProfilePage());
                         }
@@ -454,7 +450,7 @@ submitParticipate() async{
                       tooltip: 'View Profile',
                         backgroundColor: Colors.transparent, // remove default color
                         elevation: 0,
-                      child: Container(
+                      child: SizedBox(
                         width: 100,
                         height: 100,
 
@@ -477,7 +473,7 @@ submitParticipate() async{
                           () =>Visibility(
                         visible: Get.put(HideShowState()).isVisible.value,
                         child: Container(
-                          color: Colors.black.withOpacity(0.65),
+                          color: Colors.black.withValues(alpha:0.65),
                         ),
                       ),
                     )
@@ -502,7 +498,7 @@ submitParticipate() async{
       //do whatever you want after closing the bottom sheet
     });
   }
-  Widget MyTextWidget(String encodedData){
+  Widget myTextWidget(String encodedData){
 
       passData = jsonDecode(utf8.decode(base64Decode(encodedData)));
 
@@ -524,7 +520,7 @@ submitParticipate() async{
         child: Column(
 
           children: [
-            ScanUser(passData),
+            scanUser(passData),
 
             Visibility(
               visible:false,
@@ -565,7 +561,7 @@ submitParticipate() async{
             Visibility(
               visible:false,
               child: TextField(
-                controller: ClientName,
+                controller: clientName,
                 enabled: false,
                 //obscureText: true,
                 decoration: InputDecoration(
@@ -589,13 +585,13 @@ submitParticipate() async{
       );
     }
     //if((promotionState.obj["id"])==1) return Center(child: CircularProgressIndicator());
-    PromoName.text="${(promotionState.obj["resultData"]["result"][0]["promoName"])}";
-    PromoMsg=(promotionState.obj["resultData"]["result"][0]["promo_msg"]);
+    promoName.text="${(promotionState.obj["resultData"]["result"][0]["promoName"])}";
+    promoMsg=(promotionState.obj["resultData"]["result"][0]["promo_msg"]);
 
     startedDate="${(Get.put(PromotionQuery()).obj)["resultData"]["result"][0]["started_date"]}";
     endedDate="${(Get.put(PromotionQuery()).obj)["resultData"]["result"][0]["ended_date"]}";
     subscriberPromo="${(Get.put(PromotionQuery()).obj)["resultData"]["result"][0]["subscriber"]}";
-    PromoMsg=(subscriberPromo!=subscriberText)?PromoMsg:"From $startedDate To $endedDate";
+    promoMsg=(subscriberPromo!=subscriberText)?promoMsg:"From $startedDate To $endedDate";
 
     uidInput.text="${(promotionState.obj["resultData"]["result"][0]["uid"])}";
    // print((promotionState.obj["resultData"]));
@@ -604,7 +600,7 @@ submitParticipate() async{
     uidInput5.text="${(promotionState.obj["resultData"]["result"][0]["gain"])}";
 
     uidInput2.text=passData["uid"];
-    ClientName.text=passData["name"];
+    clientName.text=passData["name"];
 
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -616,10 +612,10 @@ submitParticipate() async{
 
               children: [
 
-                ScanUser(passData),
+                scanUser(passData),
                 SizedBox(height:10.0,),
                 TextField(
-                  controller:PromoName,
+                  controller:promoName,
                  // enabled: false,
                   readOnly: true,
                   //obscureText: true,
@@ -682,7 +678,7 @@ submitParticipate() async{
                 Visibility(
                   visible:false,
                   child: TextField(
-                    controller: ClientName,
+                    controller: clientName,
                     enabled: false,
                     //obscureText: true,
                     decoration: InputDecoration(
@@ -736,7 +732,7 @@ submitParticipate() async{
                       contentPadding: const EdgeInsets.symmetric(vertical: 16,horizontal: 12),
                       border: OutlineInputBorder(),
                       // labelText: 'Enter ${Promo_data["result"][0]["promo_msg"]}',${promotionState.obj["resultData"]["result"][0]["uid"]}
-                      hintText: PromoMsg,
+                      hintText: promoMsg,
                       //labelText: '${PromoMsg}',
 
                       hintStyle: TextStyle(
@@ -803,8 +799,7 @@ submitParticipate() async{
       ),
     );
   }
-  Widget ScanUser(passData){
-    print(passData.toString());
+  Widget scanUser(passData){
     return
       Column(
         children: [
@@ -846,7 +841,7 @@ submitParticipate() async{
                   Visibility(
                       visible: false,
                       child: Text("")),
-                  Text(PromoMsg),
+                  Text(promoMsg),
 
                   (passData["expiredIn"]=="yes")?Visibility(
                     visible: false,
@@ -907,12 +902,11 @@ choosePromo(){
                 onChanged: (value){
 
                   _groupVal=value.toString();
-                  print(_groupVal);
                   //value="male";
 
                   uidInput.text=_groupVal;
-                  PromoName.text="${(Get.put(PromotionQuery()).obj)["resultData"]["result"][i]["promoName"]}";
-                  PromoMsg="${(Get.put(PromotionQuery()).obj)["resultData"]["result"][i]["promo_msg"]}";
+                  promoName.text="${(Get.put(PromotionQuery()).obj)["resultData"]["result"][i]["promoName"]}";
+                  promoMsg="${(Get.put(PromotionQuery()).obj)["resultData"]["result"][i]["promo_msg"]}";
                   startedDate="${(Get.put(PromotionQuery()).obj)["resultData"]["result"][i]["started_date"]}";
                   endedDate="${(Get.put(PromotionQuery()).obj)["resultData"]["result"][i]["ended_date"]}";
                   subscriberPromo="${(Get.put(PromotionQuery()).obj)["resultData"]["result"][i]["subscriber"]}";
@@ -922,7 +916,7 @@ choosePromo(){
                   uidInput5.text="${(Get.put(PromotionQuery()).obj)["resultData"]["result"][i]["gain"]}";
 
                   setState(() {
-                    PromoMsg=(subscriberPromo!=subscriberText)?PromoMsg:"From $startedDate To $endedDate";
+                    promoMsg=(subscriberPromo!=subscriberText)?promoMsg:"From $startedDate To $endedDate";
 
                   });
 
@@ -974,17 +968,17 @@ choosePromo(){
 
         // controller!.pauseCamera();
         //controller!.pauseCamera();
-        var ResultData=(await Get.put(CardQuery()).GetDetailCardOnline(CardModel(uid:'${result!.code}'))).data;
-        if(ResultData["status"])
+        var resultData=(await Get.put(CardQuery()).GetDetailCardOnline(CardModel(uid:'${result!.code}'))).data;
+        if(resultData["status"])
         {
           setState(() {
             showOveray=false;
           });
           await promotionState.getAllPromotionEventOnline();
-          //print(ResultData["UserDetail"]["uid"]);
-          String encodedData = base64Encode(utf8.encode(jsonEncode(ResultData["UserDetail"])));
-          ScanPopup(encodedData);
-          (await Get.put(CardQuery()).updateCardState(ResultData));
+          //print(resultData["UserDetail"]["uid"]);
+          String encodedData = base64Encode(utf8.encode(jsonEncode(resultData["UserDetail"])));
+          scanPopup(encodedData);
+          (await Get.put(CardQuery()).updateCardState(resultData));
         }
         else{
           controller!.pauseCamera();
@@ -1002,7 +996,7 @@ choosePromo(){
             // Event to trigger when the alert is dismissed
             controller!.resumeCamera();
           });
-          //uidInput2.text="${ResultData["status"]}";
+          //uidInput2.text="${resultData["status"]}";
         }
 
       } catch (e) {
@@ -1030,18 +1024,18 @@ choosePromo(){
     controller?.dispose();
     super.dispose();
   }
-  Widget CameraSwitch()=>Transform.scale(
+  Widget cameraSwitch()=>Transform.scale(
     scale: 1,
     child: Switch.adaptive(
         activeColor: Colors.red,
-        activeTrackColor: Colors.red.withOpacity(0.4),
+        activeTrackColor: Colors.red.withValues(alpha:0.4),
         inactiveThumbColor: Colors.orange,
         inactiveTrackColor: Colors.blueAccent,
 
-        value: Cameravalue,
+        value: cameraValue,
         onChanged:(value)async{
           setState((){
-            Cameravalue=value;
+            cameraValue=value;
 
             //print(value);
           });
@@ -1049,18 +1043,18 @@ choosePromo(){
         }
     ),
   );
-  Widget FlashSwitch()=>Transform.scale(
+  Widget flashSwitch()=>Transform.scale(
     scale: 1,
     child: Switch.adaptive(
         activeColor: Colors.red,
-        activeTrackColor: Colors.red.withOpacity(0.4),
+        activeTrackColor: Colors.red.withValues(alpha:0.4),
         inactiveThumbColor: Colors.orange,
         inactiveTrackColor: Colors.blueAccent,
 
-        value:Flashvalue,
+        value:flashvalue,
         onChanged:(value)async{
           setState((){
-            Flashvalue=value;
+            flashvalue=value;
 
             //print(value);
           });

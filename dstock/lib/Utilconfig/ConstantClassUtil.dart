@@ -15,6 +15,10 @@ class ConstantClassUtil extends GetxController
   /*static const urlLink="https://stockapi.appdev.live/api";
   static const urlApp="https://stockapi.appdev.live";*/
 
+  static const appVers="v2.0.0";
+
+
+
 
   //static final StockLink="http://10.0.2.2:8050/api";//Testing Link
   static const StockLink="https://stock.appdev.live/api";//production Link

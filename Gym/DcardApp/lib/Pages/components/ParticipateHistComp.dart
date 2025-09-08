@@ -13,15 +13,15 @@ import '../../Pages/components/ProfilePic.dart';
 import '../../models/Topups.dart';
 
 class ParticipateHistComp extends StatefulWidget {
-  const ParticipateHistComp({Key? key}) : super(key: key);
+  const ParticipateHistComp({super.key});
 
   @override
   State<ParticipateHistComp> createState() => _ParticipateHistCompState();
 }
 
 class _ParticipateHistCompState extends State<ParticipateHistComp> {
-  ScrollController _scrollController = ScrollController();// detect scroll
-  List<dynamic> _data = [];
+  final ScrollController _scrollController = ScrollController();// detect scroll
+  final List<dynamic> _data = [];
   int _page=0;
   bool hasMoreData=true;
   bool isLoading=false;
@@ -63,8 +63,8 @@ class _ParticipateHistCompState extends State<ParticipateHistComp> {
 
                   child: ListTile(
                     leading: CircleAvatar(
-                      child: Icon(_getRandomIcon()),
                       backgroundColor:getRandomColor(),
+                      child: Icon(_getRandomIcon()),
                     ),
                     title:Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -86,7 +86,7 @@ class _ParticipateHistCompState extends State<ParticipateHistComp> {
 
                       ],
                     ),
-                    subtitle: Text("${_data[index]['inputData']}"),
+                    subtitle: Text("${(_data[index]['inputData']!='0')?_data[index]['inputData']:_data[index]['weight']} kg"),
 
 
                   ),
@@ -111,6 +111,7 @@ class _ParticipateHistCompState extends State<ParticipateHistComp> {
       ],
     );
   }
+  @override
   void initState()
   {
     super.initState();
@@ -235,12 +236,12 @@ Widget detailsProfile(IconText,icon,IconDescr,listBackground,IconrightText,iconr
 
           ),
           SizedBox(width:3,),
-          Text("${IconText}:",style:GoogleFonts.pacifico(fontSize:15,color: Colors.teal,fontWeight: FontWeight.w700)),
+          Text("$IconText:",style:GoogleFonts.pacifico(fontSize:15,color: Colors.teal,fontWeight: FontWeight.w700)),
           SizedBox(width:5,),
           Expanded(
             child: Container(
               padding: EdgeInsets.only(top: 3.9),
-              child: Text("${IconDescr}",style:GoogleFonts.pacifico(fontSize: 15)),
+              child: Text("$IconDescr",style:GoogleFonts.pacifico(fontSize: 15)),
             ),
           ),
 

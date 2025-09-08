@@ -17,6 +17,7 @@ import 'AdminQuery.dart';
 
 import '../DatabaseHelper.dart';
 import '../Utilconfig/ConstantClassUtil.dart';
+import '../Utilconfig/AppInfo.dart';
 
 class ParticipatedQuery extends GetxController{
   UserQuery userStatedata=Get.put(UserQuery());
@@ -930,12 +931,17 @@ getPreviousPriceOnline(Topups topupData,BonusModel bonusData)async{
         //"kebineericMuna_1668935593",
       "inputAction":"clientparticipant",
       "uid":"gold_1748467262",
+        "advancedSearch":topupData.advancedSearch,
+        "searchOption":topupData.optionCase,
+        "app_vers":AppInfo.version,
       "uidUser":"kebineericMuna_1676390572",
       "userStatus":"member",
       "commentData":"Option",
         "LimitStart":topupData.endlimit,  //page
         "LimitEnd":topupData.startlimit,//limit
-        "name":userData.name??'none'
+        "name":userData.name??'none',
+        "thisDate":topupData.created_at,
+        "toDate":topupData.updated_at??'none'
 
         //"options": [1,2,3],
       };
@@ -975,6 +981,7 @@ getPreviousPriceOnline(Topups topupData,BonusModel bonusData)async{
        "uidUser":"kebineericMuna_1676390572",
        "userStatus":"member",
         "commentData":"Option",
+        "app_vers":AppInfo.version,
         "LimitStart":topupData.endlimit,  //page
         "LimitEnd":topupData.startlimit,//limit
         "name":topupData.name??'none',
@@ -1018,6 +1025,7 @@ getPreviousPriceOnline(Topups topupData,BonusModel bonusData)async{
        // "PhoneNumber":"+25071113655898",
         "PhoneNumber":userData.phone??"none",
         "name":userData.name??"none",
+        "app_vers":AppInfo.version,
         "commentData":"Option",
         "createEvenExist":"yes"
         //"options": [1,2,3],

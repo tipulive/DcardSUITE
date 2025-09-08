@@ -1,13 +1,10 @@
-
-
-
-import 'package:dcard/Pages/SetEditCardNoPage.dart';
-import 'package:dcard/Pages/SetStockPage.dart';
-import 'package:dcard/Pages/SetWithdrawBonusPage.dart';
-import 'package:dcard/Query/AdminQuery.dart';
-import 'package:dcard/Query/TopupQuery.dart';
-import 'package:dcard/Utilconfig/HideShowState.dart';
-
+import '../SetEditCardNoPage.dart';
+import '../SetStockPage.dart';
+import '../SetWithdrawBonusPage.dart';
+import '../../Query/AdminQuery.dart';
+import '../../Query/TopupQuery.dart';
+import '../../Utilconfig/HideShowState.dart';
+import '../../Utilconfig/AppInfo.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -20,8 +17,9 @@ import '../SetWithdrawBalancePage.dart';
 
 
 
+
 class SettingComp extends StatefulWidget {
-  const SettingComp({Key? key}) : super(key: key);
+  const SettingComp({super.key});
 
   @override
   State<SettingComp> createState() => _SettingCompState();
@@ -42,7 +40,11 @@ class _SettingCompState extends State<SettingComp> {
 
 
           children: [
-
+            Center(
+              child: Text("App Version:${AppInfo.version}", style: GoogleFonts.abel(fontSize: 11,
+                  color: Colors.red,
+                  fontWeight: FontWeight.w700)),
+            ),
             Center(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -94,7 +96,7 @@ class _SettingCompState extends State<SettingComp> {
                 onTap: (){
                   withdrawBonusFunc();
                 },
-                child: detailsProfile("Bonus History",Icons.redeem,"$bonus",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,withdrawBonusFunc)),
+                child: detailsProfile("Bonus History",Icons.redeem,bonus,0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,withdrawBonusFunc)),
             const SizedBox(height:5,),
             GestureDetector(
                 onTap: () {
@@ -155,6 +157,7 @@ class _SettingCompState extends State<SettingComp> {
   }
 
 
+  @override
   void initState()
   {
     super.initState();
@@ -289,7 +292,7 @@ Widget detailsProfile(iconText,icon,iconDescr,listBackground,iconrightText,iconr
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Container(
+                SizedBox(
 
                     width: 30,
                     height: 30,

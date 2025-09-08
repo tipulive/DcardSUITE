@@ -18,6 +18,8 @@ class ProfilePic extends GetxController{
         SizedBox(height:6.0),
 
         Text("${(Get.put(CardQuery()).obj)["resultData"]["UserDetail"]["name"]??'none'}",style:GoogleFonts.pacifico(fontSize: 18,color: Colors.teal,fontWeight:FontWeight.w100),),
+        Text("${(Get.put(CardQuery()).obj)["resultData"]["UserDetail"]["packName"]??'none'}",style:GoogleFonts.pacifico(fontSize: 18,color: Colors.blue,fontWeight:FontWeight.w100),),
+
         SizedBox(height:3.0),
         //Text("Eric Ford",style: TextStyle(color: Colors.teal,fontSize:18,fontWeight:FontWeight.w500,fontStyle: FontStyle.normal),),
         Row(

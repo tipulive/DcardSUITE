@@ -6,10 +6,11 @@ import 'package:dio/dio.dart';
 //import 'package:firebase_core/firebase_core.dart';
 
 import 'package:flutter/material.dart';
+import 'package:wakelock_plus/wakelock_plus.dart' show WakelockPlus;
 import 'Pages/routes.dart';
+import 'Utilconfig/ConstantClassUtil.dart';
 
 
-import 'package:wakelock/wakelock.dart';
 import 'package:get/get.dart';
 
 
@@ -30,7 +31,7 @@ void main() async{
   );
  await FirebaseApi().initialize();*/
 
-  Wakelock.enable();
+  WakelockPlus.enable();
   //i may add  Wakelock.disable(); // to make apps to go on sleep mode
   /*this will make apps not going to sleep Mode*/
   runApp(const MyApp());
@@ -120,7 +121,7 @@ class _MyHomePageState extends State<MyHomePage> {
           child:Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text("V2Beta.0.0"),
+              const Text(ConstantClassUtil.appVers),
               const Text("Welcome TO Our Shop"),
               Container(
                 decoration: BoxDecoration(

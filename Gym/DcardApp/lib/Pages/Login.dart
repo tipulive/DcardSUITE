@@ -17,7 +17,7 @@ import 'package:intl_phone_field/intl_phone_field.dart';
 
 
 class Login extends StatefulWidget {
-  const Login({Key? key}) : super(key: key);
+  const Login({super.key});
 
   @override
   State<Login> createState() => _LoginState();
@@ -81,7 +81,6 @@ class _LoginState extends State<Login> {
 
                           ),
                           onChanged: (phone) {
-                            print(uidInput.text);
 
                             if((uidInput.text).isPhoneNumber)
                             {
@@ -104,7 +103,7 @@ class _LoginState extends State<Login> {
                           onCountryChanged: (country) {
 
 
-                            uidInput2.text="+"+country.dialCode;
+                            uidInput2.text="+${country.dialCode}";
                             if((uidInput.text).isPhoneNumber)
                             {
                               //Get.put(HideShowState()).isValid(true);
@@ -123,16 +122,13 @@ class _LoginState extends State<Login> {
                       ),
                       Visibility(
                         visible: false,
-                        child: Container(
-
-                          child: TextField(
-                            controller: uidInput2,
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(90.0),
-                              ),
-                              labelText: 'Ccode',
+                        child: TextField(
+                          controller: uidInput2,
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(90.0),
                             ),
+                            labelText: 'Ccode',
                           ),
                         ),
                       ),
@@ -172,7 +168,6 @@ class _LoginState extends State<Login> {
 
                       TextButton(
                         onPressed: () {
-                          print(uidInput.text);
                         },
                         child: Text(
                           'Forgot Password?',
@@ -275,7 +270,7 @@ setState(() {
           alignment: Alignment.bottomCenter,
           children: [
             SingleChildScrollView(
-              child: Container(
+              child: SizedBox(
                 height: 200,
 
                 child: Column(
@@ -369,7 +364,7 @@ setState(() {
 
             Positioned.fill(
               child: Container(
-                color: Colors.black.withOpacity(0.5),
+                color: Colors.black.withValues(alpha:0.5),
               ),
             ),
             Positioned(
@@ -397,7 +392,7 @@ setState(() {
           ),
           Positioned.fill(
             child: Container(
-              color: Colors.black.withOpacity(0.5),
+              color: Colors.black.withValues(alpha:0.5),
             ),
           ),
           Positioned(

@@ -41,6 +41,12 @@ class _ProfileCompState extends State<ProfileComp> {
         ProfilePic().profile(),
     const SizedBox(height: 6.0,),
     divLine(),
+          GestureDetector(
+              onTap: (){
+                eventfunc();
+              },
+              child: detailsProfile("Event",Icons.calendar_month_outlined,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,eventfunc)),//Last Time Purchase
+          const SizedBox(height:5,),
     GestureDetector(
         onTap: (){
           balancefunc();
@@ -53,12 +59,7 @@ class _ProfileCompState extends State<ProfileComp> {
         },
         child: detailsProfile("Bonus",Icons.redeem,"${(Get.put(TopupQuery()).obj)["resultData"]["result"].length>0?(Get.put(TopupQuery()).obj)["resultData"]["result"][0]["bonus"]:"0"}",0xffffffff,"textright",Icons.arrow_forward,"200",0xffffffff,bonusfunc)),
     const SizedBox(height:5,),
-    GestureDetector(
-        onTap: (){
-          eventfunc();
-        },
-        child: detailsProfile("Event",Icons.calendar_month_outlined,"",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,eventfunc)),//Last Time Purchase
-    const SizedBox(height:5,),
+
     //   detailsProfile("Status",Icons.track_changes,"Redeemed",0xffffffff,"textright",Icons.arrow_forward,"200\$",0xffffffff,Statusfunc),
           //Top Up
 
@@ -236,7 +237,7 @@ class _ProfileCompState extends State<ProfileComp> {
                       () =>Visibility(
                     visible: Get.put(HideShowState()).profVisible.value,
                     child: Container(
-                      color: Colors.black.withOpacity(0.65),
+                      color: Colors.black.withValues(alpha:0.65),
                     ),
                   ),
                 )
@@ -360,7 +361,7 @@ class _ProfileCompState extends State<ProfileComp> {
           Obx(() => Visibility(
             visible: Get.put(HideShowState()).profVisible.value,
             child: Container(
-              color: Colors.black.withOpacity(0.65),
+              color: Colors.black.withValues(alpha:0.65),
               child: Center(child: CircularProgressIndicator()),
             ),
           )),

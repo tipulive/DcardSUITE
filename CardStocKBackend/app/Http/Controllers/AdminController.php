@@ -23,6 +23,7 @@ class AdminController extends Controller
     public function __construct()
     {
         date_default_timezone_set(env('TIME_ZONE'));
+        //date_default_timezone_set(env('Africa/Johannesburg'));
         $this->today = date('Y-m-d H:i:s', time());
         $this->Appstate=env('APP_LIVE')?env('APP_PRO'):env('APP_DEV');
         $this->AppName=env('APP_NAME');

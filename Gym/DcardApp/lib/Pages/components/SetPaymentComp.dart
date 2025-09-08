@@ -1,6 +1,6 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:math';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 import 'package:dcard/models/User.dart';
 import 'package:flutter/material.dart';
@@ -12,10 +12,10 @@ import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import '../../Query/ParticipatedQuery.dart';
 
+
 import '../../Utilconfig/HideShowState.dart';
 import '../../models/Topups.dart';
 import '../../models/Participated.dart';
-import '../../models/Promotions.dart';
 import '../../Utilconfig/ConstantClassUtil.dart';
 
 class SetPaymentComp extends StatefulWidget {
@@ -38,7 +38,6 @@ class _SetPaymentCompState extends State<SetPaymentComp> {
 
   String advancedSearch = "today";
   String viewTitle = "Today";
-  final List<String> _dropdownOptions = ['Name', 'OrderId'];
   String selectOption = "Name";
   String thisDate = "none";
   String toDate = "";
@@ -157,7 +156,7 @@ class _SetPaymentCompState extends State<SetPaymentComp> {
                         Column(
                           children: [
                           Center(
-                            child: Text("$viewTitle", style: GoogleFonts.abel(fontSize: 11,
+                            child: Text(viewTitle, style: GoogleFonts.abel(fontSize: 11,
                                 color: Colors.red,
                                 fontWeight: FontWeight.w700)),
                           ),
@@ -423,6 +422,7 @@ class _SetPaymentCompState extends State<SetPaymentComp> {
                               context: context,
                               firstDate: DateTime(2024),
                               lastDate: DateTime(2100));
+
                           if (datetimeRange != null) {
                             setState(() {
                               advancedSearch = "choosedaterange";
@@ -473,7 +473,7 @@ class _SetPaymentCompState extends State<SetPaymentComp> {
 
                   child: Ink(
                     decoration: ShapeDecoration(
-                      color: Colors.grey.withOpacity(0.2),
+                      color: Colors.grey.withValues(alpha: 0.2),
                       shape: const CircleBorder(),
                     ),
                     child: const Padding(
@@ -529,7 +529,9 @@ class _SetPaymentCompState extends State<SetPaymentComp> {
                   else {
                     _data.clear();
                   }
-                } catch (e) {}
+                } catch (e) {
+                  Get.snackbar("Error", e.toString());
+                }
 
                 //print(this._data[index]["total_var"]);
                 // print("Text changed to: $text");
@@ -689,7 +691,7 @@ class _SetPaymentCompState extends State<SetPaymentComp> {
         });
         (Get.put(HideShowState()).isHiden(false));
         confirmCard();
-         controller!.pauseCamera();
+         controller.pauseCamera();
 
 
 
@@ -705,11 +707,11 @@ class _SetPaymentCompState extends State<SetPaymentComp> {
     // ${(Get.put(HideShowState()).delivery)[Get.put(HideShowState()).indexCountData]["currentQty"]}
     // (Get.put(StockQuery()).dispatchOrder)[Get.put(HideShowState()).indexCountData]["productCode"];
 
-    String lastFive = "******"+cardUid.substring(cardUid.length - 8);
-    String confirmText=(inputAction=="membership")?"Confirm if it is your Card $lastFive ?":"Confirm if your Number is ${phoneNumber} and your name:${name.text} ?";
+    String lastFive = "******${cardUid.substring(cardUid.length - 8)}";
+    String confirmText=(inputAction=="membership")?"Confirm if it is your Card $lastFive ?":"Confirm if your Number is $phoneNumber and your name:${name.text} ?";
     Get.dialog(
       AlertDialog(
-        title: Text("${confirmText}", style: TextStyle(fontSize: 14),),
+        title: Text(confirmText, style: TextStyle(fontSize: 14),),
         content: Text('Do you Want To Pay ${selpackages!["name"]} Subscription Which is Valid ${selpackages!["packValid"]}'),
         actions: [
           ElevatedButton(
@@ -722,7 +724,7 @@ class _SetPaymentCompState extends State<SetPaymentComp> {
             onPressed: () async{
               Get.back(canPop: false);
 
-              payment();
+              await payment();
 
 
             },
@@ -747,7 +749,6 @@ class _SetPaymentCompState extends State<SetPaymentComp> {
     final response = (await ParticipatedQuery().participantPayment(
         Participated(inputAction:inputAction, uid:selpackages!["uid"],carduid:cardUid),
         User(uid: "none",phone:phoneNumber, name: name.text))).data; // your API here
-    print(response);
     if (response!["status"]) {
       (Get.put(HideShowState()).isHiden(false));
       Get.close(1);
@@ -786,7 +787,6 @@ class _SetPaymentCompState extends State<SetPaymentComp> {
     final response = (await ParticipatedQuery().getAllPackage(
         Topups(startlimit: 1, endlimit: _page),
         User(uid: "none", name: "none"))).data; // your API here
-    print(response);
     if (response!["status"]) {
       (Get.put(HideShowState()).isHiden(false));
       setState(() {
@@ -815,7 +815,7 @@ class _SetPaymentCompState extends State<SetPaymentComp> {
           AlertDialog(
             title: Text(package['name']),
             content: Text(
-                'Description: ${package['packDetail']}\nPrice: ${package['price']}'),
+                '1)Description: ${package['packDetail']}\n2)Valid:${package['packValid']}Days(Count IN)\n3)Type:${package['packType']}\n4)Price:${package['price']}'),
             actions: [
               TextButton(onPressed: () => Navigator.pop(context),
                   child: Text('Close')),
@@ -827,7 +827,7 @@ class _SetPaymentCompState extends State<SetPaymentComp> {
     scale: 1,
     child: Switch.adaptive(
         activeColor: Colors.red,
-        activeTrackColor: Colors.red.withOpacity(0.4),
+        activeTrackColor: Colors.red.withValues(alpha: 0.4),
         inactiveThumbColor: Colors.orange,
         inactiveTrackColor: Colors.blueAccent,
 
@@ -846,7 +846,7 @@ class _SetPaymentCompState extends State<SetPaymentComp> {
     scale: 1,
     child: Switch.adaptive(
         activeColor: Colors.red,
-        activeTrackColor: Colors.red.withOpacity(0.4),
+        activeTrackColor: Colors.red.withValues(alpha: 0.4),
         inactiveThumbColor: Colors.orange,
         inactiveTrackColor: Colors.blueAccent,
 
@@ -948,6 +948,32 @@ class _SetPaymentCompState extends State<SetPaymentComp> {
 
 
       });
+      if(resultData["result"]==1){
+        Get.dialog(
+          AlertDialog(
+            title: const Text('Error'),
+            content: Text(resultData["error"]??''),
+            actions: [
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+
+                  //primary: Colors.grey[300],
+                  backgroundColor: const Color(0xff9a1c55),
+                  foregroundColor:Colors.white,
+                  elevation:0,
+                ),
+                onPressed: () async{
+
+
+                  Get.back();
+                },
+                child: const Text('Close'),
+              ),
+
+            ],
+          ),
+        );
+      }
     }
 
   }
@@ -960,6 +986,8 @@ class _SetPaymentCompState extends State<SetPaymentComp> {
 
   //popup
   payPackage() {
+    //Get.put(ParticipatedQuery().isHidden("none"));
+
     Map<String, dynamic>? selectedPackage; // ✅ Local variable to avoid null errors
     final GlobalKey qrkey1 = GlobalKey(debugLabel: 'QR Key 1');
     return Get.bottomSheet(
@@ -982,10 +1010,12 @@ class _SetPaymentCompState extends State<SetPaymentComp> {
 
 
                   const SizedBox(height: 10),
-
+                  //Get.put(ParticipatedQuery().isHidden("none")),
                   GetBuilder<ParticipatedQuery>(
                     builder: (controller) {
+
                       if (controller.package.isEmpty) {
+                        //print("no package available");
                         return const Text('No package data available.');
                       }
 
@@ -998,7 +1028,8 @@ class _SetPaymentCompState extends State<SetPaymentComp> {
                             suffixIcon: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                            ((controller.isVisible!="none"))?
+                                //Get.put(HideShowState()).isValid(true)
+                            ((controller.isVisible!="none".obs))?
                                 IconButton(
                                   icon: Icon(Icons.info_outline), // Info icon
                                   tooltip: 'Package Info',
@@ -1010,7 +1041,7 @@ class _SetPaymentCompState extends State<SetPaymentComp> {
                                 child: Text("")
                             ),
                             //return
-                                ((controller.isVisible=="0") || (controller.isVisible=="2") || (controller.isVisible=="3") || (controller.isVisible=="4"))?
+                                ((controller.isVisible=="0".obs) || (controller.isVisible=="2".obs) || (controller.isVisible=="3".obs) || (controller.isVisible=="4".obs))?
                                 IconButton(
                                   icon: Icon(Icons.payments), // Scan icon
                                   tooltip: 'Pay By Cash',
@@ -1038,7 +1069,7 @@ class _SetPaymentCompState extends State<SetPaymentComp> {
                                     visible: false,
                                     child: Text("")
                                 ),
-                                ((controller.isVisible=="1") || (controller.isVisible=="2") || (controller.isVisible=="3") || (controller.isVisible=="4"))?
+                                ((controller.isVisible=="1".obs) || (controller.isVisible=="2".obs) || (controller.isVisible=="3".obs) || (controller.isVisible=="4".obs))?
                                 IconButton(
                                   icon: Icon(Icons.qr_code_scanner), // Scan icon
                                   tooltip: 'Scan Package',
@@ -1085,18 +1116,22 @@ class _SetPaymentCompState extends State<SetPaymentComp> {
                                 setState(() {
                                   selpackages=value;
                                   selectedPackage = value;
+                                  //controller.isHidden("0");
                                 });
                                 controller.isHidden(value!["packEligible"]);
-                                if(value!["packEligible"]=="0")
+                                if(value["packEligible"]=="0")
                                   {
                                     setState(() {
                                      inputAction="cashpayment";
+                                     //controller.isHidden("0");
                                     });
                                   }
-                                  else if(value!["packEligible"]=="1"){
+                                  else if(value["packEligible"]=="1"){
 
                                   setState(() {
                                     inputAction="membership";
+                                   // controller.isHidden("1");
+
                                   });
                                    }
                                   else{
@@ -1125,7 +1160,7 @@ class _SetPaymentCompState extends State<SetPaymentComp> {
                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
                      child: Column(
                        children: [
-                         ((myLoadercontroller.isVisible=="1") || (myLoadercontroller.isVisible=="4"))?
+                         ((myLoadercontroller.isVisible=="1".obs) || (myLoadercontroller.isVisible=="4".obs))?
                           SizedBox(
                            width:400,
                            height: 200,
@@ -1171,122 +1206,115 @@ class _SetPaymentCompState extends State<SetPaymentComp> {
                              visible: false,
                              child: Text("")
                          ),
-                         ((myLoadercontroller.isVisible=="0") || (myLoadercontroller.isVisible=="3"))?
+                         ((myLoadercontroller.isVisible=="0".obs) || (myLoadercontroller.isVisible=="3".obs))?
                          Column(
                            children: [
 
-                             Container(
+                             IntlPhoneField(
+                               initialCountryCode: 'CD',
+                               controller: uidInput,
+                               autofocus: true,
 
-                               child:  IntlPhoneField(
-                                 initialCountryCode: 'CD',
-                                 controller: uidInput,
-                                 autofocus: true,
-
-                                 decoration: InputDecoration(
-                                   labelText: 'Phone Number',
-                                   border: const OutlineInputBorder(
-                                     borderSide: BorderSide(),
-                                   ),
-                                   suffixIcon:Obx(() => Get.put(HideShowState()).visibleIcon.value?const Icon(Icons.done,color:Colors.green,):const Icon(Icons.dangerous,color:Colors.red,)),
-
-
+                               decoration: InputDecoration(
+                                 labelText: 'Phone Number',
+                                 border: const OutlineInputBorder(
+                                   borderSide: BorderSide(),
                                  ),
+                                 suffixIcon:Obx(() => Get.put(HideShowState()).visibleIcon.value?const Icon(Icons.done,color:Colors.green,):const Icon(Icons.dangerous,color:Colors.red,)),
 
 
-                                 onChanged: (phone) async{
-
-                                   if((uidInput.text).isPhoneNumber)
-                                   {
-
-
-                                     // getDataFromNo(phone.number);
-                                     setState(() {
-                                       phoneNumber="${phone.countryCode}${phone.number}";
-                                       validForm=(validForm<2)?validForm+1:validForm;
-                                     });
-
-                                     Get.put(HideShowState()).isIconVisible(true);
-                                     (validForm==2)?Get.put(HideShowState()).isValid(true):Get.put(HideShowState()).isValid(false);
-
-                                   }
-                                   else{
-                                     setState(() {
-                                       validForm=(validForm>0)?validForm-1:validForm;
-                                     });
-                                     Get.put(HideShowState()).isValid(false);
-                                     Get.put(HideShowState()).isIconVisible(false);
-                                   }
-
-
-                                   //uidInput4.text=phone.countryCode;
-                                   //uidInput2.text=phone.number;
-                                   // uidInput2.text=phone.countryISOCode;
-                                   //print(phone.completeNumber);
-
-
-
-                                 },
-
-                                 onCountryChanged: (country) {
-
-                                   uidInput4.text="+${country.dialCode}";
-                                   uidInput5.text=country.name;
-                                   initCountry.text=country.code;
-
-                                   if((uidInput.text).isPhoneNumber)
-                                   {
-                                     Get.put(HideShowState()).isIconVisible(true);
-                                     //phoneNumber="+${country.dialCode}${uidInput.text}";
-                                     setState(() {
-                                       phoneNumber="+${country.dialCode}${uidInput.text}";
-                                       validForm=(validForm<2)?validForm+1:validForm;
-                                     });
-
-                                     (validForm==2)?Get.put(HideShowState()).isValid(true):Get.put(HideShowState()).isValid(false);
-                                     //getDataFromNo(uidInput.text);
-
-                                   }
-                                   else{
-                                     Get.put(HideShowState()).isIconVisible(false);
-                                     setState(() {
-                                       validForm=(validForm>0)?validForm-1:validForm;
-                                     });
-                                     Get.put(HideShowState()).isValid(false);
-
-                                     // initCountry.text="";
-                                     //password.text="";
-                                   }
-                                   // print('Country changed to: ' + country.name);
-                                   // print('Country changed to: ' + country.dialCode);
-                                 },
                                ),
-                             ),
-                             Container(
 
-                               child: TextField(
-                                 controller: name,
-                                 decoration: const InputDecoration(
-                                   contentPadding: EdgeInsets.symmetric(vertical: 3, horizontal: 3),
-                                   border: OutlineInputBorder(),
-                                   labelText: 'Name',
-                                   hintText: 'Enter your name',
-                                   hintStyle: TextStyle(color: Colors.grey),
-                                 ),
-                                 onChanged: (value) {
-                                   final nameRegex = RegExp(r"^[a-zA-Z\s]{2,}$"); // letters and spaces, at least 2 characters
 
-                                   if (value.isNotEmpty && nameRegex.hasMatch(value)) {
+                               onChanged: (phone) async{
+
+                                 if((uidInput.text).isPhoneNumber)
+                                 {
+
+
+                                   // getDataFromNo(phone.number);
+                                   setState(() {
+                                     phoneNumber="${phone.countryCode}${phone.number}";
                                      validForm=(validForm<2)?validForm+1:validForm;
-                                     (validForm==2)?Get.put(HideShowState()).isValid(true):Get.put(HideShowState()).isValid(false);
-                                   } else {
-                                     setState(() {
-                                       validForm=(validForm>0)?validForm-1:validForm;
-                                     });
-                                     Get.put(HideShowState()).isValid(false);
-                                   }
-                                 },
-                               ),
+                                   });
 
+                                   Get.put(HideShowState()).isIconVisible(true);
+                                   (validForm==2)?Get.put(HideShowState()).isValid(true):Get.put(HideShowState()).isValid(false);
+
+                                 }
+                                 else{
+                                   setState(() {
+                                     validForm=(validForm>0)?validForm-1:validForm;
+                                   });
+                                   Get.put(HideShowState()).isValid(false);
+                                   Get.put(HideShowState()).isIconVisible(false);
+                                 }
+
+
+                                 //uidInput4.text=phone.countryCode;
+                                 //uidInput2.text=phone.number;
+                                 // uidInput2.text=phone.countryISOCode;
+                                 //print(phone.completeNumber);
+
+
+
+                               },
+
+                               onCountryChanged: (country) {
+
+                                 uidInput4.text="+${country.dialCode}";
+                                 uidInput5.text=country.name;
+                                 initCountry.text=country.code;
+
+                                 if((uidInput.text).isPhoneNumber)
+                                 {
+                                   Get.put(HideShowState()).isIconVisible(true);
+                                   //phoneNumber="+${country.dialCode}${uidInput.text}";
+                                   setState(() {
+                                     phoneNumber="+${country.dialCode}${uidInput.text}";
+                                     validForm=(validForm<2)?validForm+1:validForm;
+                                   });
+
+                                   (validForm==2)?Get.put(HideShowState()).isValid(true):Get.put(HideShowState()).isValid(false);
+                                   //getDataFromNo(uidInput.text);
+
+                                 }
+                                 else{
+                                   Get.put(HideShowState()).isIconVisible(false);
+                                   setState(() {
+                                     validForm=(validForm>0)?validForm-1:validForm;
+                                   });
+                                   Get.put(HideShowState()).isValid(false);
+
+                                   // initCountry.text="";
+                                   //password.text="";
+                                 }
+                                 // print('Country changed to: ' + country.name);
+                                 // print('Country changed to: ' + country.dialCode);
+                               },
+                             ),
+                             TextField(
+                               controller: name,
+                               decoration: const InputDecoration(
+                                 contentPadding: EdgeInsets.symmetric(vertical: 3, horizontal: 3),
+                                 border: OutlineInputBorder(),
+                                 labelText: 'Name',
+                                 hintText: 'Enter your name',
+                                 hintStyle: TextStyle(color: Colors.grey),
+                               ),
+                               onChanged: (value) {
+                                 final nameRegex = RegExp(r"^[a-zA-Z\s]{2,}$"); // letters and spaces, at least 2 characters
+
+                                 if (value.isNotEmpty && nameRegex.hasMatch(value)) {
+                                   validForm=(validForm<2)?validForm+1:validForm;
+                                   (validForm==2)?Get.put(HideShowState()).isValid(true):Get.put(HideShowState()).isValid(false);
+                                 } else {
+                                   setState(() {
+                                     validForm=(validForm>0)?validForm-1:validForm;
+                                   });
+                                   Get.put(HideShowState()).isValid(false);
+                                 }
+                               },
                              ),
 
                            ],
@@ -1296,23 +1324,21 @@ class _SetPaymentCompState extends State<SetPaymentComp> {
                          ),
                          const SizedBox(height: 5.0,),
                          Obx(() => Get.put(HideShowState()).isNumberValid.value?
-                         Container(
-                           child: FloatingActionButton.extended(
-                               label: const Text('Pay By Cash'), // <-- Text
-                               backgroundColor: Colors.black,
-                               foregroundColor: Colors.white,
-                               icon: const Icon( // <-- Icon
-                                 Icons.attach_money_rounded,
-                                 size: 24.0,
-                               ),
-                               onPressed: () =>{
-                                 //paidDebt()
-                                 //addUserMethod(),
-                                 // formReset(),
-                                confirmCard(),
+                         FloatingActionButton.extended(
+                             label: const Text('Pay By Cash'), // <-- Text
+                             backgroundColor: Colors.black,
+                             foregroundColor: Colors.white,
+                             icon: const Icon( // <-- Icon
+                               Icons.attach_money_rounded,
+                               size: 24.0,
+                             ),
+                             onPressed: () =>{
+                               //paidDebt()
+                               //addUserMethod(),
+                               // formReset(),
+                              confirmCard(),
 
-                               }),
-                         ):const Text("")),
+                             }):const Text("")),
 
                        ],
                      ),
@@ -1330,6 +1356,15 @@ class _SetPaymentCompState extends State<SetPaymentComp> {
         },
       ),
     ).whenComplete(() {
+      setState(() {
+
+name.text="";
+uidInput.text="";
+      });
+      Get.put(HideShowState()).isValid(false);
+      Get.put(HideShowState()).isIconVisible(false);
+      Get.put(HideShowState()).isVisible(false);
+      Get.put(ParticipatedQuery()).isHidden("none");
       // ✅ Post-bottom-sheet logic
     });
   }

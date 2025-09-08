@@ -36,7 +36,6 @@ class _SetGymLiveCompState extends State<SetGymLiveComp> {
 
   String advancedSearch="today";
   String viewTitle="Today";
-  final List<String> _dropdownOptions = ['Name','OrderId'];
   String selectOption="Name";
   String thisDate="none";
   String toDate="";
@@ -61,7 +60,7 @@ class _SetGymLiveCompState extends State<SetGymLiveComp> {
                   () =>Visibility(
                 visible: Get.put(HideShowState()).isVisible.value,
                 child: Container(
-                  color: Colors.black.withOpacity(0.65),
+                  color: Colors.black.withValues(alpha:0.65),
                 ),
               ),
             )
@@ -112,7 +111,11 @@ class _SetGymLiveCompState extends State<SetGymLiveComp> {
 
                         Column(
                           children: [
-
+                            Center(
+                              child: Text(viewTitle, style: GoogleFonts.abel(fontSize: 11,
+                                  color: Colors.red,
+                                  fontWeight: FontWeight.w700)),
+                            ),
                             Center(
                               child: RichText(
                                 text: TextSpan(
@@ -415,42 +418,7 @@ class _SetGymLiveCompState extends State<SetGymLiveComp> {
                         ),
                       )
                   ),
-                  PopupMenuItem(
-                      child: InkWell(
-                        onTap: () async{
-                          setState(() {
-                            advancedSearch="mysales";
-                            viewTitle="My Sales";
 
-                          });
-                          await viewData('test',"false");
-                        },
-                        child: const Column(
-                          children: [
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.apartment,
-                                  color: Colors.orange,
-                                ),
-
-                                Padding(
-                                  padding: EdgeInsets.only(left:10.0),
-                                  child: Text("All My Sales"),
-                                ),
-
-                              ],
-                            ),
-                            Divider(
-                              height: 20, // Adjust the height as needed
-                              thickness: 0.2, // Adjust the thickness as needed
-                              color: Colors.grey,
-                            ),
-
-                          ],
-                        ),
-                      )
-                  ),
 
                 ],
                 offset: const Offset(0, 40),
@@ -458,7 +426,7 @@ class _SetGymLiveCompState extends State<SetGymLiveComp> {
 
                   child: Ink(
                     decoration: ShapeDecoration(
-                      color: Colors.grey.withOpacity(0.2),
+                      color: Colors.grey.withValues(alpha:0.2),
                       shape: const CircleBorder(),
                     ),
                     child: const Padding(
@@ -516,6 +484,7 @@ class _SetGymLiveCompState extends State<SetGymLiveComp> {
 
 
                 } catch (e) {
+
                 }
 
                 //print(this._data[index]["total_var"]);
@@ -593,7 +562,7 @@ class _SetGymLiveCompState extends State<SetGymLiveComp> {
                             mainAxisAlignment:MainAxisAlignment.spaceBetween,
                             children: [
 
-                              Text("${ConstantClassUtil().formatMinutes(_data[index]['Min_remaining'])} left" ),
+                              Text((ConstantClassUtil().formatMinutes(_data[index]['Min_remaining'])).contains('-')?'${(ConstantClassUtil().formatMinutes(_data[index]['Min_remaining'])).replaceAll('-', '')} Ago':'${ConstantClassUtil().formatMinutes(_data[index]['Min_remaining'])} Left' ),
                               Text("${_data[index]['created_at']}"),
 
 
@@ -665,32 +634,86 @@ class _SetGymLiveCompState extends State<SetGymLiveComp> {
     return icons[random.nextInt(icons.length)];
   }
   viewData(nameVal,searchVal) async{
-
-  }
-  scrolldata()async
-  {
     if(isLoading) return;
     isLoading=true;
     int limit=10;
-    //var resul=(await ParticipatedQuery().getAllParticipateHistEventOnline(Topups(startlimit:limit,endlimit:_page),User(uid: "none",name:"none"))).data;
-    var resul=(await ParticipatedQuery().participantIn(Topups(startlimit:limit,endlimit:_page),User(uid: "none",name:"none"))).data;
 
-if(resul!["status"]) {
-  setState(() {
-    isLoading = false;
-    if (resul["result"].length < limit) {
-      hasMoreData = false;
+
+    var resultData=(await ParticipatedQuery().participantIn(Topups(startlimit:limit,endlimit:_page,name:nameVal,optionCase:"$searchVal",advancedSearch:advancedSearch,created_at:thisDate,updated_at:toDate),User(uid: "none",name:"none"))).data;
+
+    if(resultData["status"])
+    {
+
+
+
+      if(resultData["result"]!=0)
+      {
+        setState(() {
+          isLoading=false;
+          hasMoreData=false;
+          _data.clear();
+          _data.addAll(resultData["result"]);
+
+        });
+      }
+      else{
+        setState(() {
+          isLoading=false;
+          hasMoreData=false;
+          _data.clear();
+
+
+        });
+
+      }
+
+
+
+
     }
-    _data.addAll(resul["result"]);
-  });
-}
-else{
-  setState(() {
-    isLoading = true;
-    hasMoreData = false;
+    else{
 
-  });
-}
+
+      setState(() {
+        isLoading=false;
+        hasMoreData=false;
+        _data.clear();
+
+
+      });
+      if(resultData["result"]==1){
+        Get.dialog(
+          AlertDialog(
+            title: const Text('Error'),
+            content: Text(resultData["error"]??''),
+            actions: [
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+
+                  //primary: Colors.grey[300],
+                  backgroundColor: const Color(0xff9a1c55),
+                  foregroundColor:Colors.white,
+                  elevation:0,
+                ),
+                onPressed: () async{
+
+
+                  Get.back();
+                },
+                child: const Text('Close'),
+              ),
+
+            ],
+          ),
+        );
+      }
+
+
+    }
+  }
+  scrolldata()async
+  {
+    await viewData('test',"false");
   }
 
   //popup
@@ -807,7 +830,7 @@ else{
                           () =>Visibility(
                         visible: Get.put(HideShowState()).isVisible.value,
                         child: Container(
-                          color: Colors.black.withOpacity(0.65),
+                          color: Colors.black.withValues(alpha:0.65),
                         ),
                       ),
                     )
