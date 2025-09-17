@@ -10,13 +10,16 @@ import 'package:intl_phone_field/intl_phone_field.dart';
 
 
 import 'package:qr_code_scanner/qr_code_scanner.dart';
+import '../../Query/CardQuery.dart';
 import '../../Query/ParticipatedQuery.dart';
 
 
 import '../../Utilconfig/HideShowState.dart';
+import '../../models/Admin.dart';
 import '../../models/Topups.dart';
 import '../../models/Participated.dart';
 import '../../Utilconfig/ConstantClassUtil.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SetPaymentComp extends StatefulWidget {
   const SetPaymentComp({super.key});
@@ -780,7 +783,32 @@ class _SetPaymentCompState extends State<SetPaymentComp> {
           duration: Duration(seconds: 5));
     }
   }
+  getDataFromNo(phoneNumber) async{
+    (Get.put(HideShowState()).isHiden(true));
+    var resultData=(await CardQuery().getNumberDetailCardOnline(Admin(uid: "tets", subscriber: "test",phone:phoneNumber,Ccode: uidInput4.text))).data;
+    if(resultData["status"])
+    {
+      uidData.text=resultData["UserDetail"]["uid"];
+      name.text=resultData["UserDetail"]["name"];
+      email.text=resultData["UserDetail"]["email"];
+      initCountry.text=resultData["UserDetail"]["initCountry"];
+      password.text=resultData["UserDetail"]["password"]??'none';
+      (Get.put(HideShowState()).isHiden(false));
 
+    }
+    else{
+      name.text="";
+      (Get.put(HideShowState()).isHiden(false));
+      setState(() {
+
+        isLoading=false;
+      });
+
+
+
+    }
+
+  }
   Future<void> fetchPackages() async {
  //loader is needed here
 
@@ -797,13 +825,51 @@ class _SetPaymentCompState extends State<SetPaymentComp> {
       payPackage();
     }
     else{
-      (Get.put(HideShowState()).isHiden(false));
-      Get.snackbar("Error", "Something Wrong Contact System Admin",backgroundColor: Color(0xff9a1c55),
-          colorText: Color(0xffffffff),
-          titleText: Text("Error"),
+      if(response["result"]==1){
+        Get.dialog(
+          AlertDialog(
+            title: const Text('Error'),
+            content: Text(response["error"]??''),
+            actions: [
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
 
-          icon: Icon(Icons.access_alarm),
-          duration: Duration(seconds: 5));
+                  //primary: Colors.grey[300],
+                  backgroundColor: Color(0xff9a1c55),
+                  foregroundColor: Colors.white,
+                  elevation:0,
+                ),
+                onPressed: () async{
+                  final Uri urlData = Uri.parse(response["downNew"]);
+                  if (!await launchUrl(urlData)) {
+                    throw Exception('Could not launch $urlData');
+                  }
+                },
+                child: Text('Update'),
+              ),
+              ElevatedButton(
+
+                onPressed: () async{
+
+
+                  Get.back();
+                },
+                child: const Text('Close'),
+              ),
+
+            ],
+          ),
+        );
+      }else{
+        (Get.put(HideShowState()).isHiden(false));
+        Get.snackbar("Error", "Something Wrong Contact System Admin",backgroundColor: Color(0xff9a1c55),
+            colorText: Color(0xffffffff),
+            titleText: Text("Error"),
+
+            icon: Icon(Icons.access_alarm),
+            duration: Duration(seconds: 5));
+      }
+
 
     }
   }
@@ -958,10 +1024,20 @@ class _SetPaymentCompState extends State<SetPaymentComp> {
                 style: ElevatedButton.styleFrom(
 
                   //primary: Colors.grey[300],
-                  backgroundColor: const Color(0xff9a1c55),
-                  foregroundColor:Colors.white,
+                  backgroundColor: Color(0xff9a1c55),
+                  foregroundColor: Colors.white,
                   elevation:0,
                 ),
+                onPressed: () async{
+                  final Uri urlData = Uri.parse(resultData["downNew"]);
+                  if (!await launchUrl(urlData)) {
+                    throw Exception('Could not launch $urlData');
+                  }
+                },
+                child: Text('Update'),
+              ),
+              ElevatedButton(
+
                 onPressed: () async{
 
 
@@ -993,365 +1069,392 @@ class _SetPaymentCompState extends State<SetPaymentComp> {
     return Get.bottomSheet(
       StatefulBuilder(
         builder: (BuildContext context, StateSetter setState) {
-          return Container(
-            padding: const EdgeInsets.all(5.0),
-            height: 600,
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(30),
-                topRight: Radius.circular(30),
-              ),
-            ),
-            child: SingleChildScrollView( // ✅ Prevent overflow
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+          return Stack(
+            alignment: Alignment.bottomCenter,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(5.0),
+                height: 600,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(30),
+                    topRight: Radius.circular(30),
+                  ),
+                ),
+                child: SingleChildScrollView( // ✅ Prevent overflow
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
 
 
-                  const SizedBox(height: 10),
-                  //Get.put(ParticipatedQuery().isHidden("none")),
-                  GetBuilder<ParticipatedQuery>(
-                    builder: (controller) {
+                      const SizedBox(height: 10),
+                      //Get.put(ParticipatedQuery().isHidden("none")),
+                      GetBuilder<ParticipatedQuery>(
+                        builder: (controller) {
 
-                      if (controller.package.isEmpty) {
-                        //print("no package available");
-                        return const Text('No package data available.');
-                      }
+                          if (controller.package.isEmpty) {
+                            //print("no package available");
+                            return const Text('No package data available.');
+                          }
 
-                      return Container(
-                        padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-                        child: InputDecorator(
-                          decoration: InputDecoration(
-                            labelText: 'Select Package',
-                            border: OutlineInputBorder(),
-                            suffixIcon: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                //Get.put(HideShowState()).isValid(true)
-                            ((controller.isVisible!="none".obs))?
-                                IconButton(
-                                  icon: Icon(Icons.info_outline), // Info icon
-                                  tooltip: 'Package Info',
-                                  onPressed: selectedPackage != null
-                                      ? () => showPackageDetails(context, selectedPackage!)
-                                      : null,
-                                ):Visibility(
-                                visible: false,
-                                child: Text("")
-                            ),
-                            //return
-                                ((controller.isVisible=="0".obs) || (controller.isVisible=="2".obs) || (controller.isVisible=="3".obs) || (controller.isVisible=="4".obs))?
-                                IconButton(
-                                  icon: Icon(Icons.payments), // Scan icon
-                                  tooltip: 'Pay By Cash',
-                                  onPressed: () {
-                                    // handle scan action
-                                    //package
-                                    if(selectedPackage!["packEligible"]=="2")
-                                      {
-                                        setState(() {
-                                          inputAction="cashpayment";
-                                          controller.isHidden("3");
-                                        });
-                                      }else{
+                          return Container(
+                            padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                            child: InputDecorator(
+                              decoration: InputDecoration(
+                                labelText: 'Select Package',
+                                border: OutlineInputBorder(),
+                                suffixIcon: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    //Get.put(HideShowState()).isValid(true)
+                                    ((controller.isVisible!="none".obs))?
+                                    IconButton(
+                                      icon: Icon(Icons.info_outline), // Info icon
+                                      tooltip: 'Package Info',
+                                      onPressed: selectedPackage != null
+                                          ? () => showPackageDetails(context, selectedPackage!)
+                                          : null,
+                                    ):Visibility(
+                                        visible: false,
+                                        child: Text("")
+                                    ),
+                                    //return
+                                    ((controller.isVisible=="0".obs) || (controller.isVisible=="2".obs) || (controller.isVisible=="3".obs) || (controller.isVisible=="4".obs))?
+                                    IconButton(
+                                      icon: Icon(Icons.payments), // Scan icon
+                                      tooltip: 'Pay By Cash',
+                                      onPressed: () {
+                                        // handle scan action
+                                        //package
+                                        if(selectedPackage!["packEligible"]=="2")
+                                        {
+                                          setState(() {
+                                            inputAction="cashpayment";
+                                            controller.isHidden("3");
+                                          });
+                                        }else{
+                                          setState(() {
+                                            inputAction="cashpayment";
+                                            controller.isHidden(selectedPackage!["packEligible"]);
+                                          });
+
+
+                                        }
+                                        // print(selectedPackage!);
+                                      },
+                                    )
+                                        :Visibility(
+                                        visible: false,
+                                        child: Text("")
+                                    ),
+                                    ((controller.isVisible=="1".obs) || (controller.isVisible=="2".obs) || (controller.isVisible=="3".obs) || (controller.isVisible=="4".obs))?
+                                    IconButton(
+                                      icon: Icon(Icons.qr_code_scanner), // Scan icon
+                                      tooltip: 'Scan Package',
+                                      onPressed: () {
+                                        // handle scan action
+                                        //package
+                                        if(selectedPackage!["packEligible"]=="2")
+                                        {
+                                          setState(() {
+                                            inputAction="membership";
+                                            controller.isHidden("4");
+                                          });
+
+                                        }else{
+                                          setState(() {
+                                            inputAction="membership";
+                                            controller.isHidden(selectedPackage!["packEligible"]);
+                                          });
+                                        }
+                                      },
+                                    )
+                                        :
+                                    Visibility(
+                                        visible: false,
+                                        child: Text("")
+                                    ),
+
+
+                                  ],
+                                ),
+                              ),
+                              child: DropdownButtonHideUnderline(
+                                child: DropdownButton<Map<String, dynamic>>(
+                                  isExpanded: true,
+                                  hint: Text("Choose package"),
+                                  value: selectedPackage,
+                                  items: controller.package.map<DropdownMenuItem<Map<String, dynamic>>>((pkg) {
+                                    return DropdownMenuItem(
+                                      value: pkg,
+                                      child: Text(pkg['name']),
+                                    );
+                                  }).toList(),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      selpackages=value;
+                                      selectedPackage = value;
+                                      //controller.isHidden("0");
+                                    });
+                                    controller.isHidden(value!["packEligible"]);
+                                    if(value["packEligible"]=="0")
+                                    {
                                       setState(() {
                                         inputAction="cashpayment";
-                                        controller.isHidden(selectedPackage!["packEligible"]);
+                                        //controller.isHidden("0");
                                       });
-
-
                                     }
-                                   // print(selectedPackage!);
+                                    else if(value["packEligible"]=="1"){
+
+                                      setState(() {
+                                        inputAction="membership";
+                                        // controller.isHidden("1");
+
+                                      });
+                                    }
+                                    else{
+                                      setState(() {
+                                        inputAction="none";
+                                      });
+                                    }
+                                    // print(value!["id"]);
+
+
+
                                   },
-                                )
-                                    :Visibility(
+                                ),
+                              ),
+                            ),
+                          );
+
+                        },
+                      ),
+                      const SizedBox(height: 10),
+                      GetBuilder<ParticipatedQuery>(
+                        builder: (myLoadercontroller) {
+                          //return Text('Data: ${_controller.data}');
+
+                          return Container(
+                            padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                            child: Column(
+                              children: [
+                                ((myLoadercontroller.isVisible=="1".obs) || (myLoadercontroller.isVisible=="4".obs))?
+                                SizedBox(
+                                  width:400,
+                                  height: 200,
+                                  child: Stack(
+                                    alignment:Alignment.bottomCenter,
+                                    children: [
+                                      QRView(key:qrkey1,onQRViewCreated: _onQRViewCreated,
+                                        overlay: QrScannerOverlayShape(
+                                          borderColor: Colors.pink,
+                                          borderRadius: 10,
+                                          borderLength: 30,
+                                          borderWidth: 10,
+                                          cutOutSize: 300,
+                                          // Add the laser effect
+
+                                        ),
+                                      ),
+
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+
+                                              cameraSwitch(),
+                                              //SizedBox(width: 10.0,),
+
+                                              // SizedBox(width: 10.0,),
+                                              flashSwitch(),
+                                              Image.asset(
+                                                flashValue ? 'images/on.png' : 'images/off.png',
+                                                height: 30,
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+
+                                    ],
+                                  ),
+                                ):Visibility(
                                     visible: false,
                                     child: Text("")
                                 ),
-                                ((controller.isVisible=="1".obs) || (controller.isVisible=="2".obs) || (controller.isVisible=="3".obs) || (controller.isVisible=="4".obs))?
-                                IconButton(
-                                  icon: Icon(Icons.qr_code_scanner), // Scan icon
-                                  tooltip: 'Scan Package',
-                                  onPressed: () {
-                                    // handle scan action
-                                    //package
-                                    if(selectedPackage!["packEligible"]=="2")
-                                    {
-                                      setState(() {
-                                        inputAction="membership";
-                                        controller.isHidden("4");
-                                      });
+                                ((myLoadercontroller.isVisible=="0".obs) || (myLoadercontroller.isVisible=="3".obs))?
+                                Column(
+                                  children: [
 
-                                    }else{
-                                      setState(() {
-                                        inputAction="membership";
-                                        controller.isHidden(selectedPackage!["packEligible"]);
-                                      });
-                                    }
-                                  },
-                                )
-                                :
-                                Visibility(
-                                  visible: false,
+                                    IntlPhoneField(
+                                      initialCountryCode: 'CD',
+                                      controller: uidInput,
+                                      autofocus: true,
+
+                                      decoration: InputDecoration(
+                                        labelText: 'Phone Number',
+                                        border: const OutlineInputBorder(
+                                          borderSide: BorderSide(),
+                                        ),
+                                        suffixIcon:Obx(() => Get.put(HideShowState()).visibleIcon.value?const Icon(Icons.done,color:Colors.green,):const Icon(Icons.dangerous,color:Colors.red,)),
+
+
+                                      ),
+
+
+                                      onChanged: (phone) async{
+
+                                        if((uidInput.text).isPhoneNumber)
+                                        {
+
+
+                                          getDataFromNo(phone.number);
+                                          setState(() {
+                                            phoneNumber="${phone.countryCode}${phone.number}";
+                                            validForm=(validForm<2)?validForm+1:validForm;
+                                          });
+
+                                          Get.put(HideShowState()).isIconVisible(true);
+                                          (validForm==2)?Get.put(HideShowState()).isValid(true):Get.put(HideShowState()).isValid(false);
+
+                                        }
+                                        else{
+                                          setState(() {
+                                            validForm=(validForm>0)?validForm-1:validForm;
+                                          });
+                                          Get.put(HideShowState()).isValid(false);
+                                          Get.put(HideShowState()).isIconVisible(false);
+                                        }
+
+
+                                        //uidInput4.text=phone.countryCode;
+                                        //uidInput2.text=phone.number;
+                                        // uidInput2.text=phone.countryISOCode;
+                                        //print(phone.completeNumber);
+
+
+
+                                      },
+
+                                      onCountryChanged: (country) {
+
+                                        uidInput4.text="+${country.dialCode}";
+                                        uidInput5.text=country.name;
+                                        initCountry.text=country.code;
+
+                                        if((uidInput.text).isPhoneNumber)
+                                        {
+                                          getDataFromNo(uidInput.text);
+                                          Get.put(HideShowState()).isIconVisible(true);
+                                          //phoneNumber="+${country.dialCode}${uidInput.text}";
+                                          setState(() {
+                                            phoneNumber="+${country.dialCode}${uidInput.text}";
+                                            validForm=(validForm<2)?validForm+1:validForm;
+                                          });
+
+                                          (validForm==2)?Get.put(HideShowState()).isValid(true):Get.put(HideShowState()).isValid(false);
+                                          //getDataFromNo(uidInput.text);
+
+                                        }
+                                        else{
+                                          Get.put(HideShowState()).isIconVisible(false);
+                                          setState(() {
+                                            validForm=(validForm>0)?validForm-1:validForm;
+                                          });
+                                          Get.put(HideShowState()).isValid(false);
+
+                                          // initCountry.text="";
+                                          //password.text="";
+                                        }
+                                        // print('Country changed to: ' + country.name);
+                                        // print('Country changed to: ' + country.dialCode);
+                                      },
+                                    ),
+                                    TextField(
+                                      controller: name,
+                                      decoration: const InputDecoration(
+                                        contentPadding: EdgeInsets.symmetric(vertical: 3, horizontal: 3),
+                                        border: OutlineInputBorder(),
+                                        labelText: 'Name',
+                                        hintText: 'Enter your name',
+                                        hintStyle: TextStyle(color: Colors.grey),
+                                      ),
+                                      onChanged: (value) {
+                                        final nameRegex = RegExp(r"^[a-zA-Z\s]{2,}$"); // letters and spaces, at least 2 characters
+
+                                        if (value.isNotEmpty && nameRegex.hasMatch(value)) {
+                                          validForm=(validForm<2)?validForm+1:validForm;
+                                          (validForm==2)?Get.put(HideShowState()).isValid(true):Get.put(HideShowState()).isValid(false);
+                                        } else {
+                                          setState(() {
+                                            validForm=(validForm>0)?validForm-1:validForm;
+                                          });
+                                          Get.put(HideShowState()).isValid(false);
+                                        }
+                                      },
+                                    ),
+
+                                  ],
+                                ):Visibility(
+                                    visible: false,
                                     child: Text("")
                                 ),
+                                const SizedBox(height: 5.0,),
+                                Obx(() => Get.put(HideShowState()).isNumberValid.value?
+                                FloatingActionButton.extended(
+                                    label: const Text('Pay By Cash'), // <-- Text
+                                    backgroundColor: Colors.black,
+                                    foregroundColor: Colors.white,
+                                    icon: const Icon( // <-- Icon
+                                      Icons.attach_money_rounded,
+                                      size: 24.0,
+                                    ),
+                                    onPressed: () =>{
+                                      //paidDebt()
+                                      //addUserMethod(),
+                                      // formReset(),
+                                      confirmCard(),
 
+                                    }):const Text("")),
 
                               ],
                             ),
-                          ),
-                          child: DropdownButtonHideUnderline(
-                            child: DropdownButton<Map<String, dynamic>>(
-                              isExpanded: true,
-                              hint: Text("Choose package"),
-                              value: selectedPackage,
-                              items: controller.package.map<DropdownMenuItem<Map<String, dynamic>>>((pkg) {
-                                return DropdownMenuItem(
-                                  value: pkg,
-                                  child: Text(pkg['name']),
-                                );
-                              }).toList(),
-                              onChanged: (value) {
-                                setState(() {
-                                  selpackages=value;
-                                  selectedPackage = value;
-                                  //controller.isHidden("0");
-                                });
-                                controller.isHidden(value!["packEligible"]);
-                                if(value["packEligible"]=="0")
-                                  {
-                                    setState(() {
-                                     inputAction="cashpayment";
-                                     //controller.isHidden("0");
-                                    });
-                                  }
-                                  else if(value["packEligible"]=="1"){
+                          );
 
-                                  setState(() {
-                                    inputAction="membership";
-                                   // controller.isHidden("1");
-
-                                  });
-                                   }
-                                  else{
-                                  setState(() {
-                                    inputAction="none";
-                                  });
-                                }
-                               // print(value!["id"]);
+                        },
+                      ),
 
 
-
-                              },
-                            ),
-                          ),
-                        ),
-                      );
-
-                    },
+                      // You can add more content below...
+                    ],
                   ),
-                  const SizedBox(height: 10),
-                  GetBuilder<ParticipatedQuery>(
-                    builder: (myLoadercontroller) {
-                      //return Text('Data: ${_controller.data}');
-
-                   return Container(
-                     padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-                     child: Column(
-                       children: [
-                         ((myLoadercontroller.isVisible=="1".obs) || (myLoadercontroller.isVisible=="4".obs))?
-                          SizedBox(
-                           width:400,
-                           height: 200,
-                           child: Stack(
-                             alignment:Alignment.bottomCenter,
-                             children: [
-                               QRView(key:qrkey1,onQRViewCreated: _onQRViewCreated,
-                                 overlay: QrScannerOverlayShape(
-                                   borderColor: Colors.pink,
-                                   borderRadius: 10,
-                                   borderLength: 30,
-                                   borderWidth: 10,
-                                   cutOutSize: 300,
-                                   // Add the laser effect
-
-                                 ),
-                               ),
-
-                               Row(
-                                 mainAxisAlignment: MainAxisAlignment.center,
-                                 children: [
-                                   Row(
-                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                     children: [
-
-                                       cameraSwitch(),
-                                       //SizedBox(width: 10.0,),
-
-                                       // SizedBox(width: 10.0,),
-                                       flashSwitch(),
-                                       Image.asset(
-                                         flashValue ? 'images/on.png' : 'images/off.png',
-                                         height: 30,
-                                       ),
-                                     ],
-                                   ),
-                                 ],
-                               ),
-
-                             ],
-                           ),
-                         ):Visibility(
-                             visible: false,
-                             child: Text("")
-                         ),
-                         ((myLoadercontroller.isVisible=="0".obs) || (myLoadercontroller.isVisible=="3".obs))?
-                         Column(
-                           children: [
-
-                             IntlPhoneField(
-                               initialCountryCode: 'CD',
-                               controller: uidInput,
-                               autofocus: true,
-
-                               decoration: InputDecoration(
-                                 labelText: 'Phone Number',
-                                 border: const OutlineInputBorder(
-                                   borderSide: BorderSide(),
-                                 ),
-                                 suffixIcon:Obx(() => Get.put(HideShowState()).visibleIcon.value?const Icon(Icons.done,color:Colors.green,):const Icon(Icons.dangerous,color:Colors.red,)),
-
-
-                               ),
-
-
-                               onChanged: (phone) async{
-
-                                 if((uidInput.text).isPhoneNumber)
-                                 {
-
-
-                                   // getDataFromNo(phone.number);
-                                   setState(() {
-                                     phoneNumber="${phone.countryCode}${phone.number}";
-                                     validForm=(validForm<2)?validForm+1:validForm;
-                                   });
-
-                                   Get.put(HideShowState()).isIconVisible(true);
-                                   (validForm==2)?Get.put(HideShowState()).isValid(true):Get.put(HideShowState()).isValid(false);
-
-                                 }
-                                 else{
-                                   setState(() {
-                                     validForm=(validForm>0)?validForm-1:validForm;
-                                   });
-                                   Get.put(HideShowState()).isValid(false);
-                                   Get.put(HideShowState()).isIconVisible(false);
-                                 }
-
-
-                                 //uidInput4.text=phone.countryCode;
-                                 //uidInput2.text=phone.number;
-                                 // uidInput2.text=phone.countryISOCode;
-                                 //print(phone.completeNumber);
-
-
-
-                               },
-
-                               onCountryChanged: (country) {
-
-                                 uidInput4.text="+${country.dialCode}";
-                                 uidInput5.text=country.name;
-                                 initCountry.text=country.code;
-
-                                 if((uidInput.text).isPhoneNumber)
-                                 {
-                                   Get.put(HideShowState()).isIconVisible(true);
-                                   //phoneNumber="+${country.dialCode}${uidInput.text}";
-                                   setState(() {
-                                     phoneNumber="+${country.dialCode}${uidInput.text}";
-                                     validForm=(validForm<2)?validForm+1:validForm;
-                                   });
-
-                                   (validForm==2)?Get.put(HideShowState()).isValid(true):Get.put(HideShowState()).isValid(false);
-                                   //getDataFromNo(uidInput.text);
-
-                                 }
-                                 else{
-                                   Get.put(HideShowState()).isIconVisible(false);
-                                   setState(() {
-                                     validForm=(validForm>0)?validForm-1:validForm;
-                                   });
-                                   Get.put(HideShowState()).isValid(false);
-
-                                   // initCountry.text="";
-                                   //password.text="";
-                                 }
-                                 // print('Country changed to: ' + country.name);
-                                 // print('Country changed to: ' + country.dialCode);
-                               },
-                             ),
-                             TextField(
-                               controller: name,
-                               decoration: const InputDecoration(
-                                 contentPadding: EdgeInsets.symmetric(vertical: 3, horizontal: 3),
-                                 border: OutlineInputBorder(),
-                                 labelText: 'Name',
-                                 hintText: 'Enter your name',
-                                 hintStyle: TextStyle(color: Colors.grey),
-                               ),
-                               onChanged: (value) {
-                                 final nameRegex = RegExp(r"^[a-zA-Z\s]{2,}$"); // letters and spaces, at least 2 characters
-
-                                 if (value.isNotEmpty && nameRegex.hasMatch(value)) {
-                                   validForm=(validForm<2)?validForm+1:validForm;
-                                   (validForm==2)?Get.put(HideShowState()).isValid(true):Get.put(HideShowState()).isValid(false);
-                                 } else {
-                                   setState(() {
-                                     validForm=(validForm>0)?validForm-1:validForm;
-                                   });
-                                   Get.put(HideShowState()).isValid(false);
-                                 }
-                               },
-                             ),
-
-                           ],
-                         ):Visibility(
-                             visible: false,
-                             child: Text("")
-                         ),
-                         const SizedBox(height: 5.0,),
-                         Obx(() => Get.put(HideShowState()).isNumberValid.value?
-                         FloatingActionButton.extended(
-                             label: const Text('Pay By Cash'), // <-- Text
-                             backgroundColor: Colors.black,
-                             foregroundColor: Colors.white,
-                             icon: const Icon( // <-- Icon
-                               Icons.attach_money_rounded,
-                               size: 24.0,
-                             ),
-                             onPressed: () =>{
-                               //paidDebt()
-                               //addUserMethod(),
-                               // formReset(),
-                              confirmCard(),
-
-                             }):const Text("")),
-
-                       ],
-                     ),
-                   );
-
-                    },
-                  ),
-
-
-                  // You can add more content below...
-                ],
+                ),
               ),
-            ),
+              Positioned.fill(
+                  child:  Obx(
+                        () =>Visibility(
+                      visible: Get.put(HideShowState()).isVisible.value,
+                      child: Container(
+                        color: Colors.black.withValues(alpha:0.65),
+                      ),
+                    ),
+                  )
+              ),
+
+              Positioned(
+                  top: 0,
+
+                  child:  Obx(
+                        () =>Visibility(
+                      visible: Get.put(HideShowState()).isVisible.value,
+                      child: CircularProgressIndicator(),
+                    ),
+                  )
+              ),
+            ],
           );
         },
       ),

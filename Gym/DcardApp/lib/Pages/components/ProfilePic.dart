@@ -3,7 +3,11 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../Query/CardQuery.dart';
+import 'package:qr_code_scanner/qr_code_scanner.dart';
 class ProfilePic extends GetxController{
+  final GlobalKey qrkey = GlobalKey(debugLabel: 'QR');
+
+
   Widget profile(){
     return Column(
 
@@ -18,7 +22,20 @@ class ProfilePic extends GetxController{
         SizedBox(height:6.0),
 
         Text("${(Get.put(CardQuery()).obj)["resultData"]["UserDetail"]["name"]??'none'}",style:GoogleFonts.pacifico(fontSize: 18,color: Colors.teal,fontWeight:FontWeight.w100),),
-        Text("${(Get.put(CardQuery()).obj)["resultData"]["UserDetail"]["packName"]??'none'}",style:GoogleFonts.pacifico(fontSize: 18,color: Colors.blue,fontWeight:FontWeight.w100),),
+        Row(
+          mainAxisSize: MainAxisSize.min, // keeps text+icon close
+          children: [
+            Text("${(Get.put(CardQuery()).obj)["resultData"]["UserDetail"]["packName"]??'none'}",style:GoogleFonts.pacifico(fontSize: 18,color: Colors.blue,fontWeight:FontWeight.w100),),
+
+            const SizedBox(width: 8), // spacing between text and icon
+            IconButton(
+              onPressed: () {
+                // your QR scanner action here
+              },
+              icon: const Icon(Icons.qr_code_scanner, size: 24),
+            ),
+          ],
+        ),
 
         SizedBox(height:3.0),
         //Text("Eric Ford",style: TextStyle(color: Colors.teal,fontSize:18,fontWeight:FontWeight.w500,fontStyle: FontStyle.normal),),

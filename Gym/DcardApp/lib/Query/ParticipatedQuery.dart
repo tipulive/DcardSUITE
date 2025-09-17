@@ -896,7 +896,8 @@ getPreviousPriceOnline(Topups topupData,BonusModel bonusData)async{
         "inputAction":"viewallpackage",
         "LimitStart":topupData.endlimit,  //page
         "LimitEnd":topupData.startlimit,//limit
-        "name":userData.name??'none'
+        "name":userData.name??'none',
+        "app_vers":AppInfo.version
 
         //"options": [1,2,3],
       };

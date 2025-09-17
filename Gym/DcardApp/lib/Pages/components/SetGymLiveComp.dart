@@ -15,6 +15,7 @@ import '../../models/Topups.dart';
 import '../../models/Participated.dart';
 import '../../models/Promotions.dart';
 import '../../Utilconfig/ConstantClassUtil.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SetGymLiveComp extends StatefulWidget {
   const SetGymLiveComp({super.key});
@@ -691,10 +692,20 @@ class _SetGymLiveCompState extends State<SetGymLiveComp> {
                 style: ElevatedButton.styleFrom(
 
                   //primary: Colors.grey[300],
-                  backgroundColor: const Color(0xff9a1c55),
-                  foregroundColor:Colors.white,
+                  backgroundColor: Color(0xff9a1c55),
+                  foregroundColor: Colors.white,
                   elevation:0,
                 ),
+                onPressed: () async{
+                  final Uri urlData = Uri.parse(resultData["downNew"]);
+                  if (!await launchUrl(urlData)) {
+                    throw Exception('Could not launch $urlData');
+                  }
+                },
+                child: Text('Update'),
+              ),
+              ElevatedButton(
+
                 onPressed: () async{
 
 

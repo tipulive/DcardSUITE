@@ -15,6 +15,7 @@ import '../../models/Topups.dart';
 import '../ActiveEventPage.dart';
 import'../../Pages/components/ProfilePic.dart';
 
+
 class ProfileComp extends StatefulWidget {
   const ProfileComp({super.key});
 
@@ -29,6 +30,8 @@ class _ProfileCompState extends State<ProfileComp> {
   bool showOveray=false;
 
   var resultDatas;
+
+
   @override
   Widget build(BuildContext context) {
     return Stack(
