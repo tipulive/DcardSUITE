@@ -65,6 +65,7 @@ dependencies:
   #camera: ^0.10.5+9
   cached_network_image: ^3.0.0
   flutter_cache_manager: ^3.3.2
+  dio_cache_interceptor: ^4.0.3
 
 dev_dependencies:
   flutter_test:

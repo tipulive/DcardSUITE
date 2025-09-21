@@ -17,6 +17,7 @@ import 'AdminQuery.dart';
 
 import '../DatabaseHelper.dart';
 import '../Utilconfig/ConstantClassUtil.dart';
+import '../Utilconfig/client.dart';
 import '../Utilconfig/AppInfo.dart';
 
 class ParticipatedQuery extends GetxController{
@@ -971,48 +972,38 @@ getPreviousPriceOnline(Topups topupData,BonusModel bonusData)async{
     }
   }
 
+
   participantGetPayment(Topups topupData) async{
-    try {
+    String Authtoken =(adminStateData.obj)["result"][0]["AuthToken"];
+    final api = ApiClient(Authtoken);
+    final stopwatch = Stopwatch()..start();
+    final response = await api.getData("/payment", params:
+    {
+      "inputAction":"getmembership",
+      "advancedSearch":topupData.advancedSearch,
+      "searchOption":topupData.optionCase,
+      "uidUser":"kebineericMuna_1676390572",
+      "userStatus":"member",
+      "commentData":"Option",
+      "app_vers":AppInfo.version,
+      "LimitStart":topupData.endlimit,  //page
+      "LimitEnd":topupData.startlimit,//limit
+      "name":topupData.name??'none',
+      "thisDate":topupData.created_at,
+      "toDate":topupData.updated_at??'none'
 
-      var params =  {
-        //"kebineericMuna_1668935593",
-        "inputAction":"getmembership",
-       "advancedSearch":topupData.advancedSearch,
-       "searchOption":topupData.optionCase,
-       "uidUser":"kebineericMuna_1676390572",
-       "userStatus":"member",
-        "commentData":"Option",
-        "app_vers":AppInfo.version,
-        "LimitStart":topupData.endlimit,  //page
-        "LimitEnd":topupData.startlimit,//limit
-        "name":topupData.name??'none',
-        "thisDate":topupData.created_at,
-        "toDate":topupData.updated_at??'none'
-
-        //"options": [1,2,3],
-      };
-//print(params);
-      String Authtoken =(adminStateData.obj)["result"][0]["AuthToken"];
-      var url="${ConstantClassUtil.urlLink}/payment";
-      var response = await Dio().get(url,
-        options: Options(headers: {
-          HttpHeaders.contentTypeHeader: "application/json",
-          HttpHeaders.authorizationHeader:"Bearer $Authtoken"
-        }),
-        queryParameters: params,
-      );
-      if (response.statusCode == 200) {
-
-        //updateParticipateHistState(response.data);
-        return response;
+      //"options": [1,2,3],
+    }
+    );
+    if (response.statusCode == 200) {
+      print("Response time: ${stopwatch.elapsedMilliseconds} ms");
+      //updateParticipateHistState(response.data);
+      return response;
 
 
-      } else {
-        return false;
-        //print(false);
-      }
-    } catch (e) {
-      //return false;
+    } else {
+      return false;
+      //print(false);
     }
   }
   participantPayment(Participated participateddata,User userData) async{
@@ -1045,7 +1036,6 @@ getPreviousPriceOnline(Topups topupData,BonusModel bonusData)async{
 
         // updateParticipateState(response.data);
         return response;
-          print(response);
 
 
       } else {
