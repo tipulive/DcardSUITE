@@ -38,7 +38,7 @@ class _SetPaymentCompState extends State<SetPaymentComp> {
   final args = Get.arguments;
 
   var resultDatas;
-
+  final hideController = Get.put(HideShowState());
   String advancedSearch = "today";
   String viewTitle = "Today";
   String selectOption = "Name";
@@ -137,10 +137,11 @@ class _SetPaymentCompState extends State<SetPaymentComp> {
             child: ListTile(
               leading: InkWell(
                 onTap:() async {
-             //show package
-                  (Get.put(HideShowState()).isHiden(true));
+                  //show package
+                  //(Get.put(HideShowState()).isHiden(false));
+                  hideController.isHiden(true);
                   await fetchPackages();
-              },
+                },
                 child: CircleAvatar(
                   backgroundColor: Colors.redAccent,
                   foregroundColor: Colors.white,
@@ -158,11 +159,11 @@ class _SetPaymentCompState extends State<SetPaymentComp> {
 
                         Column(
                           children: [
-                          Center(
-                            child: Text(viewTitle, style: GoogleFonts.abel(fontSize: 11,
-                                color: Colors.red,
-                                fontWeight: FontWeight.w700)),
-                          ),
+                            Center(
+                              child: Text(viewTitle, style: GoogleFonts.abel(fontSize: 11,
+                                  color: Colors.red,
+                                  fontWeight: FontWeight.w700)),
+                            ),
                             Center(
                               child: RichText(
                                 text: TextSpan(
@@ -363,10 +364,10 @@ class _SetPaymentCompState extends State<SetPaymentComp> {
                         onTap: () async {
                           setState(() {
 
-                              advancedSearch="year";
-                              viewTitle="This Year";
-                            });
-                            await viewData('test',"false");
+                            advancedSearch="year";
+                            viewTitle="This Year";
+                          });
+                          await viewData('test',"false");
                           final DateTime? datetime = await showDatePicker(
                               context: context,
                               initialDate: selectedDate,
@@ -417,10 +418,10 @@ class _SetPaymentCompState extends State<SetPaymentComp> {
                         onTap: () async {
                           setState(() {
 
-                              advancedSearch="year";
-                              viewTitle="This Year";
-                            });
-                            await viewData('test',"false");
+                            advancedSearch="year";
+                            viewTitle="This Year";
+                          });
+                          await viewData('test',"false");
                           final DateTimeRange? datetimeRange = await showDateRangePicker(
                               context: context,
                               firstDate: DateTime(2024),
@@ -550,7 +551,8 @@ class _SetPaymentCompState extends State<SetPaymentComp> {
             itemBuilder: (context, index) {
               if (index < _data.length) {
                 return GestureDetector(
-                    onTap: () {
+                    onTap: () async{
+                      await viewUser(_data[index]);
                       // Handle card click event here
                       //Get.put(HideShowState()).isVisible(true);
                       //fetchPackages(_data[index]);
@@ -676,7 +678,7 @@ class _SetPaymentCompState extends State<SetPaymentComp> {
   }
   void _onQRViewCreated(QRViewController controller)
   {
-    (Get.put(HideShowState()).isHiden(true));
+    //(Get.put(HideShowState()).isHiden(true));
 
 
     this.controller=controller;
@@ -694,7 +696,7 @@ class _SetPaymentCompState extends State<SetPaymentComp> {
         });
         (Get.put(HideShowState()).isHiden(false));
         confirmCard();
-         controller.pauseCamera();
+        controller.pauseCamera();
 
 
 
@@ -705,6 +707,90 @@ class _SetPaymentCompState extends State<SetPaymentComp> {
 
 
 
+  }
+  viewUser(data){
+    Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.all(16),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Card(
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    height: 4,
+                    width: 40,
+                    margin: const EdgeInsets.only(bottom: 16),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[400],
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.person, color: Colors.blue),
+                  title: Text(ConstantClassUtil().capitalize(data["name"]),
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold)),
+                  subtitle: const Text("Name"),
+                ),
+                const Divider(),
+                ListTile(
+                  leading: const Icon(Icons.phone, color: Colors.green),
+                  title: Text(ConstantClassUtil().extractAfterUnderscore(data["PhoneNumber"]),
+                      style: const TextStyle(fontSize: 16)),
+                  subtitle: const Text("Phone"),
+                ),
+                ((data["packName"] != "") && (data["packName"] != "none"))
+                    ? Column(
+                  children: [
+                    const Divider(),
+                    ListTile(
+                      leading: const Icon(Icons.backpack, color: Colors.green),
+                      title: Text(
+                        "${ConstantClassUtil().capitalize(data["packName"])} (${data["packValid"]} days)",
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                      subtitle: const Text("Pack"),
+                    ),
+                  ],
+                )
+                    : const SizedBox.shrink(),
+                const Divider(),
+                ListTile(
+                  leading:
+                  const Icon(Icons.monetization_on, color: Colors.orange),
+                  title: Text("${data["packPrice"]}",
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold)),
+                  subtitle: const Text("Price"),
+                ),
+                const SizedBox(height: 10),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: ElevatedButton(
+                    onPressed: () => Get.back(),
+                    child: const Text("Close"),
+                  ),
+                )
+              ],
+            ),
+          ),
+        ),
+      ),
+      isScrollControlled: true,
+    );
   }
   confirmCard(){
     // ${(Get.put(HideShowState()).delivery)[Get.put(HideShowState()).indexCountData]["currentQty"]}
@@ -810,7 +896,7 @@ class _SetPaymentCompState extends State<SetPaymentComp> {
 
   }
   Future<void> fetchPackages() async {
- //loader is needed here
+    //loader is needed here
 
     final response = (await ParticipatedQuery().getAllPackage(
         Topups(startlimit: 1, endlimit: _page),
@@ -1196,8 +1282,11 @@ class _SetPaymentCompState extends State<SetPaymentComp> {
                                       selpackages=value;
                                       selectedPackage = value;
                                       //controller.isHidden("0");
+
                                     });
+
                                     controller.isHidden(value!["packEligible"]);
+
                                     if(value["packEligible"]=="0")
                                     {
                                       setState(() {
@@ -1209,6 +1298,7 @@ class _SetPaymentCompState extends State<SetPaymentComp> {
 
                                       setState(() {
                                         inputAction="membership";
+                                        hideController.isHiden(false);
                                         // controller.isHidden("1");
 
                                       });
@@ -1444,12 +1534,14 @@ class _SetPaymentCompState extends State<SetPaymentComp> {
                   )
               ),
 
+
+
               Positioned(
                   top: 0,
 
                   child:  Obx(
                         () =>Visibility(
-                      visible: Get.put(HideShowState()).isVisible.value,
+                      visible: hideController.isVisible.value,
                       child: CircularProgressIndicator(),
                     ),
                   )
@@ -1461,8 +1553,8 @@ class _SetPaymentCompState extends State<SetPaymentComp> {
     ).whenComplete(() {
       setState(() {
 
-name.text="";
-uidInput.text="";
+        name.text="";
+        uidInput.text="";
       });
       Get.put(HideShowState()).isValid(false);
       Get.put(HideShowState()).isIconVisible(false);

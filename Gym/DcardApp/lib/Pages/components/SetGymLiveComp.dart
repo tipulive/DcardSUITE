@@ -12,8 +12,6 @@ import '../../Query/ParticipatedQuery.dart';
 
 import '../../Utilconfig/HideShowState.dart';
 import '../../models/Topups.dart';
-import '../../models/Participated.dart';
-import '../../models/Promotions.dart';
 import '../../Utilconfig/ConstantClassUtil.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -507,7 +505,7 @@ class _SetGymLiveCompState extends State<SetGymLiveComp> {
                       // Handle card click event here
                       //Get.put(HideShowState()).isVisible(true);
 
-                      editParticipatePopup(_data[index]);
+                      viewUser(_data[index]);
                     },
                     child:Card(
                       elevation:0,
@@ -729,142 +727,81 @@ class _SetGymLiveCompState extends State<SetGymLiveComp> {
 
   //popup
 
-  editParticipatePopup(data){
-
+  viewUser(data){
     Get.bottomSheet(
-      StatefulBuilder(
-        builder: (BuildContext context, StateSetter setState) {
-          return
-
-            Stack(
-              alignment: Alignment.bottomCenter,
+      Container(
+        padding: const EdgeInsets.all(16),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Card(
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(
-                  height:200,
-
-                  child: Column(
-                    children: [
-                      Container(
-
-                        height: 200,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(16),
-                            topRight: Radius.circular(16),
-                          ),
-                        ),
-                        child: ListView(
-                          padding: EdgeInsets.all(10),
-                          children: [
-                            Center(child: Text(data["name"])),
-                            Center(child: Text("Promotion:${data["promoName"]}")),
-                            TextField(
-                              controller:inputData,
-                              keyboardType: TextInputType.number,
-
-                              decoration: InputDecoration(
-                                contentPadding: const EdgeInsets.symmetric(vertical: 3,horizontal: 3),
-                                border: OutlineInputBorder(),
-                                labelText: 'Enter Value',
-                                hintText: 'Enter Value',
-                                hintStyle: TextStyle(
-                                  color: Colors.grey,
-                                ),
-
-                              ),
-                            ),
-                            SizedBox(height: 10.0,),
-                            SizedBox(height: 10.0,),
-                            Center(
-                              child: FloatingActionButton.extended(
-                                label: Text('Edit'), // <-- Text
-                                backgroundColor: Color(0xff010a0e),
-                                icon: Icon( // <-- Icon
-                                  Icons.redeem,
-                                  size: 24.0,
-                                ),
-                                onPressed: () async=> {
-
-
-                                  Get.put(HideShowState()).isVisible(true),
-                                  resultDatas=(await ParticipatedQuery().ParticipateEditEventOnline(Participated(uid:data["uid"],uidUser:data["uidUser"],inputData:inputData.text),Promotions(reach:data["reach"],gain:data["gain"]))).data,
-                                  if(resultDatas["status"])
-                                    {
-                                      Get.put(HideShowState()).isVisible(false),
-                                      Get.snackbar("Success", "Successfully Edited ",backgroundColor: Color(0xff9a1c55),
-                                          colorText: Color(0xffffffff),
-                                          titleText: const Text("Events",style:TextStyle(color:Color(
-                                              0xffffffff),fontSize:18,fontWeight:FontWeight.w500,fontStyle: FontStyle.normal),),
-
-                                          icon: Icon(Icons.access_alarm),
-                                          duration: Duration(seconds: 4)),
-
-
-                                    }else{
-                                    Get.put(HideShowState()).isVisible(false),
-
-                                    Get.snackbar("Error", "something wrong",backgroundColor: Color(
-                                        0xffdc2323),
-                                        colorText: Color(0xffffffff),
-                                        titleText: const Text("Events",style:TextStyle(color:Color(
-                                            0xffffffff),fontSize:18,fontWeight:FontWeight.w500,fontStyle: FontStyle.normal),),
-
-                                        icon: Icon(Icons.access_alarm),
-                                        duration: Duration(seconds: 4))
-                                  }
-
-
-                                },
-
-
-
-
-                              ),
-                            ),
-
-
-
-                            //MyTextWidget(uid,name)
-                          ],
-                        ),
-                      ),
-                    ],
+                Center(
+                  child: Container(
+                    height: 4,
+                    width: 40,
+                    margin: const EdgeInsets.only(bottom: 16),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[400],
+                      borderRadius: BorderRadius.circular(2),
+                    ),
                   ),
                 ),
-
-
-
-
-                Positioned.fill(
-                    child:  Obx(
-                          () =>Visibility(
-                        visible: Get.put(HideShowState()).isVisible.value,
-                        child: Container(
-                          color: Colors.black.withValues(alpha:0.65),
-                        ),
-                      ),
-                    )
+                ListTile(
+                  leading: const Icon(Icons.person, color: Colors.blue),
+                  title: Text(ConstantClassUtil().capitalize(data["name"]),
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold)),
+                  subtitle: const Text("Name"),
                 ),
-
-                Positioned(
-                    top: 0,
-
-                    child:  Obx(
-                          () =>Visibility(
-                        visible: Get.put(HideShowState()).isVisible.value,
-                        child: CircularProgressIndicator(),
-                      ),
-                    )
+                const Divider(),
+                ListTile(
+                  leading: const Icon(Icons.phone, color: Colors.green),
+                  title: Text(ConstantClassUtil().extractAfterUnderscore(data["PhoneNumber"]),
+                      style: const TextStyle(fontSize: 16)),
+                  subtitle: const Text("Phone"),
                 ),
+                ((data["packName"] != "") && (data["packName"] != "none"))
+                    ? Column(
+                  children: [
+                    const Divider(),
+                    ListTile(
+                      leading: const Icon(Icons.backpack, color: Colors.green),
+                      title: Text(
+                        "${ConstantClassUtil().capitalize(data["packName"])} (${data["packValid"]} days)",
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                      subtitle: const Text("Pack"),
+                    ),
+                  ],
+                )
+                    : const SizedBox.shrink(),
+
+                const SizedBox(height: 10),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: ElevatedButton(
+                    onPressed: () => Get.back(),
+                    child: const Text("Close"),
+                  ),
+                )
               ],
-            );
-        },
+            ),
+          ),
+        ),
       ),
-    ).whenComplete(() {
-
-      //do whatever you want after closing the bottom sheet
-    });
+      isScrollControlled: true,
+    );
   }
 //popup
 }

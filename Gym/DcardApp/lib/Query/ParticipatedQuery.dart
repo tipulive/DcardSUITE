@@ -1006,6 +1006,77 @@ getPreviousPriceOnline(Topups topupData,BonusModel bonusData)async{
       //print(false);
     }
   }
+  getAllParticipatePackage(User userData) async{//reached
+    try {
+
+      var params =  {
+        //"kebineericMuna_1668935593",
+        "inputAction":"view_user_in_package",
+        "userId":userData.uid
+
+        //"options": [1,2,3],
+      };
+
+      String Authtoken =(adminStateData.obj)["result"][0]["AuthToken"];
+      var url="${ConstantClassUtil.urlLink}/package";
+      var response = await Dio().get(url,
+        options: Options(headers: {
+          HttpHeaders.contentTypeHeader: "application/json",
+          HttpHeaders.authorizationHeader:"Bearer $Authtoken"
+        }),
+        queryParameters: params,
+      );
+      if (response.statusCode == 200) {
+
+        //updateParticipateHistState(response.data);
+        return response;
+
+
+      } else {
+        return false;
+        //print(false);
+      }
+    } catch (e) {
+      //return false;
+    }
+  }
+  participantInPackage(Participated participateddata,User userData) async{
+// cash Payment or Card Payment
+    try {
+
+      var params =  {
+        "inputAction":"add_user_in_package",
+        "packUid":participateddata.uid,//package uid
+        "carduid":participateddata.carduid,
+        "app_vers":AppInfo.version,
+        "userId":userData.uid
+        //"options": [1,2,3],
+      };
+      String Authtoken =(adminStateData.obj)["result"][0]["AuthToken"];
+
+      var url="${ConstantClassUtil.urlLink}/package";
+      var response = await Dio().post(url,
+        options: Options(headers: {
+          HttpHeaders.contentTypeHeader: "application/json",
+          HttpHeaders.authorizationHeader:"Bearer $Authtoken"
+        }),
+        data: jsonEncode(params),
+      );
+      if (response.statusCode == 200) {
+
+        // updateParticipateState(response.data);
+        return response;
+
+
+      } else {
+        return false;
+        //print(false);
+      }
+    } catch (e) {
+      //return false;
+    }
+
+  }
   participantPayment(Participated participateddata,User userData) async{
 // cash Payment or Card Payment
     try {

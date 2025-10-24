@@ -12,7 +12,7 @@ class ConstantClassUtil extends GetxController
   //static final urlLink="https://card.appdev.live/api"; //production Link
 
 
-  //static final urlApp="https://62e7c0bdaec4.ngrok-free.app";
+  //static final urlApp="https://9167fd049492.ngrok-free.app";
   static final urlApp="https://thedo.yegob.com";
   static final urlLink="$urlApp/api";
   //static final urlLink="https://thedo.yegob.com/api";
@@ -28,6 +28,16 @@ class ConstantClassUtil extends GetxController
     formatted.value=formatter.format(now);
     return formatted;
     //update();
+  }
+  String extractAfterUnderscore(String input) {
+    if (input.contains("_")) {
+      return input.split("_").last;
+    }
+    return input; // return original if no underscore found
+  }
+  String capitalize(String name) {
+    if (name.isEmpty) return name;
+    return name[0].toUpperCase() + name.substring(1).toLowerCase();
   }
   String formatMinutes(int totalMinutes) {
     if (totalMinutes < 60) {

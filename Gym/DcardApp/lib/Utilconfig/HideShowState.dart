@@ -21,7 +21,7 @@ class HideShowState extends GetxController{
   isCameraHiden(valData){
     isCameraVisible.value=valData;
   }
-  isValid(valData){
+  isValid(bool valData){
     isNumberValid.value=valData;
   }
   isNumberCorrect(valData){

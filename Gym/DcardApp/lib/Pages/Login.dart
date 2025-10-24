@@ -12,6 +12,7 @@ import '../Query/AdminQuery.dart';
 import '../Utilconfig/HideShowState.dart';
 import '../models/Admin.dart';
 import '../Utilconfig/ConstantClassUtil.dart';
+import '../Utilconfig/RPSCustomPainter.dart';
 import 'Homepage.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 
@@ -35,152 +36,171 @@ class _LoginState extends State<Login> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
         appBar: AppBar(
           title: Center(child: Text('Login')),
         ),
         body: Stack(
           children: [
-            Center(
-              child: ListView(
-                shrinkWrap: true,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Container(
-                        padding: const EdgeInsets.fromLTRB(20, 20, 20, 70),
-                        child: Image.asset(
-                          'images/playstore.png',
-                          width: 80,
-                          height: 80,
-                        ),
-                      ),
 
 
+            Column(
 
+              children: [
+                Row(
 
-
-                    //
-
-
-
-    Container(
-                        padding: const EdgeInsets.fromLTRB(20, 5, 20, 0),
-                        child: IntlPhoneField(
-                          controller: uidInput,
-                          initialCountryCode: 'RW',
-                          decoration: InputDecoration(
-                            labelText: 'Phone Number',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(5.0),
-                            ),
-                            //suffixIcon:Obx(() => Get.put(HideShowState()).isNumberValid.value?Icon(Icons.done,color:Colors.green,):Icon(Icons.dangerous,color:Colors.red,)),
-                            suffixIcon:isValid?Icon(Icons.done,color:Colors.green,):Icon(Icons.dangerous,color:Colors.red,)
-
-                          ),
-                          onChanged: (phone) {
-
-                            if((uidInput.text).isPhoneNumber)
-                            {
-                             // Get.put(HideShowState()).isValid(true);
-                              setState(() {
-                                isValid=true;
-                              });
-
-
-                            }
-                            else{
-                             // Get.put(HideShowState()).isValid(false);
-
-                              setState(() {
-                                isValid=false;
-                              });
-                              // print("not empty");
-                            }
-                          },
-                          onCountryChanged: (country) {
-
-
-                            uidInput2.text="+${country.dialCode}";
-                            if((uidInput.text).isPhoneNumber)
-                            {
-                              //Get.put(HideShowState()).isValid(true);
-                              setState(() {
-                                isValid=true;
-                              });
-                            }
-                            else{
-                             // Get.put(HideShowState()).isValid(false);
-                              setState(() {
-                                isValid=false;
-                              });
-                            }
-                          },
-                        ),
-                      ),
-                      Visibility(
-                        visible: false,
-                        child: TextField(
-                          controller: uidInput2,
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(90.0),
-                            ),
-                            labelText: 'Ccode',
-                          ),
-                        ),
-                      ),
-
-                      Container(
-                        padding: const EdgeInsets.fromLTRB(20, 5, 20, 0),
-                        child: TextField(
-                          controller: uidInput3,
-                          obscureText: true,
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(5.0),
-                            ),
-                            labelText: 'Password',
-                          ),
-                        ),
-                      ),
-                    Visibility(
-                      visible:isValid,
-                      child: Container(
-                          height: 80,
-                          padding: const EdgeInsets.all(20),
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              minimumSize: const Size.fromHeight(50),
-                            ),
-                            child: const Text('Log In'),
-                            onPressed: () async{
-                              //print(uidInput.text);
-                              //print(await loginOnline());
-                              await loginOnline();
-                              // Get.to(() =>Aboutpage());
-                            },
-                          )),
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CustomPaint(
+                      size: Size(200, 280),
+                      painter:RPSCustomPainter(),
                     ),
+                  ],
+                ),
+                Center(
+                  child: ListView(
+                    shrinkWrap: true,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Container(
+                            padding: const EdgeInsets.fromLTRB(20, 20, 20, 70),
+                            child: Image.asset(
+                              'images/playstore.png',
+                              width: 80,
+                              height: 80,
+                            ),
+                          ),
 
 
-                      TextButton(
-                        onPressed: () {
-                        },
-                        child: Text(
-                          'Forgot Password?',
-                          style: TextStyle(color: Colors.grey[600]),
+
+
+
+                        //
+
+
+
+                    Container(
+                            padding: const EdgeInsets.fromLTRB(20, 5, 20, 0),
+                            child: IntlPhoneField(
+                              controller: uidInput,
+                              initialCountryCode: 'RW',
+                              decoration: InputDecoration(
+                                labelText: 'Phone Number',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(5.0),
+                                ),
+                                //suffixIcon:Obx(() => Get.put(HideShowState()).isNumberValid.value?Icon(Icons.done,color:Colors.green,):Icon(Icons.dangerous,color:Colors.red,)),
+                                suffixIcon:isValid?Icon(Icons.done,color:Colors.green,):Icon(Icons.dangerous,color:Colors.red,)
+
+                              ),
+                              onChanged: (phone) {
+
+                                if((uidInput.text).isPhoneNumber)
+                                {
+                                 // Get.put(HideShowState()).isValid(true);
+                                  setState(() {
+                                    isValid=true;
+                                  });
+
+
+                                }
+                                else{
+                                 // Get.put(HideShowState()).isValid(false);
+
+                                  setState(() {
+                                    isValid=false;
+                                  });
+                                  // print("not empty");
+                                }
+                              },
+                              onCountryChanged: (country) {
+
+
+                                uidInput2.text="+${country.dialCode}";
+                                if((uidInput.text).isPhoneNumber)
+                                {
+                                  //Get.put(HideShowState()).isValid(true);
+                                  setState(() {
+                                    isValid=true;
+                                  });
+                                }
+                                else{
+                                 // Get.put(HideShowState()).isValid(false);
+                                  setState(() {
+                                    isValid=false;
+                                  });
+                                }
+                              },
+                            ),
+                          ),
+                          Visibility(
+                            visible: false,
+                            child: TextField(
+                              controller: uidInput2,
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(90.0),
+                                ),
+                                labelText: 'Ccode',
+                              ),
+                            ),
+                          ),
+
+                          Container(
+                            padding: const EdgeInsets.fromLTRB(20, 5, 20, 0),
+                            child: TextField(
+                              controller: uidInput3,
+                              obscureText: true,
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(5.0),
+                                ),
+                                labelText: 'Password',
+                              ),
+                            ),
+                          ),
+                        Visibility(
+                          visible:isValid,
+                          child: Container(
+                              height: 80,
+                              padding: const EdgeInsets.all(20),
+                              child: ElevatedButton(
+
+                                style: ElevatedButton.styleFrom(
+                                  minimumSize: const Size.fromHeight(50),
+                                ),
+                                child: const Text('Log In'),
+                                onPressed: () async{
+                                  //print(uidInput.text);
+                                  //print(await loginOnline());
+                                  await loginOnline();
+                                  // Get.to(() =>Aboutpage());
+                                },
+                              )),
                         ),
+
+
+                          TextButton(
+                            onPressed: () {
+                            },
+                            child: Text(
+                              'Forgot Password?',
+                              style: TextStyle(color: Colors.grey[600]),
+                            ),
+                          ),
+
+
+
+                        ],
                       ),
-
-
-
                     ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
             if(showOveray)
             Positioned.fill(
